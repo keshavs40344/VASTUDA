@@ -1,5 +1,5 @@
-// VASTUDA SaaS - Cloud Ingress & Railway Integration
-const API_BASE_URL = "https://web-production-2ac2a.up.railway.app";
+// VASTUDA SaaS - Cloud Ingress & PythonAnywhere Integration
+const API_BASE_URL = "https://keshavs40344.pythonanywhere.com";
 window.API_BASE_URL = API_BASE_URL;
 window.SOVEREIGN_API_BASE = API_BASE_URL;
 window.CLOUDFLARE_WORKER_URL = "https://vastuda.keshavkumarthakur00007.workers.dev";
@@ -20,15 +20,17 @@ async function checkBackend() {
   try {
     const res = await fetch(`${API_BASE_URL}/api/status`);
     const data = await res.json();
-    console.log("Connected to Live Railway Backend:", data);
+    console.log("Connected to Backend:", data);
     return data;
   } catch (err) {
-    console.warn("Railway Backend ping pending:", err);
+    console.error("Backend fetch error:", err);
     return null;
   }
 }
 
 window.checkBackend = checkBackend;
+
+// Run on page load
 document.addEventListener("DOMContentLoaded", () => {
-  checkBackend().catch(() => {});
+  checkBackend();
 });
