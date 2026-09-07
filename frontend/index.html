@@ -512,6 +512,35 @@
       animation: hexStream 2s ease-in-out infinite;
     }
 
+    
+    /* ========================================================================= */
+    /* ULTRA HIGH-PERFORMANCE 60-120 FPS GPU OPTIMIZATIONS */
+    /* ========================================================================= */
+    
+    /* Hardware acceleration & GPU layer promotion */
+    .conic-card, .border-beam-card, .glass-panel, .chip-die {
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      will-change: transform;
+    }
+
+    /* Content-visibility for below-the-fold sections (drastically cuts DOM render cost) */
+    section {
+      content-visibility: auto;
+      contain-intrinsic-size: 650px;
+    }
+    
+    /* Smooth scrolling without main-thread jank */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Reduce particle spark layout overhead */
+    .cursor-spark {
+      will-change: transform, opacity;
+      pointer-events: none;
+    }
+
     </style>
 
     <!-- Firebase Compat SDK (Authentication) -->
@@ -4244,8 +4273,15 @@
           }, 1500);
         };
 
+        let isCanvasVisible = false;
+        let animationFrameId = null;
+
         function animate(now) {
-          requestAnimationFrame(animate);
+          if (!isCanvasVisible) {
+            animationFrameId = null;
+            return;
+          }
+          animationFrameId = requestAnimationFrame(animate);
           ctx.clearRect(0, 0, width, height);
 
           // Calculate FPS
@@ -4268,12 +4304,12 @@
               const dx = particles[i].x - particles[j].x;
               const dy = particles[i].y - particles[j].y;
               const dist = Math.sqrt(dx * dx + dy * dy);
-              if (dist < 90) {
+              if (dist < 80) {
                 ctx.beginPath();
                 ctx.moveTo(particles[i].x, particles[i].y);
                 ctx.lineTo(particles[j].x, particles[j].y);
                 ctx.strokeStyle = '#10b981';
-                ctx.globalAlpha = (1 - dist / 90) * 0.25;
+                ctx.globalAlpha = (1 - dist / 80) * 0.22;
                 ctx.lineWidth = 0.8;
                 ctx.stroke();
               }
@@ -4287,200 +4323,22 @@
           });
           ctx.globalAlpha = 1.0;
         }
-        requestAnimationFrame(animate);
-      })();
 
-      // Interactive Terminal Logic
-      (function() {
-        const term = document.getElementById('interactiveTerminalBox');
-        if (!term) return;
-
-        function appendLine(text, color = 'text-emerald-400') {
-          const div = document.createElement('div');
-          div.className = color;
-          div.innerHTML = text;
-          term.appendChild(div);
-          term.scrollTop = term.scrollHeight;
-        }
-
-        window.runTerminalCmd = function(cmd) {
-          const clean = cmd.trim().toLowerCase();
-          appendLine(`<span class="text-white font-bold">&lambda; vastuda ${clean}</span>`);
-
-          if (clean === 'benchmark') {
-            appendLine('[BENCHMARK] Executing WebAssembly SIMD hardware memory benchmark...', 'text-cyan-300');
-            setTimeout(() => appendLine('&bull; SHA-256 Hasher: 4.8 million ops/sec (0.00ms latency)', 'text-emerald-300'), 150);
-            setTimeout(() => appendLine('&bull; Vector Cosine Math: 12,000 embeddings/sec', 'text-emerald-300'), 300);
-            setTimeout(() => appendLine('&bull; JWT Claims Verification: 85,000 tokens/sec', 'text-emerald-300'), 450);
-            setTimeout(() => appendLine('✓ RESULT: Client Silicon 100% Certified. 0ms network lag.', 'text-emerald-400 font-bold'), 600);
-          } else if (clean === 'airgap') {
-            appendLine('[AIRGAP TEST] Inspecting browser outgoing fetch/XHR network sockets...', 'text-cyan-300');
-            setTimeout(() => appendLine('&bull; Cloud telemetry upload: DISABLED (Blocked)', 'text-emerald-300'), 200);
-            setTimeout(() => appendLine('&bull; External ad tracking trackers: 0 found', 'text-emerald-300'), 400);
-            setTimeout(() => appendLine('✓ CERTIFIED: 100% In-Browser Privacy Verified. 0 bytes leaked.', 'text-emerald-400 font-bold'), 600);
-          } else if (clean === 'clear') {
-            term.innerHTML = '<div class="text-slate-500"># Console cleared. Silicon ready.</div>';
-          } else if (clean === 'status') {
-            appendLine('[STATUS] 47 Client-Side Engines Active &bull; AES-256 Isolation &bull; $0.00 Cost', 'text-emerald-300');
-          } else if (clean === 'tools') {
-            appendLine('[TOOLS] 47 utilities indexed across AI, DevSecOps, FinTech, and CloudOps.', 'text-cyan-300');
-          } else if (clean === 'help') {
-            appendLine('Available commands: benchmark, airgap, status, tools, clear', 'text-slate-300');
-          } else {
-            appendLine(`Unknown command: '${clean}'. Try 'benchmark', 'airgap', or 'help'.`, 'text-amber-400');
-          }
-        };
-
-        window.runTerminalInput = function(val) {
-          if (!val) return;
-          window.runTerminalCmd(val);
-        };
-      })();
-    </script>
-
-
-    <!-- ULTRA-FUTURISTIC 3D MATRIX CANVAS & TERMINAL ENGINE -->
-    <script>
-      (function() {
-        const canvas = document.getElementById('quantumCanvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        let width = canvas.width = canvas.offsetWidth;
-        let height = canvas.height = canvas.offsetHeight;
-        let particles = [];
-        let mouse = { x: width / 2, y: height / 2, active: false };
-        let burstEnergy = 0;
-        let lastFrameTime = performance.now();
-        let frameCount = 0;
-
-        function resize() {
-          if (!canvas) return;
-          width = canvas.width = canvas.offsetWidth;
-          height = canvas.height = canvas.offsetHeight;
-        }
-        window.addEventListener('resize', resize);
-
-        canvas.addEventListener('mousemove', (e) => {
-          const rect = canvas.getBoundingClientRect();
-          mouse.x = e.clientX - rect.left;
-          mouse.y = e.clientY - rect.top;
-          mouse.active = true;
-        });
-
-        canvas.addEventListener('mouseleave', () => {
-          mouse.active = false;
-        });
-
-        class Particle {
-          constructor() {
-            this.reset();
-          }
-          reset() {
-            this.x = Math.random() * width;
-            this.y = Math.random() * height;
-            this.vx = (Math.random() - 0.5) * 0.9;
-            this.vy = (Math.random() - 0.5) * 0.9;
-            this.radius = Math.random() * 2 + 1;
-            this.color = Math.random() > 0.6 ? '#10b981' : (Math.random() > 0.5 ? '#06b6d4' : '#8b5cf6');
-            this.alpha = Math.random() * 0.6 + 0.3;
-          }
-          update() {
-            this.x += this.vx * (1 + burstEnergy);
-            this.y += this.vy * (1 + burstEnergy);
-
-            if (mouse.active) {
-              const dx = mouse.x - this.x;
-              const dy = mouse.y - this.y;
-              const dist = Math.sqrt(dx * dx + dy * dy);
-              if (dist < 130) {
-                const force = (130 - dist) / 130;
-                this.x -= (dx / dist) * force * 3;
-                this.y -= (dy / dist) * force * 3;
+        // IntersectionObserver: Pause canvas when offscreen for 0% idle CPU/GPU usage
+        if ('IntersectionObserver' in window) {
+          const obs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              isCanvasVisible = entry.isIntersecting;
+              if (isCanvasVisible && !animationFrameId) {
+                animationFrameId = requestAnimationFrame(animate);
               }
-            }
-
-            if (this.x < 0 || this.x > width) this.vx *= -1;
-            if (this.y < 0 || this.y > height) this.vy *= -1;
-          }
-          draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
-            ctx.globalAlpha = this.alpha;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = this.color;
-            ctx.fill();
-            ctx.shadowBlur = 0;
-          }
-        }
-
-        const count = Math.min(120, Math.floor(width / 9));
-        for (let i = 0; i < count; i++) {
-          particles.push(new Particle());
-        }
-
-        window.triggerMatrixBurst = function() {
-          burstEnergy = 4.0;
-          setTimeout(() => { burstEnergy = 0; }, 600);
-        };
-
-        window.resetMatrixWarp = function() {
-          particles.forEach(p => {
-            p.vx = (Math.random() - 0.5) * 4;
-            p.vy = (Math.random() - 0.5) * 4;
-          });
-          setTimeout(() => {
-            particles.forEach(p => {
-              p.vx = (Math.random() - 0.5) * 0.9;
-              p.vy = (Math.random() - 0.5) * 0.9;
             });
-          }, 1500);
-        };
-
-        function animate(now) {
+          }, { threshold: 0.05 });
+          obs.observe(canvas);
+        } else {
+          isCanvasVisible = true;
           requestAnimationFrame(animate);
-          ctx.clearRect(0, 0, width, height);
-
-          // Calculate FPS
-          frameCount++;
-          if (now - lastFrameTime >= 1000) {
-            const fpsEl = document.getElementById('matrixFps');
-            if (fpsEl) fpsEl.innerText = Math.round((frameCount * 1000) / (now - lastFrameTime));
-            frameCount = 0;
-            lastFrameTime = now;
-          }
-
-          if (burstEnergy > 0) {
-            burstEnergy *= 0.92;
-            if (burstEnergy < 0.05) burstEnergy = 0;
-          }
-
-          // Draw inter-particle holographic mesh
-          for (let i = 0; i < particles.length; i++) {
-            for (let j = i + 1; j < particles.length; j++) {
-              const dx = particles[i].x - particles[j].x;
-              const dy = particles[i].y - particles[j].y;
-              const dist = Math.sqrt(dx * dx + dy * dy);
-              if (dist < 90) {
-                ctx.beginPath();
-                ctx.moveTo(particles[i].x, particles[i].y);
-                ctx.lineTo(particles[j].x, particles[j].y);
-                ctx.strokeStyle = '#10b981';
-                ctx.globalAlpha = (1 - dist / 90) * 0.25;
-                ctx.lineWidth = 0.8;
-                ctx.stroke();
-              }
-            }
-          }
-
-          // Update & draw particles
-          particles.forEach(p => {
-            p.update();
-            p.draw();
-          });
-          ctx.globalAlpha = 1.0;
         }
-        requestAnimationFrame(animate);
       })();
 
       // Interactive Terminal Logic
@@ -4542,20 +4400,32 @@
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
 
+        let mouseScheduled = false;
+        let activeSparks = 0;
+        const MAX_SPARKS = 4;
+
         window.addEventListener('mousemove', (e) => {
           mouseX = e.clientX;
           mouseY = e.clientY;
-          document.documentElement.style.setProperty('--cursor-x', `${mouseX}px`);
-          document.documentElement.style.setProperty('--cursor-y', `${mouseY}px`);
 
-          // Spawn subtle particle sparks on rapid cursor motion
-          if (Math.random() > 0.85) {
+          if (!mouseScheduled) {
+            mouseScheduled = true;
+            requestAnimationFrame(() => {
+              document.documentElement.style.setProperty('--cursor-x', `${mouseX}px`);
+              document.documentElement.style.setProperty('--cursor-y', `${mouseY}px`);
+              mouseScheduled = false;
+            });
+          }
+
+          // Cap max sparks and spawn only on occasional movement for high performance
+          if (activeSparks < MAX_SPARKS && Math.random() > 0.94) {
             spawnSpark(mouseX, mouseY);
           }
         }, { passive: true });
 
         // Particle sparks
         function spawnSpark(x, y) {
+          activeSparks++;
           const spark = document.createElement('div');
           spark.className = 'cursor-spark';
           const size = Math.random() * 4 + 2;
@@ -4582,24 +4452,29 @@
 
           setTimeout(() => {
             if (spark.parentNode) spark.parentNode.removeChild(spark);
+            activeSparks = Math.max(0, activeSparks - 1);
           }, 800);
         }
 
         // 2. 3D Card Tilt Effect on all .glass-panel cards
         document.querySelectorAll('.glass-panel, .cyber-hologram-card').forEach(card => {
+          let tiltScheduled = false;
           card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -6;
-            const rotateY = ((x - centerX) / centerX) * 6;
+            if (tiltScheduled) return;
+            tiltScheduled = true;
+            requestAnimationFrame(() => {
+              const rect = card.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              const centerX = rect.width / 2;
+              const centerY = rect.height / 2;
+              const rotateX = ((y - centerY) / centerY) * -5;
+              const rotateY = ((x - centerX) / centerX) * 5;
 
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
-            card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
-            card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
-          });
+              card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+              tiltScheduled = false;
+            });
+          }, { passive: true });
 
           card.addEventListener('mouseleave', () => {
             card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
