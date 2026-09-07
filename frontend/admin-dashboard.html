@@ -425,7 +425,7 @@
   <script type="module">
     import { auth, db } from "./admin-firebase.js";
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     // Enforce Admin Verification on Load
     onAuthStateChanged(auth, async (user) => {
@@ -606,5 +606,35 @@
       }, 4000);
     }
   </script>
+
+  <script type="module">
+    import { db } from "./admin-firebase.js";
+    import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    window.saveVisibilityToFirestore = async function(visibilityMap) {
+      try {
+        await setDoc(doc(db, "config", "tools_visibility"), {
+          overrides: visibilityMap,
+          updated_at: new Date().toISOString()
+        }, { merge: true });
+        console.log("[FIRESTORE CLOUD] Successfully synced tool visibility to Google Cloud Firestore!");
+      } catch (e) {
+        console.warn("[FIRESTORE CLOUD] Firestore sync error:", e);
+      }
+    };
+
+    window.loadVisibilityFromFirestore = async function() {
+      try {
+        const snap = await getDoc(doc(db, "config", "tools_visibility"));
+        if (snap.exists()) {
+          return snap.data().overrides || {};
+        }
+      } catch (e) {
+        console.warn("[FIRESTORE CLOUD] Load error:", e);
+      }
+      return null;
+    };
+  </script>
+
 </body>
 </html>

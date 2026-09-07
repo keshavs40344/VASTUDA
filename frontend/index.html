@@ -603,6 +603,37 @@
     </script>
     <!-- /SEO BLOCK -->
     
+
+    <!-- Cloud Firestore Dynamic Tool Visibility Reader -->
+    <script type="module">
+      import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDpSwbMUHP1L7hSK_o-3Kg4uW8pKaZfyR4",
+        authDomain: "saas-34243.firebaseapp.com",
+        projectId: "saas-34243",
+        storageBucket: "saas-34243.firebasestorage.app",
+        messagingSenderId: "964647710435",
+        appId: "1:964647710435:web:c1159dc50b671a891f9fd6"
+      };
+
+      const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+      const db = getFirestore(app);
+
+      window.fetchCloudVisibility = async function() {
+        try {
+          const snap = await getDoc(doc(db, "config", "tools_visibility"));
+          if (snap.exists()) {
+            return snap.data().overrides || {};
+          }
+        } catch (e) {
+          console.warn("[FIRESTORE USER SYNC] Using server API fallback:", e);
+        }
+        return null;
+      };
+    </script>
+
 </head>
 
 <body class="min-h-screen cyber-grid font-sans antialiased selection:bg-emerald-500 selection:text-black">
@@ -2507,8 +2538,12 @@
 
       async function loadCatalog() {
         try {
-          // 1. Check local admin overrides
-          const localOverrides = JSON.parse(localStorage.getItem('vastuda_tool_visibility') || '{}');
+          // 1. Check Cloud Firestore / Server Overrides
+          let cloudOverrides = null;
+          if (window.fetchCloudVisibility) {
+            cloudOverrides = await window.fetchCloudVisibility();
+          }
+          const localOverrides = cloudOverrides || JSON.parse(localStorage.getItem('vastuda_tool_visibility') || '{}');
 
           let raw = [];
           // Try backend API first
