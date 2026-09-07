@@ -277,31 +277,8 @@
 
 
         loginAsGuest: function() {
-
-            const guestId = Math.floor(1000 + Math.random() * 9000);
-
-            const guestUser = {
-
-                email: `guest_${guestId}@genesis.world`,
-
-                displayName: `Guest #${guestId}`,
-
-                avatar: "G",
-
-                token: "gnx_guest_" + guestId,
-
-                loginAt: new Date().toISOString(),
-
-                isGuest: true
-
-            };
-
-            localStorage.setItem("genesis_current_user", JSON.stringify(guestUser));
-
-            this.updateNavbarAuth();
-
-            return { success: true, user: guestUser };
-
+            window.location.href = 'login.html';
+            return { success: false, message: 'Guest login permanently disabled. Pure Firebase authentication required.' };
         },
 
 
@@ -343,11 +320,11 @@
             } else {
                 authContainer.innerHTML = `
                     <div class="flex items-center gap-2">
-                        <button onclick="GenesisAuth.openModal('login')" class="text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-xl hover:bg-slate-800/80 transition font-sans inline-flex items-center">Log In</button>
-                        <button onclick="GenesisAuth.openModal('register')" class="text-xs font-bold text-slate-950 hover:text-black px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 shadow-md shadow-emerald-500/20 transition font-sans inline-flex items-center gap-1.5 group">
+                        <a href="login.html" class="text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-xl hover:bg-slate-800/80 transition font-sans inline-flex items-center">Log In</a>
+                        <a href="login.html#register" class="text-xs font-bold text-slate-950 hover:text-black px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 shadow-md shadow-emerald-500/20 transition font-sans inline-flex items-center gap-1.5 group">
                             <span>Sign Up Free</span>
                             <span class="group-hover:translate-x-0.5 transition-transform text-[11px]">→</span>
-                        </button>
+                        </a>
                         <button onclick="GenesisDonation.open()" class="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-300 hover:text-white px-3 py-1.5 rounded-xl border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 transition font-mono">
                             <span>⚡</span>
                             <span>Back R&amp;D</span>
@@ -360,21 +337,7 @@
 
 
         openModal: function(mode = 'login') {
-
-            let modal = document.getElementById("genesisAuthModal");
-
-            if (!modal) {
-
-                this._injectAuthModal();
-
-                modal = document.getElementById("genesisAuthModal");
-
-            }
-
-            this.switchModalTab(mode);
-
-            modal.classList.remove("hidden");
-
+            window.location.href = (mode === 'register') ? 'login.html#register' : 'login.html';
         },
 
 
@@ -559,21 +522,11 @@
 
 
 
-                    <div class="relative my-4 text-center">
-
-                        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-800"></div></div>
-
-                        <span class="relative px-3 bg-slate-900 text-[11px] font-mono text-slate-500">OR</span>
-
-                    </div>
+                    
 
 
 
-                    <button onclick="GenesisAuth.loginAsGuest(); GenesisAuth.closeModal();" class="w-full py-2.5 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-slate-300 text-xs font-mono transition">
-
-                        ⚡ Continue as Instant Guest
-
-                    </button>
+                    
 
 
 

@@ -573,6 +573,16 @@ def serve_admin():
 def serve_admin_login():
     return send_from_directory(FRONTEND_DIR, "admin-login.html")
 
+@app.route("/login")
+@app.route("/login.html")
+def serve_login():
+    return send_from_directory(FRONTEND_DIR, "login.html")
+
+@app.route("/auth")
+@app.route("/auth.html")
+def serve_auth():
+    return send_from_directory(FRONTEND_DIR, "login.html")
+
 @app.route("/user_dashboard.html")
 def serve_user_dashboard():
     return send_from_directory(FRONTEND_DIR, "user_dashboard.html")

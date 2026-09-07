@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>AI World Sovereign — Secure Access</title>
+  <meta name="robots" content="noindex"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    /* ═══ DESIGN TOKENS ═══════════════════════════════════════════ */
+    :root{
+      --bg:#08080f; --bg-card:#0f0f18; --bg-elevated:#14141e;
+      --bg-input:#0b0b13; --bg-glass:rgba(15,15,24,.85);
+      --border:rgba(255,255,255,.07); --border-focus:rgba(99,102,241,.6);
+      --border-err:rgba(239,68,68,.6); --border-ok:rgba(16,185,129,.5);
+      --text:#e2e8f0; --text-muted:#64748b; --text-dim:#374151;
+      --accent:#6366f1; --accent2:#818cf8; --glow:rgba(99,102,241,.18);
+      --green:#10b981; --red:#ef4444; --amber:#f59e0b; --blue:#3b82f6;
+      --r:12px; --r-sm:8px; --r-xs:6px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{min-height:100%;background:var(--bg);color:var(--text);
+      font-family:'Inter',system-ui,-apple-system,sans-serif;
+      font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+    /* ═══ PAGE SHELL ═══════════════════════════════════════════════ */
+    .page{min-height:100vh;display:grid;place-items:center;padding:28px 16px;
+      position:relative;overflow-x:hidden}
+    .page::before{content:'';position:fixed;top:-25%;left:50%;
+      transform:translateX(-50%);width:900px;height:600px;
+      background:radial-gradient(ellipse,rgba(99,102,241,.10) 0%,transparent 68%);
+      pointer-events:none;z-index:0}
+    .page::after{content:'';position:fixed;bottom:-18%;right:-8%;
+      width:700px;height:500px;
+      background:radial-gradient(ellipse,rgba(16,185,129,.06) 0%,transparent 68%);
+      pointer-events:none;z-index:0}
+
+    /* ═══ CARD ══════════════════════════════════════════════════════ */
+    .card{position:relative;z-index:1;width:100%;max-width:460px;
+      background:var(--bg-card);border:1px solid var(--border);
+      border-radius:var(--r);padding:38px 34px;
+      box-shadow:0 0 0 1px rgba(255,255,255,.025),0 40px 80px -20px rgba(0,0,0,.7);
+      animation:fadeUp .45s cubic-bezier(.16,1,.3,1) both}
+    @media(max-width:500px){.card{padding:26px 20px;border-radius:10px}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ═══ BRAND ═════════════════════════════════════════════════════ */
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:30px}
+    .brand-logo{width:42px;height:42px;background:linear-gradient(135deg,#6366f1,#818cf8);
+      border-radius:10px;display:flex;align-items:center;justify-content:center;
+      font-size:20px;font-weight:900;color:#fff;
+      box-shadow:0 0 22px rgba(99,102,241,.38);flex-shrink:0;user-select:none}
+    .brand-info{display:flex;flex-direction:column}
+    .brand-name{font-size:16px;font-weight:800;color:#f1f5f9;letter-spacing:-.3px}
+    .brand-sub{font-size:11px;color:var(--text-muted);margin-top:1px}
+
+    /* ═══ TABS ══════════════════════════════════════════════════════ */
+    .tabs{display:grid;grid-template-columns:1fr 1fr;
+      background:var(--bg-input);border:1px solid var(--border);
+      border-radius:var(--r-sm);padding:3px;margin-bottom:28px}
+    .tab-btn{padding:9px 0;font-size:13px;font-weight:600;border:none;cursor:pointer;
+      border-radius:6px;transition:all .2s ease;background:transparent;
+      color:var(--text-muted);font-family:inherit}
+    .tab-btn.active{background:var(--bg-elevated);color:var(--text);
+      box-shadow:0 1px 5px rgba(0,0,0,.4)}
+    .tab-btn:hover:not(.active){color:#94a3b8}
+    .tab-btn:disabled{opacity:.5;cursor:not-allowed}
+
+    /* ═══ HEADINGS ══════════════════════════════════════════════════ */
+    .form-title{font-size:20px;font-weight:800;letter-spacing:-.4px;color:#f8fafc;margin-bottom:4px}
+    .form-sub{font-size:13px;color:var(--text-muted);margin-bottom:26px}
+
+    /* ═══ OAUTH BUTTONS ═════════════════════════════════════════════ */
+    .oauth-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+    @media(max-width:370px){.oauth-row{grid-template-columns:1fr}}
+    .oauth-btn{display:flex;align-items:center;justify-content:center;gap:8px;
+      padding:10px 14px;background:var(--bg-elevated);border:1px solid var(--border);
+      border-radius:var(--r-sm);color:#cbd5e1;font-size:13px;font-weight:600;
+      cursor:pointer;transition:all .18s ease;font-family:inherit;user-select:none}
+    .oauth-btn:hover:not(:disabled){border-color:rgba(255,255,255,.14);
+      background:#191925;color:#e2e8f0;transform:translateY(-1px)}
+    .oauth-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+    /* ═══ DIVIDER ═══════════════════════════════════════════════════ */
+    .divider{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+    .divider-line{flex:1;height:1px;background:var(--border)}
+    .divider-text{font-size:11px;font-weight:500;color:var(--text-dim);white-space:nowrap}
+
+    /* ═══ FORM ══════════════════════════════════════════════════════ */
+    .form{display:flex;flex-direction:column;gap:15px}
+    .field{display:flex;flex-direction:column;gap:5px}
+    .field-label{font-size:11.5px;font-weight:700;color:#94a3b8;
+      letter-spacing:.05em;text-transform:uppercase}
+    .input-wrap{position:relative;display:flex;align-items:center}
+    .input-wrap input{width:100%;padding:11px 14px;background:var(--bg-input);
+      border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);
+      font-size:14px;font-family:inherit;outline:none;
+      transition:border-color .18s ease,box-shadow .18s ease;-webkit-appearance:none}
+    .input-wrap input::placeholder{color:#2d3748}
+    .input-wrap input:focus{border-color:var(--border-focus);box-shadow:0 0 0 3px var(--glow)}
+    .input-wrap input.is-err{border-color:var(--border-err);box-shadow:0 0 0 3px rgba(239,68,68,.10)}
+    .input-wrap input.is-ok{border-color:var(--border-ok)}
+    .input-wrap input.has-icon{padding-right:44px}
+
+    /* Eye toggle */
+    .eye-btn{position:absolute;right:12px;background:none;border:none;cursor:pointer;
+      color:var(--text-muted);padding:4px;display:flex;align-items:center;
+      transition:color .15s;flex-shrink:0}
+    .eye-btn:hover{color:#94a3b8}
+
+    /* Inline error */
+    .field-msg{font-size:12px;display:none;margin-top:2px}
+    .field-msg.show{display:block}
+    .field-msg.err{color:#f87171}
+    .field-msg.ok{color:#6ee7b7}
+
+    /* ═══ PASSWORD STRENGTH ══════════════════════════════════════════ */
+    .pw-strength{margin-top:6px}
+    .pw-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+    .pw-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0%}
+    .pw-label{font-size:11px;margin-top:4px;color:var(--text-muted)}
+
+    /* ═══ CONFIRM MATCH ══════════════════════════════════════════════ */
+    .match-note{font-size:11.5px;margin-top:3px;display:none}
+    .match-note.show{display:block}
+    .match-note.ok{color:var(--green)}
+    .match-note.fail{color:var(--red)}
+
+    /* ═══ FORGOT LINK ════════════════════════════════════════════════ */
+    .forgot-row{display:flex;justify-content:flex-end;margin-top:-6px}
+    .forgot-btn{font-size:12px;font-weight:500;color:var(--accent2);
+      background:none;border:none;cursor:pointer;font-family:inherit;
+      transition:color .15s;padding:2px 0}
+    .forgot-btn:hover{color:#c7d2fe;text-decoration:underline}
+
+    /* ═══ SUBMIT BUTTON ══════════════════════════════════════════════ */
+    .submit-btn{display:flex;align-items:center;justify-content:center;gap:8px;
+      width:100%;padding:12px;border:none;border-radius:var(--r-sm);
+      background:linear-gradient(135deg,#6366f1,#818cf8);
+      color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
+      transition:all .2s ease;box-shadow:0 4px 14px rgba(99,102,241,.25)}
+    .submit-btn:hover:not(:disabled){transform:translateY(-1px);
+      box-shadow:0 8px 22px rgba(99,102,241,.42)}
+    .submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
+
+    /* ═══ SPINNER ════════════════════════════════════════════════════ */
+    .spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);
+      border-top-color:#fff;border-radius:50%;
+      animation:rot .6s linear infinite;flex-shrink:0}
+    @keyframes rot{to{transform:rotate(360deg)}}
+
+    /* ═══ FOOTER PROMPT ══════════════════════════════════════════════ */
+    .form-footer{text-align:center;font-size:13px;color:var(--text-muted);margin-top:6px}
+    .form-footer button{background:none;border:none;cursor:pointer;color:var(--accent2);
+      font-weight:600;font-family:inherit;font-size:13px;padding:0}
+    .form-footer button:hover{color:#c7d2fe;text-decoration:underline}
+
+    /* ═══ TOAST SYSTEM ═══════════════════════════════════════════════ */
+    #toast-root{position:fixed;top:20px;right:20px;z-index:9999;
+      display:flex;flex-direction:column;gap:10px;pointer-events:none}
+    .toast{display:flex;align-items:flex-start;gap:10px;padding:13px 16px;
+      border-radius:var(--r-sm);background:#1a1a26;border:1px solid;
+      box-shadow:0 10px 28px rgba(0,0,0,.45);
+      max-width:360px;min-width:250px;pointer-events:all;
+      animation:tIn .3s cubic-bezier(.16,1,.3,1) both}
+    @keyframes tIn{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
+    .toast.out{animation:tOut .3s ease forwards}
+    @keyframes tOut{to{opacity:0;transform:translateX(14px)}}
+    .toast.s{border-color:rgba(16,185,129,.35)}.toast.e{border-color:rgba(239,68,68,.35)}
+    .toast.i{border-color:rgba(99,102,241,.35)}.toast.w{border-color:rgba(245,158,11,.35)}
+    .t-icon{font-size:16px;margin-top:1px;flex-shrink:0}
+    .t-body{flex:1}
+    .t-title{font-size:13px;font-weight:700;margin-bottom:2px}
+    .toast.s .t-title{color:#6ee7b7}.toast.e .t-title{color:#fca5a5}
+    .toast.i .t-title{color:#a5b4fc}.toast.w .t-title{color:#fcd34d}
+    .t-msg{font-size:12px;color:var(--text-muted);line-height:1.45}
+    .t-close{background:none;border:none;cursor:pointer;color:var(--text-muted);
+      font-size:14px;padding:0;flex-shrink:0;margin-top:1px}
+
+    /* ═══ FORGOT MODAL ═══════════════════════════════════════════════ */
+    #fw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);
+      backdrop-filter:blur(8px);z-index:500;display:none;
+      place-items:center;padding:20px}
+    #fw-overlay.open{display:grid}
+    .fw-modal{background:var(--bg-card);border:1px solid var(--border);
+      border-radius:var(--r);padding:30px;max-width:380px;width:100%;
+      box-shadow:0 28px 56px rgba(0,0,0,.55);
+      animation:scIn .3s cubic-bezier(.16,1,.3,1) both}
+    @keyframes scIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+    .fw-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+    .fw-head h3{font-size:16px;font-weight:700;color:#f1f5f9}
+    .fw-close{background:none;border:none;cursor:pointer;color:var(--text-muted);
+      font-size:18px;line-height:1;padding:2px;transition:color .15s}
+    .fw-close:hover{color:#94a3b8}
+    .fw-modal p{font-size:13px;color:var(--text-muted);margin-bottom:18px}
+
+    /* ═══ DASHBOARD CARD ══════════════════════════════════════════════ */
+    #dash-card{display:none;animation:fadeUp .4s cubic-bezier(.16,1,.3,1) both}
+    #dash-card.show{display:block}
+
+    .dash-hero{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:22px}
+    .dash-avi{width:72px;height:72px;border-radius:50%;
+      background:linear-gradient(135deg,#6366f1,#818cf8);
+      display:flex;align-items:center;justify-content:center;
+      font-size:28px;font-weight:900;color:#fff;
+      box-shadow:0 0 28px rgba(99,102,241,.38);margin-bottom:14px;
+      overflow:hidden;flex-shrink:0}
+    .dash-avi img{width:100%;height:100%;object-fit:cover}
+    .dash-name{font-size:20px;font-weight:800;color:#f1f5f9;letter-spacing:-.3px;margin-bottom:3px}
+    .dash-email{font-size:13px;color:var(--text-muted);margin-bottom:10px}
+
+    /* Badges row */
+    .badge-row{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:20px}
+    .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;
+      padding:3px 10px;border-radius:20px;white-space:nowrap;letter-spacing:.03em}
+    .badge.verified{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#6ee7b7}
+    .badge.unverified{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+    .badge.provider{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.3);color:#a5b4fc}
+    .badge.active-dot::before{content:'';display:inline-block;width:6px;height:6px;
+      border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor}
+
+    /* Meta grid */
+    .dash-meta{background:var(--bg-input);border:1px solid var(--border);
+      border-radius:var(--r-sm);padding:14px 16px;margin-bottom:18px;display:grid;gap:9px}
+    .meta-row{display:flex;align-items:center;justify-content:space-between;font-size:12px}
+    .meta-k{color:var(--text-muted);font-weight:500}
+    .meta-v{color:#94a3b8;font-family:'JetBrains Mono',monospace;
+      font-size:11px;max-width:55%;text-align:right;word-break:break-all}
+    .meta-v.green{color:#6ee7b7}.meta-v.red{color:#fca5a5}.meta-v.amber{color:#fcd34d}
+
+    /* Dash actions */
+    .dash-actions{display:flex;flex-direction:column;gap:10px}
+    .btn-dash-main{display:flex;align-items:center;justify-content:center;gap:8px;
+      padding:12px;background:linear-gradient(135deg,#6366f1,#818cf8);
+      border-radius:var(--r-sm);color:#fff;font-weight:700;font-size:14px;
+      text-decoration:none;transition:all .2s ease;border:none;cursor:pointer;
+      font-family:inherit;width:100%}
+    .btn-dash-main:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(99,102,241,.38)}
+    .btn-resend{display:flex;align-items:center;justify-content:center;gap:7px;
+      padding:10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);
+      border-radius:var(--r-sm);color:#fcd34d;font-weight:600;font-size:13px;
+      cursor:pointer;font-family:inherit;transition:all .18s ease;width:100%}
+    .btn-resend:hover:not(:disabled){background:rgba(245,158,11,.18);border-color:rgba(245,158,11,.5)}
+    .btn-resend:disabled{opacity:.5;cursor:not-allowed}
+    .btn-signout{display:flex;align-items:center;justify-content:center;gap:7px;
+      padding:10px;background:var(--bg-elevated);border:1px solid var(--border);
+      border-radius:var(--r-sm);color:#94a3b8;font-size:13px;font-weight:600;
+      cursor:pointer;font-family:inherit;transition:all .18s ease;width:100%}
+    .btn-signout:hover:not(:disabled){border-color:rgba(239,68,68,.4);color:#fca5a5}
+    .btn-signout:disabled{opacity:.5;cursor:not-allowed}
+
+    /* ═══ UTILITIES ══════════════════════════════════════════════════ */
+    .hidden{display:none!important}
+    .back-link{display:block;text-align:center;margin-top:20px;font-size:12px;
+      color:var(--text-muted);text-decoration:none;transition:color .15s}
+    .back-link:hover{color:#94a3b8}
+    .sep{margin:6px 0;height:1px;background:var(--border)}
+  </style>
+    <!-- Microsoft Clarity Live Recording -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "ydiazy740a");
+    </script>
+</head>
+<body>
+
+<div id="toast-root"></div>
+
+<!-- ═══ FORGOT PASSWORD MODAL ═════════════════════════════════════════ -->
+<div id="fw-overlay" role="dialog" aria-modal="true">
+  <div class="fw-modal">
+    <div class="fw-head">
+      <h3>Reset Password</h3>
+      <button class="fw-close" id="fw-close-btn">&#x2715;</button>
+    </div>
+    <p>Enter the email address for your account. We will send you a secure link to reset your password.</p>
+    <div class="field" style="margin-bottom:16px">
+      <label class="field-label" for="fw-email">Email Address</label>
+      <div class="input-wrap">
+        <input type="email" id="fw-email" placeholder="you@domain.com" data-clarity-mask="true" autocomplete="email"/>
+      </div>
+      <span id="fw-err" class="field-msg err">Please enter a valid email address.</span>
+    </div>
+    <button id="fw-send-btn" class="submit-btn" style="margin-bottom:10px">Send Reset Link</button>
+    <button id="fw-cancel-btn" class="btn-signout">Cancel</button>
+  </div>
+</div>
+
+<!-- ═══ MAIN PAGE ═════════════════════════════════════════════════════ -->
+<div class="page">
+
+  <!-- AUTH FORM CARD -->
+  <div id="auth-card" class="card">
+    <div class="brand">
+      <div class="brand-logo">&#937;</div>
+      <div class="brand-info">
+        <span class="brand-name">AI World Sovereign</span>
+        <span class="brand-sub">Cloud-Verified Identity Platform</span>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" id="tab-signin" role="tab" aria-selected="true">Sign In</button>
+      <button class="tab-btn" id="tab-register" role="tab" aria-selected="false">Register Free</button>
+    </div>
+
+    <div class="form-title" id="form-title">Welcome back</div>
+    <div class="form-sub" id="form-sub">Sign in to your cloud-verified workspace.</div>
+
+    <!-- OAuth Providers -->
+    <div class="oauth-row">
+      <button class="oauth-btn" id="btn-google">
+        <svg width="17" height="17" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        Google
+      </button>
+      <button class="oauth-btn" id="btn-github">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+        GitHub
+      </button>
+    </div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-text">or continue with email</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- ── EMAIL FORM ── -->
+    <form id="auth-form" class="form" novalidate>
+      <!-- Full Name (register only) -->
+      <div class="field hidden" id="f-name">
+        <label class="field-label" for="in-name">Full Name</label>
+        <div class="input-wrap">
+          <input type="text" id="in-name" placeholder="Your Full Name" autocomplete="name"/>
+        </div>
+        <span id="err-name" class="field-msg err">Full name is required.</span>
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <label class="field-label" for="in-email">Email Address</label>
+        <div class="input-wrap">
+          <input type="email" id="in-email" placeholder="you@domain.com" autocomplete="email" required/>
+        </div>
+        <span id="err-email" class="field-msg err">Please enter a valid email address.</span>
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <label class="field-label" for="in-pw">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="in-pw" class="has-icon" data-clarity-mask="true" placeholder="Minimum 8 characters" autocomplete="current-password" required/>
+          <button type="button" class="eye-btn" id="eye-pw" aria-label="Toggle password visibility">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <span id="err-pw" class="field-msg err">Password must be at least 8 characters.</span>
+        <!-- Strength meter (register only) -->
+        <div class="pw-strength hidden" id="pw-strength-wrap">
+          <div class="pw-bar"><div id="pw-fill" class="pw-fill"></div></div>
+          <div id="pw-label" class="pw-label">Strength: enter a password</div>
+        </div>
+      </div>
+
+      <!-- Confirm Password (register only) -->
+      <div class="field hidden" id="f-confirm">
+        <label class="field-label" for="in-confirm">Confirm Password</label>
+        <div class="input-wrap">
+          <input type="password" id="in-confirm" class="has-icon" data-clarity-mask="true" placeholder="Repeat password" autocomplete="new-password"/>
+          <button type="button" class="eye-btn" id="eye-confirm" aria-label="Toggle confirm password visibility">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div id="confirm-note" class="match-note"></div>
+      </div>
+
+      <!-- Forgot link (sign-in only) -->
+      <div class="forgot-row" id="forgot-row">
+        <button type="button" class="forgot-btn" id="open-forgot">Forgot password?</button>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">
+        <span id="submit-label">Sign In to Workspace</span>
+      </button>
+    </form>
+
+    <div class="form-footer" style="margin-top:14px">
+      <span id="fp-prompt">Don't have an account?</span>
+      <button id="fp-switch" style="margin-left:4px">Create one free</button>
+    </div>
+
+    <a href="index.html" class="back-link">&#8592; Back to AI World</a>
+  </div><!-- /auth-card -->
+
+  <!-- ═══ CLOUD VERIFIED DASHBOARD ════════════════════════════════ -->
+  <div id="dash-card" class="card">
+    <div class="brand" style="margin-bottom:22px">
+      <div class="brand-logo">&#937;</div>
+      <div class="brand-info">
+        <span class="brand-name">Cloud Verified Dashboard</span>
+        <span class="brand-sub">AI World Sovereign — Live Session</span>
+      </div>
+    </div>
+
+    <!-- Hero: avatar + name + email -->
+    <div class="dash-hero">
+      <div class="dash-avi" id="d-avi">?</div>
+      <div class="dash-name" id="d-name">Loading...</div>
+      <div class="dash-email" id="d-email">&#8212;</div>
+      <!-- Badges -->
+      <div class="badge-row" id="d-badges">
+        <span class="badge verified active-dot" id="d-verify-badge">Verified &#x2713;</span>
+        <span class="badge provider" id="d-provider-badge">Email</span>
+      </div>
+    </div>
+
+    <!-- Meta grid -->
+    <div class="dash-meta">
+      <div class="meta-row">
+        <span class="meta-k">UID</span>
+        <span class="meta-v" id="d-uid">&#8212;</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-k">Role</span>
+        <span class="meta-v green">user</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-k">Auth Provider</span>
+        <span class="meta-v" id="d-provider-meta">&#8212;</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-k">Email Verified</span>
+        <span class="meta-v" id="d-verified-meta">&#8212;</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-k">Last Sign-In</span>
+        <span class="meta-v" id="d-signin-time">&#8212;</span>
+      </div>
+      <div class="sep"></div>
+      <div class="meta-row">
+        <span class="meta-k">Firestore Sync</span>
+        <span class="meta-v amber" id="d-fs-sync">Syncing...</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-k">IP Recorded</span>
+        <span class="meta-v" id="d-ip">Fetching...</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="dash-actions">
+      <a href="user_dashboard.html" class="btn-dash-main">Enter Personal Workspace &#8594;</a>
+      <a href="admin-dashboard.html" id="btn-admin-portal" class="btn-dash-main" style="display:none;background:linear-gradient(135deg,#dc2626,#ef4444);box-shadow:0 4px 14px rgba(220,38,38,.3);">Enter Admin Mission Control &#128274;</a>
+      <button class="btn-resend hidden" id="btn-resend">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Resend Verification Email
+      </button>
+      <button class="btn-signout" id="btn-signout">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </div>
+
+    <a href="index.html" class="back-link">&#8592; Back to AI World</a>
+  </div><!-- /dash-card -->
+
+</div><!-- /page -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FIREBASE MODULAR SDK v10  —  ALL LOGIC
+════════════════════════════════════════════════════════════════════ -->
+<script type="module">
+/* ── IMPORTS ──────────────────────────────────────────────────────── */
+import { initializeApp, getApps }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged,
+  signInWithPopup, signOut,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  sendPasswordResetEmail, sendEmailVerification,
+  GoogleAuthProvider, GithubAuthProvider, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ── FIREBASE INIT ────────────────────────────────────────────────── */
+const FB_CFG = {
+  apiKey:            "AIzaSyDpSwbMUHP1L7hSK_o-3Kg4uW8pKaZfyR4",
+  authDomain:        "saas-34243.firebaseapp.com",
+  projectId:         "saas-34243",
+  storageBucket:     "saas-34243.firebasestorage.app",
+  messagingSenderId: "964647710435",
+  appId:             "1:964647710435:web:368c5e868e434ed61f9fd6",
+  measurementId:     "G-P8XJF24WHD"
+};
+const fbApp = getApps().find(a => a.name === "sov-auth") || initializeApp(FB_CFG, "sov-auth");
+const auth  = getAuth(fbApp);
+const db    = getFirestore(fbApp);
+
+/* ── ERROR DICTIONARY ─────────────────────────────────────────────── */
+const ERR = {
+  "auth/invalid-email":
+    "That email address is not valid. Please check the format.",
+  "auth/user-not-found":
+    "No account found with this email. Please create one first.",
+  "auth/wrong-password":
+    "Incorrect password. Please try again or use the Forgot Password link.",
+  "auth/invalid-credential":
+    "Email or password is incorrect. Please double-check your credentials.",
+  "auth/email-already-in-use":
+    "This email is already registered. Please sign in instead.",
+  "auth/weak-password":
+    "Your password is too weak. Use at least 8 characters with a mix of letters, numbers, and symbols.",
+  "auth/too-many-requests":
+    "Too many failed attempts. Your account is temporarily locked. Please wait a few minutes or reset your password.",
+  "auth/popup-closed-by-user":   null,  // Silent
+  "auth/cancelled-popup-request": null,
+  "auth/popup-blocked":
+    "Sign-in popup was blocked by your browser. Please allow popups for this site and try again.",
+  "auth/account-exists-with-different-credential":
+    "An account already exists with this email using a different sign-in method. Try the other provider or email/password.",
+  "auth/unauthorized-domain":
+    "This domain is not authorised in Firebase. Go to Firebase Console \u2192 Authentication \u2192 Settings \u2192 Authorised Domains and add your current domain.",
+  "auth/network-request-failed":
+    "Network request failed. Please check your internet connection and try again.",
+  "auth/operation-not-allowed":
+    "This sign-in method is not enabled in Firebase. Please contact support.",
+  "auth/user-disabled":
+    "Your account has been suspended. Please contact support for assistance.",
+  "auth/requires-recent-login":
+    "This action requires a recent sign-in. Please sign out and sign in again.",
+  "auth/missing-email":
+    "Please enter your email address to continue.",
+  "auth/internal-error":
+    "An internal error occurred. Please try again in a moment.",
+  "auth/provider-already-linked":
+    "This social account is already linked to your profile.",
+  "auth/credential-already-in-use":
+    "This credential is already associated with another account.",
+};
+
+function friendlyError(err) {
+  if (!err) return "An unexpected error occurred. Please try again.";
+  const mapped = ERR[err.code];
+  if (mapped === null) return null;  // intentionally silent
+  return mapped || `Sign-in error (${err.code || "unknown"}). Please try again.`;
+}
+
+/* ── TOAST ENGINE ─────────────────────────────────────────────────── */
+const TICONS = { s: "&#x2713;", e: "&#x2715;", i: "&#x2139;", w: "&#x26A0;" };
+window.toast = function(type, title, msg, ms = 5000) {
+  const root = document.getElementById("toast-root");
+  const el   = document.createElement("div");
+  el.className = "toast " + type;
+  el.innerHTML = `
+    <div class="t-icon">${TICONS[type] || "&#x2139;"}</div>
+    <div class="t-body">
+      <div class="t-title">${title}</div>
+      ${msg ? `<div class="t-msg">${msg}</div>` : ""}
+    </div>
+    <button class="t-close" onclick="this.closest('.toast').remove()">&#x2715;</button>`;
+  root.appendChild(el);
+  setTimeout(() => {
+    el.classList.add("out");
+    setTimeout(() => el.remove(), 320);
+  }, ms);
+};
+
+/* ── BUTTON LOADING HELPERS ───────────────────────────────────────── */
+function btnLoad(id, yes, label) {
+  const b = document.getElementById(id);
+  if (!b) return;
+  b.disabled = yes;
+  if (yes)  b.innerHTML = `<div class="spin"></div><span>${label}</span>`;
+}
+function btnRestore(id, html) {
+  const b = document.getElementById(id);
+  if (!b) return;
+  b.disabled = false;
+  b.innerHTML = html;
+}
+
+function disableOAuth(yes) {
+  document.getElementById("btn-google").disabled = yes;
+  document.getElementById("btn-github").disabled = yes;
+}
+
+/* ── IP FETCHER ───────────────────────────────────────────────────── */
+async function clientIP() {
+  try {
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 4000);
+    const r = await fetch("https://api.ipify.org?format=json", { signal: ctrl.signal, cache: "no-store" });
+    return (await r.json()).ip || "unavailable";
+  } catch { return "unavailable"; }
+}
+
+/* ── FIRESTORE SYNC ───────────────────────────────────────────────── */
+async function syncFirestore(user, ghExtra) {
+  ghExtra = ghExtra || {};
+  if (!user || !user.uid) return;
+  try {
+    const ip = await clientIP();
+    document.getElementById("d-ip").textContent = ip;
+
+    const providerMap = { "google.com": "google.com", "github.com": "github.com" };
+    const pid = (user.providerData && user.providerData[0] && user.providerData[0].providerId) || "password";
+
+    const payload = {
+      uid:           user.uid,
+      email:         user.email         || null,
+      displayName:   user.displayName   || null,
+      phoneNumber:   user.phoneNumber   || null,
+      company:       null,
+      role:          "user",
+      clientIP:      ip,
+      userAgent:     navigator.userAgent,
+      lastLoginAt:   serverTimestamp(),
+      emailVerified: user.emailVerified  || false,
+      photoURL:      user.photoURL      || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.email || "U") + "&background=6366f1&color=fff",
+      providerId:    pid,
+      emailVerified: user.emailVerified  || false,
+      createdAt:     serverTimestamp(),
+      lastLoginAt:   serverTimestamp(),
+      role:          "user",
+      clientIP:      ip,
+      userAgent:     navigator.userAgent,
+      github: ghExtra.username ? {
+        username:    ghExtra.username   || null,
+        bio:         ghExtra.bio        || null,
+        publicRepos: ghExtra.publicRepos != null ? ghExtra.publicRepos : null,
+        profileUrl:  ghExtra.profileUrl || null,
+        followers:   ghExtra.followers  || 0
+      } : null,
+      network: {
+        timeZone: (Intl && Intl.DateTimeFormat) ? Intl.DateTimeFormat().resolvedOptions().timeZone : "unknown",
+        language: navigator.language || "unknown"
+      },
+      device: {
+        screenResolution: window.screen.width + "x" + window.screen.height,
+        viewportSize:     window.innerWidth  + "x" + window.innerHeight,
+        platform:         (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "unknown"
+      }
+    };
+
+    await setDoc(doc(db, "users", user.uid), payload, { merge: true });
+
+    const syncEl = document.getElementById("d-fs-sync");
+    if (syncEl) { syncEl.textContent = "Synced \u2713"; syncEl.className = "meta-v green"; }
+    console.log("%c\u2705 Firestore /users/" + user.uid + " synced", "color:#10b981;font-weight:bold;");
+  } catch (err) {
+    console.warn("Firestore sync note:", err);
+    const syncEl = document.getElementById("d-fs-sync");
+    if (syncEl) { syncEl.textContent = "Sync error"; syncEl.className = "meta-v red"; }
+  }
+}
+
+/* ── RENDER DASHBOARD ─────────────────────────────────────────────── */
+const PROVIDER_LABEL = {
+  "google.com":  "Google OAuth",
+  "github.com":  "GitHub OAuth",
+  "password":    "Email + Password",
+  "emailLink":   "Email Link"
+};
+
+function renderDash(user) {
+  // Switch visibility
+  document.getElementById("auth-card").classList.add("hidden");
+  document.getElementById("dash-card").classList.add("show");
+
+  // Avatar
+  const aviEl = document.getElementById("d-avi");
+  if (user.photoURL) {
+    aviEl.innerHTML = `<img src="${user.photoURL}" alt="avatar" onerror="this.parentElement.textContent='${(user.displayName||user.email||'?').charAt(0).toUpperCase()}'" />`;
+  } else {
+    aviEl.textContent = (user.displayName || user.email || "?").charAt(0).toUpperCase();
+  }
+
+  // Name + email
+  document.getElementById("d-name").textContent =
+    user.displayName || user.email?.split("@")[0] || "Authenticated User";
+  document.getElementById("d-email").textContent = user.email || "No email";
+
+  // UID
+  document.getElementById("d-uid").textContent = user.uid.substring(0, 20) + "...";
+
+  // Provider
+  const pid = (user.providerData && user.providerData[0] && user.providerData[0].providerId) || "password";
+  document.getElementById("d-provider-meta").textContent = PROVIDER_LABEL[pid] || pid;
+  document.getElementById("d-provider-badge").textContent = PROVIDER_LABEL[pid] || pid;
+
+  // Email verification
+  const isVerified = user.emailVerified;
+  const verifyBadge = document.getElementById("d-verify-badge");
+  const verifiedMeta = document.getElementById("d-verified-meta");
+  const resendBtn = document.getElementById("btn-resend");
+
+  if (isVerified) {
+    verifyBadge.className = "badge verified active-dot";
+    verifyBadge.textContent = "Verified \u2713";
+    verifiedMeta.textContent = "Yes \u2713";
+    verifiedMeta.className = "meta-v green";
+    resendBtn.classList.add("hidden");
+  } else {
+    verifyBadge.className = "badge unverified";
+    verifyBadge.textContent = "Pending Verification \u2717";
+    verifiedMeta.textContent = "No — check your inbox";
+    verifiedMeta.className = "meta-v amber";
+    resendBtn.classList.remove("hidden");
+  }
+
+  // Sign-in time
+  const siTime = user.metadata && user.metadata.lastSignInTime
+    ? new Date(user.metadata.lastSignInTime).toLocaleString()
+    : new Date().toLocaleString();
+  document.getElementById("d-signin-time").textContent = siTime;
+}
+
+/* ── SESSION LISTENER ─────────────────────────────────────────────── */
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    // ── Microsoft Clarity Identity Mapping & Session Tagging ──
+    try {
+      if (typeof window.clarity === "function") {
+        // 1. Video session ke saath UID aur email attach karein
+        window.clarity("identify", user.uid, {
+          email: user.email || "No Email",
+          name: user.displayName || "User",
+          provider: user.providerData[0]?.providerId || "password"
+        });
+        window.clarity("set", "auth_status", "logged_in");
+        window.clarity("set", "email_verified", user.emailVerified ? "true" : "false");
+      }
+    } catch (cErr) {
+      console.warn("Clarity identify hook note:", cErr);
+    }
+
+    renderDash(user);
+    // Admin clearance probe
+    try {
+      const isMaster = (user.email === "keshavkumarthakur00007@gmail.com");
+      const adminBtn = document.getElementById("btn-admin-portal");
+      if (isMaster) {
+        if (adminBtn) adminBtn.style.display = "flex";
+        sessionStorage.setItem("SOVEREIGN_ADMIN_UNLOCKED", "true");
+        sessionStorage.setItem("SOVEREIGN_ADMIN_EMAIL", user.email);
+      } else {
+        // Probe server clearance
+        user.getIdToken().then(tok => {
+          fetch("/api/admin/verify-clearance", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tok }
+          }).then(r => r.json()).then(d => {
+            if (d.status === "authorized" && adminBtn) {
+              adminBtn.style.display = "flex";
+              sessionStorage.setItem("SOVEREIGN_ADMIN_UNLOCKED", "true");
+              sessionStorage.setItem("SOVEREIGN_ADMIN_EMAIL", user.email);
+            }
+          }).catch(() => {});
+        }).catch(() => {});
+      }
+    } catch(e) {}
+
+    // Background Firestore sync
+    syncFirestore(user).catch(() => {});
+  } else {
+    try {
+      if (typeof window.clarity === "function") {
+        window.clarity("set", "auth_status", "guest");
+      }
+    } catch (cErr) {}
+    document.getElementById("auth-card").classList.remove("hidden");
+    document.getElementById("dash-card").classList.remove("show");
+  }
+});
+
+/* ── TAB SWITCHER ─────────────────────────────────────────────────── */
+let MODE = "signin";
+
+function switchMode(mode) {
+  MODE = mode;
+  const reg = mode === "register";
+
+  document.getElementById("tab-signin").classList.toggle("active",   !reg);
+  document.getElementById("tab-register").classList.toggle("active",  reg);
+  document.getElementById("tab-signin").setAttribute("aria-selected",   String(!reg));
+  document.getElementById("tab-register").setAttribute("aria-selected", String(reg));
+
+  document.getElementById("f-name").classList.toggle("hidden",    !reg);
+  document.getElementById("f-confirm").classList.toggle("hidden", !reg);
+  document.getElementById("pw-strength-wrap").classList.toggle("hidden", !reg);
+  document.getElementById("forgot-row").classList.toggle("hidden",  reg);
+
+  document.getElementById("form-title").textContent = reg ? "Create your account" : "Welcome back";
+  document.getElementById("form-sub").textContent   = reg
+    ? "Join AI World Sovereign — free forever."
+    : "Sign in to your cloud-verified workspace.";
+  document.getElementById("submit-label").textContent = reg ? "Create Account" : "Sign In to Workspace";
+  document.getElementById("fp-prompt").textContent    = reg ? "Already have an account?" : "Don't have an account?";
+  document.getElementById("fp-switch").textContent    = reg ? "Sign In" : "Create one free";
+
+  document.getElementById("in-pw").autocomplete = reg ? "new-password" : "current-password";
+  clearErrors();
+}
+
+document.getElementById("tab-signin").addEventListener("click", () => switchMode("signin"));
+document.getElementById("tab-register").addEventListener("click", () => switchMode("register"));
+document.getElementById("fp-switch").addEventListener("click", () => switchMode(MODE === "signin" ? "register" : "signin"));
+
+// Auto-switch mode based on URL hash (#register) or parameter (?mode=register)
+try {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (window.location.hash === "#register" || urlParams.get("mode") === "register") {
+    switchMode("register");
+  }
+} catch (e) {}
+
+/* ── EYE TOGGLE ───────────────────────────────────────────────────── */
+function toggleEye(inputId, btnId) {
+  const inp = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  const show = inp.type === "password";
+  inp.type = show ? "text" : "password";
+  btn.innerHTML = show
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+}
+document.getElementById("eye-pw").addEventListener("click",      () => toggleEye("in-pw", "eye-pw"));
+document.getElementById("eye-confirm").addEventListener("click", () => toggleEye("in-confirm", "eye-confirm"));
+
+/* ── PASSWORD STRENGTH ────────────────────────────────────────────── */
+document.getElementById("in-pw").addEventListener("input", function () {
+  if (MODE !== "register") return;
+  const v = this.value;
+  let s = 0;
+  if (v.length >= 8)           s++;
+  if (v.length >= 12)          s++;
+  if (/[A-Z]/.test(v))         s++;
+  if (/[0-9]/.test(v))         s++;
+  if (/[^A-Za-z0-9]/.test(v)) s++;
+
+  const W = ["0%","20%","40%","65%","85%","100%"];
+  const C = ["#ef4444","#ef4444","#f59e0b","#3b82f6","#10b981","#10b981"];
+  const L = ["Very weak","Weak","Fair","Good","Strong","Excellent"];
+  const fill  = document.getElementById("pw-fill");
+  const label = document.getElementById("pw-label");
+  fill.style.width      = v.length ? W[s] : "0%";
+  fill.style.background = C[s];
+  label.textContent     = v.length ? "Strength: " + L[s] : "Strength: enter a password";
+  label.style.color     = v.length ? C[s] : "var(--text-muted)";
+});
+
+/* ── CONFIRM PASSWORD MATCH ───────────────────────────────────────── */
+document.getElementById("in-confirm").addEventListener("input", function () {
+  const pw   = document.getElementById("in-pw").value;
+  const conf = this.value;
+  const note = document.getElementById("confirm-note");
+  if (!conf) { note.classList.remove("show","ok","fail"); return; }
+  note.classList.add("show");
+  if (pw === conf) {
+    note.classList.add("ok"); note.classList.remove("fail");
+    note.textContent = "\u2713 Passwords match";
+    this.classList.add("is-ok"); this.classList.remove("is-err");
+  } else {
+    note.classList.add("fail"); note.classList.remove("ok");
+    note.textContent = "\u2715 Passwords do not match";
+    this.classList.add("is-err"); this.classList.remove("is-ok");
+  }
+});
+
+/* ── VALIDATION ───────────────────────────────────────────────────── */
+function isEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim()); }
+
+function showErr(id, show) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle("show", show);
+}
+function clearErrors() {
+  ["err-name","err-email","err-pw","confirm-note","fw-err"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove("show");
+  });
+  document.querySelectorAll(".input-wrap input").forEach(i => i.classList.remove("is-err","is-ok"));
+}
+
+function validateForm() {
+  let valid = true;
+  const email = document.getElementById("in-email").value.trim();
+  const pw    = document.getElementById("in-pw").value;
+
+  if (!isEmail(email)) {
+    showErr("err-email", true);
+    document.getElementById("in-email").classList.add("is-err");
+    valid = false;
+  }
+  if (pw.length < 8) {
+    showErr("err-pw", true);
+    document.getElementById("in-pw").classList.add("is-err");
+    valid = false;
+  }
+  if (MODE === "register") {
+    const name = document.getElementById("in-name").value.trim();
+    const conf = document.getElementById("in-confirm").value;
+    if (!name) {
+      showErr("err-name", true);
+      document.getElementById("in-name").classList.add("is-err");
+      valid = false;
+    }
+    if (pw !== conf) {
+      const note = document.getElementById("confirm-note");
+      note.textContent = "\u2715 Passwords do not match";
+      note.classList.add("show","fail"); note.classList.remove("ok");
+      document.getElementById("in-confirm").classList.add("is-err");
+      valid = false;
+    }
+  }
+  return valid;
+}
+
+/* ── EMAIL FORM SUBMIT ────────────────────────────────────────────── */
+document.getElementById("auth-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  clearErrors();
+  if (!validateForm()) return;
+
+  const email = document.getElementById("in-email").value.trim();
+  const pw    = document.getElementById("in-pw").value;
+  const name  = MODE === "register" ? document.getElementById("in-name").value.trim() : "";
+
+  const origLabel = MODE === "register" ? "Create Account" : "Sign In to Workspace";
+  btnLoad("submit-btn", true, MODE === "register" ? "Creating account..." : "Signing in...");
+  disableOAuth(true);
+
+  try {
+    let cred;
+    if (MODE === "register") {
+      // ── REGISTER ──
+      cred = await createUserWithEmailAndPassword(auth, email, pw);
+      // Set display name
+      if (name) await updateProfile(cred.user, { displayName: name }).catch(() => {});
+
+      // Send email verification — critical requirement
+      await sendEmailVerification(cred.user);
+      toast("s", "Account created!",
+        "Welcome, " + (name || email.split("@")[0]) + "! A verification email has been sent to " + email + ". Please verify before continuing.");
+
+    } else {
+      // ── SIGN IN ──
+      cred = await signInWithEmailAndPassword(auth, email, pw);
+      toast("s", "Signed in!",
+        "Welcome back, " + (cred.user.displayName || email.split("@")[0]) + ". Your session is live.");
+    }
+
+    // Firestore sync (non-blocking)
+    syncFirestore(cred.user).catch(() => {});
+
+    // Clear sensitive fields
+    document.getElementById("in-pw").value = "";
+    const cf = document.getElementById("in-confirm");
+    if (cf) cf.value = "";
+
+  } catch (err) {
+    const msg = friendlyError(err);
+    if (msg) toast("e", "Authentication failed", msg, 7000);
+  } finally {
+    btnRestore("submit-btn", `<span id="submit-label">${origLabel}</span>`);
+    disableOAuth(false);
+  }
+});
+
+/* ── GOOGLE SIGN-IN ───────────────────────────────────────────────── */
+const ORIG_GOOGLE = document.getElementById("btn-google").innerHTML;
+document.getElementById("btn-google").addEventListener("click", async () => {
+  document.getElementById("btn-google").disabled = true;
+  document.getElementById("btn-google").innerHTML =
+    `<div class="spin" style="border-color:rgba(66,133,244,.35);border-top-color:#4285F4;"></div><span>Google...</span>`;
+  document.getElementById("btn-github").disabled = true;
+  document.getElementById("submit-btn").disabled = true;
+
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.addScope("profile");
+    provider.addScope("email");
+    const result = await signInWithPopup(auth, provider);
+    syncFirestore(result.user).catch(() => {});
+    toast("s", "Signed in with Google",
+      "Welcome, " + (result.user.displayName || "User") + "! Your profile is cloud-synced.");
+  } catch (err) {
+    const msg = friendlyError(err);
+    if (msg) toast("e", "Google sign-in failed", msg, 7000);
+  } finally {
+    document.getElementById("btn-google").innerHTML = ORIG_GOOGLE;
+    document.getElementById("btn-google").disabled = false;
+    document.getElementById("btn-github").disabled = false;
+    document.getElementById("submit-btn").disabled = false;
+  }
+});
+
+/* ── GITHUB SIGN-IN ───────────────────────────────────────────────── */
+const ORIG_GITHUB = document.getElementById("btn-github").innerHTML;
+document.getElementById("btn-github").addEventListener("click", async () => {
+  document.getElementById("btn-github").disabled = true;
+  document.getElementById("btn-github").innerHTML =
+    `<div class="spin" style="border-color:rgba(255,255,255,.2);border-top-color:#e2e8f0;"></div><span>GitHub...</span>`;
+  document.getElementById("btn-google").disabled = true;
+  document.getElementById("submit-btn").disabled = true;
+
+  try {
+    const provider = new GithubAuthProvider();
+    provider.addScope("read:user");
+    provider.addScope("user:email");
+    const result = await signInWithPopup(auth, provider);
+    const user   = result.user;
+
+    // Fetch GitHub profile extras using the OAuth access token
+    let ghExtra = {};
+    try {
+      const cred  = GithubAuthProvider.credentialFromResult(result);
+      const token = cred ? cred.accessToken : null;
+      if (token) {
+        const ghRes = await fetch("https://api.github.com/user", {
+          headers: { "Authorization": "token " + token, "Accept": "application/vnd.github.v3+json" }
+        });
+        if (ghRes.ok) {
+          const g = await ghRes.json();
+          ghExtra = {
+            username:    g.login,
+            bio:         g.bio,
+            publicRepos: g.public_repos,
+            profileUrl:  g.html_url,
+            followers:   g.followers
+          };
+        }
+      }
+    } catch (ghErr) {
+      console.warn("GitHub extras note:", ghErr);
+    }
+
+    syncFirestore(user, ghExtra).catch(() => {});
+    toast("s", "Signed in with GitHub",
+      "Welcome, @" + (ghExtra.username || user.displayName || "User") + "! Profile and Firestore synced.");
+  } catch (err) {
+    const msg = friendlyError(err);
+    if (msg) toast("e", "GitHub sign-in failed", msg, 7000);
+  } finally {
+    document.getElementById("btn-github").innerHTML = ORIG_GITHUB;
+    document.getElementById("btn-github").disabled = false;
+    document.getElementById("btn-google").disabled = false;
+    document.getElementById("submit-btn").disabled = false;
+  }
+});
+
+/* ── SIGN OUT ─────────────────────────────────────────────────────── */
+document.getElementById("btn-signout").addEventListener("click", async () => {
+  const btn = document.getElementById("btn-signout");
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spin" style="width:13px;height:13px;border-width:2px;"></div> Signing out...`;
+  try {
+    await signOut(auth);
+    // Clear local session if present
+    try { localStorage.removeItem("genesis_current_user"); } catch {}
+    if (window.GenesisAuth && window.GenesisAuth.updateNavbarAuth) window.GenesisAuth.updateNavbarAuth();
+    toast("i", "Signed out", "Your session has been ended securely. See you next time.");
+  } catch (err) {
+    const msg = friendlyError(err);
+    if (msg) toast("e", "Sign-out failed", msg);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Sign Out`;
+  }
+});
+
+/* ── RESEND VERIFICATION ──────────────────────────────────────────── */
+document.getElementById("btn-resend").addEventListener("click", async () => {
+  const btn = document.getElementById("btn-resend");
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spin" style="width:13px;height:13px;border-width:2px;border-color:rgba(245,158,11,.35);border-top-color:#f59e0b;"></div> Sending...`;
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("No user signed in.");
+    await sendEmailVerification(user);
+    toast("s", "Verification email sent!",
+      "A new verification link has been sent to " + (user.email || "your email") + ".");
+  } catch (err) {
+    const msg = friendlyError(err);
+    if (msg) toast("e", "Could not resend email", msg);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Resend Verification Email`;
+  }
+});
+
+/* ── FORGOT PASSWORD MODAL ────────────────────────────────────────── */
+function openFW() {
+  const em = document.getElementById("in-email").value;
+  if (em) document.getElementById("fw-email").value = em;
+  document.getElementById("fw-overlay").classList.add("open");
+  setTimeout(() => document.getElementById("fw-email").focus(), 80);
+}
+function closeFW() {
+  document.getElementById("fw-overlay").classList.remove("open");
+  document.getElementById("fw-err").classList.remove("show");
+  document.getElementById("fw-email").classList.remove("is-err");
+}
+
+document.getElementById("open-forgot").addEventListener("click", openFW);
+document.getElementById("fw-close-btn").addEventListener("click", closeFW);
+document.getElementById("fw-cancel-btn").addEventListener("click", closeFW);
+document.getElementById("fw-overlay").addEventListener("click", (e) => {
+  if (e.target === document.getElementById("fw-overlay")) closeFW();
+});
+
+const ORIG_FW_BTN = "Send Reset Link";
+document.getElementById("fw-send-btn").addEventListener("click", async () => {
+  const email = document.getElementById("fw-email").value.trim();
+  document.getElementById("fw-err").classList.remove("show");
+  document.getElementById("fw-email").classList.remove("is-err");
+
+  if (!isEmail(email)) {
+    document.getElementById("fw-err").classList.add("show");
+    document.getElementById("fw-email").classList.add("is-err");
+    return;
+  }
+
+  btnLoad("fw-send-btn", true, "Sending...");
+  try {
+    await sendPasswordResetEmail(auth, email);
+    closeFW();
+    toast("s", "Password reset email sent",
+      "Check your inbox at " + email + " for a secure reset link. It may take a minute to arrive.");
+  } catch (err) {
+    const msg = friendlyError(err);
+    if (msg) toast("e", "Could not send reset email", msg, 7000);
+  } finally {
+    btnRestore("fw-send-btn", ORIG_FW_BTN);
+  }
+});
+
+/* ── KEYBOARD ─────────────────────────────────────────────────────── */
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeFW();
+});
+
+console.log("%c\uD83D\uDD25 Genesis Auth v5 — Firebase Modular SDK — saas-34243", "color:#818cf8;font-weight:bold;font-size:12px;");
+</script>
+</body>
+</html>
