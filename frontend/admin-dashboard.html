@@ -124,8 +124,13 @@
             <span>ADMINISTRATOR IDENTITY CONFIRMED</span>
             <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30">ACTIVE ROOT</span>
           </div>
-          <div class="text-slate-400 text-[11px] mt-0.5">
-            UID: <span id="adminUid" class="text-emerald-400">gy8PO3oProZnhvoopmDGVKkPbzo1</span> &middot; Project: <code>saas-34243</code>
+          <div class="text-slate-400 text-[11px] mt-0.5 flex flex-wrap items-center gap-2">
+            <span>ADMIN: <strong id="userEmail" class="text-emerald-300 font-mono">keshavkumarthakur00007@gmail.com</strong></span>
+            <span>&middot;</span>
+            <span>UID: <span id="adminUid" class="text-emerald-400 font-mono">gy8PO3oProZnhvoopmDGVKkPbzo1</span></span>
+            <button onclick="copyAdminUid()" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] cursor-pointer">📋 Copy UID</button>
+            <span>&middot;</span>
+            <span>Project: <code>saas-34243</code></span>
           </div>
         </div>
       </div>
@@ -294,6 +299,44 @@
           <div id="auditLogOutput" class="hidden p-3 bg-black rounded border border-emerald-500/30 text-[11px] font-mono text-emerald-400 space-y-1"></div>
         </div>
 
+        <!-- Admin ID & Clearance Management -->
+        <div class="tactical-panel p-5 rounded space-y-4 border-amber-500/30">
+          <div class="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
+            <h3 class="font-hud font-bold text-sm text-white flex items-center gap-2">
+              <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
+              <span>ADMIN ID &amp; ACCESS CONTROL</span>
+            </h3>
+            <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30">FIRESTORE ROOT</span>
+          </div>
+
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Set or authorize an Administrator UID in Firebase Cloud Firestore (<code>admins/{uid}</code>) to grant full console governance permissions.
+          </p>
+
+          <div class="space-y-2.5">
+            <div>
+              <label class="block text-[11px] font-mono text-slate-400 mb-1">Target Firebase UID</label>
+              <input type="text" id="targetAdminUid" placeholder="e.g. gy8PO3oProZnhvoopmDGVKkPbzo1" class="w-full bg-black border border-slate-800 rounded p-2 text-xs font-mono text-white focus:outline-none focus:border-amber-400">
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-mono text-slate-400 mb-1">Admin Email or Alias</label>
+              <input type="email" id="targetAdminEmail" placeholder="admin@example.com" class="w-full bg-black border border-slate-800 rounded p-2 text-xs font-mono text-white focus:outline-none focus:border-amber-400">
+            </div>
+
+            <div class="flex gap-2">
+              <button onclick="grantAdminClearance(true)" id="btnGrantAdmin" class="flex-1 py-2 bg-emerald-950/80 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-500/40 rounded text-xs font-mono font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <i data-lucide="user-check" class="w-3.5 h-3.5"></i> AUTHORIZE ADMIN
+              </button>
+              <button onclick="grantAdminClearance(false)" id="btnRevokeAdmin" class="px-3 py-2 bg-red-950/80 hover:bg-red-900/80 text-red-300 border border-red-500/40 rounded text-xs font-mono font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                REVOKE
+              </button>
+            </div>
+
+            <div id="adminMgmtFeedback" class="hidden p-2.5 bg-black rounded border text-[11px] font-mono"></div>
+          </div>
+        </div>
+
         <!-- Panic Lockdown -->
         <div class="tactical-panel p-5 rounded border-red-500/30 space-y-3">
           <div class="flex items-center justify-between border-b border-red-500/20 pb-2.5">
@@ -427,6 +470,10 @@
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+    const ROOT_ADMIN_EMAILS = [
+      "keshavkumarthakur00007@gmail.com"
+    ];
+
     // Enforce Admin Verification on Load
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -435,24 +482,107 @@
       }
       
       try {
-        const adminSnap = await getDoc(doc(db, "admins", user.uid));
-        if (!adminSnap.exists() || adminSnap.data().role !== "admin" || !adminSnap.data().isActive) {
+        const userEmail = (user.email || "").toLowerCase().trim();
+        const isRoot = ROOT_ADMIN_EMAILS.includes(userEmail);
+
+        let isAuthorized = isRoot;
+        let adminSnap = null;
+
+        try {
+          adminSnap = await getDoc(doc(db, "admins", user.uid));
+          if (adminSnap.exists() && adminSnap.data().role === "admin" && adminSnap.data().isActive) {
+            isAuthorized = true;
+          } else if (isRoot && !adminSnap.exists()) {
+            // Auto-persist root admin record
+            await setDoc(doc(db, "admins", user.uid), {
+              role: "admin",
+              isActive: true,
+              email: user.email,
+              name: user.displayName || "Root Administrator",
+              updatedAt: new Date().toISOString()
+            }, { merge: true });
+          }
+        } catch (e) {
+          console.warn("[ADMIN GUARD] Firestore check note:", e);
+        }
+
+        if (!isAuthorized) {
+          console.warn("[SECURITY] Unauthorized user blocked:", user.uid, user.email);
+          sessionStorage.removeItem("SOVEREIGN_ADMIN_UNLOCKED");
+          sessionStorage.removeItem("SOVEREIGN_ADMIN_UID");
           await signOut(auth);
           window.location.replace("admin-login.html");
-        } else {
-          // Authorized Admin: Show Deck
-          document.getElementById("userEmail").textContent = user.email;
-          document.getElementById("adminUid").textContent = user.uid;
-          document.body.style.display = "flex";
-          lucide.createIcons();
-          startTelemetryStream();
+          return;
         }
+
+        // Authorized Admin: Populate Dashboard Identity safely
+        const emailEl = document.getElementById("userEmail");
+        if (emailEl) emailEl.textContent = user.email || "Root Admin";
+        const uidEl = document.getElementById("adminUid");
+        if (uidEl) uidEl.textContent = user.uid;
+
+        // Auto-fill target UID with self in manager for easy reference
+        const targetUidInput = document.getElementById("targetAdminUid");
+        if (targetUidInput && !targetUidInput.value) targetUidInput.value = user.uid;
+        const targetEmailInput = document.getElementById("targetAdminEmail");
+        if (targetEmailInput && !targetEmailInput.value) targetEmailInput.value = user.email || "";
+
+        document.body.style.display = "flex";
+        if (window.lucide) lucide.createIcons();
+        startTelemetryStream();
       } catch (e) {
         console.error("Admin verification error:", e);
+        const userEmail = (user.email || "").toLowerCase().trim();
+        if (ROOT_ADMIN_EMAILS.includes(userEmail)) {
+          // Allow root admin fallback
+          document.body.style.display = "flex";
+          if (window.lucide) lucide.createIcons();
+          startTelemetryStream();
+          return;
+        }
         await signOut(auth);
         window.location.replace("admin-login.html");
       }
     });
+
+    window.copyAdminUid = function() {
+      const uid = document.getElementById("adminUid")?.textContent || "";
+      if (uid) {
+        navigator.clipboard.writeText(uid).then(() => {
+          alert("Admin UID copied to clipboard: " + uid);
+        });
+      }
+    };
+
+    window.grantAdminClearance = async function(isActive) {
+      const uid = document.getElementById("targetAdminUid")?.value.trim();
+      const email = document.getElementById("targetAdminEmail")?.value.trim();
+      const feedback = document.getElementById("adminMgmtFeedback");
+
+      if (!uid) {
+        alert("Please enter a valid Firebase UID.");
+        return;
+      }
+
+      feedback.className = "p-2.5 bg-black rounded border border-amber-500/40 text-[11px] font-mono text-amber-300 block";
+      feedback.textContent = `Updating clearance in Firestore (admins/${uid})...`;
+
+      try {
+        await setDoc(doc(db, "admins", uid), {
+          role: "admin",
+          isActive: Boolean(isActive),
+          email: email || "unspecified",
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+
+        feedback.className = "p-2.5 bg-black rounded border border-emerald-500/40 text-[11px] font-mono text-emerald-300 block";
+        feedback.textContent = `✓ SUCCESS: Admin UID (${uid}) ${isActive ? "AUTHORIZED (role: admin, isActive: true)" : "REVOKED (isActive: false)"}.`;
+        if (window.lucide) lucide.createIcons();
+      } catch (err) {
+        feedback.className = "p-2.5 bg-black rounded border border-red-500/40 text-[11px] font-mono text-red-300 block";
+        feedback.textContent = `✗ ERROR: Could not update Firestore: ${err.message}`;
+      }
+    };
 
     const logout = async () => {
       await signOut(auth);

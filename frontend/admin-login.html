@@ -193,19 +193,50 @@
   <script type="module">
     import { auth, db } from "./admin-firebase.js";
     import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const form = document.getElementById("adminForm");
     const googleBtn = document.getElementById("googleSignInBtn");
     const errorMsg = document.getElementById("errorMsg");
     const submitBtn = document.getElementById("submitBtn");
 
+    // Configured Root Administrator Whitelist
+    const ROOT_ADMIN_EMAILS = [
+      "keshavkumarthakur00007@gmail.com"
+    ];
+
     async function verifyAndRedirect(user) {
       try {
+        const userEmail = (user.email || "").toLowerCase().trim();
+        const isRoot = ROOT_ADMIN_EMAILS.includes(userEmail);
+
         // Query Firestore collection 'admins/{uid}'
-        const adminSnap = await getDoc(doc(db, "admins", user.uid));
-        
-        if (adminSnap.exists() && adminSnap.data().role === "admin" && adminSnap.data().isActive === true) {
+        let adminSnap = null;
+        try {
+          adminSnap = await getDoc(doc(db, "admins", user.uid));
+        } catch (e) {
+          console.warn("[ADMIN AUTH] Firestore read warning:", e);
+        }
+
+        // Auto-bootstrap root admin into Firestore if not exists
+        if ((!adminSnap || !adminSnap.exists()) && isRoot) {
+          try {
+            await setDoc(doc(db, "admins", user.uid), {
+              role: "admin",
+              isActive: true,
+              email: user.email,
+              name: user.displayName || "Root Administrator",
+              updatedAt: new Date().toISOString()
+            }, { merge: true });
+            adminSnap = await getDoc(doc(db, "admins", user.uid));
+          } catch (e) {
+            console.warn("[ADMIN AUTH] Auto-bootstrap write note:", e);
+          }
+        }
+
+        const isAuthorized = isRoot || (adminSnap && adminSnap.exists() && adminSnap.data().role === "admin" && adminSnap.data().isActive === true);
+
+        if (isAuthorized) {
           // Authorized Admin: Store session indicators and forward
           sessionStorage.setItem("SOVEREIGN_ADMIN_UNLOCKED", "true");
           sessionStorage.setItem("SOVEREIGN_UNLOCKED_AT", Date.now().toString());
@@ -217,6 +248,14 @@
           showError(`Access Denied: Account (${user.email}) is not authorized as an administrator.`);
         }
       } catch (err) {
+        const isRoot = user.email && ROOT_ADMIN_EMAILS.includes(user.email.toLowerCase().trim());
+        if (isRoot) {
+          sessionStorage.setItem("SOVEREIGN_ADMIN_UNLOCKED", "true");
+          sessionStorage.setItem("SOVEREIGN_ADMIN_EMAIL", user.email || "");
+          sessionStorage.setItem("SOVEREIGN_ADMIN_UID", user.uid);
+          window.location.href = "admin-dashboard.html";
+          return;
+        }
         await signOut(auth);
         showError("Firestore Authorization Error: " + err.message);
       }
