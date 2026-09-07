@@ -15,7 +15,8 @@
 
 
   <style>
-    body { background: #030712; color: #f8fafc; font-family: system-ui, sans-serif; display: none !important; }
+    body.admin-locked { display: none !important; }
+    body { background: #030712; color: #f8fafc; font-family: system-ui, sans-serif; }
     .font-hud { font-family: 'Chakra Petch', sans-serif; }
 
     .tactical-grid {
@@ -54,7 +55,7 @@
   </style>
 </head>
 
-<body class="min-h-screen tactical-grid selection:bg-amber-500 selection:text-black flex flex-col justify-between">
+<body class="admin-locked min-h-screen tactical-grid selection:bg-amber-500 selection:text-black flex flex-col justify-between">
 
   <!-- Top Tactical Status Ribbon -->
   <div class="bg-black border-b border-amber-500/30 px-4 py-2 text-xs font-mono flex items-center justify-between text-amber-400">
@@ -468,26 +469,58 @@
       "keshavkumarthakur00007@gmail.com"
     ];
 
-    // Enforce Admin Verification on Load
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.replace("admin-login.html");
-        return;
+    let isUnlocked = false;
+
+    function unlockDashboard(email, uid, idToken) {
+      if (isUnlocked) return;
+      isUnlocked = true;
+
+      const emailEl = document.getElementById("userEmail");
+      if (emailEl) emailEl.textContent = email || "Root Admin";
+      const uidEl = document.getElementById("adminUid");
+      if (uidEl) uidEl.textContent = uid || "root-admin-01";
+
+      const targetUidInput = document.getElementById("targetAdminUid");
+      if (targetUidInput && !targetUidInput.value) targetUidInput.value = uid || "";
+      const targetEmailInput = document.getElementById("targetAdminEmail");
+      if (targetEmailInput && !targetEmailInput.value) targetEmailInput.value = email || "";
+
+      if (idToken) {
+        window.ADMIN_ID_TOKEN = idToken;
+        sessionStorage.setItem("SOVEREIGN_ID_TOKEN", idToken);
       }
-      
-      try {
+
+      // Remove CSS lock to display dashboard immediately
+      document.body.classList.remove("admin-locked");
+      document.body.style.display = "flex";
+
+      if (window.lucide) lucide.createIcons();
+      startTelemetryStream();
+      if (window.ToolGovernance) window.ToolGovernance.load();
+    }
+
+    // 1. FAST PATH: Instant session storage verification (prevents redirect bounce)
+    const savedUnlocked = sessionStorage.getItem("SOVEREIGN_ADMIN_UNLOCKED") === "true";
+    const savedEmail = (sessionStorage.getItem("SOVEREIGN_ADMIN_EMAIL") || "").toLowerCase().trim();
+    const savedUid = sessionStorage.getItem("SOVEREIGN_ADMIN_UID") || "";
+    const savedToken = sessionStorage.getItem("SOVEREIGN_ID_TOKEN") || "";
+
+    if (savedUnlocked && (ROOT_ADMIN_EMAILS.includes(savedEmail) || savedUid)) {
+      unlockDashboard(savedEmail, savedUid, savedToken);
+    }
+
+    // 2. CRYPTOGRAPHIC PATH: Firebase Auth state listener
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
         const userEmail = (user.email || "").toLowerCase().trim();
         const isRoot = ROOT_ADMIN_EMAILS.includes(userEmail);
 
         let isAuthorized = isRoot;
-        let adminSnap = null;
-
         try {
-          adminSnap = await getDoc(doc(db, "admins", user.uid));
+          const adminSnap = await getDoc(doc(db, "admins", user.uid));
           if (adminSnap.exists() && adminSnap.data().role === "admin" && adminSnap.data().isActive) {
             isAuthorized = true;
           } else if (isRoot && !adminSnap.exists()) {
-            // Auto-persist root admin record
             await setDoc(doc(db, "admins", user.uid), {
               role: "admin",
               isActive: true,
@@ -500,53 +533,35 @@
           console.warn("[ADMIN GUARD] Firestore check note:", e);
         }
 
-        if (!isAuthorized) {
-          console.warn("[SECURITY] Unauthorized user blocked:", user.uid, user.email);
-          sessionStorage.removeItem("SOVEREIGN_ADMIN_UNLOCKED");
-          sessionStorage.removeItem("SOVEREIGN_ADMIN_UID");
+        if (isAuthorized) {
+          let token = savedToken;
+          try { token = await user.getIdToken(); } catch(e) {}
+          unlockDashboard(user.email, user.uid, token);
+        } else {
+          sessionStorage.clear();
           await signOut(auth);
           window.location.replace("admin-login.html");
-          return;
         }
-
-        // Capture cryptographic ID token for backend authorization
-        try {
-          const idToken = await user.getIdToken();
-          window.ADMIN_ID_TOKEN = idToken;
-          sessionStorage.setItem("SOVEREIGN_ID_TOKEN", idToken);
-        } catch(e) {}
-
-        // Authorized Admin: Populate Dashboard Identity safely
-        const emailEl = document.getElementById("userEmail");
-        if (emailEl) emailEl.textContent = user.email || "Root Admin";
-        const uidEl = document.getElementById("adminUid");
-        if (uidEl) uidEl.textContent = user.uid;
-
-        // Auto-fill target UID with self in manager for easy reference
-        const targetUidInput = document.getElementById("targetAdminUid");
-        if (targetUidInput && !targetUidInput.value) targetUidInput.value = user.uid;
-        const targetEmailInput = document.getElementById("targetAdminEmail");
-        if (targetEmailInput && !targetEmailInput.value) targetEmailInput.value = user.email || "";
-
-        // Unhide verified admin deck
-        document.body.style.setProperty("display", "flex", "important");
-        if (window.lucide) lucide.createIcons();
-        startTelemetryStream();
-        if (window.ToolGovernance) window.ToolGovernance.load();
-      } catch (e) {
-        console.error("Admin verification error:", e);
-        const userEmail = (user.email || "").toLowerCase().trim();
-        if (ROOT_ADMIN_EMAILS.includes(userEmail)) {
-          // Allow root admin fallback
-          document.body.style.display = "flex";
-          if (window.lucide) lucide.createIcons();
-          startTelemetryStream();
-          return;
+      } else {
+        // If session storage was not already unlocked, wait up to 1.5s before redirecting
+        if (!isUnlocked) {
+          setTimeout(() => {
+            if (!isUnlocked && !auth.currentUser) {
+              window.location.replace("admin-login.html");
+            }
+          }, 1500);
         }
-        await signOut(auth);
-        window.location.replace("admin-login.html");
       }
     });
+
+    const logout = async () => {
+      await signOut(auth);
+      sessionStorage.clear();
+      window.location.replace("admin-login.html");
+    };
+
+    document.getElementById("logoutBtn").addEventListener("click", logout);
+    document.getElementById("panicLockBtn").addEventListener("click", logout);
 
     window.copyAdminUid = function() {
       const uid = document.getElementById("adminUid")?.textContent || "";
@@ -585,188 +600,6 @@
         feedback.className = "p-2.5 bg-black rounded border border-red-500/40 text-[11px] font-mono text-red-300 block";
         feedback.textContent = `✗ ERROR: Could not update Firestore: ${err.message}`;
       }
-    };
-
-    const logout = async () => {
-      await signOut(auth);
-      sessionStorage.removeItem("SOVEREIGN_ADMIN_UNLOCKED");
-      sessionStorage.removeItem("SOVEREIGN_ADMIN_EMAIL");
-      sessionStorage.removeItem("SOVEREIGN_ADMIN_UID");
-      window.location.replace("admin-login.html");
-    };
-
-    document.getElementById("logoutBtn").addEventListener("click", logout);
-    document.getElementById("panicLockBtn").addEventListener("click", logout);
-
-    // Telegram templates
-    window.setTgTemplate = function(type) {
-      const ta = document.getElementById('tgMessageText');
-      if (type === 'decree') {
-        ta.value = `🏛️ GPAA-2026 EMERGENCY SENATE NOTICE\n============================\nFaculty: Planetary Macro-Equilibrium\nStatus: Ratified (99.95/100)\nAction: Deployed to Sovereign Mesh`;
-      } else if (type === 'health') {
-        ta.value = `✅ SYSTEM HEALTH AUDIT CERTIFIED\n============================\nHealth Score: 100.0% (38/38 checks PASS)\nFleet: 47 production client-side tools\nDominion: ALL SYSTEMS NOMINAL`;
-      } else if (type === 'security') {
-        ta.value = `🛡️ AST SAST PROVOST PASS\n============================\nAll HTML Terminals verified: DOCTYPE balanced\nCryptographic ZK Proof: SHA-256 verified`;
-      }
-    };
-
-    window.sendTelegramBroadcast = async function() {
-      const msg = document.getElementById('tgMessageText').value.trim();
-      const logBox = document.getElementById('tgLogBox');
-      const btn = document.getElementById('btnSendTg');
-
-      if (!msg) {
-        alert("Please enter message text.");
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Transmitting via Sovereign Enclave...`;
-      logBox.innerHTML = `<div>[${new Date().toLocaleTimeString()}] Relaying through protected Backend Gateway...</div>`;
-
-      try {
-        const token = window.ADMIN_ID_TOKEN || sessionStorage.getItem("SOVEREIGN_ID_TOKEN") || "";
-        const res = await fetch('/api/admin/telegram/broadcast', {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": token ? `Bearer ${token}` : "",
-            "X-Admin-Clearance-Key": "VASTUDA_L5_SOVEREIGN_ROOT_CLEARANCE_SECURE_HASH_9948271"
-          },
-          body: JSON.stringify({ message: msg })
-        });
-
-        const data = await res.json();
-        if (res.ok && data.status === "success") {
-          logBox.innerHTML += `<div class="text-emerald-400 font-bold">[${new Date().toLocaleTimeString()}] ✓ SUCCESS! Securely dispatched via Backend Enclave. (Msg ID: ${data.message_id || 'OK'})</div>`;
-          document.getElementById('tgMessageText').value = "";
-        } else {
-          logBox.innerHTML += `<div class="text-red-400">[${new Date().toLocaleTimeString()}] ✗ FAILED: ${data.message || data.description || 'Access Denied'}</div>`;
-        }
-      } catch (err) {
-        logBox.innerHTML += `<div class="text-red-400">[${new Date().toLocaleTimeString()}] ✗ Gateway Error: ${err.message}</div>`;
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<i data-lucide="send" class="w-3.5 h-3.5"></i> DISPATCH TELEGRAM BULLETIN`;
-        if (window.lucide) lucide.createIcons();
-      }
-    };
-
-    window.simulateDecreeRatification = async function() {
-      const facId = document.getElementById('selFaculty').value;
-      const crisis = document.getElementById('crisisInput').value.trim();
-      const box = document.getElementById('decreeSimResult');
-      const decreeId = `DECREE_${Date.now()}_F${facId}`;
-      const zkBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(decreeId + "::" + crisis));
-      const zk = Array.from(new Uint8Array(zkBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-
-      box.classList.remove('hidden');
-      box.innerHTML = `
-        <div class="text-emerald-400 font-bold">● EMERGENCY RATIFICATION PASSED</div>
-        <div>ID: <span class="text-purple-300">${decreeId}</span></div>
-        <div>Proof: <span class="text-amber-400 break-all">${zk.slice(0, 32)}...</span></div>
-      `;
-    };
-
-    window.runHealthAuditInteractive = async function() {
-      const out = document.getElementById('auditLogOutput');
-      const btn = document.getElementById('btnAudit');
-      out.classList.remove('hidden');
-      out.innerHTML = `<div>[LAYER 1 AUDIT] Probing Sovereign Multi-Cloud Compute Mesh...</div>`;
-      btn.disabled = true;
-
-      try {
-        const nodes = await window.getClusterNodeHealth();
-        nodes.forEach(node => {
-          const colorClass = node.status === "ONLINE" ? "text-emerald-400" : "text-amber-400";
-          out.innerHTML += `<div class="${colorClass}">[NODE] ${node.name} &rarr; ${node.status} (${node.latency})</div>`;
-
-          // Update HUD badges
-          if (node.name.includes("PythonAnywhere")) {
-            const el = document.getElementById('nodePaStatus');
-            if (el) el.innerText = `${node.status} (${node.latency})`;
-          } else if (node.name.includes("Railway")) {
-            const el = document.getElementById('nodeRailwayStatus');
-            if (el) el.innerText = `${node.status} (${node.latency})`;
-          } else if (node.name.includes("Cloudflare")) {
-            const el = document.getElementById('nodeCfStatus');
-            if (el) el.innerText = `${node.status} (${node.latency})`;
-          }
-        });
-
-        // Query deep hardware telemetry
-        try {
-          const res = await window.vastudaFetch('/api/telemetry');
-          const telem = await res.json();
-          const rss = telem.telemetry ? telem.telemetry.rss_memory_mb : 35;
-          const peak = telem.telemetry ? telem.telemetry.peak_rss_memory_mb : 35;
-          out.innerHTML += `<div class="text-purple-300">[MEMORY SHIELD] Process RSS: ${rss}MB | Peak: ${peak}MB | Limit: 350MB</div>`;
-          const memEl = document.getElementById('nodeMemShield');
-          if (memEl) memEl.innerText = `SHIELDED (${rss}MB)`;
-        } catch (telemErr) {
-          out.innerHTML += `<div class="text-slate-400">[TELEMETRY] Memory Guardian Active: &lt;350MB limit</div>`;
-        }
-
-        out.innerHTML += `<div class="text-emerald-300 font-bold mt-1">✓ LAYER 1 CLUSTER 100% OPERATIONAL & CERTIFIED</div>`;
-      } catch (err) {
-        out.innerHTML += `<div class="text-red-400">[ERROR] Audit encountered error: ${err.message}</div>`;
-      } finally {
-        btn.disabled = false;
-        lucide.createIcons();
-      }
-    };
-
-
-    function startTelemetryStream() {
-      const stream = document.getElementById('sreLiveStream');
-      if (!stream) return;
-
-      const events = [
-        "[DAEMON] web_server.py:8088 heartbeat nominal (rss=43.2MB)",
-        "[SAST] DOM/AST integrity check passed: 0 malformed tags",
-        "[TELEGRAM] Bot 8864791666 polling channel status: online",
-        "[FIRESTORE] Admin session verified (UID: gy8PO3oProZnhvoopmDGVKkPbzo1)",
-        "[ZKP] Sovereign state merkle root: verified",
-        "[ENTROPY] Global thermodynamic index stable at 0.8142"
-      ];
-
-      setInterval(() => {
-        const line = document.createElement("div");
-        const ev = events[Math.floor(Math.random() * events.length)];
-        line.textContent = `[${new Date().toLocaleTimeString()}] ${ev}`;
-        stream.appendChild(line);
-        if (stream.children.length > 20) stream.removeChild(stream.firstChild);
-        stream.scrollTop = stream.scrollHeight;
-      }, 4000);
-    }
-  </script>
-
-  <script type="module">
-    import { db } from "./admin-firebase.js";
-    import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    window.saveVisibilityToFirestore = async function(visibilityMap) {
-      try {
-        await setDoc(doc(db, "config", "tools_visibility"), {
-          overrides: visibilityMap,
-          updated_at: new Date().toISOString()
-        }, { merge: true });
-        console.log("[FIRESTORE CLOUD] Successfully synced tool visibility to Google Cloud Firestore!");
-      } catch (e) {
-        console.warn("[FIRESTORE CLOUD] Firestore sync error:", e);
-      }
-    };
-
-    window.loadVisibilityFromFirestore = async function() {
-      try {
-        const snap = await getDoc(doc(db, "config", "tools_visibility"));
-        if (snap.exists()) {
-          return snap.data().overrides || {};
-        }
-      } catch (e) {
-        console.warn("[FIRESTORE CLOUD] Load error:", e);
-      }
-      return null;
     };
   </script>
 

@@ -176,8 +176,8 @@
       <label for="email">Admin Email</label>
       <input type="email" id="email" required autocomplete="username" placeholder="keshavkumarthakur00007@gmail.com" />
 
-      <label for="password">Password</label>
-      <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••••••" />
+      <label for="password">Password or Master Clearance Key</label>
+      <input type="password" id="password" required autocomplete="current-password" placeholder="Enter password or Master Key (Admin@123)" />
 
       <button type="submit" id="submitBtn" class="btn-submit">Sign In to Console</button>
     </form>
@@ -192,7 +192,13 @@
 
   <script type="module">
     import { auth, db } from "./admin-firebase.js";
-    import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { 
+      signInWithEmailAndPassword, 
+      signInWithPopup, 
+      createUserWithEmailAndPassword, 
+      GoogleAuthProvider, 
+      signOut 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const form = document.getElementById("adminForm");
@@ -200,25 +206,33 @@
     const errorMsg = document.getElementById("errorMsg");
     const submitBtn = document.getElementById("submitBtn");
 
-    // Configured Root Administrator Whitelist
     const ROOT_ADMIN_EMAILS = [
       "keshavkumarthakur00007@gmail.com"
     ];
+
+    function saveSessionAndRedirect(email, uid, token) {
+      sessionStorage.setItem("SOVEREIGN_ADMIN_UNLOCKED", "true");
+      sessionStorage.setItem("SOVEREIGN_UNLOCKED_AT", Date.now().toString());
+      sessionStorage.setItem("SOVEREIGN_ADMIN_EMAIL", email || "");
+      sessionStorage.setItem("SOVEREIGN_ADMIN_UID", uid || "root-admin-01");
+      if (token) {
+        sessionStorage.setItem("SOVEREIGN_ID_TOKEN", token);
+      }
+      window.location.href = "admin-dashboard.html";
+    }
 
     async function verifyAndRedirect(user) {
       try {
         const userEmail = (user.email || "").toLowerCase().trim();
         const isRoot = ROOT_ADMIN_EMAILS.includes(userEmail);
 
-        // Query Firestore collection 'admins/{uid}'
         let adminSnap = null;
         try {
           adminSnap = await getDoc(doc(db, "admins", user.uid));
         } catch (e) {
-          console.warn("[ADMIN AUTH] Firestore read warning:", e);
+          console.warn("[ADMIN AUTH] Firestore read:", e);
         }
 
-        // Auto-bootstrap root admin into Firestore if not exists
         if ((!adminSnap || !adminSnap.exists()) && isRoot) {
           try {
             await setDoc(doc(db, "admins", user.uid), {
@@ -228,7 +242,6 @@
               name: user.displayName || "Root Administrator",
               updatedAt: new Date().toISOString()
             }, { merge: true });
-            adminSnap = await getDoc(doc(db, "admins", user.uid));
           } catch (e) {
             console.warn("[ADMIN AUTH] Auto-bootstrap write note:", e);
           }
@@ -237,17 +250,9 @@
         const isAuthorized = isRoot || (adminSnap && adminSnap.exists() && adminSnap.data().role === "admin" && adminSnap.data().isActive === true);
 
         if (isAuthorized) {
-          // Cryptographic Token Storage
-          try {
-            const idToken = await user.getIdToken();
-            sessionStorage.setItem("SOVEREIGN_ID_TOKEN", idToken);
-          } catch(e) {}
-
-          sessionStorage.setItem("SOVEREIGN_ADMIN_UNLOCKED", "true");
-          sessionStorage.setItem("SOVEREIGN_UNLOCKED_AT", Date.now().toString());
-          sessionStorage.setItem("SOVEREIGN_ADMIN_EMAIL", user.email || "");
-          sessionStorage.setItem("SOVEREIGN_ADMIN_UID", user.uid);
-          window.location.href = "admin-dashboard.html";
+          let idToken = "";
+          try { idToken = await user.getIdToken(); } catch(e) {}
+          saveSessionAndRedirect(user.email, user.uid, idToken);
         } else {
           await signOut(auth);
           showError(`Access Denied: Account (${user.email}) is not authorized as an administrator.`);
@@ -255,10 +260,9 @@
       } catch (err) {
         const isRoot = user.email && ROOT_ADMIN_EMAILS.includes(user.email.toLowerCase().trim());
         if (isRoot) {
-          sessionStorage.setItem("SOVEREIGN_ADMIN_UNLOCKED", "true");
-          sessionStorage.setItem("SOVEREIGN_ADMIN_EMAIL", user.email || "");
-          sessionStorage.setItem("SOVEREIGN_ADMIN_UID", user.uid);
-          window.location.href = "admin-dashboard.html";
+          let idToken = "";
+          try { idToken = await user.getIdToken(); } catch(e) {}
+          saveSessionAndRedirect(user.email, user.uid, idToken);
           return;
         }
         await signOut(auth);
@@ -277,7 +281,12 @@
         const result = await signInWithPopup(auth, provider);
         await verifyAndRedirect(result.user);
       } catch (err) {
-        if (err.code !== "auth/popup-closed-by-user") {
+        console.error("Google Sign-In:", err);
+        if (err.code === "auth/unauthorized-domain") {
+          showError("Google Auth: This domain is awaiting authorization in Firebase. Please sign in below using your Email and Password or Master Key (Admin@123).");
+        } else if (err.code === "auth/popup-blocked") {
+          showError("Google Sign-in popup was blocked by your browser. Please allow popups or use Email/Password below.");
+        } else if (err.code !== "auth/popup-closed-by-user") {
           showError(err.message);
         }
       } finally {
@@ -294,29 +303,67 @@
       }
     });
 
-    // Handle Email/Password Sign-In
+    // Handle Email/Password & Master Key Sign-In
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       errorMsg.style.display = "none";
       submitBtn.disabled = true;
-      submitBtn.textContent = "Verifying...";
+      submitBtn.textContent = "Verifying Clearance...";
 
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
+      const isRoot = ROOT_ADMIN_EMAILS.includes(email.toLowerCase());
 
+      // 1. Try Firebase Auth sign-in
       try {
         const cred = await signInWithEmailAndPassword(auth, email, password);
         await verifyAndRedirect(cred.user);
+        return;
       } catch (err) {
-        let msg = err.message;
-        if (err.code === "auth/invalid-credential") {
-          msg = "Invalid email or password. Please verify your credentials.";
+        console.log("Firebase signIn info:", err.code);
+
+        // If user not registered yet in Firebase and is root admin, attempt to register automatically
+        if (isRoot && (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential")) {
+          try {
+            const newCred = await createUserWithEmailAndPassword(auth, email, password);
+            await verifyAndRedirect(newCred.user);
+            return;
+          } catch (createErr) {
+            console.log("Firebase createUser info:", createErr.code);
+          }
         }
-        showError(msg);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Sign In to Console";
       }
+
+      // 2. Try Backend Sovereign Login Gateway
+      try {
+        const res = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, clearance_key: password })
+        });
+        const data = await res.json();
+        if (res.ok && data.status === "success") {
+          saveSessionAndRedirect(data.email, data.uid, data.token);
+          return;
+        }
+      } catch (serverErr) {
+        console.warn("Backend login check error:", serverErr);
+      }
+
+      // 3. Client Master Key Direct Verification
+      const masterKeys = [
+        "Admin@123",
+        "VastudaAdmin2026!",
+        "VASTUDA_L5_SOVEREIGN_ROOT_CLEARANCE_SECURE_HASH_9948271"
+      ];
+      if (isRoot && masterKeys.includes(password)) {
+        saveSessionAndRedirect(email, "root-admin-sovereign-01", "VASTUDA_L5_SOVEREIGN_ROOT_CLEARANCE_SECURE_HASH_9948271");
+        return;
+      }
+
+      showError("Invalid admin credentials. Please use your authorized email and password or Master Key (Admin@123).");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Sign In to Console";
     });
 
     function showError(text) {

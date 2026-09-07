@@ -1,5 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Registered ADMIN-PORTAL Web App Configuration (Project: saas-34243)
@@ -13,6 +13,10 @@ const firebaseConfig = {
   measurementId: "G-LZK0Y6D017"
 };
 
-export const app = initializeApp(firebaseConfig, "adminPortalInstance");
+export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+try {
+  setPersistence(auth, browserLocalPersistence).catch(() => {});
+} catch (e) {}
