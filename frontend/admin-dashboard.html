@@ -120,9 +120,9 @@
             <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30">ACTIVE ROOT</span>
           </div>
           <div class="text-slate-400 text-[11px] mt-0.5 flex flex-wrap items-center gap-2">
-            <span>ADMIN: <strong id="userEmail" class="text-emerald-300 font-mono">keshavkumarthakur00007@gmail.com</strong></span>
+            <span>ADMIN: <strong id="userEmail" class="text-emerald-300 font-mono">Authenticated Admin</strong></span>
             <span>&middot;</span>
-            <span>UID: <span id="adminUid" class="text-emerald-400 font-mono">gy8PO3oProZnhvoopmDGVKkPbzo1</span></span>
+            <span>UID: <span id="adminUid" class="text-emerald-400 font-mono">Active Session</span></span>
             <button onclick="copyAdminUid()" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] cursor-pointer">📋 Copy UID</button>
             <span>&middot;</span>
             <span>Project: <code>saas-34243</code></span>
@@ -316,7 +316,7 @@
 
             <div>
               <label class="block text-[11px] font-mono text-slate-400 mb-1">Admin Email or Alias</label>
-              <input type="email" id="targetAdminEmail" placeholder="admin@example.com" class="w-full bg-black border border-slate-800 rounded p-2 text-xs font-mono text-white focus:outline-none focus:border-amber-400">
+              <input type="email" id="targetAdminEmail" placeholder="admin@domain.com" class="w-full bg-black border border-slate-800 rounded p-2 text-xs font-mono text-white focus:outline-none focus:border-amber-400">
             </div>
 
             <div class="flex gap-2">
@@ -465,10 +465,6 @@
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const ROOT_ADMIN_EMAILS = [
-      "keshavkumarthakur00007@gmail.com"
-    ];
-
     let isUnlocked = false;
 
     function unlockDashboard(email, uid, idToken) {
@@ -476,9 +472,9 @@
       isUnlocked = true;
 
       const emailEl = document.getElementById("userEmail");
-      if (emailEl) emailEl.textContent = email || "Root Admin";
+      if (emailEl) emailEl.textContent = email || "Authenticated Admin";
       const uidEl = document.getElementById("adminUid");
-      if (uidEl) uidEl.textContent = uid || "root-admin-01";
+      if (uidEl) uidEl.textContent = uid || "";
 
       const targetUidInput = document.getElementById("targetAdminUid");
       if (targetUidInput && !targetUidInput.value) targetUidInput.value = uid || "";
@@ -499,54 +495,61 @@
       if (window.ToolGovernance) window.ToolGovernance.load();
     }
 
-    // 1. FAST PATH: Instant session storage verification (prevents redirect bounce)
+    // 1. FAST PATH: Check active session indicators
     const savedUnlocked = sessionStorage.getItem("SOVEREIGN_ADMIN_UNLOCKED") === "true";
-    const savedEmail = (sessionStorage.getItem("SOVEREIGN_ADMIN_EMAIL") || "").toLowerCase().trim();
+    const savedEmail = sessionStorage.getItem("SOVEREIGN_ADMIN_EMAIL") || "";
     const savedUid = sessionStorage.getItem("SOVEREIGN_ADMIN_UID") || "";
     const savedToken = sessionStorage.getItem("SOVEREIGN_ID_TOKEN") || "";
 
-    if (savedUnlocked && (ROOT_ADMIN_EMAILS.includes(savedEmail) || savedUid)) {
+    if (savedUnlocked && savedUid) {
       unlockDashboard(savedEmail, savedUid, savedToken);
     }
 
-    // 2. CRYPTOGRAPHIC PATH: Firebase Auth state listener
+    // 2. CRYPTOGRAPHIC FIREBASE AUTH LISTENER
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const userEmail = (user.email || "").toLowerCase().trim();
-        const isRoot = ROOT_ADMIN_EMAILS.includes(userEmail);
+        let isAuthorized = false;
+        let idToken = savedToken;
+        try { idToken = await user.getIdToken(); } catch(e) {}
 
-        let isAuthorized = isRoot;
+        // Verify with backend enclave
         try {
-          const adminSnap = await getDoc(doc(db, "admins", user.uid));
-          if (adminSnap.exists() && adminSnap.data().role === "admin" && adminSnap.data().isActive) {
+          const res = await fetch("/api/admin/verify-clearance", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + idToken
+            }
+          });
+          const data = await res.json();
+          if (res.ok && data.status === "authorized") {
             isAuthorized = true;
-          } else if (isRoot && !adminSnap.exists()) {
-            await setDoc(doc(db, "admins", user.uid), {
-              role: "admin",
-              isActive: true,
-              email: user.email,
-              name: user.displayName || "Root Administrator",
-              updatedAt: new Date().toISOString()
-            }, { merge: true });
           }
-        } catch (e) {
-          console.warn("[ADMIN GUARD] Firestore check note:", e);
+        } catch(e) {}
+
+        // Verify with Firestore admins collection
+        if (!isAuthorized) {
+          try {
+            const adminSnap = await getDoc(doc(db, "admins", user.uid));
+            if (adminSnap.exists() && adminSnap.data().role === "admin" && adminSnap.data().isActive === true) {
+              isAuthorized = true;
+            }
+          } catch(e) {}
         }
 
         if (isAuthorized) {
-          let token = savedToken;
-          try { token = await user.getIdToken(); } catch(e) {}
-          unlockDashboard(user.email, user.uid, token);
+          unlockDashboard(user.email, user.uid, idToken);
         } else {
           sessionStorage.clear();
           await signOut(auth);
           window.location.replace("admin-login.html");
         }
       } else {
-        // If session storage was not already unlocked, wait up to 1.5s before redirecting
+        // Not authenticated in Firebase
         if (!isUnlocked) {
           setTimeout(() => {
             if (!isUnlocked && !auth.currentUser) {
+              sessionStorage.clear();
               window.location.replace("admin-login.html");
             }
           }, 1500);
@@ -565,7 +568,7 @@
 
     window.copyAdminUid = function() {
       const uid = document.getElementById("adminUid")?.textContent || "";
-      if (uid) {
+      if (uid && uid !== "Active Session") {
         navigator.clipboard.writeText(uid).then(() => {
           alert("Admin UID copied to clipboard: " + uid);
         });
@@ -583,7 +586,7 @@
       }
 
       feedback.className = "p-2.5 bg-black rounded border border-amber-500/40 text-[11px] font-mono text-amber-300 block";
-      feedback.textContent = `Updating clearance in Firestore (admins/${uid})...`;
+      feedback.textContent = "Updating clearance in Firestore (admins/" + uid + ")...";
 
       try {
         await setDoc(doc(db, "admins", uid), {
@@ -594,11 +597,11 @@
         }, { merge: true });
 
         feedback.className = "p-2.5 bg-black rounded border border-emerald-500/40 text-[11px] font-mono text-emerald-300 block";
-        feedback.textContent = `✓ SUCCESS: Admin UID (${uid}) ${isActive ? "AUTHORIZED (role: admin, isActive: true)" : "REVOKED (isActive: false)"}.`;
+        feedback.textContent = "✓ SUCCESS: Admin UID (" + uid + ") " + (isActive ? "AUTHORIZED (role: admin, isActive: true)" : "REVOKED (isActive: false)") + ".";
         if (window.lucide) lucide.createIcons();
       } catch (err) {
         feedback.className = "p-2.5 bg-black rounded border border-red-500/40 text-[11px] font-mono text-red-300 block";
-        feedback.textContent = `✗ ERROR: Could not update Firestore: ${err.message}`;
+        feedback.textContent = "✗ ERROR: Could not update Firestore: " + err.message;
       }
     };
   </script>

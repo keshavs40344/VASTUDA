@@ -174,10 +174,10 @@
     <!-- Email/Password Fallback -->
     <form id="adminForm">
       <label for="email">Admin Email</label>
-      <input type="email" id="email" required autocomplete="username" placeholder="keshavkumarthakur00007@gmail.com" />
+      <input type="email" id="email" required autocomplete="username" placeholder="admin@domain.com" />
 
-      <label for="password">Password or Master Clearance Key</label>
-      <input type="password" id="password" required autocomplete="current-password" placeholder="Enter password or Master Key (Admin@123)" />
+      <label for="password">Password</label>
+      <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••••••" />
 
       <button type="submit" id="submitBtn" class="btn-submit">Sign In to Console</button>
     </form>
@@ -195,26 +195,21 @@
     import { 
       signInWithEmailAndPassword, 
       signInWithPopup, 
-      createUserWithEmailAndPassword, 
       GoogleAuthProvider, 
       signOut 
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const form = document.getElementById("adminForm");
     const googleBtn = document.getElementById("googleSignInBtn");
     const errorMsg = document.getElementById("errorMsg");
     const submitBtn = document.getElementById("submitBtn");
 
-    const ROOT_ADMIN_EMAILS = [
-      "keshavkumarthakur00007@gmail.com"
-    ];
-
     function saveSessionAndRedirect(email, uid, token) {
       sessionStorage.setItem("SOVEREIGN_ADMIN_UNLOCKED", "true");
       sessionStorage.setItem("SOVEREIGN_UNLOCKED_AT", Date.now().toString());
-      sessionStorage.setItem("SOVEREIGN_ADMIN_EMAIL", email || "");
-      sessionStorage.setItem("SOVEREIGN_ADMIN_UID", uid || "root-admin-01");
+      sessionStorage.setItem("SOVEREIGN_ADMIN_EMAIL", email || "Authenticated Admin");
+      sessionStorage.setItem("SOVEREIGN_ADMIN_UID", uid || "");
       if (token) {
         sessionStorage.setItem("SOVEREIGN_ID_TOKEN", token);
       }
@@ -223,54 +218,45 @@
 
     async function verifyAndRedirect(user) {
       try {
-        const userEmail = (user.email || "").toLowerCase().trim();
-        const isRoot = ROOT_ADMIN_EMAILS.includes(userEmail);
+        const idToken = await user.getIdToken();
 
-        let adminSnap = null;
+        // 1. Verify via Server-Side Firebase Admin Enclave
         try {
-          adminSnap = await getDoc(doc(db, "admins", user.uid));
-        } catch (e) {
-          console.warn("[ADMIN AUTH] Firestore read:", e);
-        }
-
-        if ((!adminSnap || !adminSnap.exists()) && isRoot) {
-          try {
-            await setDoc(doc(db, "admins", user.uid), {
-              role: "admin",
-              isActive: true,
-              email: user.email,
-              name: user.displayName || "Root Administrator",
-              updatedAt: new Date().toISOString()
-            }, { merge: true });
-          } catch (e) {
-            console.warn("[ADMIN AUTH] Auto-bootstrap write note:", e);
+          const res = await fetch("/api/admin/verify-clearance", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + idToken
+            }
+          });
+          const data = await res.json();
+          if (res.ok && data.status === "authorized") {
+            saveSessionAndRedirect(user.email, user.uid, idToken);
+            return;
           }
+        } catch(apiErr) {
+          console.warn("[ADMIN AUTH] Server clearance verify note:", apiErr);
         }
 
-        const isAuthorized = isRoot || (adminSnap && adminSnap.exists() && adminSnap.data().role === "admin" && adminSnap.data().isActive === true);
-
-        if (isAuthorized) {
-          let idToken = "";
-          try { idToken = await user.getIdToken(); } catch(e) {}
-          saveSessionAndRedirect(user.email, user.uid, idToken);
-        } else {
-          await signOut(auth);
-          showError(`Access Denied: Account (${user.email}) is not authorized as an administrator.`);
-        }
-      } catch (err) {
-        const isRoot = user.email && ROOT_ADMIN_EMAILS.includes(user.email.toLowerCase().trim());
-        if (isRoot) {
-          let idToken = "";
-          try { idToken = await user.getIdToken(); } catch(e) {}
+        // 2. Client-Side Firestore Clearance Fallback
+        const adminSnap = await getDoc(doc(db, "admins", user.uid));
+        if (adminSnap.exists() && adminSnap.data().role === "admin" && adminSnap.data().isActive === true) {
           saveSessionAndRedirect(user.email, user.uid, idToken);
           return;
         }
+
+        // Unauthorized account
         await signOut(auth);
-        showError("Firestore Authorization Error: " + err.message);
+        sessionStorage.clear();
+        showError("Access Denied: This Firebase account is not authorized as an administrator.");
+      } catch (err) {
+        await signOut(auth);
+        sessionStorage.clear();
+        showError("Authorization Check Failed: " + err.message);
       }
     }
 
-    // Handle Google Sign-In
+    // Google Sign-In (Strict Firebase Auth Only)
     googleBtn.addEventListener("click", async () => {
       errorMsg.style.display = "none";
       googleBtn.disabled = true;
@@ -281,11 +267,11 @@
         const result = await signInWithPopup(auth, provider);
         await verifyAndRedirect(result.user);
       } catch (err) {
-        console.error("Google Sign-In:", err);
+        console.error("Google Sign-In Error:", err);
         if (err.code === "auth/unauthorized-domain") {
-          showError("Google Auth: This domain is awaiting authorization in Firebase. Please sign in below using your Email and Password or Master Key (Admin@123).");
+          showError("Google Auth: Current domain is pending authorization in Firebase Console -> Authentication -> Settings.");
         } else if (err.code === "auth/popup-blocked") {
-          showError("Google Sign-in popup was blocked by your browser. Please allow popups or use Email/Password below.");
+          showError("Popup was blocked by your browser. Please allow popups or use Email/Password sign-in.");
         } else if (err.code !== "auth/popup-closed-by-user") {
           showError(err.message);
         }
@@ -303,67 +289,39 @@
       }
     });
 
-    // Handle Email/Password & Master Key Sign-In
+    // Email & Password Sign-In (STRICT FIREBASE AUTH ONLY - 0 FAKE DATA)
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       errorMsg.style.display = "none";
       submitBtn.disabled = true;
-      submitBtn.textContent = "Verifying Clearance...";
+      submitBtn.textContent = "Verifying with Firebase...";
 
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
-      const isRoot = ROOT_ADMIN_EMAILS.includes(email.toLowerCase());
 
-      // 1. Try Firebase Auth sign-in
       try {
+        // Authenticate directly against Firebase Authentication
         const cred = await signInWithEmailAndPassword(auth, email, password);
         await verifyAndRedirect(cred.user);
-        return;
       } catch (err) {
-        console.log("Firebase signIn info:", err.code);
-
-        // If user not registered yet in Firebase and is root admin, attempt to register automatically
-        if (isRoot && (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential")) {
-          try {
-            const newCred = await createUserWithEmailAndPassword(auth, email, password);
-            await verifyAndRedirect(newCred.user);
-            return;
-          } catch (createErr) {
-            console.log("Firebase createUser info:", createErr.code);
-          }
+        console.error("Firebase Authentication failed:", err.code);
+        let msg = "Invalid email or password.";
+        if (err.code === "auth/invalid-credential" || err.code === "auth/wrong-password") {
+          msg = "Invalid password. Your credentials could not be verified by Firebase.";
+        } else if (err.code === "auth/user-not-found") {
+          msg = "No administrator account found with this email in Firebase.";
+        } else if (err.code === "auth/too-many-requests") {
+          msg = "Access temporarily disabled due to multiple failed login attempts. Please try again later.";
+        } else if (err.code === "auth/network-request-failed") {
+          msg = "Network connection to Firebase failed. Check your internet connection.";
+        } else {
+          msg = err.message;
         }
+        showError(msg);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Sign In to Console";
       }
-
-      // 2. Try Backend Sovereign Login Gateway
-      try {
-        const res = await fetch("/api/admin/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, clearance_key: password })
-        });
-        const data = await res.json();
-        if (res.ok && data.status === "success") {
-          saveSessionAndRedirect(data.email, data.uid, data.token);
-          return;
-        }
-      } catch (serverErr) {
-        console.warn("Backend login check error:", serverErr);
-      }
-
-      // 3. Client Master Key Direct Verification
-      const masterKeys = [
-        "Admin@123",
-        "VastudaAdmin2026!",
-        "VASTUDA_L5_SOVEREIGN_ROOT_CLEARANCE_SECURE_HASH_9948271"
-      ];
-      if (isRoot && masterKeys.includes(password)) {
-        saveSessionAndRedirect(email, "root-admin-sovereign-01", "VASTUDA_L5_SOVEREIGN_ROOT_CLEARANCE_SECURE_HASH_9948271");
-        return;
-      }
-
-      showError("Invalid admin credentials. Please use your authorized email and password or Master Key (Admin@123).");
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Sign In to Console";
     });
 
     function showError(text) {
