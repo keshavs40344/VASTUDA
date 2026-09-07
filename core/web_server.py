@@ -1,12 +1,13 @@
 """
 VASTUDA SaaS Core - Flask & Gunicorn Production Web Server
-Integrated with Firebase Admin SDK, REST APIs, and static frontend routing.
+Integrated with Firebase Admin SDK, Cloudflare Workers CORS, and Railway Deployment.
 """
 
 import os
 import time
 import threading
 from flask import Flask, jsonify, request, send_from_directory
+from flask_cors import CORS
 import requests
 import firebase_admin
 from firebase_admin import credentials, auth as fb_auth, firestore as fb_firestore
@@ -16,10 +17,19 @@ FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 
 app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
 
+# Configure CORS specifically allowing Cloudflare Worker and global origins
+CORS(app, origins=[
+    "https://vastuda.keshavkumarthakur00007.workers.dev",
+    "https://web-production-2ac2a.up.railway.app",
+    "https://keshavs40344.github.io",
+    "http://localhost:8088",
+    "http://127.0.0.1:8088",
+    "*"
+], supports_credentials=True)
+
 # Initialize Firebase Admin SDK if not already initialized
 try:
     if not firebase_admin._apps:
-        # Defaults to Application Default Credentials or Project ID
         firebase_admin.initialize_app(options={
             "projectId": "saas-34243"
         })
@@ -34,6 +44,20 @@ daemon_thread = threading.Thread(target=worker_daemon.start_loop, daemon=True)
 daemon_thread.start()
 
 # --- REST API Endpoints ---
+
+@app.route("/api/status", methods=["GET"])
+def get_status():
+    """Railway live status endpoint for Cloudflare Worker & Frontend"""
+    return jsonify({
+        "status": "online",
+        "service": "vastuda-saas-core",
+        "version": "2.0.0",
+        "cloud_provider": "Railway PaaS",
+        "cloudflare_worker": "https://vastuda.keshavkumarthakur00007.workers.dev",
+        "backend_url": "https://web-production-2ac2a.up.railway.app",
+        "uptime": worker_daemon.get_stats()["uptime_seconds"],
+        "timestamp": time.time()
+    }), 200
 
 @app.route("/api/health", methods=["GET"])
 def health_check():

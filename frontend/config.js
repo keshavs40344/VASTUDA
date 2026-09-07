@@ -1,7 +1,8 @@
-// Sovereign Cloud Intelligence - Unified Ingress Configuration
-// Points the client-side frontend directly to the live Render FastAPI backend.
-
-window.SOVEREIGN_API_BASE = "https://ai-world-core.onrender.com";
+// VASTUDA SaaS - Cloud Ingress & Railway Integration
+const API_BASE_URL = "https://web-production-2ac2a.up.railway.app";
+window.API_BASE_URL = API_BASE_URL;
+window.SOVEREIGN_API_BASE = API_BASE_URL;
+window.CLOUDFLARE_WORKER_URL = "https://vastuda.keshavkumarthakur00007.workers.dev";
 
 // Google Firebase Cloud Configuration (Project: saas-34243)
 window.FIREBASE_CONFIG = {
@@ -13,3 +14,21 @@ window.FIREBASE_CONFIG = {
   appId: "1:964647710435:web:368c5e868e434ed61f9fd6",
   measurementId: "G-P8XJF24WHD"
 };
+
+// Automatic Connectivity Verification Hook
+async function checkBackend() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/status`);
+    const data = await res.json();
+    console.log("Connected to Live Railway Backend:", data);
+    return data;
+  } catch (err) {
+    console.warn("Railway Backend ping pending:", err);
+    return null;
+  }
+}
+
+window.checkBackend = checkBackend;
+document.addEventListener("DOMContentLoaded", () => {
+  checkBackend().catch(() => {});
+});
