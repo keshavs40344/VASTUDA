@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Startup Runway & Unit Economics Simulator | Free Baremetrics & Finmark Alternative</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20 text-slate-950">
+          <i data-lucide="trending-up" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-bold tracking-tight text-white">Startup Runway & Unit Economics Simulator</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full">100% Free & Sovereign</span>
+          </div>
+          <p class="text-xs text-slate-400">Replaces Baremetrics & Finmark ($100/mo) • Deterministic Monte Carlo Runway</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="loadSeedStage()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5 border border-slate-700">
+          <i data-lucide="seedling" class="w-3.5 h-3.5 text-emerald-400"></i> Seed Stage ($1.2M)
+        </button>
+        <button onclick="loadSeriesA()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5 border border-slate-700">
+          <i data-lucide="rocket" class="w-3.5 h-3.5 text-amber-400"></i> Series A ($5M)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- Controls (4 Cols) -->
+    <div class="lg:col-span-4 flex flex-col space-y-4">
+      
+      <!-- Treasury & Cash Balance -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+          <i data-lucide="banknote" class="w-4 h-4"></i> Treasury & Operating Cash
+        </h3>
+        <div>
+          <label class="text-[11px] text-slate-400 block mb-1">Current Bank Balance ($):</label>
+          <input type="number" id="cashBalance" value="850000" step="10000" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs mono text-amber-300 focus:outline-none focus:border-amber-500" oninput="simulateRunway()">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[10px] text-slate-500 block mb-1">Gross Monthly Burn ($):</label>
+            <input type="number" id="grossBurn" value="65000" step="2500" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs mono text-slate-200" oninput="simulateRunway()">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-500 block mb-1">Current MRR ($):</label>
+            <input type="number" id="mrr" value="18000" step="1000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs mono text-emerald-400" oninput="simulateRunway()">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[10px] text-slate-500 block mb-1">MoM Growth Rate (%):</label>
+            <input type="number" id="momGrowth" value="12" step="1" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs mono text-slate-200" oninput="simulateRunway()">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-500 block mb-1">Burn Growth Rate (%):</label>
+            <input type="number" id="burnInflation" value="3" step="0.5" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs mono text-slate-200" oninput="simulateRunway()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Unit Economics & LTV/CAC -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-2">
+          <i data-lucide="calculator" class="w-4 h-4"></i> Unit Economics & Payback
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[10px] text-slate-500 block mb-1">ARPU (Monthly Rev/User):</label>
+            <input type="number" id="arpu" value="120" step="5" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs mono text-slate-200" oninput="simulateRunway()">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-500 block mb-1">Gross Margin (%):</label>
+            <input type="number" id="grossMargin" value="82" min="1" max="100" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs mono text-slate-200" oninput="simulateRunway()">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[10px] text-slate-500 block mb-1">CAC (Acquisition Cost):</label>
+            <input type="number" id="cac" value="450" step="25" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs mono text-slate-200" oninput="simulateRunway()">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-500 block mb-1">Monthly Churn (%):</label>
+            <input type="number" id="monthlyChurn" value="2.5" step="0.1" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs mono text-slate-200" oninput="simulateRunway()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagnostic Badges -->
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4 space-y-2 text-xs">
+        <h4 class="font-bold text-slate-300 uppercase tracking-wider text-[11px]">Venture Benchmark Health</h4>
+        <div class="flex justify-between items-center text-slate-400">
+          <span>LTV / CAC Ratio:</span>
+          <span id="ltvCacRatio" class="mono font-bold text-emerald-400">8.7x</span>
+        </div>
+        <div class="flex justify-between items-center text-slate-400">
+          <span>CAC Payback Period:</span>
+          <span id="cacPayback" class="mono font-bold text-sky-400">4.6 months</span>
+        </div>
+        <div class="flex justify-between items-center text-slate-400">
+          <span>Customer Lifetime Value:</span>
+          <span id="calcLtv" class="mono font-bold text-amber-400">$3,936</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Charts & Runway Visualizer (8 Cols) -->
+    <div class="lg:col-span-8 flex flex-col space-y-4">
+      
+      <!-- Key Stat Cards -->
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-center shadow-lg">
+          <span class="text-[10px] uppercase text-slate-500 font-semibold">Remaining Runway</span>
+          <div id="statRunwayMonths" class="text-3xl font-black text-amber-400 mono mt-1">18.1 mos</div>
+          <span id="statZeroCashDate" class="text-[10px] text-slate-500 mt-0.5">Out of cash: ~March 2028</span>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-center shadow-lg">
+          <span class="text-[10px] uppercase text-slate-500 font-semibold">Net Monthly Burn</span>
+          <div id="statNetBurn" class="text-3xl font-black text-rose-400 mono mt-1">-$47,000</div>
+          <span class="text-[10px] text-slate-500 mt-0.5">Gross Burn - MRR</span>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-center shadow-lg">
+          <span class="text-[10px] uppercase text-slate-500 font-semibold">Default Alive Status</span>
+          <div id="statDefaultAlive" class="text-lg font-black text-emerald-400 mt-2">Default Alive</div>
+          <span id="statCrossover" class="text-[10px] text-slate-500 mt-0.5">Profitable before cash-out</span>
+        </div>
+      </div>
+
+      <!-- Runway Cash Trajectory Chart -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex-1 flex flex-col">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+            <i data-lucide="line-chart" class="w-4 h-4 text-amber-400"></i> 24-Month Cash & Revenue Trajectory ($)
+          </h3>
+          <span class="text-[11px] text-slate-500">Continuous Simulation</span>
+        </div>
+        <div class="h-64 flex items-center justify-center">
+          <canvas id="runwayChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Unit Economics Evaluation Box -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl text-xs space-y-2">
+        <h4 class="font-bold text-amber-400 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Autonomous CFO Recommendation
+        </h4>
+        <p id="cfoAdvice" class="text-slate-300 leading-relaxed"></p>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
+    Vastuda Sovereign Suite • 100% Free Autonomous Software • Replaces $100/mo Baremetrics/Finmark Paywalls
+  </footer>
+
+  <script>
+    let runwayChart = null;
+
+    function simulateRunway() {
+      const initialCash = parseFloat(document.getElementById('cashBalance').value) || 0;
+      const initialGrossBurn = parseFloat(document.getElementById('grossBurn').value) || 0;
+      let curMrr = parseFloat(document.getElementById('mrr').value) || 0;
+      const momGrowth = (parseFloat(document.getElementById('momGrowth').value) || 0) / 100;
+      const burnInflation = (parseFloat(document.getElementById('burnInflation').value) || 0) / 100;
+
+      const arpu = parseFloat(document.getElementById('arpu').value) || 1;
+      const margin = (parseFloat(document.getElementById('grossMargin').value) || 1) / 100;
+      const cac = parseFloat(document.getElementById('cac').value) || 1;
+      const churn = (parseFloat(document.getElementById('monthlyChurn').value) || 0.1) / 100;
+
+      // Unit Economics
+      const lifetimeMonths = 1 / Math.max(0.001, churn);
+      const ltv = arpu * margin * lifetimeMonths;
+      const ltvCac = ltv / Math.max(1, cac);
+      const payback = cac / Math.max(1, arpu * margin);
+
+      document.getElementById('calcLtv').innerText = '$' + Math.round(ltv).toLocaleString();
+      document.getElementById('ltvCacRatio').innerText = ltvCac.toFixed(1) + 'x';
+      document.getElementById('cacPayback').innerText = payback.toFixed(1) + ' months';
+
+      // 24 Month Cash Projection
+      const months = [];
+      const cashSeries = [];
+      const revenueSeries = [];
+      const burnSeries = [];
+
+      let runningCash = initialCash;
+      let runningBurn = initialGrossBurn;
+      let outOfCashMonth = -1;
+      let crossoverMonth = -1;
+
+      for (let i = 0; i <= 24; i++) {
+        months.push('Mo ' + i);
+        cashSeries.push(Math.round(runningCash));
+        revenueSeries.push(Math.round(curMrr));
+        burnSeries.push(Math.round(runningBurn));
+
+        if (curMrr >= runningBurn && crossoverMonth === -1) {
+          crossoverMonth = i;
+        }
+
+        const netBurn = runningBurn - curMrr;
+        if (runningCash <= 0 && outOfCashMonth === -1) {
+          outOfCashMonth = i;
+        }
+
+        runningCash -= Math.max(0, netBurn);
+        curMrr = curMrr * (1 + momGrowth);
+        runningBurn = runningBurn * (1 + burnInflation);
+      }
+
+      // Update Top Cards
+      const netInitialBurn = initialGrossBurn - parseFloat(document.getElementById('mrr').value);
+      document.getElementById('statNetBurn').innerText = `-$${Math.round(netInitialBurn).toLocaleString()}`;
+
+      const statRunway = document.getElementById('statRunwayMonths');
+      const statZero = document.getElementById('statZeroCashDate');
+      const statAlive = document.getElementById('statDefaultAlive');
+      const statCross = document.getElementById('statCrossover');
+
+      if (outOfCashMonth === -1) {
+        statRunway.innerText = '24+ mos';
+        statRunway.className = 'text-3xl font-black text-emerald-400 mono mt-1';
+        statZero.innerText = 'Sufficient cash beyond 2-year horizon';
+      } else {
+        statRunway.innerText = `${outOfCashMonth} mos`;
+        statRunway.className = outOfCashMonth > 12 ? 'text-3xl font-black text-amber-400 mono mt-1' : 'text-3xl font-black text-rose-400 mono mt-1';
+        statZero.innerText = `Zero balance projected at month ${outOfCashMonth}`;
+      }
+
+      if (crossoverMonth !== -1 && (outOfCashMonth === -1 || crossoverMonth <= outOfCashMonth)) {
+        statAlive.innerText = 'Default Alive';
+        statAlive.className = 'text-lg font-black text-emerald-400 mt-2';
+        statCross.innerText = `Profitable at Month ${crossoverMonth} before cash exhausts`;
+      } else {
+        statAlive.innerText = 'Default Dead';
+        statAlive.className = 'text-lg font-black text-rose-400 mt-2';
+        statCross.innerText = 'Requires fundraising or burn reduction';
+      }
+
+      // Chart Update
+      renderChart(months, cashSeries, revenueSeries, burnSeries);
+
+      // CFO Advice
+      let advice = [];
+      if (ltvCac >= 3.0) {
+        advice.push(`Strong unit economics (LTV/CAC = ${ltvCac.toFixed(1)}x). You have headroom to accelerate paid marketing.`);
+      } else {
+        advice.push(`LTV/CAC is depressed (${ltvCac.toFixed(1)}x). Focus on retention and reducing CAC to avoid burning cash inefficiently.`);
+      }
+      if (payback <= 12) {
+        advice.push(`Payback period of ${payback.toFixed(1)} months is VC-grade (<12 months).`);
+      } else {
+        advice.push(`CAC payback is long (${payback.toFixed(1)} mos). Push for annual upfront collections to boost working capital.`);
+      }
+      document.getElementById('cfoAdvice').innerHTML = advice.map(a => `• ${a}`).join('<br>');
+    }
+
+    function renderChart(labels, cash, revenue, burn) {
+      const ctx = document.getElementById('runwayChart').getContext('2d');
+      if (runwayChart) runwayChart.destroy();
+
+      runwayChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Treasury Cash Balance',
+              data: cash,
+              borderColor: '#f59e0b',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              borderWidth: 3,
+              tension: 0.3,
+              fill: true,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Monthly Revenue (MRR)',
+              data: revenue,
+              borderColor: '#10b981',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              tension: 0.3,
+              yAxisID: 'y1'
+            },
+            {
+              label: 'Gross Monthly Burn',
+              data: burn,
+              borderColor: '#f43f5e',
+              borderWidth: 2,
+              tension: 0.3,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#f59e0b', callback: v => '$' + (v >= 1000 ? (v/1000) + 'k' : v) }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#94a3b8', callback: v => '$' + (v >= 1000 ? (v/1000) + 'k' : v) }
+            }
+          },
+          plugins: {
+            legend: { labels: { color: '#cbd5e1', font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    function loadSeedStage() {
+      document.getElementById('cashBalance').value = '1200000';
+      document.getElementById('grossBurn').value = '45000';
+      document.getElementById('mrr').value = '8000';
+      document.getElementById('momGrowth').value = '15';
+      document.getElementById('burnInflation').value = '4';
+      document.getElementById('arpu').value = '99';
+      document.getElementById('cac').value = '350';
+      document.getElementById('monthlyChurn').value = '2.0';
+      simulateRunway();
+    }
+
+    function loadSeriesA() {
+      document.getElementById('cashBalance').value = '5000000';
+      document.getElementById('grossBurn').value = '180000';
+      document.getElementById('mrr').value = '95000';
+      document.getElementById('momGrowth').value = '9';
+      document.getElementById('burnInflation').value = '2.5';
+      document.getElementById('arpu').value = '450';
+      document.getElementById('cac').value = '1600';
+      document.getElementById('monthlyChurn').value = '1.2';
+      simulateRunway();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      simulateRunway();
+    });
+  </script>
+</body>
+</html>

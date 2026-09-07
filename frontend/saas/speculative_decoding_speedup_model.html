@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speculative Decoding Latency & Speedup Estimator — Sovereign AI Suite</title>
+  <meta name="description" content="Models speculative decoding acceleration between draft (e.g. 1B) and target (e.g. 70B) models based on acceptance rate and gamma lookahead. 100% private, client-side, zero server latency.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(99, 102, 241, 0.2); }
+    .glass:hover { border-color: rgba(99, 102, 241, 0.35); }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+  </style>
+
+    <!-- DYNAMIC SEO & SOCIAL GRAPH (Auto-Injected) -->
+    <meta name="title" content="Speculative Decoding Latency & Speedup Estimator — Sovereign AI Suite">
+    <meta name="description" content="Models speculative decoding acceleration between draft (e.g. 1B) and target (e.g. 70B) models based on acceptance rate and gamma lookahead. 100% private, client-side, zero server latency.">
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://keshavs40344.github.io/ai-world-core/saas/speculative_decoding_speedup_model.html">
+    <meta property="og:title" content="Speculative Decoding Latency & Speedup Estimator — Sovereign AI Suite">
+    <meta property="og:description" content="Models speculative decoding acceleration between draft (e.g. 1B) and target (e.g. 70B) models based on acceptance rate and gamma lookahead. 100% private, client-side, zero server latency.">
+    <meta property="og:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Speculative%20Decoding%20Latency%20%26%20Speedup%20E+Studio&font=montserrat">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://keshavs40344.github.io/ai-world-core/saas/speculative_decoding_speedup_model.html">
+    <meta name="twitter:title" content="Speculative Decoding Latency & Speedup Estimator — Sovereign AI Suite">
+    <meta name="twitter:description" content="Models speculative decoding acceleration between draft (e.g. 1B) and target (e.g. 70B) models based on acceptance rate and gamma lookahead. 100% private, client-side, zero server latency.">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Speculative%20Decoding%20Latency%20%26%20Speedup%20E+Studio&font=montserrat">
+
+    <!-- JSON-LD Structured Data for Googlebot -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Speculative Decoding Latency & Speedup Estimator — Sovereign AI Suite",
+      "url": "https://keshavs40344.github.io/ai-world-core/saas/speculative_decoding_speedup_model.html",
+      "description": "Models speculative decoding acceleration between draft (e.g. 1B) and target (e.g. 70B) models based on acceptance rate and gamma lookahead. 100% private, client-side, zero server latency.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All modern browsers",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <!-- /SEO BLOCK -->
+    
+</head>
+<body class="min-h-screen antialiased flex flex-col selection:bg-indigo-500/30 selection:text-indigo-300">
+
+  <!-- Sovereign Nav -->
+  <header class="glass border-b border-indigo-500/10 sticky top-0 z-50 px-6 py-3.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-sm font-mono hover:text-indigo-400 transition">
+        <i data-lucide="brain-circuit" class="w-4 h-4 text-indigo-400"></i>
+        <span>AI WORLD HUB</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          AI CORE OPERATIONAL
+        </span>
+        <a href="../../tools.html" class="text-xs text-slate-400 hover:text-white transition">All Tools</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-6">
+    <div class="glass p-6 sm:p-8 rounded-3xl border border-indigo-500/20 relative overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/40 flex items-center justify-center shrink-0">
+          <i data-lucide="zap" class="w-7 h-7 text-indigo-400"></i>
+        </div>
+        <div class="space-y-1 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-500/30">AI & LLM Core</span>
+            <span class="text-[10px] font-mono text-slate-400">&bull; 100% Client-Side &bull; Zero Cloud Leakage</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-black font-display text-white">Speculative Decoding Latency & Speedup Estimator</h1>
+          <p class="text-slate-400 text-sm max-w-3xl">Models speculative decoding acceleration between draft (e.g. 1B) and target (e.g. 70B) models based on acceptance rate and gamma lookahead.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Tool Interactive UI -->
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">Speculative Parameters</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] font-mono text-slate-400">Draft Lookahead (&gamma;):</label>
+            <input id="specGamma" type="number" value="4" min="1" max="10" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+          </div>
+          <div>
+            <label class="text-[10px] font-mono text-slate-400">Acceptance Rate (&alpha;):</label>
+            <input id="specAlpha" type="number" value="0.75" step="0.05" min="0.1" max="0.99" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] font-mono text-slate-400">Target Latency (ms/token):</label>
+            <input id="specTargetLat" type="number" value="45" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+          </div>
+          <div>
+            <label class="text-[10px] font-mono text-slate-400">Draft Latency (ms/token):</label>
+            <input id="specDraftLat" type="number" value="6" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+          </div>
+        </div>
+        <button id="calcSpecBtn" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs font-mono transition">Calculate Speedup</button>
+      </div>
+
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">Acceleration Results</h3>
+        <div id="specResults" class="space-y-3 font-mono text-xs">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+        
+
+  </main>
+
+  <footer class="border-t border-white/5 py-8 mt-12 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>AI WORLD CORE &bull; Sovereign AI & LLM Systems &bull; 100% Private</div>
+      <div class="flex items-center gap-5 text-slate-400">
+        <a href="../../index.html" class="hover:text-indigo-400 transition">Hub</a>
+        <a href="../../tools.html" class="hover:text-cyan-400 transition">Catalogue</a>
+        <a href="../../world.html" class="hover:text-pink-400 transition">World Live</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    
+    function computeSpec() {
+      const gamma = parseInt(document.getElementById('specGamma').value);
+      const alpha = parseFloat(document.getElementById('specAlpha').value);
+      const targetLat = parseFloat(document.getElementById('specTargetLat').value);
+      const draftLat = parseFloat(document.getElementById('specDraftLat').value);
+
+      // Expected accepted tokens E[N] = (1 - alpha^(gamma + 1)) / (1 - alpha)
+      const expectedAccepted = (1 - Math.pow(alpha, gamma + 1)) / (1 - alpha);
+
+      // Time per iteration: gamma * draftLat + targetLat (one forward verification step)
+      const timePerIter = (gamma * draftLat) + targetLat;
+      const effectiveLatPerToken = timePerIter / expectedAccepted;
+      const speedup = (targetLat / effectiveLatPerToken).toFixed(2);
+
+      document.getElementById('specResults').innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-900 border border-emerald-500/30 space-y-2">
+          <div class="text-[10px] text-emerald-400 uppercase">Effective Speedup Factor</div>
+          <div class="text-3xl font-black text-white">${speedup}x Faster</div>
+          <div class="text-[10px] text-slate-400">From ${targetLat} ms/token &rarr; ${effectiveLatPerToken.toFixed(1)} ms/token</div>
+        </div>
+
+        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 space-y-1.5">
+          <div class="flex justify-between text-slate-400">
+            <span>Expected Tokens Accepted/Step:</span>
+            <span class="text-white font-bold">${expectedAccepted.toFixed(2)} tokens</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Draft Overhead per Step:</span>
+            <span class="text-indigo-400">${gamma * draftLat} ms</span>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById('calcSpecBtn').addEventListener('click', computeSpec);
+    computeSpec();
+        
+  </script>
+</body>
+</html>

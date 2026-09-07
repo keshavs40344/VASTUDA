@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice & Contract Shield Pro | Free Bonsai & FreshBooks Alternative</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    @media print {
+      body * { visibility: hidden; }
+      #printableInvoice, #printableInvoice * { visibility: visible; }
+      #printableInvoice { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-sky-400 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white">
+          <i data-lucide="receipt" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-bold tracking-tight text-white">Invoice & Contract Shield Pro</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full">100% Free & Sovereign</span>
+          </div>
+          <p class="text-xs text-slate-400">Replaces FreshBooks & Bonsai ($38/mo) • Tax Compliant & Print-Ready</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="loadSampleInvoice()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5 border border-slate-700">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i> Sample Bill
+        </button>
+        <button onclick="window.print()" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20 flex items-center gap-1.5 transition">
+          <i data-lucide="printer" class="w-3.5 h-3.5"></i> Print / PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6 no-print">
+    
+    <!-- Left Configuration Panel (5 Cols) -->
+    <div class="lg:col-span-5 flex flex-col space-y-4">
+      
+      <!-- Company Details -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+          <i data-lucide="building" class="w-4 h-4"></i> Sender / Freelancer Details
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" id="senderName" placeholder="Your Name or Studio" value="Apex Systems Studio" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:border-indigo-500" oninput="renderLiveInvoice()">
+          <input type="text" id="senderTaxId" placeholder="Tax ID / GST / VAT #" value="GSTIN: 27AABCV1234F1Z5" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs mono text-slate-200 focus:border-indigo-500" oninput="renderLiveInvoice()">
+        </div>
+        <textarea id="senderAddress" placeholder="Physical Address, City, Country, ZIP" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 h-16 resize-none focus:border-indigo-500" oninput="renderLiveInvoice()">104 Tech Boulevard, Suite 400, Austin, TX 78701</textarea>
+      </div>
+
+      <!-- Client Details -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-2">
+          <i data-lucide="user" class="w-4 h-4"></i> Client / Billed To
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+          <input type="text" id="clientName" placeholder="Client Company or Individual" value="Global Logistics Corp" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 focus:border-sky-500" oninput="renderLiveInvoice()">
+          <input type="text" id="clientTaxId" placeholder="Client VAT / GST ID" value="VAT ID: EU987654321" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs mono text-slate-200 focus:border-sky-500" oninput="renderLiveInvoice()">
+        </div>
+        <textarea id="clientAddress" placeholder="Client Billing Address" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200 h-16 resize-none focus:border-sky-500" oninput="renderLiveInvoice()">Tower 2, Commercial Center, London, EC2A 1NT, UK</textarea>
+      </div>
+
+      <!-- Invoice Meta & Tax Options -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+          <i data-lucide="calendar" class="w-4 h-4 text-amber-400"></i> Terms & Taxation
+        </h3>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="text-[10px] text-slate-400">Invoice #</label>
+            <input type="text" id="invNumber" value="INV-2026-0042" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs mono text-slate-200" oninput="renderLiveInvoice()">
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400">Currency</label>
+            <select id="invCurrency" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs mono text-slate-200" onchange="renderLiveInvoice()">
+              <option value="$">USD ($)</option>
+              <option value="₹">INR (₹)</option>
+              <option value="€">EUR (€)</option>
+              <option value="£">GBP (£)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] text-slate-400">Tax / VAT (%)</label>
+            <input type="number" id="taxRate" value="18" min="0" max="50" step="0.5" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs mono text-slate-200" oninput="renderLiveInvoice()">
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-800/80">
+          <label class="text-[11px] font-semibold text-slate-300 block mb-1">Protective Legal Clause:</label>
+          <select id="legalClause" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" onchange="renderLiveInvoice()">
+            <option value="net30">Net 30: 2% monthly late fee assessed after 30 days overdue.</option>
+            <option value="ip_retention">IP Retention: Ownership rights transfer solely upon receipt of full payment.</option>
+            <option value="arbitration">Dispute Clause: Disputes settled under binding AAA commercial arbitration.</option>
+            <option value="custom">Strict NDA & Milestone Acceptance Binding.</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Line Items Manager -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+            <i data-lucide="list-plus" class="w-4 h-4"></i> Line Items
+          </h3>
+          <button onclick="addLineItem()" class="px-2 py-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-semibold hover:bg-emerald-500/30 transition flex items-center gap-1">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Item
+          </button>
+        </div>
+        
+        <div id="lineItemsInputs" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+          <!-- Live items populated via JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Live Preview Sheet (7 Cols) -->
+    <div class="lg:col-span-7 flex flex-col">
+      <div class="bg-white text-slate-900 rounded-2xl p-8 shadow-2xl border border-slate-200 min-h-[750px] flex flex-col justify-between" id="printableInvoice">
+        
+        <div>
+          <!-- Top Row -->
+          <div class="flex justify-between items-start border-b border-slate-200 pb-6">
+            <div>
+              <h2 id="viewSenderName" class="text-2xl font-black text-slate-900 tracking-tight">Apex Systems Studio</h2>
+              <p id="viewSenderTax" class="text-xs font-semibold text-indigo-600 mono mt-0.5">GSTIN: 27AABCV1234F1Z5</p>
+              <p id="viewSenderAddress" class="text-xs text-slate-500 mt-2 max-w-xs leading-relaxed whitespace-pre-line">104 Tech Boulevard, Suite 400, Austin, TX 78701</p>
+            </div>
+            <div class="text-right">
+              <span class="text-xs font-black uppercase tracking-widest text-slate-400">INVOICE</span>
+              <div id="viewInvNumber" class="text-lg font-black text-slate-900 mono mt-0.5">INV-2026-0042</div>
+              <p class="text-xs text-slate-500 mt-1">Date: <span id="viewDate" class="mono font-semibold">2026-09-07</span></p>
+              <p class="text-xs text-slate-500">Due: <span id="viewDueDate" class="mono font-semibold">2026-10-07</span></p>
+            </div>
+          </div>
+
+          <!-- Billed To -->
+          <div class="my-6">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Billed To:</span>
+            <h4 id="viewClientName" class="text-sm font-bold text-slate-800 mt-0.5">Global Logistics Corp</h4>
+            <p id="viewClientTax" class="text-xs text-slate-500 mono">VAT ID: EU987654321</p>
+            <p id="viewClientAddress" class="text-xs text-slate-500 mt-1 max-w-sm whitespace-pre-line leading-relaxed">Tower 2, Commercial Center, London, EC2A 1NT, UK</p>
+          </div>
+
+          <!-- Items Table -->
+          <table class="w-full text-left border-collapse my-6">
+            <thead>
+              <tr class="border-b-2 border-slate-900 text-[11px] uppercase tracking-wider text-slate-600 font-bold">
+                <th class="py-2.5">Description</th>
+                <th class="py-2.5 text-right w-16">Qty</th>
+                <th class="py-2.5 text-right w-24">Rate</th>
+                <th class="py-2.5 text-right w-28">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="viewItemsTable" class="divide-y divide-slate-100 text-xs">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Totals & Legal Footer -->
+        <div class="border-t border-slate-200 pt-4">
+          <div class="flex justify-end mb-6">
+            <div class="w-64 space-y-2 text-xs">
+              <div class="flex justify-between text-slate-600">
+                <span>Subtotal:</span>
+                <span id="viewSubtotal" class="mono font-semibold">$0.00</span>
+              </div>
+              <div class="flex justify-between text-slate-600">
+                <span>Tax (<span id="viewTaxPercent">18%</span>):</span>
+                <span id="viewTaxAmount" class="mono font-semibold">$0.00</span>
+              </div>
+              <div class="flex justify-between text-sm font-black border-t-2 border-slate-900 pt-2 text-slate-900">
+                <span>Total Due:</span>
+                <span id="viewTotalDue" class="mono text-indigo-700 text-base">$0.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legal Shield Footer -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[10px] text-slate-600 leading-relaxed">
+            <span class="font-bold text-slate-800 uppercase block mb-0.5">Legal Notice & Remittance Terms:</span>
+            <p id="viewLegalText">Ownership of all intellectual property, deliverables, and designs outlined in this invoice shall remain exclusively with Apex Systems Studio until this invoice has been satisfied in full.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500 no-print">
+    Vastuda Sovereign Suite • Zero Monthly Fees • Completely Replaces Freelance Invoicing Stacks
+  </footer>
+
+  <script>
+    let items = [
+      { desc: 'Autonomous AI Agent Architecture & Multi-Node Cluster', qty: 1, rate: 4800 },
+      { desc: 'Cloudflare Zero-Trust Network Defense Configuration', qty: 1, rate: 1600 },
+      { desc: 'Deterministic Financial Simulation & Analytics Engine', qty: 1, rate: 2200 }
+    ];
+
+    function renderLineItemInputs() {
+      const container = document.getElementById('lineItemsInputs');
+      container.innerHTML = '';
+      items.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center gap-2 bg-slate-950 p-2 rounded-xl border border-slate-800/80';
+        div.innerHTML = `
+          <input type="text" value="${item.desc}" placeholder="Item description" class="flex-1 bg-transparent border-0 text-xs text-slate-200 focus:outline-none" oninput="updateItem(${index}, 'desc', this.value)">
+          <input type="number" value="${item.qty}" min="1" class="w-12 bg-slate-900 border border-slate-800 rounded p-1 text-center text-xs mono text-slate-200" oninput="updateItem(${index}, 'qty', this.value)">
+          <input type="number" value="${item.rate}" min="0" step="50" class="w-20 bg-slate-900 border border-slate-800 rounded p-1 text-right text-xs mono text-slate-200" oninput="updateItem(${index}, 'rate', this.value)">
+          <button onclick="removeItem(${index})" class="p-1 text-slate-500 hover:text-rose-400">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        `;
+        container.appendChild(div);
+      });
+      lucide.createIcons();
+    }
+
+    function addLineItem() {
+      items.push({ desc: 'Custom Software Engineering Service', qty: 1, rate: 1000 });
+      renderLineItemInputs();
+      renderLiveInvoice();
+    }
+
+    function removeItem(idx) {
+      if (items.length <= 1) {
+        alert('Invoice requires at least one line item.');
+        return;
+      }
+      items.splice(idx, 1);
+      renderLineItemInputs();
+      renderLiveInvoice();
+    }
+
+    function updateItem(idx, key, val) {
+      if (key === 'qty' || key === 'rate') {
+        items[idx][key] = parseFloat(val) || 0;
+      } else {
+        items[idx][key] = val;
+      }
+      renderLiveInvoice();
+    }
+
+    function renderLiveInvoice() {
+      const curr = document.getElementById('invCurrency').value;
+      const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+
+      // Sender Info
+      document.getElementById('viewSenderName').innerText = document.getElementById('senderName').value || 'Sender Name';
+      document.getElementById('viewSenderTax').innerText = document.getElementById('senderTaxId').value || '';
+      document.getElementById('viewSenderAddress').innerText = document.getElementById('senderAddress').value || '';
+
+      // Client Info
+      document.getElementById('viewClientName').innerText = document.getElementById('clientName').value || 'Client Name';
+      document.getElementById('viewClientTax').innerText = document.getElementById('clientTaxId').value || '';
+      document.getElementById('viewClientAddress').innerText = document.getElementById('clientAddress').value || '';
+
+      // Invoice Meta
+      document.getElementById('viewInvNumber').innerText = document.getElementById('invNumber').value || 'INV-001';
+
+      // Table Items
+      const tbody = document.getElementById('viewItemsTable');
+      tbody.innerHTML = '';
+      let subtotal = 0;
+
+      items.forEach(it => {
+        const amt = it.qty * it.rate;
+        subtotal += amt;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-2.5 font-medium text-slate-800">${it.desc}</td>
+          <td class="py-2.5 text-right mono text-slate-600">${it.qty}</td>
+          <td class="py-2.5 text-right mono text-slate-600">${curr}${it.rate.toLocaleString()}</td>
+          <td class="py-2.5 text-right mono font-semibold text-slate-900">${curr}${amt.toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const taxAmount = (subtotal * taxRate) / 100;
+      const total = subtotal + taxAmount;
+
+      document.getElementById('viewSubtotal').innerText = `${curr}${subtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('viewTaxPercent').innerText = `${taxRate}%`;
+      document.getElementById('viewTaxAmount').innerText = `${curr}${taxAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      document.getElementById('viewTotalDue').innerText = `${curr}${total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+      // Legal Clause
+      const clauseSelect = document.getElementById('legalClause').value;
+      const sName = document.getElementById('senderName').value || 'the Provider';
+      let clauseText = `Ownership of all intellectual property, deliverables, and designs outlined in this invoice shall remain exclusively with ${sName} until this invoice has been satisfied in full.`;
+      if (clauseSelect === 'net30') {
+        clauseText = `Payment terms are Net 30 days from invoice issuance date. A late fee of 2.0% per month will be assessed on outstanding balances.`;
+      } else if (clauseSelect === 'arbitration') {
+        clauseText = `Any dispute arising under this billing agreement shall be resolved exclusively through binding arbitration under AAA rules.`;
+      }
+      document.getElementById('viewLegalText').innerText = clauseText;
+    }
+
+    function loadSampleInvoice() {
+      document.getElementById('senderName').value = 'Zenith Autonomous AI Labs';
+      document.getElementById('senderTaxId').value = 'US EIN: 84-2918402';
+      document.getElementById('senderAddress').value = '500 Howard Street, Suite 1200
+San Francisco, CA 94105';
+      document.getElementById('clientName').value = 'Vanguard Logistics International';
+      document.getElementById('clientTaxId').value = 'Tax Reg: 302-881-990';
+      document.getElementById('clientAddress').value = '88 Marina Promenade
+Singapore 018981';
+      document.getElementById('invNumber').value = 'INV-2026-X88';
+      document.getElementById('taxRate').value = '8.5';
+      items = [
+        { desc: 'Autonomous Supply Chain Routing Engine (Phase 1)', qty: 1, rate: 8500 },
+        { desc: 'Container Tracking Webhook & Kafka Broker Integration', qty: 1, rate: 3200 },
+        { desc: 'High-Availability PostgreSQL Cluster Optimization', qty: 1, rate: 2100 }
+      ];
+      renderLineItemInputs();
+      renderLiveInvoice();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const dueDate = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+      document.getElementById('viewDate').innerText = today;
+      document.getElementById('viewDueDate').innerText = dueDate;
+      renderLineItemInputs();
+      renderLiveInvoice();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

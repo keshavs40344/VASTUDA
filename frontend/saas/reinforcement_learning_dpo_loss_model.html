@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Direct Preference Optimization (DPO) Loss & Reward Simulator — Sovereign AI Suite</title>
+  <meta name="description" content="Simulates DPO objective L_DPO = -E[log(sigmoid(beta * log(pi(y_w)/pi_ref(y_w)) - beta * log(pi(y_l)/pi_ref(y_l))))]. 100% private, client-side, zero server latency.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(99, 102, 241, 0.2); }
+    .glass:hover { border-color: rgba(99, 102, 241, 0.35); }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+  </style>
+
+    <!-- DYNAMIC SEO & SOCIAL GRAPH (Auto-Injected) -->
+    <meta name="title" content="Direct Preference Optimization (DPO) Loss & Reward Simulator — Sovereign AI Suite">
+    <meta name="description" content="Simulates DPO objective L_DPO = -E[log(sigmoid(beta * log(pi(y_w)/pi_ref(y_w)) - beta * log(pi(y_l)/pi_ref(y_l))))]. 100% private, client-side, zero server latency.">
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://keshavs40344.github.io/ai-world-core/saas/reinforcement_learning_dpo_loss_model.html">
+    <meta property="og:title" content="Direct Preference Optimization (DPO) Loss & Reward Simulator — Sovereign AI Suite">
+    <meta property="og:description" content="Simulates DPO objective L_DPO = -E[log(sigmoid(beta * log(pi(y_w)/pi_ref(y_w)) - beta * log(pi(y_l)/pi_ref(y_l))))]. 100% private, client-side, zero server latency.">
+    <meta property="og:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Direct%20Preference%20Optimization%20%28DPO%29%20Los+Studio&font=montserrat">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://keshavs40344.github.io/ai-world-core/saas/reinforcement_learning_dpo_loss_model.html">
+    <meta name="twitter:title" content="Direct Preference Optimization (DPO) Loss & Reward Simulator — Sovereign AI Suite">
+    <meta name="twitter:description" content="Simulates DPO objective L_DPO = -E[log(sigmoid(beta * log(pi(y_w)/pi_ref(y_w)) - beta * log(pi(y_l)/pi_ref(y_l))))]. 100% private, client-side, zero server latency.">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Direct%20Preference%20Optimization%20%28DPO%29%20Los+Studio&font=montserrat">
+
+    <!-- JSON-LD Structured Data for Googlebot -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Direct Preference Optimization (DPO) Loss & Reward Simulator — Sovereign AI Suite",
+      "url": "https://keshavs40344.github.io/ai-world-core/saas/reinforcement_learning_dpo_loss_model.html",
+      "description": "Simulates DPO objective L_DPO = -E[log(sigmoid(beta * log(pi(y_w)/pi_ref(y_w)) - beta * log(pi(y_l)/pi_ref(y_l))))]. 100% private, client-side, zero server latency.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All modern browsers",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <!-- /SEO BLOCK -->
+    
+</head>
+<body class="min-h-screen antialiased flex flex-col selection:bg-indigo-500/30 selection:text-indigo-300">
+
+  <!-- Sovereign Nav -->
+  <header class="glass border-b border-indigo-500/10 sticky top-0 z-50 px-6 py-3.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-sm font-mono hover:text-indigo-400 transition">
+        <i data-lucide="brain-circuit" class="w-4 h-4 text-indigo-400"></i>
+        <span>AI WORLD HUB</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          AI CORE OPERATIONAL
+        </span>
+        <a href="../../tools.html" class="text-xs text-slate-400 hover:text-white transition">All Tools</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-6">
+    <div class="glass p-6 sm:p-8 rounded-3xl border border-indigo-500/20 relative overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/40 flex items-center justify-center shrink-0">
+          <i data-lucide="award" class="w-7 h-7 text-indigo-400"></i>
+        </div>
+        <div class="space-y-1 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-500/30">AI & LLM Core</span>
+            <span class="text-[10px] font-mono text-slate-400">&bull; 100% Client-Side &bull; Zero Cloud Leakage</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-black font-display text-white">Direct Preference Optimization (DPO) Loss & Reward Simulator</h1>
+          <p class="text-slate-400 text-sm max-w-3xl">Simulates DPO objective L_DPO = -E[log(sigmoid(beta * log(pi(y_w)/pi_ref(y_w)) - beta * log(pi(y_l)/pi_ref(y_l))))].</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Tool Interactive UI -->
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">DPO Parameters</h3>
+        <div>
+          <label class="text-[10px] font-mono text-slate-400">Beta (&beta; temperature):</label>
+          <input id="dpoBeta" type="number" value="0.1" step="0.05" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] font-mono text-slate-400">Log-Ratio Winner log(&pi;/&pi;_ref):</label>
+            <input id="dpoWin" type="number" value="1.5" step="0.1" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+          </div>
+          <div>
+            <label class="text-[10px] font-mono text-slate-400">Log-Ratio Loser log(&pi;/&pi;_ref):</label>
+            <input id="dpoLose" type="number" value="-0.8" step="0.1" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+          </div>
+        </div>
+        <button id="calcDpoBtn" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs font-mono transition">Compute DPO Loss</button>
+      </div>
+
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">Implicit Reward Margin & Loss</h3>
+        <div id="dpoResults" class="space-y-3 font-mono text-xs">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+        
+
+  </main>
+
+  <footer class="border-t border-white/5 py-8 mt-12 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>AI WORLD CORE &bull; Sovereign AI & LLM Systems &bull; 100% Private</div>
+      <div class="flex items-center gap-5 text-slate-400">
+        <a href="../../index.html" class="hover:text-indigo-400 transition">Hub</a>
+        <a href="../../tools.html" class="hover:text-cyan-400 transition">Catalogue</a>
+        <a href="../../world.html" class="hover:text-pink-400 transition">World Live</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    
+    function computeDPO() {
+      const beta = parseFloat(document.getElementById('dpoBeta').value);
+      const rW = parseFloat(document.getElementById('dpoWin').value);
+      const rL = parseFloat(document.getElementById('dpoLose').value);
+
+      const margin = beta * (rW - rL);
+      const sig = 1 / (1 + Math.exp(-margin));
+      const loss = -Math.log(sig);
+
+      document.getElementById('dpoResults').innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="flex justify-between text-slate-400">
+            <span>Implicit Reward Margin:</span>
+            <span class="text-emerald-400 font-bold">${margin.toFixed(3)}</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>Preference Win Probability:</span>
+            <span class="text-indigo-400 font-bold">${(sig * 100).toFixed(1)}%</span>
+          </div>
+          <div class="flex justify-between text-slate-400">
+            <span>DPO Loss:</span>
+            <span class="text-white font-bold">${loss.toFixed(4)}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById('calcDpoBtn').addEventListener('click', computeDPO);
+    computeDPO();
+        
+  </script>
+</body>
+</html>

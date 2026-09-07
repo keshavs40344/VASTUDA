@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Waveform & Podcast Chapter Studio | Free Descript & Headliner Alternative</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-rose-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-violet-600 flex items-center justify-center shadow-lg shadow-rose-500/20 text-white">
+          <i data-lucide="waveform" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-bold tracking-tight text-white">Audio Waveform & Chapter Studio</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-full">100% Free & Sovereign</span>
+          </div>
+          <p class="text-xs text-slate-400">Replaces Headliner & Descript ($24/mo) • Web Audio API Waveform Engine</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="loadDemoAudio()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5 border border-slate-700">
+          <i data-lucide="music" class="w-3.5 h-3.5 text-rose-400"></i> Generate Demo Track
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- Audio Waveform Canvas & Player (8 Cols) -->
+    <div class="lg:col-span-8 flex flex-col space-y-4">
+      
+      <!-- Upload Drop Zone -->
+      <div id="dropZone" class="bg-slate-900/80 border-2 border-dashed border-slate-800 rounded-2xl p-6 text-center hover:border-rose-500/50 transition cursor-pointer flex flex-col items-center justify-center">
+        <input type="file" id="audioFileInput" accept="audio/*" class="hidden" onchange="handleAudioUpload(event)">
+        <i data-lucide="upload-cloud" class="w-10 h-10 text-rose-400 mb-2"></i>
+        <span class="text-xs font-bold text-slate-200">Drop an audio file (MP3, WAV, AAC, OGG) or click to browse</span>
+        <p class="text-[11px] text-slate-500 mt-1">Processed 100% locally via Web Audio API. Never sent over the wire.</p>
+      </div>
+
+      <!-- Waveform Visualizer Surface -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4 flex-1 flex flex-col">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span id="trackName" class="text-xs font-bold text-slate-200">Synth Demo Signal (Vastuda Frequency)</span>
+            <span id="trackDuration" class="text-[11px] mono text-slate-500">03:42</span>
+          </div>
+          <div class="flex items-center space-x-3 mono text-xs text-rose-400">
+            <span id="currentTime">00:00</span>
+          </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="relative bg-slate-950 rounded-xl overflow-hidden h-44 border border-slate-800/80 cursor-pointer" onclick="seekWaveform(event)">
+          <canvas id="waveformCanvas" class="w-full h-full"></canvas>
+          <div id="playhead" class="absolute top-0 bottom-0 w-0.5 bg-rose-500 pointer-events-none left-0"></div>
+        </div>
+
+        <!-- Playback Controls -->
+        <div class="flex items-center justify-between pt-2">
+          <div class="flex items-center space-x-3">
+            <button id="btnPlay" onclick="togglePlay()" class="w-10 h-10 rounded-xl bg-gradient-to-r from-rose-500 to-violet-600 hover:from-rose-400 hover:to-violet-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/20 transition">
+              <i data-lucide="play" id="playIcon" class="w-5 h-5 ml-0.5"></i>
+            </button>
+            <button onclick="stopAudio()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center border border-slate-700 transition">
+              <i data-lucide="square" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="addChapterAtPlayhead()" class="px-3 py-2 bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-xl text-xs font-bold hover:bg-rose-500/30 transition flex items-center gap-1.5">
+              <i data-lucide="bookmark-plus" class="w-4 h-4"></i> Add Chapter Marker at Playhead
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Chapter Management & YouTube/Spotify Exporter (4 Cols) -->
+    <div class="lg:col-span-4 flex flex-col space-y-4">
+      
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3 flex-1 flex flex-col">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-2">
+            <i data-lucide="list-music" class="w-4 h-4"></i> Podcast Chapters (<span id="chapterCount">3</span>)
+          </h3>
+          <button onclick="exportYouTubeTimestamps()" class="text-[11px] text-slate-400 hover:text-white flex items-center gap-1">
+            <i data-lucide="copy" class="w-3 h-3"></i> Copy Timestamps
+          </button>
+        </div>
+
+        <div id="chaptersList" class="space-y-2 overflow-y-auto max-h-[380px] flex-1 pr-1">
+          <!-- Populated dynamically -->
+        </div>
+
+        <div class="pt-3 border-t border-slate-800/80 space-y-2">
+          <button onclick="downloadCuesheet()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition">
+            <i data-lucide="download" class="w-4 h-4 text-rose-400"></i> Export .CUE Sheet (Spotify/Apple)
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
+    Vastuda Sovereign Suite • 100% Free Autonomous Software • Replaces $24/mo Headliner & Descript Paywalls
+  </footer>
+
+  <script>
+    let audioCtx = null;
+    let audioBuffer = null;
+    let sourceNode = null;
+    let isPlaying = false;
+    let startTime = 0;
+    let pausedAt = 0;
+    let animationFrame = null;
+
+    let chapters = [
+      { time: 0, title: 'Introduction & Sovereign Principles' },
+      { time: 48, title: 'Deconstructing SaaS Subscription Taxes' },
+      { time: 135, title: 'Building Autonomous Agent Networks' }
+    ];
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function renderChapters() {
+      const container = document.getElementById('chaptersList');
+      container.innerHTML = '';
+      document.getElementById('chapterCount').innerText = chapters.length;
+
+      chapters.sort((a, b) => a.time - b.time).forEach((ch, idx) => {
+        const div = document.createElement('div');
+        div.className = 'p-2.5 rounded-xl bg-slate-950 border border-slate-800/80 space-y-1';
+        div.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs mono font-bold text-rose-400 cursor-pointer" onclick="jumpTo(${ch.time})">${formatTime(ch.time)}</span>
+            <button onclick="deleteChapter(${idx})" class="text-slate-600 hover:text-rose-400"><i data-lucide="trash" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <input type="text" value="${ch.title}" class="w-full bg-transparent border-0 text-xs text-slate-200 focus:outline-none" oninput="chapters[${idx}].title = this.value">
+        `;
+        container.appendChild(div);
+      });
+      lucide.createIcons();
+    }
+
+    function addChapterAtPlayhead() {
+      const current = pausedAt || 0;
+      chapters.push({ time: Math.round(current), title: `New Chapter ${chapters.length + 1}` });
+      renderChapters();
+    }
+
+    function deleteChapter(idx) {
+      chapters.splice(idx, 1);
+      renderChapters();
+    }
+
+    function jumpTo(sec) {
+      if (isPlaying) {
+        stopAudio();
+        pausedAt = sec;
+        togglePlay();
+      } else {
+        pausedAt = sec;
+        updatePlayhead(sec);
+      }
+    }
+
+    function updatePlayhead(time) {
+      document.getElementById('currentTime').innerText = formatTime(time);
+      const duration = audioBuffer ? audioBuffer.duration : 222;
+      const pct = (time / duration) * 100;
+      document.getElementById('playhead').style.left = `${pct}%`;
+    }
+
+    function drawWaveform(buffer) {
+      const canvas = document.getElementById('waveformCanvas');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      ctx.scale(dpr, dpr);
+
+      const width = canvas.offsetWidth;
+      const height = canvas.offsetHeight;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const data = buffer ? buffer.getChannelData(0) : generateMockWaveform();
+      const step = Math.ceil(data.length / width);
+      const amp = height / 2;
+
+      ctx.fillStyle = '#f43f5e';
+      for (let i = 0; i < width; i++) {
+        let min = 1.0;
+        let max = -1.0;
+        for (let j = 0; j < step; j++) {
+          const datum = data[(i * step) + j];
+          if (datum < min) min = datum;
+          if (datum > max) max = datum;
+        }
+        ctx.fillRect(i, (1 + min) * amp, 1, Math.max(1, (max - min) * amp));
+      }
+    }
+
+    function generateMockWaveform() {
+      const len = 44100 * 222;
+      const arr = new Float32Array(len);
+      for (let i = 0; i < len; i++) {
+        arr[i] = (Math.sin(i / 100) * 0.4 + Math.sin(i / 20) * 0.2 + (Math.random() - 0.5) * 0.1);
+      }
+      return arr;
+    }
+
+    function loadDemoAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const sampleRate = audioCtx.sampleRate;
+      const duration = 222; // ~3m42s
+      audioBuffer = audioCtx.createBuffer(1, sampleRate * duration, sampleRate);
+      const channel = audioBuffer.getChannelData(0);
+      for (let i = 0; i < channel.length; i++) {
+        channel[i] = (Math.sin(i / 80) * 0.3 + Math.sin(i / 15) * 0.1 + (Math.random() - 0.5) * 0.05);
+      }
+      document.getElementById('trackName').innerText = 'Synth Demo Track (Autonomous Frequency)';
+      document.getElementById('trackDuration').innerText = formatTime(duration);
+      drawWaveform(audioBuffer);
+    }
+
+    function togglePlay() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (!audioBuffer) loadDemoAudio();
+
+      if (isPlaying) {
+        pausedAt = audioCtx.currentTime - startTime;
+        sourceNode.stop();
+        sourceNode.disconnect();
+        isPlaying = false;
+        document.getElementById('playIcon').setAttribute('data-lucide', 'play');
+        cancelAnimationFrame(animationFrame);
+        lucide.createIcons();
+      } else {
+        sourceNode = audioCtx.createBufferSource();
+        sourceNode.buffer = audioBuffer;
+        sourceNode.connect(audioCtx.destination);
+        startTime = audioCtx.currentTime - pausedAt;
+        sourceNode.start(0, pausedAt);
+        isPlaying = true;
+        document.getElementById('playIcon').setAttribute('data-lucide', 'pause');
+        lucide.createIcons();
+        tick();
+      }
+    }
+
+    function stopAudio() {
+      if (isPlaying && sourceNode) {
+        sourceNode.stop();
+        sourceNode.disconnect();
+      }
+      isPlaying = false;
+      pausedAt = 0;
+      updatePlayhead(0);
+      document.getElementById('playIcon').setAttribute('data-lucide', 'play');
+      lucide.createIcons();
+      cancelAnimationFrame(animationFrame);
+    }
+
+    function tick() {
+      if (!isPlaying) return;
+      const cur = audioCtx.currentTime - startTime;
+      if (cur >= audioBuffer.duration) {
+        stopAudio();
+        return;
+      }
+      updatePlayhead(cur);
+      animationFrame = requestAnimationFrame(tick);
+    }
+
+    function seekWaveform(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      const duration = audioBuffer ? audioBuffer.duration : 222;
+      jumpTo(pct * duration);
+    }
+
+    function handleAudioUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        audioCtx.decodeAudioData(ev.target.result, function (buffer) {
+          audioBuffer = buffer;
+          document.getElementById('trackName').innerText = file.name;
+          document.getElementById('trackDuration').innerText = formatTime(buffer.duration);
+          drawWaveform(buffer);
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    document.getElementById('dropZone').addEventListener('click', () => {
+      document.getElementById('audioFileInput').click();
+    });
+
+    function exportYouTubeTimestamps() {
+      const text = chapters
+        .sort((a, b) => a.time - b.time)
+        .map(ch => `${formatTime(ch.time)} - ${ch.title}`)
+        .join('\n');
+      navigator.clipboard.writeText(text);
+      alert('Copied YouTube timestamps to clipboard!');
+    }
+
+    function downloadCuesheet() {
+      let cue = `TITLE "Podcast Episode"\nFILE "audio.mp3" MP3\n`;
+      chapters.sort((a, b) => a.time - b.time).forEach((ch, idx) => {
+        const num = String(idx + 1).padStart(2, '0');
+        const m = String(Math.floor(ch.time / 60)).padStart(2, '0');
+        const s = String(Math.floor(ch.time % 60)).padStart(2, '0');
+        cue += `  TRACK ${num} AUDIO\n    TITLE "${ch.title}"\n    INDEX 01 ${m}:${s}:00\n`;
+      });
+      const blob = new Blob([cue], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'podcast-chapters.cue';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderChapters();
+      loadDemoAudio();
+    });
+  </script>
+</body>
+</html>

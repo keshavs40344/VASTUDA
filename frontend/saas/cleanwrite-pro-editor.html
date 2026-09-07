@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VASTUDA CleanWrite // Sovereign Prose & Readability Sentinel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #030712;
+      color: #f3f4f6;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .hl-hard {
+      background: rgba(234, 179, 8, 0.25);
+      border-bottom: 2px solid #eab308;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+    .hl-very-hard {
+      background: rgba(239, 68, 68, 0.25);
+      border-bottom: 2px solid #ef4444;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+    .hl-passive {
+      background: rgba(56, 189, 248, 0.25);
+      border-bottom: 2px solid #38bdf8;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+    .hl-adverb {
+      background: rgba(168, 85, 247, 0.25);
+      border-bottom: 2px solid #a855f7;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+    .editor-box:focus {
+      outline: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
+
+  <!-- Header -->
+  <header class="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg shadow-emerald-950">
+          <i data-lucide="feather" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm font-bold tracking-tight text-white font-mono">VASTUDA CLEANWRITE SENTINEL</h1>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800/60 text-[10px] font-mono">100% PRIVATE • ZERO LEAKAGE</span>
+          </div>
+          <p class="text-[11px] font-mono text-zinc-400">Replaces Grammarly & Hemingway Editor ($20–$30/mo) • Zero Server Latency</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="cleanAndCondense()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold flex items-center gap-1.5 transition">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>Auto-Trim Redundancies</span>
+        </button>
+        <button onclick="copyCleanText()" class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-mono flex items-center gap-1.5 transition">
+          <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+          <span id="copyBtnText">Copy Text</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Quick Presets -->
+  <div class="bg-zinc-950/60 border-b border-zinc-900 py-2.5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-2 overflow-x-auto text-xs font-mono">
+      <span class="text-zinc-500 shrink-0">Sample Drafts:</span>
+      <button onclick="loadSample('corporate')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Bloated Corporate Memo</button>
+      <button onclick="loadSample('academic')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Dense Academic Abstract</button>
+      <button onclick="loadSample('clean')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Clean Hemingway Style</button>
+      <button onclick="clearEditor()" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-rose-400 hover:text-rose-300 transition">Clear</button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
+
+    <!-- Top Row: Readability Grade & Vitals -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Grade Level -->
+      <div class="glass-panel p-5 rounded-2xl relative overflow-hidden">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Readability Level</span>
+        <div class="text-3xl font-extrabold text-emerald-400 font-mono mt-1" id="vGradeLevel">Grade 8</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono" id="vEaseScore">Flesch Reading Ease: 64.2 (Standard)</p>
+      </div>
+
+      <!-- Reading / Speaking Time -->
+      <div class="glass-panel p-5 rounded-2xl">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Reading Time</span>
+        <div class="text-3xl font-extrabold text-white font-mono mt-1" id="vReadTime">1 min 14 sec</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono" id="vSpeakTime">Speaking: 1 min 58 sec</p>
+      </div>
+
+      <!-- Word & Char Counts -->
+      <div class="glass-panel p-5 rounded-2xl">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Document Length</span>
+        <div class="text-3xl font-extrabold text-cyan-400 font-mono mt-1" id="vWordCount">248 Words</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono" id="vCharCount">1,480 Characters • 14 Sentences</p>
+      </div>
+
+      <!-- Airgapped Privacy Shield -->
+      <div class="glass-panel p-5 rounded-2xl">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-mono text-zinc-400 uppercase">Privacy Status</span>
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+        </div>
+        <div class="text-lg font-bold text-emerald-400 font-mono">100% In-Browser</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono">Zero bytes sent to cloud servers</p>
+      </div>
+    </div>
+
+    <!-- Main Workspace Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: Interactive Live Prose Editor (8 Cols) -->
+      <div class="lg:col-span-8 space-y-4">
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i>
+              <span>Live Prose Diagnostic Canvas</span>
+            </h2>
+            <div class="flex items-center gap-3 text-xs font-mono text-zinc-400">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-yellow-400"></span> Hard</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-red-400"></span> Very Hard</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-sky-400"></span> Passive</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-purple-400"></span> Adverb</span>
+            </div>
+          </div>
+
+          <!-- The Live Editor Textarea -->
+          <div class="relative min-h-[380px]">
+            <textarea id="editorTextarea" oninput="analyzeProse()" placeholder="Type or paste your draft, executive email, proposal, or article here..." class="w-full h-96 bg-zinc-950/80 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-200 placeholder-zinc-500 font-sans leading-relaxed focus:outline-none focus:border-emerald-500 resize-y"></textarea>
+          </div>
+
+          <!-- Highlighted Visual Preview Stream -->
+          <div class="p-4 bg-zinc-950 rounded-xl border border-zinc-800/80 space-y-2">
+            <div class="flex items-center justify-between border-b border-zinc-900 pb-2">
+              <span class="text-xs font-mono text-zinc-400 uppercase">Live Style Diagnostic Overlay</span>
+              <span class="text-[10px] font-mono text-zinc-500">Visual Heatmap</span>
+            </div>
+            <div id="highlightOverlay" class="text-sm text-zinc-300 leading-relaxed font-sans max-h-48 overflow-y-auto whitespace-pre-wrap">
+              Start typing above to see sentence complexity and passive voice highlights in real-time...
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right Column: Diagnostic Breakdown & Simplification Matrix (4 Cols) -->
+      <div class="lg:col-span-4 space-y-5">
+        
+        <!-- Style Metrics Checklist -->
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-3">
+            <i data-lucide="bar-chart" class="w-4 h-4 text-cyan-400"></i>
+            <span>Sentence & Voice Breakdown</span>
+          </h3>
+
+          <div class="space-y-3 font-mono text-xs">
+            <!-- Very Hard Sentences -->
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-red-950/20 border border-red-900/40">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                <span class="text-zinc-300">Very Hard Sentences:</span>
+              </div>
+              <span class="text-red-400 font-bold" id="cntVeryHard">0</span>
+            </div>
+
+            <!-- Hard Sentences -->
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-amber-950/20 border border-amber-900/40">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                <span class="text-zinc-300">Hard Sentences:</span>
+              </div>
+              <span class="text-amber-400 font-bold" id="cntHard">0</span>
+            </div>
+
+            <!-- Passive Voice Instances -->
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-sky-950/20 border border-sky-900/40">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+                <span class="text-zinc-300">Passive Voice:</span>
+              </div>
+              <span class="text-sky-400 font-bold" id="cntPassive">0</span>
+            </div>
+
+            <!-- Adverbs & Weak Qualifiers -->
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-purple-950/20 border border-purple-900/40">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span>
+                <span class="text-zinc-300">Adverbs / Qualifiers:</span>
+              </div>
+              <span class="text-purple-400 font-bold" id="cntAdverbs">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Redundancy Simplifier Feed -->
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="zap" class="w-4 h-4 text-emerald-400"></i>
+              <span>Wordy Phrase Replacements</span>
+            </h3>
+            <span class="text-[10px] font-mono text-zinc-500">Heuristic Engine</span>
+          </div>
+
+          <div class="space-y-2 text-xs font-mono max-h-56 overflow-y-auto" id="replacementList">
+            <p class="text-zinc-500 italic">No bloated phrases detected.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="border-t border-zinc-800/80 bg-zinc-950 py-4 text-center text-xs font-mono text-zinc-500">
+    VASTUDA Sovereign Core • 100% Client-Side Airgapped Security • Mathematical Prose Analysis
+  </footer>
+
+  <script>
+    const SAMPLES = {
+      corporate: "In order to facilitate the expeditious completion of our strategic operational objectives, it has been decided by executive leadership that a comprehensive restructuring shall be undertaken. Due to the fact that current market conditions are extremely challenging, the team was instructed by the board to utilize maximum efficiency at this point in time. It is crucially important that each individual stakeholder communicates proactively.",
+      academic: "The empirical investigation demonstrates that anomalous statistical distributions were observed within the quantum computational manifold. Consequently, significant deviations were registered by the optical telemetry sensor array. Owing to the circumstance that non-linear variables predominate, standard predictive approximations were considered insufficient by the research committee.",
+      clean: "The old man fished alone in a skiff in the Gulf Stream. He had gone eighty-four days now without taking a fish. In the first forty days a boy had been with him. But after forty days without a fish the boy’s parents had told him that the old man was definitely and finally salao."
+    };
+
+    const REDUNDANCIES = {
+      "in order to": "to",
+      "due to the fact that": "because",
+      "at this point in time": "now",
+      "at the present time": "now",
+      "for the purpose of": "to",
+      "in the event that": "if",
+      "with reference to": "about",
+      "in accordance with": "by",
+      "prior to": "before",
+      "subsequent to": "after",
+      "utilize": "use",
+      "facilitate": "help",
+      "expeditious": "fast",
+      "commence": "start",
+      "terminate": "end",
+      "crucially important": "critical"
+    };
+
+    const PASSIVE_REGEX = /\b(am|is|are|was|were|be|been|being)\s+([a-z]+ed|[a-z]+en|done|seen|made|taken|found|given)\b/gi;
+    const ADVERB_REGEX = /\b([a-z]{3,}ly)\b/gi;
+
+    function countSyllables(word) {
+      word = word.toLowerCase().replace(/[^a-z]/g, '');
+      if (word.length <= 3) return 1;
+      word = word.replace(/(?:[^laeiouy]|ed|es|e)$/, '');
+      word = word.replace(/^y/, '');
+      const matches = word.match(/[aeiouy]{1,2}/g);
+      return matches ? matches.length : 1;
+    }
+
+    function analyzeProse() {
+      const text = document.getElementById('editorTextarea').value;
+      if (!text.trim()) {
+        resetStats();
+        return;
+      }
+
+      // Word count
+      const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+      const wordCount = words.length;
+
+      // Sentence count
+      const rawSentences = text.split(/(?<=[.?!])\s+/).filter(s => s.trim().length > 0);
+      const sentenceCount = Math.max(1, rawSentences.length);
+
+      // Syllable count
+      let totalSyllables = 0;
+      words.forEach(w => totalSyllables += countSyllables(w));
+
+      // Metrics
+      const avgSentenceLength = wordCount / sentenceCount;
+      const avgSyllablesPerWord = totalSyllables / (wordCount || 1);
+
+      // Flesch Reading Ease = 206.835 - (1.015 * ASL) - (84.6 * ASW)
+      let flesch = 206.835 - (1.015 * avgSentenceLength) - (84.6 * avgSyllablesPerWord);
+      flesch = Math.max(0, Math.min(100, Math.round(flesch * 10) / 10));
+
+      // Flesch-Kincaid Grade = (0.39 * ASL) + (11.8 * ASW) - 15.59
+      let fkGrade = (0.39 * avgSentenceLength) + (11.8 * avgSyllablesPerWord) - 15.59;
+      fkGrade = Math.max(1, Math.round(fkGrade * 10) / 10);
+
+      // Update UI Header Stats
+      document.getElementById('vGradeLevel').innerText = `Grade ${Math.round(fkGrade)}`;
+      document.getElementById('vEaseScore').innerText = `Flesch Reading Ease: ${flesch} (${getFleschLabel(flesch)})`;
+      document.getElementById('vWordCount').innerText = `${wordCount.toLocaleString()} Words`;
+      document.getElementById('vCharCount').innerText = `${text.length.toLocaleString()} Characters • ${sentenceCount} Sentences`;
+
+      // Reading Time (220 WPM) & Speaking (130 WPM)
+      const readSec = Math.round((wordCount / 220) * 60);
+      const speakSec = Math.round((wordCount / 130) * 60);
+      document.getElementById('vReadTime').innerText = formatDuration(readSec);
+      document.getElementById('vSpeakTime').innerText = `Speaking: ${formatDuration(speakSec)}`;
+
+      // Sentence Classification & Highlight Overlay
+      let hardCount = 0;
+      let veryHardCount = 0;
+      let passiveCount = 0;
+      let adverbCount = 0;
+
+      const highlightedParagraphs = text.split('\n').map(para => {
+        if (!para.trim()) return '';
+        const sentences = para.split(/(?<=[.?!])\s+/);
+        return sentences.map(sent => {
+          const sWords = sent.trim().split(/\s+/).filter(Boolean).length;
+          let sentClass = '';
+          if (sWords >= 25) {
+            sentClass = 'hl-very-hard';
+            veryHardCount++;
+          } else if (sWords >= 15) {
+            sentClass = 'hl-hard';
+            hardCount++;
+          }
+
+          // Check for passives and adverbs inside sentence
+          let processed = escapeHtml(sent);
+
+          processed = processed.replace(PASSIVE_REGEX, (match) => {
+            passiveCount++;
+            return `<span class="hl-passive">${match}</span>`;
+          });
+
+          processed = processed.replace(ADVERB_REGEX, (match) => {
+            adverbCount++;
+            return `<span class="hl-adverb">${match}</span>`;
+          });
+
+          if (sentClass) {
+            return `<span class="${sentClass}">${processed}</span>`;
+          }
+          return processed;
+        }).join(' ');
+      }).join('\n\n');
+
+      document.getElementById('highlightOverlay').innerHTML = highlightedParagraphs || 'Clean prose.';
+
+      document.getElementById('cntHard').innerText = hardCount;
+      document.getElementById('cntVeryHard').innerText = veryHardCount;
+      document.getElementById('cntPassive').innerText = passiveCount;
+      document.getElementById('cntAdverbs').innerText = adverbCount;
+
+      // Detect Redundancies
+      detectRedundancies(text);
+    }
+
+    function detectRedundancies(text) {
+      const lower = text.toLowerCase();
+      const found = [];
+
+      for (const [bloat, simpler] of Object.entries(REDUNDANCIES)) {
+        if (lower.includes(bloat)) {
+          found.push({ bloat, simpler });
+        }
+      }
+
+      const list = document.getElementById('replacementList');
+      list.innerHTML = '';
+      if (found.length === 0) {
+        list.innerHTML = '<p class="text-zinc-500 italic">No wordy phrases detected. Great concise writing!</p>';
+        return;
+      }
+
+      found.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'p-2 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-between';
+        div.innerHTML = `
+          <div>
+            <span class="text-rose-400 line-through">"${item.bloat}"</span>
+            <span class="text-zinc-400 mx-1">➔</span>
+            <span class="text-emerald-400 font-bold">"${item.simpler}"</span>
+          </div>
+          <button onclick="replacePhrase('${item.bloat}', '${item.simpler}')" class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] hover:bg-emerald-900 transition">Apply</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function replacePhrase(oldP, newP) {
+      const textarea = document.getElementById('editorTextarea');
+      const regex = new RegExp(oldP, 'gi');
+      textarea.value = textarea.value.replace(regex, newP);
+      analyzeProse();
+    }
+
+    function cleanAndCondense() {
+      const textarea = document.getElementById('editorTextarea');
+      let text = textarea.value;
+
+      for (const [bloat, simpler] of Object.entries(REDUNDANCIES)) {
+        const regex = new RegExp(bloat, 'gi');
+        text = text.replace(regex, simpler);
+      }
+
+      textarea.value = text;
+      analyzeProse();
+    }
+
+    function getFleschLabel(score) {
+      if (score >= 90) return "Very Easy";
+      if (score >= 80) return "Easy";
+      if (score >= 70) return "Fairly Easy";
+      if (score >= 60) return "Standard";
+      if (score >= 50) return "Fairly Difficult";
+      if (score >= 30) return "Difficult";
+      return "Very Confusing";
+    }
+
+    function formatDuration(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      if (m === 0) return `${s} sec`;
+      return `${m} min ${s} sec`;
+    }
+
+    function escapeHtml(string) {
+      return string
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function loadSample(key) {
+      document.getElementById('editorTextarea').value = SAMPLES[key] || '';
+      analyzeProse();
+    }
+
+    function clearEditor() {
+      document.getElementById('editorTextarea').value = '';
+      analyzeProse();
+    }
+
+    function resetStats() {
+      document.getElementById('vGradeLevel').innerText = "Grade -";
+      document.getElementById('vEaseScore').innerText = "Flesch Reading Ease: -";
+      document.getElementById('vWordCount').innerText = "0 Words";
+      document.getElementById('vCharCount').innerText = "0 Characters • 0 Sentences";
+      document.getElementById('vReadTime').innerText = "0 sec";
+      document.getElementById('vSpeakTime').innerText = "Speaking: 0 sec";
+      document.getElementById('cntHard').innerText = "0";
+      document.getElementById('cntVeryHard').innerText = "0";
+      document.getElementById('cntPassive').innerText = "0";
+      document.getElementById('cntAdverbs').innerText = "0";
+      document.getElementById('highlightOverlay').innerHTML = "Start typing above...";
+      document.getElementById('replacementList').innerHTML = '<p class="text-zinc-500 italic">No text to analyze.</p>';
+    }
+
+    function copyCleanText() {
+      const text = document.getElementById('editorTextarea').value;
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtnText');
+        btn.innerText = "Copied!";
+        setTimeout(() => { btn.innerText = "Copy Text"; }, 2000);
+      });
+    }
+
+    window.onload = () => {
+      lucide.createIcons();
+      loadSample('corporate');
+    };
+  </script>
+</body>
+</html>

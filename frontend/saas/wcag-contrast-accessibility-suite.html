@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WCAG 2.2 Contrast & Accessibility Simulator | Free Stark Pro Alternative</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-sky-500/20 text-white">
+          <i data-lucide="eye" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-bold tracking-tight text-white">WCAG 2.2 Accessibility Suite</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-sky-500/20 text-sky-400 border border-sky-500/30 rounded-full">100% Free & Sovereign</span>
+          </div>
+          <p class="text-xs text-slate-400">Replaces Stark Pro & AccessiBe ($60–$490/yr) • Colorblind Vision Simulations</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="loadHighContrastPreset()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5 border border-slate-700">
+          <i data-lucide="check-check" class="w-3.5 h-3.5 text-emerald-400"></i> AAA Preset
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- Color Controls (5 Cols) -->
+    <div class="lg:col-span-5 flex flex-col space-y-4">
+      
+      <!-- Palette Picker -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-2">
+          <i data-lucide="palette" class="w-4 h-4"></i> Color Ratio Configuration
+        </h3>
+        
+        <div class="space-y-3">
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">Foreground (Text / Icon Color):</label>
+            <div class="flex items-center gap-3">
+              <input type="color" id="fgColor" value="#0f172a" class="w-12 h-10 rounded-xl border border-slate-800 bg-transparent cursor-pointer" oninput="updateColors()">
+              <input type="text" id="fgHex" value="#0f172a" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs mono text-slate-200" oninput="updateHex('fg')">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">Background (Container / Surface Color):</label>
+            <div class="flex items-center gap-3">
+              <input type="color" id="bgColor" value="#38bdf8" class="w-12 h-10 rounded-xl border border-slate-800 bg-transparent cursor-pointer" oninput="updateColors()">
+              <input type="text" id="bgHex" value="#38bdf8" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs mono text-slate-200" oninput="updateHex('bg')">
+            </div>
+          </div>
+
+          <button onclick="swapColors()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition">
+            <i data-lucide="arrow-up-down" class="w-3.5 h-3.5"></i> Invert Colors
+          </button>
+        </div>
+
+        <!-- Vision Deficiency Simulator Modes -->
+        <div class="pt-3 border-t border-slate-800/80 space-y-2">
+          <label class="text-[11px] font-semibold text-slate-400 block">Simulate Vision Deficiency:</label>
+          <select id="visionFilter" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" onchange="applyVisionFilter()">
+            <option value="none">Normal Trichromatic Vision (Default)</option>
+            <option value="protanopia">Protanopia (Red-Blind - 1% of males)</option>
+            <option value="deuteranopia">Deuteranopia (Green-Blind - 5% of males)</option>
+            <option value="tritanopia">Tritanopia (Blue-Blind - Rare)</option>
+            <option value="achromatopsia">Achromatopsia (Total Monochromacy)</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- WCAG Regulatory Matrix Card -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl space-y-3">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i> WCAG 2.2 Compliance Matrix
+        </h4>
+
+        <div class="space-y-2 text-xs">
+          <div class="flex items-center justify-between p-2 rounded-xl bg-slate-950 border border-slate-800/80">
+            <div>
+              <span class="font-bold text-slate-300 block">Normal Text (AA)</span>
+              <span class="text-[10px] text-slate-500">Requires 4.5:1</span>
+            </div>
+            <span id="badgeNormalAA" class="px-2.5 py-1 rounded text-xs font-bold mono">PASS</span>
+          </div>
+
+          <div class="flex items-center justify-between p-2 rounded-xl bg-slate-950 border border-slate-800/80">
+            <div>
+              <span class="font-bold text-slate-300 block">Large Text (AA / 18pt+)</span>
+              <span class="text-[10px] text-slate-500">Requires 3.0:1</span>
+            </div>
+            <span id="badgeLargeAA" class="px-2.5 py-1 rounded text-xs font-bold mono">PASS</span>
+          </div>
+
+          <div class="flex items-center justify-between p-2 rounded-xl bg-slate-950 border border-slate-800/80">
+            <div>
+              <span class="font-bold text-slate-300 block">Enhanced Normal Text (AAA)</span>
+              <span class="text-[10px] text-slate-500">Requires 7.0:1</span>
+            </div>
+            <span id="badgeNormalAAA" class="px-2.5 py-1 rounded text-xs font-bold mono">FAIL</span>
+          </div>
+
+          <div class="flex items-center justify-between p-2 rounded-xl bg-slate-950 border border-slate-800/80">
+            <div>
+              <span class="font-bold text-slate-300 block">UI Components & Borders</span>
+              <span class="text-[10px] text-slate-500">Requires 3.0:1</span>
+            </div>
+            <span id="badgeUi" class="px-2.5 py-1 rounded text-xs font-bold mono">PASS</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Live Preview Card & Vision Simulation (7 Cols) -->
+    <div class="lg:col-span-7 flex flex-col space-y-4">
+      
+      <!-- Top Big Ratio Banner -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex items-center justify-between shadow-xl">
+        <div>
+          <span class="text-xs uppercase font-bold text-slate-400">Calculated Contrast Ratio</span>
+          <div id="ratioDisplay" class="text-4xl font-black text-white mono mt-1">9.82 : 1</div>
+        </div>
+        <div id="statusPill" class="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
+          WCAG AAA Compliant
+        </div>
+      </div>
+
+      <!-- Live Interactive Component Canvas -->
+      <div id="previewCard" class="rounded-2xl p-8 shadow-2xl border border-slate-800 transition-all duration-300 flex-1 flex flex-col justify-between min-h-[380px]">
+        <div>
+          <div class="flex items-center justify-between border-b pb-4 mb-4 border-current/20">
+            <span class="text-xs font-bold uppercase tracking-wider opacity-80">Component Preview</span>
+            <span class="text-xs font-mono opacity-80">16px Body & 24px Headline</span>
+          </div>
+          <h2 class="text-2xl font-black tracking-tight mb-2">Autonomous Agentic Architecture</h2>
+          <p class="text-sm leading-relaxed max-w-lg mb-6 opacity-90">
+            Building software systems that operate with 100% client-side privacy, deterministic mathematical accuracy, and zero recurring SaaS subscription overhead.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button class="px-4 py-2 rounded-xl font-bold text-xs shadow-lg border border-current/30 hover:opacity-90 transition">
+            Primary Action
+          </button>
+          <button class="px-4 py-2 rounded-xl font-semibold text-xs opacity-75 hover:opacity-100 transition">
+            Secondary Link
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
+    Vastuda Sovereign Suite • 100% Free Autonomous Software • Replaces $490/yr Stark & AccessiBe Paywalls
+  </footer>
+
+  <script>
+    function getLuminance(r, g, b) {
+      const a = [r, g, b].map(v => {
+        v /= 255;
+        return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+      });
+      return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+    }
+
+    function hexToRgb(hex) {
+      const clean = hex.replace('#', '');
+      const bigint = parseInt(clean, 16);
+      return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255
+      };
+    }
+
+    function updateHex(target) {
+      if (target === 'fg') {
+        const hex = document.getElementById('fgHex').value;
+        if (/^#[0-9A-F]{6}$/i.test(hex)) {
+          document.getElementById('fgColor').value = hex;
+          updateColors();
+        }
+      } else {
+        const hex = document.getElementById('bgHex').value;
+        if (/^#[0-9A-F]{6}$/i.test(hex)) {
+          document.getElementById('bgColor').value = hex;
+          updateColors();
+        }
+      }
+    }
+
+    function updateColors() {
+      const fg = document.getElementById('fgColor').value;
+      const bg = document.getElementById('bgColor').value;
+      document.getElementById('fgHex').value = fg;
+      document.getElementById('bgHex').value = bg;
+
+      const rgbFg = hexToRgb(fg);
+      const rgbBg = hexToRgb(bg);
+
+      const l1 = getLuminance(rgbFg.r, rgbFg.g, rgbFg.b);
+      const l2 = getLuminance(rgbBg.r, rgbBg.g, rgbBg.b);
+
+      const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+      const roundedRatio = Math.round(ratio * 100) / 100;
+
+      document.getElementById('ratioDisplay').innerText = `${roundedRatio.toFixed(2)} : 1`;
+
+      // Update Badges
+      updateBadge('badgeNormalAA', ratio >= 4.5);
+      updateBadge('badgeLargeAA', ratio >= 3.0);
+      updateBadge('badgeNormalAAA', ratio >= 7.0);
+      updateBadge('badgeUi', ratio >= 3.0);
+
+      const pill = document.getElementById('statusPill');
+      if (ratio >= 7.0) {
+        pill.innerText = 'WCAG AAA Enhanced';
+        pill.className = 'px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider';
+      } else if (ratio >= 4.5) {
+        pill.innerText = 'WCAG AA Minimum';
+        pill.className = 'px-4 py-2 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 text-xs font-bold uppercase tracking-wider';
+      } else {
+        pill.innerText = 'WCAG Non-Compliant';
+        pill.className = 'px-4 py-2 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold uppercase tracking-wider';
+      }
+
+      // Apply to Preview Card
+      const card = document.getElementById('previewCard');
+      card.style.backgroundColor = bg;
+      card.style.color = fg;
+    }
+
+    function updateBadge(id, isPass) {
+      const el = document.getElementById(id);
+      if (isPass) {
+        el.innerText = 'PASS';
+        el.className = 'px-2.5 py-1 rounded text-xs font-bold mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+      } else {
+        el.innerText = 'FAIL';
+        el.className = 'px-2.5 py-1 rounded text-xs font-bold mono bg-rose-500/20 text-rose-400 border border-rose-500/30';
+      }
+    }
+
+    function swapColors() {
+      const fg = document.getElementById('fgColor').value;
+      const bg = document.getElementById('bgColor').value;
+      document.getElementById('fgColor').value = bg;
+      document.getElementById('bgColor').value = fg;
+      updateColors();
+    }
+
+    function loadHighContrastPreset() {
+      document.getElementById('fgColor').value = '#ffffff';
+      document.getElementById('bgColor').value = '#0f172a';
+      updateColors();
+    }
+
+    function applyVisionFilter() {
+      const filter = document.getElementById('visionFilter').value;
+      const card = document.getElementById('previewCard');
+      if (filter === 'achromatopsia') {
+        card.style.filter = 'grayscale(100%)';
+      } else if (filter === 'protanopia') {
+        card.style.filter = 'sepia(50%) hue-rotate(-20deg)';
+      } else if (filter === 'deuteranopia') {
+        card.style.filter = 'sepia(40%) hue-rotate(40deg)';
+      } else if (filter === 'tritanopia') {
+        card.style.filter = 'sepia(60%) hue-rotate(180deg)';
+      } else {
+        card.style.filter = 'none';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      updateColors();
+    });
+  </script>
+</body>
+</html>

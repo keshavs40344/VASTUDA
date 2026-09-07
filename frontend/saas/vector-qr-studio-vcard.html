@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vector QR Studio & Sovereign vCard Generator | Free QR Generator Pro Alternative</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-purple-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20 text-white">
+          <i data-lucide="qr-code" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-bold tracking-tight text-white">Vector QR & vCard Studio</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-full">100% Free & Sovereign</span>
+          </div>
+          <p class="text-xs text-slate-400">Replaces QR Code Generator Pro ($120/yr) • High-Res SVG & PNG Exports</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="loadDemoVCard()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5 border border-slate-700">
+          <i data-lucide="contact" class="w-3.5 h-3.5 text-purple-400"></i> Sample vCard
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- Config Inputs (6 Cols) -->
+    <div class="lg:col-span-7 flex flex-col space-y-4">
+      
+      <!-- Type Switcher -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 shadow-xl">
+        <div class="flex items-center space-x-2">
+          <button id="typeUrl" onclick="switchQrType('url')" class="flex-1 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white transition flex items-center justify-center gap-1.5 shadow">
+            <i data-lucide="link" class="w-3.5 h-3.5"></i> URL / Web
+          </button>
+          <button id="typeVcard" onclick="switchQrType('vcard')" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-950 text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5 border border-slate-800">
+            <i data-lucide="user-check" class="w-3.5 h-3.5"></i> Business vCard
+          </button>
+          <button id="typeWifi" onclick="switchQrType('wifi')" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-950 text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5 border border-slate-800">
+            <i data-lucide="wifi" class="w-3.5 h-3.5"></i> WiFi Network
+          </button>
+          <button id="typeCrypto" onclick="switchQrType('crypto')" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-950 text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5 border border-slate-800">
+            <i data-lucide="wallet" class="w-3.5 h-3.5"></i> Crypto Pay
+          </button>
+        </div>
+      </div>
+
+      <!-- Dynamic Form Container -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+        
+        <!-- URL Form -->
+        <div id="formUrl" class="space-y-3">
+          <label class="text-xs font-bold uppercase tracking-wider text-purple-400 block">Destination URL / Deep Link</label>
+          <input type="url" id="inputUrl" value="https://vastuda.org/cockpit" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs mono text-purple-300 focus:outline-none focus:border-purple-500" placeholder="https://example.com" oninput="generateQR()">
+        </div>
+
+        <!-- vCard Form -->
+        <div id="formVcard" class="space-y-3 hidden">
+          <label class="text-xs font-bold uppercase tracking-wider text-purple-400 block">Contact vCard Parameters</label>
+          <div class="grid grid-cols-2 gap-3">
+            <input type="text" id="vcFirst" placeholder="First Name" value="Aarav" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" oninput="generateQR()">
+            <input type="text" id="vcLast" placeholder="Last Name" value="Sharma" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" oninput="generateQR()">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <input type="text" id="vcOrg" placeholder="Organization / Studio" value="Vastuda Labs" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" oninput="generateQR()">
+            <input type="text" id="vcTitle" placeholder="Job Title" value="Founder & Chief Architect" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" oninput="generateQR()">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <input type="email" id="vcEmail" placeholder="Email" value="aarav@vastuda.org" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" oninput="generateQR()">
+            <input type="tel" id="vcPhone" placeholder="Mobile Phone" value="+1 (415) 890-4123" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" oninput="generateQR()">
+          </div>
+          <input type="url" id="vcWebsite" placeholder="Website" value="https://vastuda.org" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" oninput="generateQR()">
+        </div>
+
+        <!-- WiFi Form -->
+        <div id="formWifi" class="space-y-3 hidden">
+          <label class="text-xs font-bold uppercase tracking-wider text-purple-400 block">WiFi Access Credentials</label>
+          <div class="grid grid-cols-2 gap-3">
+            <input type="text" id="wifiSsid" placeholder="Network SSID (Name)" value="Office_Fiber_5G" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" oninput="generateQR()">
+            <input type="text" id="wifiPass" placeholder="WiFi Password" value="SovereignSecure2026" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" oninput="generateQR()">
+          </div>
+          <select id="wifiAuth" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" onchange="generateQR()">
+            <option value="WPA">WPA/WPA2/WPA3 (Default)</option>
+            <option value="WEP">WEP</option>
+            <option value="nopass">No Password (Open)</option>
+          </select>
+        </div>
+
+        <!-- Crypto Form -->
+        <div id="formCrypto" class="space-y-3 hidden">
+          <label class="text-xs font-bold uppercase tracking-wider text-purple-400 block">Cryptocurrency Payment Request</label>
+          <div class="grid grid-cols-3 gap-3">
+            <select id="cryptoCoin" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" onchange="generateQR()">
+              <option value="bitcoin">Bitcoin (BTC)</option>
+              <option value="ethereum">Ethereum (ETH / ERC-20)</option>
+              <option value="solana">Solana (SOL)</option>
+            </select>
+            <input type="text" id="cryptoAmount" placeholder="Amount (e.g. 0.05)" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs mono text-slate-200" oninput="generateQR()">
+            <input type="text" id="cryptoLabel" placeholder="Invoice Label" class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-200" oninput="generateQR()">
+          </div>
+          <input type="text" id="cryptoAddress" placeholder="Wallet Address" value="0x71C...3829" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs mono text-purple-300" oninput="generateQR()">
+        </div>
+
+        <!-- Design & Styling Options -->
+        <div class="pt-4 border-t border-slate-800/80 space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Color Palette & Error Correction</h4>
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="text-[10px] text-slate-500 block mb-1">Foreground Color</label>
+              <div class="flex items-center gap-2">
+                <input type="color" id="qrFgColor" value="#0f172a" class="w-8 h-8 rounded border border-slate-800 bg-transparent cursor-pointer" oninput="generateQR()">
+                <span id="fgColorVal" class="text-xs mono text-slate-400">#0f172a</span>
+              </div>
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-500 block mb-1">Background Color</label>
+              <div class="flex items-center gap-2">
+                <input type="color" id="qrBgColor" value="#ffffff" class="w-8 h-8 rounded border border-slate-800 bg-transparent cursor-pointer" oninput="generateQR()">
+                <span id="bgColorVal" class="text-xs mono text-slate-400">#ffffff</span>
+              </div>
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-500 block mb-1">Error Correction</label>
+              <select id="qrEcc" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-300" onchange="generateQR()">
+                <option value="H">High (30% recovery)</option>
+                <option value="Q">Quartile (25%)</option>
+                <option value="M" selected>Medium (15%)</option>
+                <option value="L">Low (7%)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Right Live Preview & Download (5 Cols) -->
+    <div class="lg:col-span-5 flex flex-col items-center justify-start space-y-4">
+      
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col items-center justify-center w-full min-h-[420px]">
+        <div id="qrCanvasContainer" class="p-6 bg-white rounded-2xl shadow-inner flex items-center justify-center">
+          <canvas id="qrCanvas"></canvas>
+        </div>
+
+        <div class="mt-4 text-center">
+          <span id="dataLengthNotice" class="text-[11px] mono text-slate-400">Payload: 34 characters</span>
+          <p class="text-[10px] text-slate-500 mt-0.5">Scans instantly on iOS & Android cameras</p>
+        </div>
+
+        <!-- Export Buttons -->
+        <div class="flex items-center gap-2 mt-6 w-full">
+          <button onclick="downloadPNG(1024)" class="flex-1 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2 transition">
+            <i data-lucide="image" class="w-4 h-4"></i> High-Res PNG (1024px)
+          </button>
+          <button onclick="downloadPNG(2048)" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl border border-slate-700 flex items-center gap-1.5 transition">
+            <i data-lucide="printer" class="w-4 h-4 text-amber-400"></i> Print Ready (2048px)
+          </button>
+        </div>
+
+      </div>
+
+      <div class="w-full bg-slate-900/40 border border-slate-800/80 rounded-xl p-3 text-xs text-slate-400 flex items-center gap-2">
+        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 flex-shrink-0"></i>
+        <span>No dynamic redirects or expiring link traps. This QR contains pure, offline, perpetual static data.</span>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
+    Vastuda Sovereign Suite • 100% Free Autonomous Software • Replaces $120/yr QR Paywalls
+  </footer>
+
+  <script>
+    let activeType = 'url';
+
+    function switchQrType(type) {
+      activeType = type;
+      ['url', 'vcard', 'wifi', 'crypto'].forEach(t => {
+        const btn = document.getElementById('type' + t.charAt(0).toUpperCase() + t.slice(1));
+        const form = document.getElementById('form' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (t === type) {
+          btn.className = 'flex-1 py-2 text-xs font-bold rounded-xl bg-purple-600 text-white transition flex items-center justify-center gap-1.5 shadow';
+          form.classList.remove('hidden');
+        } else {
+          btn.className = 'flex-1 py-2 text-xs font-semibold rounded-xl bg-slate-950 text-slate-400 hover:text-white transition flex items-center justify-center gap-1.5 border border-slate-800';
+          form.classList.add('hidden');
+        }
+      });
+      generateQR();
+    }
+
+    function getPayload() {
+      if (activeType === 'url') {
+        return document.getElementById('inputUrl').value.trim() || 'https://vastuda.org';
+      }
+      if (activeType === 'vcard') {
+        const fn = document.getElementById('vcFirst').value.trim();
+        const ln = document.getElementById('vcLast').value.trim();
+        const org = document.getElementById('vcOrg').value.trim();
+        const title = document.getElementById('vcTitle').value.trim();
+        const email = document.getElementById('vcEmail').value.trim();
+        const phone = document.getElementById('vcPhone').value.trim();
+        const url = document.getElementById('vcWebsite').value.trim();
+
+        return `BEGIN:VCARD\nVERSION:3.0\nN:${ln};${fn};;;\nFN:${fn} ${ln}\nORG:${org}\nTITLE:${title}\nTEL;TYPE=CELL:${phone}\nEMAIL;TYPE=WORK:${email}\nURL:${url}\nEND:VCARD`;
+      }
+      if (activeType === 'wifi') {
+        const ssid = document.getElementById('wifiSsid').value.trim();
+        const pass = document.getElementById('wifiPass').value.trim();
+        const auth = document.getElementById('wifiAuth').value;
+        return `WIFI:S:${ssid};T:${auth};P:${pass};;`;
+      }
+      if (activeType === 'crypto') {
+        const coin = document.getElementById('cryptoCoin').value;
+        const addr = document.getElementById('cryptoAddress').value.trim();
+        const amt = document.getElementById('cryptoAmount').value.trim();
+        const label = encodeURIComponent(document.getElementById('cryptoLabel').value.trim());
+        let uri = `${coin}:${addr}`;
+        const params = [];
+        if (amt) params.push(`amount=${amt}`);
+        if (label) params.push(`label=${label}`);
+        if (params.length) uri += '?' + params.join('&');
+        return uri;
+      }
+      return 'https://vastuda.org';
+    }
+
+    function generateQR() {
+      const payload = getPayload();
+      document.getElementById('dataLengthNotice').innerText = `Payload: ${payload.length} characters`;
+
+      const fg = document.getElementById('qrFgColor').value;
+      const bg = document.getElementById('qrBgColor').value;
+      document.getElementById('fgColorVal').innerText = fg;
+      document.getElementById('bgColorVal').innerText = bg;
+      const ecc = document.getElementById('qrEcc').value;
+
+      const canvas = document.getElementById('qrCanvas');
+
+      QRCode.toCanvas(canvas, payload, {
+        width: 240,
+        margin: 1,
+        color: {
+          dark: fg,
+          light: bg
+        },
+        errorCorrectionLevel: ecc
+      }, function (error) {
+        if (error) console.error(error);
+      });
+    }
+
+    function downloadPNG(size = 1024) {
+      const payload = getPayload();
+      const fg = document.getElementById('qrFgColor').value;
+      const bg = document.getElementById('qrBgColor').value;
+      const ecc = document.getElementById('qrEcc').value;
+
+      const exportCanvas = document.createElement('canvas');
+      QRCode.toCanvas(exportCanvas, payload, {
+        width: size,
+        margin: 2,
+        color: { dark: fg, light: bg },
+        errorCorrectionLevel: ecc
+      }, function (err) {
+        if (err) {
+          alert('Export error: ' + err);
+          return;
+        }
+        const a = document.createElement('a');
+        a.download = `sovereign-qr-${activeType}-${size}px.png`;
+        a.href = exportCanvas.toDataURL('image/png');
+        a.click();
+      });
+    }
+
+    function loadDemoVCard() {
+      switchQrType('vcard');
+      document.getElementById('vcFirst').value = 'Dr. Vikram';
+      document.getElementById('vcLast').value = 'Singhania';
+      document.getElementById('vcOrg').value = 'Vastuda AI Research Foundation';
+      document.getElementById('vcTitle').value = 'Head of Machine Intelligence';
+      document.getElementById('vcEmail').value = 'vikram@vastuda.foundation';
+      document.getElementById('vcPhone').value = '+91 98200 12345';
+      document.getElementById('vcWebsite').value = 'https://vastuda.foundation';
+      generateQR();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      generateQR();
+    });
+  </script>
+</body>
+</html>

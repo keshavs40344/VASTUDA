@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Semantic LLM Prompt Router & Cost Classifier — Sovereign AI Suite</title>
+  <meta name="description" content="Dynamically routes user prompts to Nano, Medium, or Heavy Frontier reasoning models based on complexity, token load, and reasoning cues. 100% private, client-side, zero server latency.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(99, 102, 241, 0.2); }
+    .glass:hover { border-color: rgba(99, 102, 241, 0.35); }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+  </style>
+
+    <!-- DYNAMIC SEO & SOCIAL GRAPH (Auto-Injected) -->
+    <meta name="title" content="Semantic LLM Prompt Router & Cost Classifier — Sovereign AI Suite">
+    <meta name="description" content="Dynamically routes user prompts to Nano, Medium, or Heavy Frontier reasoning models based on complexity, token load, and reasoning cues. 100% private, client-side, zero server latency.">
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://keshavs40344.github.io/ai-world-core/saas/llm_router_classifier.html">
+    <meta property="og:title" content="Semantic LLM Prompt Router & Cost Classifier — Sovereign AI Suite">
+    <meta property="og:description" content="Dynamically routes user prompts to Nano, Medium, or Heavy Frontier reasoning models based on complexity, token load, and reasoning cues. 100% private, client-side, zero server latency.">
+    <meta property="og:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Semantic%20LLM%20Prompt%20Router%20%26%20Cost%20Classi+Studio&font=montserrat">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://keshavs40344.github.io/ai-world-core/saas/llm_router_classifier.html">
+    <meta name="twitter:title" content="Semantic LLM Prompt Router & Cost Classifier — Sovereign AI Suite">
+    <meta name="twitter:description" content="Dynamically routes user prompts to Nano, Medium, or Heavy Frontier reasoning models based on complexity, token load, and reasoning cues. 100% private, client-side, zero server latency.">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Semantic%20LLM%20Prompt%20Router%20%26%20Cost%20Classi+Studio&font=montserrat">
+
+    <!-- JSON-LD Structured Data for Googlebot -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Semantic LLM Prompt Router & Cost Classifier — Sovereign AI Suite",
+      "url": "https://keshavs40344.github.io/ai-world-core/saas/llm_router_classifier.html",
+      "description": "Dynamically routes user prompts to Nano, Medium, or Heavy Frontier reasoning models based on complexity, token load, and reasoning cues. 100% private, client-side, zero server latency.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All modern browsers",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <!-- /SEO BLOCK -->
+    
+</head>
+<body class="min-h-screen antialiased flex flex-col selection:bg-indigo-500/30 selection:text-indigo-300">
+
+  <!-- Sovereign Nav -->
+  <header class="glass border-b border-indigo-500/10 sticky top-0 z-50 px-6 py-3.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-sm font-mono hover:text-indigo-400 transition">
+        <i data-lucide="brain-circuit" class="w-4 h-4 text-indigo-400"></i>
+        <span>AI WORLD HUB</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          AI CORE OPERATIONAL
+        </span>
+        <a href="../../tools.html" class="text-xs text-slate-400 hover:text-white transition">All Tools</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-6">
+    <div class="glass p-6 sm:p-8 rounded-3xl border border-indigo-500/20 relative overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/40 flex items-center justify-center shrink-0">
+          <i data-lucide="git-branch" class="w-7 h-7 text-indigo-400"></i>
+        </div>
+        <div class="space-y-1 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-500/30">AI & LLM Core</span>
+            <span class="text-[10px] font-mono text-slate-400">&bull; 100% Client-Side &bull; Zero Cloud Leakage</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-black font-display text-white">Semantic LLM Prompt Router & Cost Classifier</h1>
+          <p class="text-slate-400 text-sm max-w-3xl">Dynamically routes user prompts to Nano, Medium, or Heavy Frontier reasoning models based on complexity, token load, and reasoning cues.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Tool Interactive UI -->
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">Prompt & Routing Config</h3>
+        <div>
+          <label class="block text-xs font-mono text-slate-400 mb-1">User Prompt Input:</label>
+          <textarea id="routerPrompt" rows="6" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-mono text-white focus:ring-1 focus:ring-indigo-500 focus:outline-none">Write a Python script to calculate the inverse fast Fourier transform and optimize it with SIMD intrinsics. Provide rigorous time-complexity proofs.</textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] font-mono text-slate-400">Budget Priority:</label>
+            <select id="routerBudget" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+              <option value="balanced">Balanced (Quality/Cost)</option>
+              <option value="economy">Economy (Prefer Flash/Small)</option>
+              <option value="max_quality">Maximum Quality (Frontier Only)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-mono text-slate-400">Latency Sensitivity:</label>
+            <select id="routerLatency" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+              <option value="normal">Standard (&lt;2000ms)</option>
+              <option value="realtime">Ultra-Low (&lt;400ms)</option>
+            </select>
+          </div>
+        </div>
+        <button id="routeBtn" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs font-mono transition">Analyze & Route Prompt</button>
+      </div>
+
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">Routing Decision</h3>
+        <div id="routeResult" class="space-y-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+        
+
+  </main>
+
+  <footer class="border-t border-white/5 py-8 mt-12 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>AI WORLD CORE &bull; Sovereign AI & LLM Systems &bull; 100% Private</div>
+      <div class="flex items-center gap-5 text-slate-400">
+        <a href="../../index.html" class="hover:text-indigo-400 transition">Hub</a>
+        <a href="../../tools.html" class="hover:text-cyan-400 transition">Catalogue</a>
+        <a href="../../world.html" class="hover:text-pink-400 transition">World Live</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    
+    function routePrompt() {
+      const p = document.getElementById('routerPrompt').value;
+      const budget = document.getElementById('routerBudget').value;
+      const latency = document.getElementById('routerLatency').value;
+      
+      const charCount = p.length;
+      const estTokens = Math.ceil(charCount / 4);
+
+      // Complexity signals
+      const codeSignals = (p.match(/python|function|algorithm|class|import|sql|async|optimize|fourier|simd|cuda/gi) || []).length;
+      const mathSignals = (p.match(/proof|calculate|integral|derivative|matrix|vector|theorem|equation/gi) || []).length;
+      const reasoningSignals = (p.match(/why|explain step by step|compare and contrast|derive|evaluate/gi) || []).length;
+
+      let score = (codeSignals * 2) + (mathSignals * 2.5) + (reasoningSignals * 1.5) + (estTokens > 300 ? 3 : 1);
+      if (budget === 'economy') score -= 3;
+      if (budget === 'max_quality') score += 4;
+      if (latency === 'realtime') score -= 4;
+
+      let tier = "Tier 1: Nano / Edge";
+      let model = "Llama-3.2-3B / Gemini 1.5 Flash";
+      let estLatency = "~180ms";
+      let costPer1k = "$0.00015";
+      let color = "emerald";
+
+      if (score >= 6 && score < 11) {
+        tier = "Tier 2: Mid-Tier Workhorse";
+        model = "Claude 3.5 Sonnet / GPT-4o";
+        estLatency = "~650ms";
+        costPer1k = "$0.00300";
+        color = "cyan";
+      } else if (score >= 11) {
+        tier = "Tier 3: Frontier Reasoning Engine";
+        model = "OpenAI o1 / DeepSeek-R1 / Claude 3.5 Opus";
+        estLatency = "~2400ms";
+        costPer1k = "$0.01500";
+        color = "purple";
+      }
+
+      document.getElementById('routeResult').innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-900 border border-${color}-500/30">
+          <div class="text-[10px] font-mono text-${color}-400 uppercase tracking-wide">Selected Target</div>
+          <div class="text-xl font-black text-white mt-1">${model}</div>
+          <div class="text-xs text-slate-400 font-mono mt-0.5">${tier}</div>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] font-mono text-slate-500">Est. Tokens</div>
+            <div class="text-sm font-bold font-mono text-white mt-1">${estTokens}</div>
+          </div>
+          <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] font-mono text-slate-500">Target Latency</div>
+            <div class="text-sm font-bold font-mono text-white mt-1">${estLatency}</div>
+          </div>
+          <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] font-mono text-slate-500">Input Cost/1k</div>
+            <div class="text-sm font-bold font-mono text-white mt-1">${costPer1k}</div>
+          </div>
+        </div>
+        <div class="p-3 bg-slate-900/40 rounded-xl border border-slate-800 text-xs font-mono text-slate-300 space-y-1">
+          <div>Complexity Score: <span class="text-indigo-400">${score.toFixed(1)}</span></div>
+          <div>Code Heuristics: <span class="text-slate-400">${codeSignals} matches</span> | Math/Reasoning: <span class="text-slate-400">${mathSignals + reasoningSignals} matches</span></div>
+        </div>
+      `;
+    }
+
+    document.getElementById('routeBtn').addEventListener('click', routePrompt);
+    routePrompt();
+        
+  </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vector Product Quantization (PQ) Compression Simulator — Sovereign AI Suite</title>
+  <meta name="description" content="Simulates vector quantization by splitting high-dimensional float32 vectors into sub-vectors and quantizing to centroid codebooks for 75%+ memory savings. 100% private, client-side, zero server latency.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(99, 102, 241, 0.2); }
+    .glass:hover { border-color: rgba(99, 102, 241, 0.35); }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+  </style>
+
+    <!-- DYNAMIC SEO & SOCIAL GRAPH (Auto-Injected) -->
+    <meta name="title" content="Vector Product Quantization (PQ) Compression Simulator — Sovereign AI Suite">
+    <meta name="description" content="Simulates vector quantization by splitting high-dimensional float32 vectors into sub-vectors and quantizing to centroid codebooks for 75%+ memory savings. 100% private, client-side, zero server latency.">
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://keshavs40344.github.io/ai-world-core/saas/vector_quantization_product_quantizer.html">
+    <meta property="og:title" content="Vector Product Quantization (PQ) Compression Simulator — Sovereign AI Suite">
+    <meta property="og:description" content="Simulates vector quantization by splitting high-dimensional float32 vectors into sub-vectors and quantizing to centroid codebooks for 75%+ memory savings. 100% private, client-side, zero server latency.">
+    <meta property="og:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Vector%20Product%20Quantization%20%28PQ%29%20Compres+Studio&font=montserrat">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://keshavs40344.github.io/ai-world-core/saas/vector_quantization_product_quantizer.html">
+    <meta name="twitter:title" content="Vector Product Quantization (PQ) Compression Simulator — Sovereign AI Suite">
+    <meta name="twitter:description" content="Simulates vector quantization by splitting high-dimensional float32 vectors into sub-vectors and quantizing to centroid codebooks for 75%+ memory savings. 100% private, client-side, zero server latency.">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Vector%20Product%20Quantization%20%28PQ%29%20Compres+Studio&font=montserrat">
+
+    <!-- JSON-LD Structured Data for Googlebot -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Vector Product Quantization (PQ) Compression Simulator — Sovereign AI Suite",
+      "url": "https://keshavs40344.github.io/ai-world-core/saas/vector_quantization_product_quantizer.html",
+      "description": "Simulates vector quantization by splitting high-dimensional float32 vectors into sub-vectors and quantizing to centroid codebooks for 75%+ memory savings. 100% private, client-side, zero server latency.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All modern browsers",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <!-- /SEO BLOCK -->
+    
+</head>
+<body class="min-h-screen antialiased flex flex-col selection:bg-indigo-500/30 selection:text-indigo-300">
+
+  <!-- Sovereign Nav -->
+  <header class="glass border-b border-indigo-500/10 sticky top-0 z-50 px-6 py-3.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-sm font-mono hover:text-indigo-400 transition">
+        <i data-lucide="brain-circuit" class="w-4 h-4 text-indigo-400"></i>
+        <span>AI WORLD HUB</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          AI CORE OPERATIONAL
+        </span>
+        <a href="../../tools.html" class="text-xs text-slate-400 hover:text-white transition">All Tools</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-6">
+    <div class="glass p-6 sm:p-8 rounded-3xl border border-indigo-500/20 relative overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/40 flex items-center justify-center shrink-0">
+          <i data-lucide="minimize-2" class="w-7 h-7 text-indigo-400"></i>
+        </div>
+        <div class="space-y-1 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-500/30">AI & LLM Core</span>
+            <span class="text-[10px] font-mono text-slate-400">&bull; 100% Client-Side &bull; Zero Cloud Leakage</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-black font-display text-white">Vector Product Quantization (PQ) Compression Simulator</h1>
+          <p class="text-slate-400 text-sm max-w-3xl">Simulates vector quantization by splitting high-dimensional float32 vectors into sub-vectors and quantizing to centroid codebooks for 75%+ memory savings.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Tool Interactive UI -->
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">Vector Input & Sub-quantizers</h3>
+        <div>
+          <label class="block text-xs font-mono text-slate-400 mb-1">Float32 Vector (8 dimensions, comma separated):</label>
+          <input id="pqVector" type="text" value="0.25, -0.74, 0.88, 0.12, -0.45, 0.63, -0.19, 0.95" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-mono text-white focus:outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] font-mono text-slate-400">Sub-vectors (m):</label>
+            <select id="pqM" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+              <option value="2">m = 2 (dim=4 each)</option>
+              <option value="4" selected>m = 4 (dim=2 each)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-mono text-slate-400">Centroids per codebook (k*):</label>
+            <select id="pqK" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+              <option value="4">k* = 4 (2 bits/subvector)</option>
+              <option value="8" selected>k* = 8 (3 bits/subvector)</option>
+              <option value="256">k* = 256 (8 bits / 1 byte)</option>
+            </select>
+          </div>
+        </div>
+        <button id="runPQBtn" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs font-mono transition">Simulate Product Quantization</button>
+      </div>
+
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">Quantization Report & Compression</h3>
+        <div id="pqOutput" class="space-y-3 font-mono text-xs">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+        
+
+  </main>
+
+  <footer class="border-t border-white/5 py-8 mt-12 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>AI WORLD CORE &bull; Sovereign AI & LLM Systems &bull; 100% Private</div>
+      <div class="flex items-center gap-5 text-slate-400">
+        <a href="../../index.html" class="hover:text-indigo-400 transition">Hub</a>
+        <a href="../../tools.html" class="hover:text-cyan-400 transition">Catalogue</a>
+        <a href="../../world.html" class="hover:text-pink-400 transition">World Live</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    
+    function runPQ() {
+      const raw = document.getElementById('pqVector').value.split(',').map(Number);
+      const m = parseInt(document.getElementById('pqM').value);
+      const k = parseInt(document.getElementById('pqK').value);
+
+      const d = raw.length;
+      if (d % m !== 0) {
+        document.getElementById('pqOutput').innerHTML = '<div class="text-red-400">Error: Vector dimension (' + d + ') must be divisible by m (' + m + ').</div>';
+        return;
+      }
+
+      const subDim = d / m;
+      const bitsPerSub = Math.ceil(Math.log2(k));
+      const originalBytes = d * 4; // float32 = 4 bytes
+      const compressedBits = m * bitsPerSub;
+      const compressedBytes = Math.ceil(compressedBits / 8);
+      const savingsPct = ((1 - (compressedBytes / originalBytes)) * 100).toFixed(1);
+
+      // Simulate quantizing sub-vectors to pseudo centroid indices
+      const quantizedCodes = [];
+      const reconstructed = [];
+      let mse = 0;
+
+      for (let i = 0; i < m; i++) {
+        const sub = raw.slice(i * subDim, (i + 1) * subDim);
+        const code = Math.abs(Math.floor(sub.reduce((a, b) => a + b, 0) * 10)) % k;
+        quantizedCodes.push(code);
+
+        // Approximate centroid
+        sub.forEach(val => {
+          const reconVal = Math.round(val * 4) / 4;
+          reconstructed.push(reconVal);
+          mse += Math.pow(val - reconVal, 2);
+        });
+      }
+      mse = (mse / d).toFixed(4);
+
+      document.getElementById('pqOutput').innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+          <div class="flex justify-between items-center text-slate-400">
+            <span>Original Size (Float32):</span>
+            <span class="text-white font-bold">${originalBytes} bytes (${d * 32} bits)</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-400">
+            <span>Compressed PQ Code:</span>
+            <span class="text-emerald-400 font-bold">${compressedBytes} bytes (${compressedBits} bits)</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-400">
+            <span>VRAM Memory Savings:</span>
+            <span class="text-indigo-400 font-bold">${savingsPct}%</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-400">
+            <span>Reconstruction MSE Distortion:</span>
+            <span class="text-amber-400 font-bold">${mse}</span>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 space-y-1">
+          <div class="text-slate-400 text-[10px]">PQ Codebook Indices [${m} subvectors]:</div>
+          <div class="text-indigo-300 font-bold">[${quantizedCodes.join(', ')}]</div>
+        </div>
+
+        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 space-y-1">
+          <div class="text-slate-400 text-[10px]">Reconstructed Vector Estimate:</div>
+          <div class="text-slate-300 text-[11px] break-all">[${reconstructed.join(', ')}]</div>
+        </div>
+      `;
+    }
+
+    document.getElementById('runPQBtn').addEventListener('click', runPQ);
+    runPQ();
+        
+  </script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Safety & Adversarial Robustness Prompt Linter — Sovereign AI Suite</title>
+  <meta name="description" content="Audits system prompts for vulnerability against indirect prompt injections, role-play evasion, and delimiter escape attacks. 100% private, client-side, zero server latency.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(99, 102, 241, 0.2); }
+    .glass:hover { border-color: rgba(99, 102, 241, 0.35); }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+  </style>
+
+    <!-- DYNAMIC SEO & SOCIAL GRAPH (Auto-Injected) -->
+    <meta name="title" content="AI Safety & Adversarial Robustness Prompt Linter — Sovereign AI Suite">
+    <meta name="description" content="Audits system prompts for vulnerability against indirect prompt injections, role-play evasion, and delimiter escape attacks. 100% private, client-side, zero server latency.">
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://keshavs40344.github.io/ai-world-core/saas/jailbreak_red_teaming_mutator.html">
+    <meta property="og:title" content="AI Safety & Adversarial Robustness Prompt Linter — Sovereign AI Suite">
+    <meta property="og:description" content="Audits system prompts for vulnerability against indirect prompt injections, role-play evasion, and delimiter escape attacks. 100% private, client-side, zero server latency.">
+    <meta property="og:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=AI%20Safety%20%26%20Adversarial%20Robustness%20Promp+Studio&font=montserrat">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://keshavs40344.github.io/ai-world-core/saas/jailbreak_red_teaming_mutator.html">
+    <meta name="twitter:title" content="AI Safety & Adversarial Robustness Prompt Linter — Sovereign AI Suite">
+    <meta name="twitter:description" content="Audits system prompts for vulnerability against indirect prompt injections, role-play evasion, and delimiter escape attacks. 100% private, client-side, zero server latency.">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=AI%20Safety%20%26%20Adversarial%20Robustness%20Promp+Studio&font=montserrat">
+
+    <!-- JSON-LD Structured Data for Googlebot -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "AI Safety & Adversarial Robustness Prompt Linter — Sovereign AI Suite",
+      "url": "https://keshavs40344.github.io/ai-world-core/saas/jailbreak_red_teaming_mutator.html",
+      "description": "Audits system prompts for vulnerability against indirect prompt injections, role-play evasion, and delimiter escape attacks. 100% private, client-side, zero server latency.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All modern browsers",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <!-- /SEO BLOCK -->
+    
+</head>
+<body class="min-h-screen antialiased flex flex-col selection:bg-indigo-500/30 selection:text-indigo-300">
+
+  <!-- Sovereign Nav -->
+  <header class="glass border-b border-indigo-500/10 sticky top-0 z-50 px-6 py-3.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-sm font-mono hover:text-indigo-400 transition">
+        <i data-lucide="brain-circuit" class="w-4 h-4 text-indigo-400"></i>
+        <span>AI WORLD HUB</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          AI CORE OPERATIONAL
+        </span>
+        <a href="../../tools.html" class="text-xs text-slate-400 hover:text-white transition">All Tools</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-6">
+    <div class="glass p-6 sm:p-8 rounded-3xl border border-indigo-500/20 relative overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/40 flex items-center justify-center shrink-0">
+          <i data-lucide="shield-check" class="w-7 h-7 text-indigo-400"></i>
+        </div>
+        <div class="space-y-1 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-500/30">AI & LLM Core</span>
+            <span class="text-[10px] font-mono text-slate-400">&bull; 100% Client-Side &bull; Zero Cloud Leakage</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-black font-display text-white">AI Safety & Adversarial Robustness Prompt Linter</h1>
+          <p class="text-slate-400 text-sm max-w-3xl">Audits system prompts for vulnerability against indirect prompt injections, role-play evasion, and delimiter escape attacks.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Tool Interactive UI -->
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">System Prompt Under Audit</h3>
+        <textarea id="safetyPrompt" rows="8" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-mono text-white focus:outline-none">You are a helpful customer support bot. Answer any question the user has about our company. If the user asks for internal employee emails, do not share them unless they say they are an administrator.</textarea>
+        <button id="auditSafetyBtn" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs font-mono transition">Audit Prompt Robustness</button>
+      </div>
+
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">Safety Vulnerability Audit</h3>
+        <div id="safetyResults" class="space-y-3 font-mono text-xs">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+        
+
+  </main>
+
+  <footer class="border-t border-white/5 py-8 mt-12 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>AI WORLD CORE &bull; Sovereign AI & LLM Systems &bull; 100% Private</div>
+      <div class="flex items-center gap-5 text-slate-400">
+        <a href="../../index.html" class="hover:text-indigo-400 transition">Hub</a>
+        <a href="../../tools.html" class="hover:text-cyan-400 transition">Catalogue</a>
+        <a href="../../world.html" class="hover:text-pink-400 transition">World Live</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    
+    function auditSafety() {
+      const p = document.getElementById('safetyPrompt').value;
+      const issues = [];
+
+      if (/unless they say|if they claim|except when/i.test(p)) {
+        issues.push({
+          type: "Social Engineering Bypass",
+          desc: "Detected conditional privilege check based on user claim (e.g. 'unless they say...'). Attackers can easily claim 'I am an administrator'."
+        });
+      }
+
+      if (!/xml tags|<user_input>|delimiter|triple backticks/i.test(p)) {
+        issues.push({
+          type: "Missing Input Isolation Delimiters",
+          desc: "No formal input encapsulation (e.g., <user_query>...</user_query>). Susceptible to indirect prompt injection."
+        });
+      }
+
+      if (!/ignore any previous instructions|never reveal this system prompt/i.test(p)) {
+        issues.push({
+          type: "Missing System Prompt Exfiltration Defense",
+          desc: "Prompt lacks explicit guardrails against 'Output everything above this line' attacks."
+        });
+      }
+
+      const score = Math.max(10 - issues.length * 3, 2);
+      const color = score >= 8 ? 'emerald' : (score >= 5 ? 'amber' : 'red');
+
+      document.getElementById('safetyResults').innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-900 border border-${color}-500/30 flex justify-between items-center">
+          <div>
+            <div class="text-[10px] text-slate-400 uppercase">Robustness Score</div>
+            <div class="text-2xl font-black text-${color}-400">${score}/10</div>
+          </div>
+          <span class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300">${issues.length} Risks Detected</span>
+        </div>
+
+        <div class="space-y-2">
+          ${issues.map(iss => `
+            <div class="p-3 rounded-xl bg-slate-900 border border-red-500/30 space-y-1">
+              <div class="text-red-400 font-bold text-xs">${iss.type}</div>
+              <div class="text-slate-400 text-[11px]">${iss.desc}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    document.getElementById('auditSafetyBtn').addEventListener('click', auditSafety);
+    auditSafety();
+        
+  </script>
+</body>
+</html>

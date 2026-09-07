@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visual Webhook JSON Transformer | Free Zapier & Make Alternative</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white">
+          <i data-lucide="workflow" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-bold tracking-tight text-white">Webhook JSON Transformer & Pipe</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-full">100% Free & Sovereign</span>
+          </div>
+          <p class="text-xs text-slate-400">Replaces Zapier & Make.com Webhook Formatters ($29–$50/mo) • Zero Usage Limits</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="loadSampleStripeWebhook()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5 border border-slate-700">
+          <i data-lucide="zap" class="w-3.5 h-3.5 text-cyan-400"></i> Stripe Event Sample
+        </button>
+        <button onclick="loadSampleGitHubWebhook()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5 border border-slate-700">
+          <i data-lucide="github" class="w-3.5 h-3.5 text-amber-400"></i> GitHub Push Sample
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- Input Source JSON (4 Cols) -->
+    <div class="lg:col-span-4 flex flex-col space-y-3">
+      <div class="flex items-center justify-between">
+        <label class="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
+          <i data-lucide="file-json" class="w-4 h-4"></i> Inbound Webhook Payload
+        </label>
+        <button onclick="formatSourceJson()" class="text-[11px] text-slate-400 hover:text-white">Format JSON</button>
+      </div>
+      <textarea id="sourceJson" placeholder="Paste incoming webhook JSON payload from Stripe, Shopify, GitHub, Twilio, Slack..." class="w-full flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-3.5 text-xs mono text-cyan-300 focus:outline-none focus:border-cyan-500/50 resize-none h-[520px] shadow-xl"></textarea>
+    </div>
+
+    <!-- Mapping Transformer Rules (4 Cols) -->
+    <div class="lg:col-span-4 flex flex-col space-y-3">
+      <div class="flex items-center justify-between">
+        <label class="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-2">
+          <i data-lucide="git-merge" class="w-4 h-4"></i> Mapping & Schema Rules
+        </label>
+        <button onclick="addMappingRule()" class="px-2 py-0.5 text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-lg hover:bg-blue-500/30 transition flex items-center gap-1">
+          <i data-lucide="plus" class="w-3 h-3"></i> Add Rule
+        </button>
+      </div>
+
+      <!-- Quick Preset Filter -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 space-y-2 shadow-lg">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-400 font-medium">Quick Transform Preset:</span>
+          <select id="presetTransformer" onchange="applyPreset()" class="bg-slate-950 border border-slate-800 rounded-lg p-1.5 text-xs mono text-slate-200">
+            <option value="custom">Custom Schema Rules</option>
+            <option value="flatten">Flatten All Nested Keys</option>
+            <option value="slack">Format to Slack BlockKit Message</option>
+            <option value="discord">Format to Discord Webhook Embed</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Rules Container -->
+      <div id="rulesContainer" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 space-y-2 overflow-y-auto max-h-[380px] shadow-xl flex-1">
+        <!-- Rule Rows Populated Dynamically -->
+      </div>
+
+      <button onclick="executeTransformation()" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 transition">
+        <i data-lucide="play" class="w-4 h-4"></i> Run Transformation Pipe
+      </button>
+    </div>
+
+    <!-- Transformed Output JSON (4 Cols) -->
+    <div class="lg:col-span-4 flex flex-col space-y-3">
+      <div class="flex items-center justify-between">
+        <label class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4"></i> Transformed Payload
+        </label>
+        <div class="flex items-center gap-2">
+          <button onclick="copyOutputJson()" class="text-[11px] text-slate-400 hover:text-white flex items-center gap-1">
+            <i data-lucide="copy" class="w-3 h-3"></i> Copy
+          </button>
+          <button onclick="downloadOutputJson()" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1">
+            <i data-lucide="download" class="w-3 h-3"></i> .json
+          </button>
+        </div>
+      </div>
+      <textarea id="outputJson" readonly placeholder="Output payload ready for consumption in external APIs will appear here..." class="w-full flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-3.5 text-xs mono text-emerald-300 focus:outline-none resize-none h-[520px] shadow-xl"></textarea>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
+    Vastuda Sovereign Suite • 100% Free Autonomous Software • Replaces $50/mo Zapier/Make Webhook Paywalls
+  </footer>
+
+  <script>
+    let rules = [
+      { targetKey: 'transaction_id', sourcePath: 'data.object.id', transform: 'none' },
+      { targetKey: 'amount_usd', sourcePath: 'data.object.amount', transform: 'divide100' },
+      { targetKey: 'customer_email', sourcePath: 'data.object.billing_details.email', transform: 'lowercase' },
+      { targetKey: 'is_paid', sourcePath: 'data.object.paid', transform: 'boolean' }
+    ];
+
+    function renderRules() {
+      const container = document.getElementById('rulesContainer');
+      container.innerHTML = '';
+      rules.forEach((rule, idx) => {
+        const div = document.createElement('div');
+        div.className = 'p-2.5 rounded-xl bg-slate-950 border border-slate-800/80 space-y-1.5';
+        div.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold text-slate-500">Rule #${idx + 1}</span>
+            <button onclick="deleteRule(${idx})" class="text-slate-600 hover:text-rose-400"><i data-lucide="trash" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" value="${rule.sourcePath}" placeholder="Source (e.g. data.id)" class="bg-slate-900 border border-slate-800 rounded p-1.5 text-xs mono text-cyan-300 focus:outline-none" oninput="updateRule(${idx}, 'sourcePath', this.value)">
+            <input type="text" value="${rule.targetKey}" placeholder="Target Key" class="bg-slate-900 border border-slate-800 rounded p-1.5 text-xs mono text-emerald-300 focus:outline-none" oninput="updateRule(${idx}, 'targetKey', this.value)">
+          </div>
+          <select class="w-full bg-slate-900 border border-slate-800 rounded p-1 text-[11px] mono text-slate-300" onchange="updateRule(${idx}, 'transform', this.value)">
+            <option value="none" ${rule.transform === 'none' ? 'selected' : ''}>Pass Through</option>
+            <option value="divide100" ${rule.transform === 'divide100' ? 'selected' : ''}>Divide by 100 (Cents to Dollars)</option>
+            <option value="uppercase" ${rule.transform === 'uppercase' ? 'selected' : ''}>Uppercase String</option>
+            <option value="lowercase" ${rule.transform === 'lowercase' ? 'selected' : ''}>Lowercase String</option>
+            <option value="boolean" ${rule.transform === 'boolean' ? 'selected' : ''}>Cast to Boolean</option>
+          </select>
+        `;
+        container.appendChild(div);
+      });
+      lucide.createIcons();
+    }
+
+    function addMappingRule() {
+      rules.push({ targetKey: 'new_field', sourcePath: 'payload.item', transform: 'none' });
+      renderRules();
+    }
+
+    function deleteRule(idx) {
+      rules.splice(idx, 1);
+      renderRules();
+    }
+
+    function updateRule(idx, key, val) {
+      rules[idx][key] = val;
+    }
+
+    function getNested(obj, path) {
+      return path.split('.').reduce((acc, part) => acc && acc[part] !== undefined ? acc[part] : undefined, obj);
+    }
+
+    function executeTransformation() {
+      const srcText = document.getElementById('sourceJson').value.trim();
+      if (!srcText) {
+        alert('Please provide source JSON payload.');
+        return;
+      }
+
+      let parsed;
+      try {
+        parsed = JSON.parse(srcText);
+      } catch (err) {
+        alert('Invalid JSON in source input: ' + err.message);
+        return;
+      }
+
+      const preset = document.getElementById('presetTransformer').value;
+
+      if (preset === 'flatten') {
+        const flat = {};
+        function recurse(cur, prop) {
+          if (Object(cur) !== cur || Array.isArray(cur)) {
+            flat[prop] = cur;
+          } else {
+            let isEmpty = true;
+            for (let p in cur) {
+              isEmpty = false;
+              recurse(cur[p], prop ? prop + '.' + p : p);
+            }
+            if (isEmpty && prop) flat[prop] = {};
+          }
+        }
+        recurse(parsed, '');
+        document.getElementById('outputJson').value = JSON.stringify(flat, null, 2);
+        return;
+      }
+
+      if (preset === 'slack') {
+        const slackMsg = {
+          text: "Inbound Webhook Event Dispatched",
+          blocks: [
+            {
+              type: "header",
+              text: { type: "plain_text", text: "Webhook Notification", emoji: true }
+            },
+            {
+              type: "section",
+              fields: [
+                { type: "mrkdwn", text: `*Event ID:*\n\`${parsed.id || 'N/A'}\`` },
+                { type: "mrkdwn", text: `*Status:*\n${parsed.status || 'Active'}` }
+              ]
+            }
+          ]
+        };
+        document.getElementById('outputJson').value = JSON.stringify(slackMsg, null, 2);
+        return;
+      }
+
+      if (preset === 'discord') {
+        const discordMsg = {
+          content: "Incoming Sovereign Event",
+          embeds: [
+            {
+              title: "Webhook Alert",
+              color: 3447003,
+              fields: [
+                { name: "Object", value: String(parsed.object || "Event"), inline: true },
+                { name: "ID", value: String(parsed.id || "N/A"), inline: true }
+              ],
+              timestamp: new Date().toISOString()
+            }
+          ]
+        };
+        document.getElementById('outputJson').value = JSON.stringify(discordMsg, null, 2);
+        return;
+      }
+
+      // Default: Custom schema rules
+      const output = {};
+      rules.forEach(rule => {
+        let val = getNested(parsed, rule.sourcePath);
+        if (val !== undefined) {
+          if (rule.transform === 'divide100') val = typeof val === 'number' ? val / 100 : val;
+          if (rule.transform === 'uppercase') val = String(val).toUpperCase();
+          if (rule.transform === 'lowercase') val = String(val).toLowerCase();
+          if (rule.transform === 'boolean') val = Boolean(val);
+          output[rule.targetKey] = val;
+        } else {
+          output[rule.targetKey] = null;
+        }
+      });
+
+      document.getElementById('outputJson').value = JSON.stringify(output, null, 2);
+    }
+
+    function formatSourceJson() {
+      const srcText = document.getElementById('sourceJson').value.trim();
+      if (!srcText) return;
+      try {
+        const parsed = JSON.parse(srcText);
+        document.getElementById('sourceJson').value = JSON.stringify(parsed, null, 2);
+      } catch (e) {
+        alert('Invalid JSON');
+      }
+    }
+
+    function copyOutputJson() {
+      const out = document.getElementById('outputJson').value;
+      if (!out) return;
+      navigator.clipboard.writeText(out);
+      alert('Transformed JSON copied to clipboard!');
+    }
+
+    function downloadOutputJson() {
+      const out = document.getElementById('outputJson').value;
+      if (!out) return;
+      const blob = new Blob([out], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'transformed-webhook-payload.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function loadSampleStripeWebhook() {
+      const sample = {
+        id: "evt_3MtwLwLkdIwHu7ix28a3tqPa",
+        object: "event",
+        api_version: "2022-11-15",
+        created: 1679000000,
+        data: {
+          object: {
+            id: "ch_3MtwLwLkdIwHu7ix28a3tqPa",
+            object: "charge",
+            amount: 24900,
+            amount_captured: 24900,
+            currency: "usd",
+            paid: true,
+            status: "succeeded",
+            billing_details: {
+              email: "john.doe@enterprise.com",
+              name: "John Doe"
+            }
+          }
+        },
+        type: "charge.succeeded"
+      };
+      document.getElementById('sourceJson').value = JSON.stringify(sample, null, 2);
+      document.getElementById('presetTransformer').value = 'custom';
+      rules = [
+        { targetKey: 'charge_id', sourcePath: 'data.object.id', transform: 'none' },
+        { targetKey: 'net_usd_amount', sourcePath: 'data.object.amount', transform: 'divide100' },
+        { targetKey: 'payer_email', sourcePath: 'data.object.billing_details.email', transform: 'lowercase' },
+        { targetKey: 'is_successful', sourcePath: 'data.object.paid', transform: 'boolean' }
+      ];
+      renderRules();
+      executeTransformation();
+    }
+
+    function loadSampleGitHubWebhook() {
+      const sample = {
+        ref: "refs/heads/main",
+        before: "6113728f27ae82c7b1a12f6593",
+        after: "2c1664c6a60b35e9f2eac2ac34",
+        repository: {
+          name: "ai-world-core",
+          full_name: "keshavs40344/ai-world-core",
+          private: false
+        },
+        pusher: {
+          name: "autonomous-swarm",
+          email: "swarm@vastuda.local"
+        },
+        commits: [
+          {
+            id: "2c1664c6a60b35e9f2eac2ac34",
+            message: "feat: deploy 10 autonomous sovereign SaaS tools",
+            timestamp: "2026-09-07T13:40:00Z"
+          }
+        ]
+      };
+      document.getElementById('sourceJson').value = JSON.stringify(sample, null, 2);
+      document.getElementById('presetTransformer').value = 'custom';
+      rules = [
+        { targetKey: 'repo', sourcePath: 'repository.full_name', transform: 'none' },
+        { targetKey: 'author', sourcePath: 'pusher.name', transform: 'uppercase' },
+        { targetKey: 'latest_commit_msg', sourcePath: 'commits.0.message', transform: 'none' }
+      ];
+      renderRules();
+      executeTransformation();
+    }
+
+    function applyPreset() {
+      executeTransformation();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSampleStripeWebhook();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

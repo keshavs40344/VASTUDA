@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Tool Schema (JSON) Builder — Sovereign AI Suite</title>
+  <meta name="description" content="Builds and validates OpenAI, Anthropic, and Gemini function calling tool declarations with live parameter validation. 100% private, client-side, zero server latency.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(99, 102, 241, 0.2); }
+    .glass:hover { border-color: rgba(99, 102, 241, 0.35); }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+  </style>
+
+    <!-- DYNAMIC SEO & SOCIAL GRAPH (Auto-Injected) -->
+    <meta name="title" content="AI Agent Tool Schema (JSON) Builder — Sovereign AI Suite">
+    <meta name="description" content="Builds and validates OpenAI, Anthropic, and Gemini function calling tool declarations with live parameter validation. 100% private, client-side, zero server latency.">
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://keshavs40344.github.io/ai-world-core/saas/ai_agent_function_call_orchestrator.html">
+    <meta property="og:title" content="AI Agent Tool Schema (JSON) Builder — Sovereign AI Suite">
+    <meta property="og:description" content="Builds and validates OpenAI, Anthropic, and Gemini function calling tool declarations with live parameter validation. 100% private, client-side, zero server latency.">
+    <meta property="og:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=AI%20Agent%20Tool%20Schema%20%28JSON%29%20Builder%20%E2%80%94%20So+Studio&font=montserrat">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://keshavs40344.github.io/ai-world-core/saas/ai_agent_function_call_orchestrator.html">
+    <meta name="twitter:title" content="AI Agent Tool Schema (JSON) Builder — Sovereign AI Suite">
+    <meta name="twitter:description" content="Builds and validates OpenAI, Anthropic, and Gemini function calling tool declarations with live parameter validation. 100% private, client-side, zero server latency.">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=AI%20Agent%20Tool%20Schema%20%28JSON%29%20Builder%20%E2%80%94%20So+Studio&font=montserrat">
+
+    <!-- JSON-LD Structured Data for Googlebot -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "AI Agent Tool Schema (JSON) Builder — Sovereign AI Suite",
+      "url": "https://keshavs40344.github.io/ai-world-core/saas/ai_agent_function_call_orchestrator.html",
+      "description": "Builds and validates OpenAI, Anthropic, and Gemini function calling tool declarations with live parameter validation. 100% private, client-side, zero server latency.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All modern browsers",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <!-- /SEO BLOCK -->
+    
+</head>
+<body class="min-h-screen antialiased flex flex-col selection:bg-indigo-500/30 selection:text-indigo-300">
+
+  <!-- Sovereign Nav -->
+  <header class="glass border-b border-indigo-500/10 sticky top-0 z-50 px-6 py-3.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-sm font-mono hover:text-indigo-400 transition">
+        <i data-lucide="brain-circuit" class="w-4 h-4 text-indigo-400"></i>
+        <span>AI WORLD HUB</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          AI CORE OPERATIONAL
+        </span>
+        <a href="../../tools.html" class="text-xs text-slate-400 hover:text-white transition">All Tools</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-6">
+    <div class="glass p-6 sm:p-8 rounded-3xl border border-indigo-500/20 relative overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/40 flex items-center justify-center shrink-0">
+          <i data-lucide="tool" class="w-7 h-7 text-indigo-400"></i>
+        </div>
+        <div class="space-y-1 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-500/30">AI & LLM Core</span>
+            <span class="text-[10px] font-mono text-slate-400">&bull; 100% Client-Side &bull; Zero Cloud Leakage</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-black font-display text-white">AI Agent Tool Schema (JSON) Builder</h1>
+          <p class="text-slate-400 text-sm max-w-3xl">Builds and validates OpenAI, Anthropic, and Gemini function calling tool declarations with live parameter validation.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Tool Interactive UI -->
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">Define Tool Function</h3>
+        <div>
+          <label class="text-[10px] font-mono text-slate-400">Function Name:</label>
+          <input id="toolFnName" type="text" value="execute_database_query" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+        </div>
+        <div>
+          <label class="text-[10px] font-mono text-slate-400">Description:</label>
+          <input id="toolFnDesc" type="text" value="Executes a read-only SQL query against the warehouse and returns JSON records." class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">
+        </div>
+        <div>
+          <label class="text-[10px] font-mono text-slate-400">Parameters (Name:Type:Description:Required?):</label>
+          <textarea id="toolParams" rows="4" class="w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-white">query:string:SQL query string:yes
+limit:integer:Maximum rows to return:no
+timeout_sec:number:Execution timeout in seconds:no</textarea>
+        </div>
+        <button id="genToolBtn" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs font-mono transition">Generate JSON Tool Schema</button>
+      </div>
+
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">OpenAI / Claude Tool Schema</h3>
+          <button id="copyToolBtn" class="text-xs font-mono text-indigo-400 hover:text-indigo-300">Copy JSON</button>
+        </div>
+        <pre id="toolJsonOut" class="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-300 whitespace-pre-wrap overflow-x-auto h-80"></pre>
+      </div>
+    </div>
+        
+
+  </main>
+
+  <footer class="border-t border-white/5 py-8 mt-12 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>AI WORLD CORE &bull; Sovereign AI & LLM Systems &bull; 100% Private</div>
+      <div class="flex items-center gap-5 text-slate-400">
+        <a href="../../index.html" class="hover:text-indigo-400 transition">Hub</a>
+        <a href="../../tools.html" class="hover:text-cyan-400 transition">Catalogue</a>
+        <a href="../../world.html" class="hover:text-pink-400 transition">World Live</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    
+    function genToolSchema() {
+      const name = document.getElementById('toolFnName').value;
+      const desc = document.getElementById('toolFnDesc').value;
+      const rawParams = document.getElementById('toolParams').value.split('\n').filter(Boolean);
+
+      const properties = {};
+      const required = [];
+
+      rawParams.forEach(line => {
+        const parts = line.split(':');
+        if (parts.length >= 3) {
+          const pName = parts[0].trim();
+          const pType = parts[1].trim();
+          const pDesc = parts[2].trim();
+          const pReq = parts[3]?.trim().toLowerCase() === 'yes';
+
+          properties[pName] = {
+            type: pType,
+            description: pDesc
+          };
+          if (pReq) required.push(pName);
+        }
+      });
+
+      const schema = {
+        type: "function",
+        function: {
+          name: name,
+          description: desc,
+          parameters: {
+            type: "object",
+            properties: properties,
+            required: required
+          }
+        }
+      };
+
+      document.getElementById('toolJsonOut').textContent = JSON.stringify(schema, null, 2);
+    }
+
+    document.getElementById('genToolBtn').addEventListener('click', genToolSchema);
+    document.getElementById('copyToolBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(document.getElementById('toolJsonOut').textContent);
+      alert('Tool Schema copied!');
+    });
+    genToolSchema();
+        
+  </script>
+</body>
+</html>

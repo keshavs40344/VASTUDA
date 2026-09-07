@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VASTUDA CapTable Pro // Sovereign Equity & Dilution Simulator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #030712; color: #f3f4f6; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.08); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
+
+  <header class="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg shadow-emerald-950">
+          <i data-lucide="pie-chart" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm font-bold tracking-tight text-white font-mono">VASTUDA CAPTABLE & DILUTION PRO</h1>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800/60 text-[10px] font-mono">DISRUPTS CARTA ($50–$250/MO)</span>
+          </div>
+          <p class="text-[11px] font-mono text-zinc-400">100% In-Browser Startup Equity, SAFE, ESOP & Multi-Round Dilution Engine</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="exportCSV()" class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-mono flex items-center gap-1.5 transition">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Export CSV</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="bg-zinc-950/60 border-b border-zinc-900 py-2.5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-2 overflow-x-auto text-xs font-mono">
+      <span class="text-zinc-500 shrink-0">Model Presets:</span>
+      <button onclick="loadPreset('yc_seed')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Standard YC Seed ($500k at $10M Post)</button>
+      <button onclick="loadPreset('series_a')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Series A ($4M at $20M Pre + 10% ESOP)</button>
+      <button onclick="loadPreset('bootstrapped')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">50/50 Co-Founders Bootstrapped</button>
+    </div>
+  </div>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
+
+    <!-- Top Vitals -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="glass-panel p-5 rounded-2xl">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Post-Money Valuation</span>
+        <div class="text-3xl font-extrabold text-emerald-400 font-mono mt-1" id="vPostMoney">$10,000,000</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono" id="vPreMoney">Pre-Money: $9,500,000</p>
+      </div>
+      <div class="glass-panel p-5 rounded-2xl">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Capital Raised in Round</span>
+        <div class="text-3xl font-extrabold text-white font-mono mt-1" id="vRaised">$500,000</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono" id="vDilution">Effective Dilution: 5.0%</p>
+      </div>
+      <div class="glass-panel p-5 rounded-2xl">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Total Fully Diluted Shares</span>
+        <div class="text-3xl font-extrabold text-cyan-400 font-mono mt-1" id="vTotalShares">10,526,316</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono" id="vPPS">Price Per Share: $0.95</p>
+      </div>
+      <div class="glass-panel p-5 rounded-2xl">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Founder Equity Pool</span>
+        <div class="text-3xl font-extrabold text-purple-400 font-mono mt-1" id="vFounderOwnership">85.5%</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono" id="vESOPPool">ESOP Pool: 10.0%</p>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: Round Parameters & Shareholder Table (8 Cols) -->
+      <div class="lg:col-span-8 space-y-5">
+        
+        <!-- Round Input Parameters -->
+        <div class="glass-panel p-6 rounded-2xl space-y-4">
+          <h2 class="text-sm font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-3">
+            <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i>
+            <span>Current Financing Round Parameters</span>
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="text-[11px] font-mono text-zinc-400 uppercase">Round Type</label>
+              <select id="inRoundType" onchange="calculateCapTable()" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs font-mono text-white mt-1">
+                <option value="seed">Seed Round (Priced)</option>
+                <option value="safe">SAFE / Convertible Conversion</option>
+                <option value="series_a">Series A</option>
+                <option value="series_b">Series B</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[11px] font-mono text-zinc-400 uppercase">Pre-Money Valuation ($)</label>
+              <input type="number" id="inPreMoney" value="9500000" step="100000" oninput="calculateCapTable()" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs font-mono text-white mt-1">
+            </div>
+            <div>
+              <label class="text-[11px] font-mono text-zinc-400 uppercase">New Capital Invested ($)</label>
+              <input type="number" id="inInvested" value="500000" step="50000" oninput="calculateCapTable()" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs font-mono text-white mt-1">
+            </div>
+          </div>
+        </div>
+
+        <!-- Shareholders Cap Table -->
+        <div class="glass-panel p-6 rounded-2xl space-y-4">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4 text-cyan-400"></i>
+              <span>Shareholder Ownership Ledger</span>
+            </h3>
+            <button onclick="addStakeholder()" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold flex items-center gap-1 transition">
+              <i data-lucide="plus" class="w-3 h-3"></i>
+              <span>Add Stakeholder</span>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs font-mono text-left border-collapse" id="capTable">
+              <thead>
+                <tr class="text-zinc-500 border-b border-zinc-800 pb-2">
+                  <th class="py-2 px-2">Stakeholder</th>
+                  <th class="py-2 px-2">Class</th>
+                  <th class="py-2 px-2 text-right">Initial Shares</th>
+                  <th class="py-2 px-2 text-right">Post-Round Ownership</th>
+                  <th class="py-2 px-2 text-right">Value ($)</th>
+                  <th class="py-2 px-2 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-zinc-900" id="stakeholderBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Visual Pie Chart (4 Cols) -->
+      <div class="lg:col-span-4 space-y-5">
+        <div class="glass-panel p-6 rounded-2xl space-y-4">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-3">
+            <i data-lucide="pie-chart" class="w-4 h-4 text-purple-400"></i>
+            <span>Post-Money Ownership Breakdown</span>
+          </h3>
+          <div class="h-64 w-full flex items-center justify-center">
+            <canvas id="capChart"></canvas>
+          </div>
+          <div class="p-3 bg-zinc-950 rounded-xl border border-zinc-800/80 text-[11px] font-mono text-zinc-400 space-y-1">
+            <div class="flex justify-between"><span>Sum of Ownership:</span><span class="text-emerald-400 font-bold" id="vTotalCheck">100.0%</span></div>
+            <div class="flex justify-between"><span>New Investor Stake:</span><span class="text-cyan-400 font-bold" id="vInvestorPct">5.0%</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="border-t border-zinc-800/80 bg-zinc-950 py-4 text-center text-xs font-mono text-zinc-500">
+    VASTUDA Sovereign Core • 100% Client-Side Privacy • Deterministic Financial Mathematics
+  </footer>
+
+  <script>
+    let stakeholders = [
+      { id: 1, name: "CEO / Co-Founder", class: "Founder", shares: 4500000 },
+      { id: 2, name: "CTO / Co-Founder", class: "Founder", shares: 4500000 },
+      { id: 3, name: "Unallocated ESOP", class: "Option Pool", shares: 1000000 }
+    ];
+    let chartInstance = null;
+
+    function addStakeholder() {
+      const name = prompt("Enter Stakeholder Name:", "New Investor");
+      if (!name) return;
+      stakeholders.push({
+        id: Date.now(),
+        name: name,
+        class: "Investor",
+        shares: 500000
+      });
+      calculateCapTable();
+    }
+
+    function removeStakeholder(id) {
+      if (stakeholders.length <= 1) return;
+      stakeholders = stakeholders.filter(s => s.id !== id);
+      calculateCapTable();
+    }
+
+    function calculateCapTable() {
+      const preMoney = parseFloat(document.getElementById('inPreMoney').value) || 0;
+      const invested = parseFloat(document.getElementById('inInvested').value) || 0;
+      const postMoney = preMoney + invested;
+
+      const totalPreShares = stakeholders.reduce((sum, s) => sum + s.shares, 0) || 1;
+      const pricePerShare = totalPreShares > 0 ? (preMoney / totalPreShares) : 1;
+      const newSharesIssued = pricePerShare > 0 ? Math.round(invested / pricePerShare) : 0;
+      const totalPostShares = totalPreShares + newSharesIssued;
+
+      document.getElementById('vPostMoney').innerText = `$${Math.round(postMoney).toLocaleString()}`;
+      document.getElementById('vPreMoney').innerText = `Pre-Money: $${Math.round(preMoney).toLocaleString()}`;
+      document.getElementById('vRaised').innerText = `$${Math.round(invested).toLocaleString()}`;
+      const dilution = totalPostShares > 0 ? ((newSharesIssued / totalPostShares) * 100).toFixed(1) : 0;
+      document.getElementById('vDilution').innerText = `Effective Dilution: ${dilution}%`;
+      document.getElementById('vTotalShares').innerText = totalPostShares.toLocaleString();
+      document.getElementById('vPPS').innerText = `Price Per Share: $${pricePerShare.toFixed(3)}`;
+
+      // Render table
+      const tbody = document.getElementById('stakeholderBody');
+      tbody.innerHTML = '';
+      const chartLabels = [];
+      const chartData = [];
+      const chartColors = ['#10b981', '#06b6d4', '#a855f7', '#f59e0b', '#3b82f6', '#ec4899', '#6366f1'];
+
+      let founderTotalPct = 0;
+      let esopPct = 0;
+
+      stakeholders.forEach((s, idx) => {
+        const pct = totalPostShares > 0 ? ((s.shares / totalPostShares) * 100) : 0;
+        const val = s.shares * (pricePerShare || 0);
+
+        if (s.class === 'Founder') founderTotalPct += pct;
+        if (s.class === 'Option Pool') esopPct += pct;
+
+        chartLabels.push(s.name);
+        chartData.push(parseFloat(pct.toFixed(2)));
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-zinc-950/60 transition';
+        tr.innerHTML = `
+          <td class="py-2.5 px-2 font-bold text-zinc-200">${s.name}</td>
+          <td class="py-2.5 px-2 text-zinc-400">${s.class}</td>
+          <td class="py-2.5 px-2 text-right text-zinc-300">${s.shares.toLocaleString()}</td>
+          <td class="py-2.5 px-2 text-right font-bold text-emerald-400">${pct.toFixed(2)}%</td>
+          <td class="py-2.5 px-2 text-right text-zinc-300">$${Math.round(val).toLocaleString()}</td>
+          <td class="py-2.5 px-2 text-center">
+            <button onclick="removeStakeholder(${s.id})" class="text-zinc-600 hover:text-rose-400 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Add New Investor Row if capital invested
+      if (newSharesIssued > 0) {
+        chartLabels.push("New Round Investors");
+        chartData.push(parseFloat(dilution));
+        document.getElementById('vInvestorPct').innerText = `${dilution}%`;
+
+        const tr = document.createElement('tr');
+        tr.className = 'bg-cyan-950/20 font-bold border-t border-cyan-900/50';
+        tr.innerHTML = `
+          <td class="py-2.5 px-2 text-cyan-300">New Round Investors</td>
+          <td class="py-2.5 px-2 text-cyan-400">Preferred Equity</td>
+          <td class="py-2.5 px-2 text-right text-cyan-300">${newSharesIssued.toLocaleString()}</td>
+          <td class="py-2.5 px-2 text-right text-cyan-400">${dilution}%</td>
+          <td class="py-2.5 px-2 text-right text-cyan-300">$${Math.round(invested).toLocaleString()}</td>
+          <td class="py-2.5 px-2 text-center text-zinc-600">-</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById('vFounderOwnership').innerText = `${founderTotalPct.toFixed(1)}%`;
+      document.getElementById('vESOPPool').innerText = `ESOP Pool: ${esopPct.toFixed(1)}%`;
+
+      updateChart(chartLabels, chartData, chartColors);
+      lucide.createIcons();
+    }
+
+    function updateChart(labels, data, colors) {
+      if (chartInstance) {
+        chartInstance.data.labels = labels;
+        chartInstance.data.datasets[0].data = data;
+        chartInstance.update();
+        return;
+      }
+      const ctx = document.getElementById('capChart').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: colors,
+            borderColor: '#090d16',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#9ca3af', font: { family: 'JetBrains Mono', size: 10 } } }
+          }
+        }
+      });
+    }
+
+    function loadPreset(type) {
+      if (type === 'yc_seed') {
+        document.getElementById('inPreMoney').value = 9500000;
+        document.getElementById('inInvested').value = 500000;
+        stakeholders = [
+          { id: 1, name: "Co-Founder A", class: "Founder", shares: 4500000 },
+          { id: 2, name: "Co-Founder B", class: "Founder", shares: 4500000 },
+          { id: 3, name: "Option Pool", class: "Option Pool", shares: 1000000 }
+        ];
+      } else if (type === 'series_a') {
+        document.getElementById('inPreMoney').value = 20000000;
+        document.getElementById('inInvested').value = 4000000;
+        stakeholders = [
+          { id: 1, name: "Co-Founder A", class: "Founder", shares: 3800000 },
+          { id: 2, name: "Co-Founder B", class: "Founder", shares: 3800000 },
+          { id: 3, name: "Seed VC", class: "Investor", shares: 1000000 },
+          { id: 4, name: "Option Pool", class: "Option Pool", shares: 1400000 }
+        ];
+      } else {
+        document.getElementById('inPreMoney').value = 1000000;
+        document.getElementById('inInvested').value = 0;
+        stakeholders = [
+          { id: 1, name: "Founder 1", class: "Founder", shares: 5000000 },
+          { id: 2, name: "Founder 2", class: "Founder", shares: 5000000 }
+        ];
+      }
+      calculateCapTable();
+    }
+
+    function exportCSV() {
+      let csv = "Stakeholder,Class,Shares,OwnershipPercentage\n";
+      const total = stakeholders.reduce((sum, s) => sum + s.shares, 0);
+      stakeholders.forEach(s => {
+        const pct = ((s.shares / total) * 100).toFixed(2);
+        csv += `"${s.name}","${s.class}",${s.shares},"${pct}%"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = "CapTable_Ownership_Summary.csv";
+      a.click();
+    }
+
+    window.onload = () => {
+      lucide.createIcons();
+      calculateCapTable();
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATS Resume Keyword Matcher & Optimization Studio | Free Jobscan Alternative</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-slate-950">
+          <i data-lucide="file-check" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-bold tracking-tight text-white">ATS Matcher & Parser Studio</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full">100% Free & Sovereign</span>
+          </div>
+          <p class="text-xs text-slate-400">Replaces Jobscan & Teal ($89/qtr) • 100% Client-Side Privacy</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="loadSample()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1.5 border border-slate-700">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i> Load Sample JD & Resume
+        </button>
+        <button onclick="clearAll()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800/80 hover:bg-rose-950 hover:text-rose-400 text-slate-400 transition border border-slate-700/60">
+          Clear
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-6 flex flex-col space-y-4">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col h-72 shadow-xl">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+            <i data-lucide="briefcase" class="w-4 h-4"></i> Target Job Description (Paste Text)
+          </label>
+          <span id="jdWordCount" class="text-[11px] text-slate-500 mono">0 words</span>
+        </div>
+        <textarea id="jdInput" placeholder="Paste the job requirements, responsibilities, technical requirements here..." class="w-full flex-1 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs mono text-slate-200 focus:outline-none focus:border-emerald-500/50 resize-none"></textarea>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col h-80 shadow-xl">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-bold uppercase tracking-wider text-teal-400 flex items-center gap-2">
+            <i data-lucide="user-round-search" class="w-4 h-4"></i> Your Resume (Paste Clean Text)
+          </label>
+          <span id="resumeWordCount" class="text-[11px] text-slate-500 mono">0 words</span>
+        </div>
+        <textarea id="resumeInput" placeholder="Paste your resume text here (experience, skills, summary, projects)..." class="w-full flex-1 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs mono text-slate-200 focus:outline-none focus:border-teal-500/50 resize-none"></textarea>
+        
+        <div class="mt-3 flex items-center justify-between pt-2 border-t border-slate-800/80">
+          <p class="text-[11px] text-slate-400 flex items-center gap-1">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Never uploaded to any server. Completely private.
+          </p>
+          <button onclick="analyzeMatch()" class="px-5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition">
+            <i data-lucide="zap" class="w-4 h-4"></i> Run ATS Analysis
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4 text-xs text-slate-400 space-y-2">
+        <h4 class="font-bold text-slate-300 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+          <i data-lucide="info" class="w-3.5 h-3.5 text-sky-400"></i> How Real ATS Systems Grade (Taleo, Workday, Greenhouse):
+        </h4>
+        <ul class="list-disc list-inside space-y-1 text-slate-400 text-[11px]">
+          <li><strong>Hard Skills / Tech Stack:</strong> Exact string & context matches (40% weight).</li>
+          <li><strong>Domain Terminology:</strong> Specialized industry verbs & role nomenclature (30% weight).</li>
+          <li><strong>Quantifiable Impact:</strong> Numbers, percentages (%, $, +) measuring business outcomes (20% weight).</li>
+          <li><strong>Formatting & Density:</strong> Keyword balance and length adherence (10% weight).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="lg:col-span-6 flex flex-col space-y-4">
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-lg">
+          <span class="text-[11px] font-semibold text-slate-400 uppercase">Match Score</span>
+          <div id="matchScore" class="text-3xl font-black text-emerald-400 mt-1 mono">0%</div>
+          <span id="matchStatus" class="text-[10px] text-slate-500 mt-0.5">Awaiting text</span>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-lg">
+          <span class="text-[11px] font-semibold text-slate-400 uppercase">Matched Keywords</span>
+          <div id="matchedCount" class="text-3xl font-black text-teal-400 mt-1 mono">0 / 0</div>
+          <span class="text-[10px] text-slate-500 mt-0.5">Identified in JD</span>
+        </div>
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-lg">
+          <span class="text-[11px] font-semibold text-slate-400 uppercase">Impact Metrics</span>
+          <div id="quantifiedCount" class="text-3xl font-black text-sky-400 mt-1 mono">0</div>
+          <span class="text-[10px] text-slate-500 mt-0.5">% / $ / X figures in resume</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+            <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Category Competency Radar
+          </h3>
+          <span class="text-[11px] text-slate-500">4 Core Vectors</span>
+        </div>
+        <div class="h-44 flex items-center justify-center">
+          <canvas id="atsChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex-1 flex flex-col">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+          <div class="flex items-center space-x-2">
+            <button id="tabMissing" onclick="switchTab('missing')" class="px-3 py-1 rounded-lg text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 transition flex items-center gap-1.5">
+              <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i> Missing Keywords (<span id="badgeMissing">0</span>)
+            </button>
+            <button id="tabPresent" onclick="switchTab('present')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60 transition flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i> Matched (<span id="badgeMatched">0</span>)
+            </button>
+          </div>
+          <button onclick="copyMissingKeywords()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
+            <i data-lucide="copy" class="w-3 h-3"></i> Copy Missing
+          </button>
+        </div>
+
+        <div id="keywordsContainer" class="flex-1 overflow-y-auto max-h-60 space-y-2 pr-1">
+          <p class="text-xs text-slate-500 text-center py-8">Enter both Job Description and Resume to generate keyword breakdown.</p>
+        </div>
+
+        <div id="recommendationBox" class="mt-4 p-3 bg-slate-950 border border-slate-800/80 rounded-xl text-xs space-y-1.5 hidden">
+          <span class="font-bold text-amber-400 flex items-center gap-1">
+            <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i> ATS Optimization Advice:
+          </span>
+          <p id="recommendationText" class="text-slate-300 text-[11px] leading-relaxed"></p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
+    Vastuda Sovereign Suite • 100% Free Autonomous Software • Replaces $89/Quarter Resume Paywalls
+  </footer>
+
+  <script>
+    let chartInstance = null;
+    let currentAnalysis = { missing: [], matched: [] };
+    let currentTab = 'missing';
+
+    const STOP_WORDS = new Set([
+      'the','and','for','with','that','this','from','have','your','will','been','were','about','into','more','other',
+      'some','such','their','these','through','when','which','while','after','also','being','both','between','each',
+      'must','than','then','them','they','what','would','should','could','able','role','work','year','years','team',
+      'looking','opportunity','working','skills','experience','required','qualifications','responsibilities',
+      'candidate','ideal','join','company','position','including','strong','excellent','apply','please'
+    ]);
+
+    function initChart(scores = [0, 0, 0, 0]) {
+      const ctx = document.getElementById('atsChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['Hard Tech Skills', 'Domain Keywords', 'Impact Metrics', 'Format & Density'],
+          datasets: [{
+            label: 'ATS Alignment Score',
+            data: scores,
+            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+            borderColor: '#10b981',
+            borderWidth: 2,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#10b981'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+              grid: { color: 'rgba(255, 255, 255, 0.08)' },
+              pointLabels: { color: '#94a3b8', font: { size: 10, weight: '600' } },
+              ticks: { display: false, min: 0, max: 100 }
+            }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function extractTokens(text) {
+      if (!text) return [];
+      return text.toLowerCase()
+        .replace(/[^a-z0-9+#\.\-\s]/g, ' ')
+        .split(/\s+/)
+        .map(w => w.trim())
+        .filter(w => w.length > 2 && !STOP_WORDS.has(w) && !/^\d+$/.test(w));
+    }
+
+    function extractPhrases(text) {
+      if (!text) return [];
+      const clean = text.toLowerCase().replace(/[^a-z0-9\s+#\-]/g, ' ');
+      const words = clean.split(/\s+/).filter(w => w.length > 1);
+      const phrases = [];
+      for (let i = 0; i < words.length - 1; i++) {
+        const p = `${words[i]} ${words[i+1]}`;
+        if (!STOP_WORDS.has(words[i]) && !STOP_WORDS.has(words[i+1])) {
+          phrases.push(p);
+        }
+      }
+      return phrases;
+    }
+
+    function analyzeMatch() {
+      const jdText = document.getElementById('jdInput').value.trim();
+      const resumeText = document.getElementById('resumeInput').value.trim();
+
+      if (!jdText || !resumeText) {
+        alert('Please provide both the Job Description and your Resume text.');
+        return;
+      }
+
+      const jdWords = jdText.split(/\s+/).filter(Boolean);
+      const resWords = resumeText.split(/\s+/).filter(Boolean);
+      document.getElementById('jdWordCount').innerText = `${jdWords.length} words`;
+      document.getElementById('resumeWordCount').innerText = `${resWords.length} words`;
+
+      const jdTokens = extractTokens(jdText);
+      const jdFreq = {};
+      jdTokens.forEach(t => jdFreq[t] = (jdFreq[t] || 0) + 1);
+
+      const jdPhrases = extractPhrases(jdText);
+      const phraseFreq = {};
+      jdPhrases.forEach(p => phraseFreq[p] = (phraseFreq[p] || 0) + 1);
+
+      const sortedKeys = Object.entries(jdFreq)
+        .filter(([k, v]) => v >= 1)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 35);
+
+      const resumeTokensSet = new Set(extractTokens(resumeText));
+      const resumePhrasesSet = new Set(extractPhrases(resumeText));
+      const resumeLower = resumeText.toLowerCase();
+
+      const matched = [];
+      const missing = [];
+
+      sortedKeys.forEach(([word, freq]) => {
+        const isPresent = resumeTokensSet.has(word) || resumeLower.includes(word);
+        const item = { word, jdCount: freq, isPresent };
+        if (isPresent) matched.push(item);
+        else missing.push(item);
+      });
+
+      Object.entries(phraseFreq)
+        .filter(([p, count]) => count >= 2)
+        .slice(0, 10)
+        .forEach(([p, count]) => {
+          const isPresent = resumePhrasesSet.has(p) || resumeLower.includes(p);
+          const item = { word: p, jdCount: count, isPresent, isPhrase: true };
+          if (isPresent) {
+            if (!matched.some(m => m.word === p)) matched.push(item);
+          } else {
+            if (!missing.some(m => m.word === p)) missing.push(item);
+          }
+        });
+
+      currentAnalysis = { missing, matched };
+
+      const metricsMatches = resumeText.match(/(\d+([.,]\d+)?%|\$\d+([.,]\d+)?(k|m|b)?|\d+(k|m|x|\+)|\d+\s*(hours|days|percent|million|billion|users|clients|revenue))/gi) || [];
+      const metricCount = metricsMatches.length;
+      document.getElementById('quantifiedCount').innerText = metricCount;
+
+      const totalKeys = matched.length + missing.length;
+      const kwMatchRatio = totalKeys > 0 ? (matched.length / totalKeys) : 0;
+      
+      const hardSkillsScore = Math.min(100, Math.round(kwMatchRatio * 105));
+      const domainScore = Math.min(100, Math.round((matched.filter(m => m.jdCount > 1).length / Math.max(1, (matched.length + missing.length) * 0.6)) * 100));
+      const metricScore = Math.min(100, metricCount * 14);
+      const densityScore = (resWords.length >= 350 && resWords.length <= 900) ? 95 : (resWords.length < 250 ? 50 : 75);
+
+      const overall = Math.round((hardSkillsScore * 0.4) + (domainScore * 0.3) + (metricScore * 0.2) + (densityScore * 0.1));
+
+      const scoreElem = document.getElementById('matchScore');
+      scoreElem.innerText = `${overall}%`;
+      if (overall >= 75) {
+        scoreElem.className = 'text-3xl font-black text-emerald-400 mt-1 mono';
+        document.getElementById('matchStatus').innerText = 'High Interview Probability';
+      } else if (overall >= 50) {
+        scoreElem.className = 'text-3xl font-black text-amber-400 mt-1 mono';
+        document.getElementById('matchStatus').innerText = 'Moderate ATS Gap';
+      } else {
+        scoreElem.className = 'text-3xl font-black text-rose-400 mt-1 mono';
+        document.getElementById('matchStatus').innerText = 'High Rejection Risk';
+      }
+
+      document.getElementById('matchedCount').innerText = `${matched.length} / ${totalKeys}`;
+      document.getElementById('badgeMissing').innerText = missing.length;
+      document.getElementById('badgeMatched').innerText = matched.length;
+
+      initChart([hardSkillsScore, domainScore, metricScore, densityScore]);
+      renderKeywords();
+
+      const recBox = document.getElementById('recommendationBox');
+      const recText = document.getElementById('recommendationText');
+      recBox.classList.remove('hidden');
+
+      let tips = [];
+      if (missing.length > 0) {
+        const topMiss = missing.slice(0, 4).map(m => `"${m.word}"`).join(', ');
+        tips.push(`Naturally weave missing high-frequency keywords (${topMiss}) into your work history bullets.`);
+      }
+      if (metricCount < 5) {
+        tips.push(`Your resume only has ${metricCount} quantified impact metrics. Add numbers (e.g. "Increased retention by 24%", "Managed $500k budget").`);
+      }
+      if (resWords.length < 350) {
+        tips.push(`Resume word count (${resWords.length}) is below recommended single-page density (400-700 words).`);
+      }
+      recText.innerHTML = tips.length ? tips.map(t => `• ${t}`).join('<br>') : 'Great job! Your resume demonstrates high textual keyword alignment with the target specification.';
+    }
+
+    function renderKeywords() {
+      const container = document.getElementById('keywordsContainer');
+      container.innerHTML = '';
+
+      const list = currentTab === 'missing' ? currentAnalysis.missing : currentAnalysis.matched;
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No items in this category.</p>`;
+        return;
+      }
+
+      const grid = document.createElement('div');
+      grid.className = 'grid grid-cols-2 gap-2';
+
+      list.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `p-2 rounded-lg border text-xs flex items-center justify-between ${
+          currentTab === 'missing' 
+            ? 'bg-rose-950/20 border-rose-900/40 text-rose-300' 
+            : 'bg-emerald-950/20 border-emerald-900/40 text-emerald-300'
+        }`;
+        div.innerHTML = `
+          <span class="font-medium capitalize truncate mr-2">${item.word}</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] mono bg-slate-900 border border-slate-800 text-slate-400">JD: ${item.jdCount}x</span>
+        `;
+        grid.appendChild(div);
+      });
+
+      container.appendChild(grid);
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      const btnMissing = document.getElementById('tabMissing');
+      const btnPresent = document.getElementById('tabPresent');
+
+      if (tab === 'missing') {
+        btnMissing.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 transition flex items-center gap-1.5';
+        btnPresent.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60 transition flex items-center gap-1.5';
+      } else {
+        btnPresent.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition flex items-center gap-1.5';
+        btnMissing.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60 transition flex items-center gap-1.5';
+      }
+      renderKeywords();
+    }
+
+    function copyMissingKeywords() {
+      if (!currentAnalysis.missing || currentAnalysis.missing.length === 0) {
+        alert('No missing keywords to copy.');
+        return;
+      }
+      const text = currentAnalysis.missing.map(m => m.word).join(', ');
+      navigator.clipboard.writeText(text);
+      alert('Copied ' + currentAnalysis.missing.length + ' missing keywords to clipboard!');
+    }
+
+    function loadSample() {
+      document.getElementById('jdInput').value = `Senior Full Stack Software Engineer (AI Systems)
+
+About The Role:
+We are looking for a Senior Full Stack Engineer to lead our enterprise generative AI platforms. You will architect scalable distributed systems, build resilient REST and GraphQL APIs, and optimize latency for large language model inference.
+
+Responsibilities:
+- Design and deploy microservices with TypeScript, Node.js, Python, and Docker in AWS cloud environments.
+- Build high-performance frontend interfaces using React, Next.js, and Tailwind CSS with sub-100ms interaction latency.
+- Orchestrate data pipelines, PostgreSQL databases, Redis caching, and vector search stores.
+- Implement CI/CD pipelines with GitHub Actions, automated unit testing (Jest, PyTest), and zero-trust security.
+- Collaborate with product management and data science teams to deliver enterprise-grade software.
+
+Requirements:
+- 5+ years of experience with Python, TypeScript, React, and Node.js.
+- Strong proficiency in SQL database design (PostgreSQL/MySQL) and Redis caching layers.
+- Hands-on experience with Kubernetes, Docker containerization, and AWS infrastructure.
+- Proven track record with automated testing, CI/CD, and performance profiling.`;
+
+      document.getElementById('resumeInput').value = `ALEXANDER MERCER
+Senior Software Engineer | Python, JavaScript & Cloud Systems
+Email: alex.mercer@example.com • Portfolio: https://github.com/alexmercer
+
+PROFESSIONAL SUMMARY
+Results-driven Senior Engineer with 6+ years of experience designing robust web applications and distributed backends. Led modernization of core cloud services, resulting in a 42% reduction in latency and $180,000 annual AWS hosting savings.
+
+EXPERIENCE
+Lead Systems Engineer | Nexus Cloud Inc. (2022 – Present)
+- Architected high-throughput backend services using Python and Node.js, processing over 12 million daily requests with 99.98% uptime.
+- Scaled PostgreSQL and Redis data architecture, reducing slow query execution times by 55%.
+- Implemented containerized deployments with Docker and automated testing suites via GitHub Actions, increasing release frequency by 3x.
+- Mentored 6 junior engineers on secure coding standards and code review practices.
+
+Full Stack Developer | Horizon Digital Labs (2019 – 2022)
+- Built interactive customer dashboards using React and Tailwind CSS, increasing user session engagement by 28%.
+- Integrated RESTful APIs with third-party payment gateways and webhook services.
+- Maintained 90%+ unit test code coverage using Jest and PyTest.
+
+TECHNICAL SKILLS
+- Languages: Python, JavaScript, TypeScript, SQL, HTML5/CSS3
+- Frameworks & Libs: React, Node.js, Express, Tailwind CSS
+- Infrastructure & Tools: Docker, AWS (EC2, S3), Redis, PostgreSQL, Git, GitHub Actions, Jest, PyTest`;
+
+      analyzeMatch();
+    }
+
+    function clearAll() {
+      document.getElementById('jdInput').value = '';
+      document.getElementById('resumeInput').value = '';
+      document.getElementById('jdWordCount').innerText = '0 words';
+      document.getElementById('resumeWordCount').innerText = '0 words';
+      document.getElementById('matchScore').innerText = '0%';
+      document.getElementById('matchScore').className = 'text-3xl font-black text-slate-500 mt-1 mono';
+      document.getElementById('matchStatus').innerText = 'Awaiting text';
+      document.getElementById('matchedCount').innerText = '0 / 0';
+      document.getElementById('quantifiedCount').innerText = '0';
+      document.getElementById('badgeMissing').innerText = '0';
+      document.getElementById('badgeMatched').innerText = '0';
+      document.getElementById('recommendationBox').classList.add('hidden');
+      document.getElementById('keywordsContainer').innerHTML = '<p class="text-xs text-slate-500 text-center py-8">Enter both Job Description and Resume to generate keyword breakdown.</p>';
+      initChart([0, 0, 0, 0]);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initChart([0, 0, 0, 0]);
+    });
+  </script>
+</body>
+</html>

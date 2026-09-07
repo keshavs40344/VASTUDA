@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self-Consistency Majority Vote Consensus Evaluator — Sovereign AI Suite</title>
+  <meta name="description" content="Samples multiple LLM reasoning paths (Wang et al.), extracts candidate answers, clusters semantic equivalents, and determines the consensus winner with Shannon entropy. 100% private, client-side, zero server latency.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(99, 102, 241, 0.2); }
+    .glass:hover { border-color: rgba(99, 102, 241, 0.35); }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+  </style>
+
+    <!-- DYNAMIC SEO & SOCIAL GRAPH (Auto-Injected) -->
+    <meta name="title" content="Self-Consistency Majority Vote Consensus Evaluator — Sovereign AI Suite">
+    <meta name="description" content="Samples multiple LLM reasoning paths (Wang et al.), extracts candidate answers, clusters semantic equivalents, and determines the consensus winner with Shannon entropy. 100% private, client-side, zero server latency.">
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://keshavs40344.github.io/ai-world-core/saas/self_consistency_majority_vote_eval.html">
+    <meta property="og:title" content="Self-Consistency Majority Vote Consensus Evaluator — Sovereign AI Suite">
+    <meta property="og:description" content="Samples multiple LLM reasoning paths (Wang et al.), extracts candidate answers, clusters semantic equivalents, and determines the consensus winner with Shannon entropy. 100% private, client-side, zero server latency.">
+    <meta property="og:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Self-Consistency%20Majority%20Vote%20Consensus+Studio&font=montserrat">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://keshavs40344.github.io/ai-world-core/saas/self_consistency_majority_vote_eval.html">
+    <meta name="twitter:title" content="Self-Consistency Majority Vote Consensus Evaluator — Sovereign AI Suite">
+    <meta name="twitter:description" content="Samples multiple LLM reasoning paths (Wang et al.), extracts candidate answers, clusters semantic equivalents, and determines the consensus winner with Shannon entropy. 100% private, client-side, zero server latency.">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Self-Consistency%20Majority%20Vote%20Consensus+Studio&font=montserrat">
+
+    <!-- JSON-LD Structured Data for Googlebot -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Self-Consistency Majority Vote Consensus Evaluator — Sovereign AI Suite",
+      "url": "https://keshavs40344.github.io/ai-world-core/saas/self_consistency_majority_vote_eval.html",
+      "description": "Samples multiple LLM reasoning paths (Wang et al.), extracts candidate answers, clusters semantic equivalents, and determines the consensus winner with Shannon entropy. 100% private, client-side, zero server latency.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All modern browsers",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <!-- /SEO BLOCK -->
+    
+</head>
+<body class="min-h-screen antialiased flex flex-col selection:bg-indigo-500/30 selection:text-indigo-300">
+
+  <!-- Sovereign Nav -->
+  <header class="glass border-b border-indigo-500/10 sticky top-0 z-50 px-6 py-3.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="../../index.html" class="flex items-center gap-2.5 text-sm font-mono hover:text-indigo-400 transition">
+        <i data-lucide="brain-circuit" class="w-4 h-4 text-indigo-400"></i>
+        <span>AI WORLD HUB</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+          AI CORE OPERATIONAL
+        </span>
+        <a href="../../tools.html" class="text-xs text-slate-400 hover:text-white transition">All Tools</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-6">
+    <div class="glass p-6 sm:p-8 rounded-3xl border border-indigo-500/20 relative overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/40 flex items-center justify-center shrink-0">
+          <i data-lucide="check-check" class="w-7 h-7 text-indigo-400"></i>
+        </div>
+        <div class="space-y-1 flex-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-indigo-950/80 text-indigo-400 border border-indigo-500/30">AI & LLM Core</span>
+            <span class="text-[10px] font-mono text-slate-400">&bull; 100% Client-Side &bull; Zero Cloud Leakage</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-black font-display text-white">Self-Consistency Majority Vote Consensus Evaluator</h1>
+          <p class="text-slate-400 text-sm max-w-3xl">Samples multiple LLM reasoning paths (Wang et al.), extracts candidate answers, clusters semantic equivalents, and determines the consensus winner with Shannon entropy.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Tool Interactive UI -->
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">Sampled Trajectories (CoT Paths)</h3>
+        <div>
+          <label class="block text-xs font-mono text-slate-400 mb-1">Paste Sampled LLM Outputs (Separate by '---'):</label>
+          <textarea id="cotSamples" rows="8" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-mono text-white focus:outline-none">Path 1:
+Let x be the speed. 45 * 2 = 90. Therefore total time is 3.5 hours.
+Final Answer: 3.5 hours
+---
+Path 2:
+First leg is 90 miles. Remaining is 50 miles. 90/45 + 50/35 = 2 + 1.428 = 3.43 hours.
+Final Answer: 3.43 hours
+---
+Path 3:
+Distance is 140 miles. Average speed is 40 mph. 140 / 40 = 3.5 hours.
+Final Answer: 3.5 hours
+---
+Path 4:
+Direct formula yields 3.5 hours after rounding.
+Final Answer: 3.5 hours
+---
+Path 5:
+Total time calculation: 3 hours and 30 minutes (3.5 hours).
+Final Answer: 3.5 hours</textarea>
+        </div>
+        <button id="calcVoteBtn" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs font-mono transition">Compute Majority Vote Consensus</button>
+      </div>
+
+      <div class="glass p-6 rounded-2xl border border-white/10 space-y-4">
+        <h3 class="text-sm font-semibold text-white uppercase tracking-wider font-mono">Consensus Decision & Entropy</h3>
+        <div id="voteOutput" class="space-y-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+        
+
+  </main>
+
+  <footer class="border-t border-white/5 py-8 mt-12 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>AI WORLD CORE &bull; Sovereign AI & LLM Systems &bull; 100% Private</div>
+      <div class="flex items-center gap-5 text-slate-400">
+        <a href="../../index.html" class="hover:text-indigo-400 transition">Hub</a>
+        <a href="../../tools.html" class="hover:text-cyan-400 transition">Catalogue</a>
+        <a href="../../world.html" class="hover:text-pink-400 transition">World Live</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+    
+    function computeMajorityVote() {
+      const raw = document.getElementById('cotSamples').value;
+      const paths = raw.split('---').map(p => p.trim()).filter(Boolean);
+
+      const answers = [];
+      paths.forEach(p => {
+        const m = p.match(/Final Answer:\s*(.+)$/im);
+        if (m) {
+          answers.push(m[1].trim());
+        } else {
+          const lines = p.split('\n').filter(Boolean);
+          answers.push(lines[lines.length - 1].trim());
+        }
+      });
+
+      const counts = {};
+      answers.forEach(a => counts[a] = (counts[a] || 0) + 1);
+
+      const total = answers.length;
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      const winner = sorted[0];
+
+      // Shannon entropy H = -sum(p * log2(p))
+      let entropy = 0;
+      sorted.forEach(([ans, count]) => {
+        const p = count / total;
+        entropy -= p * Math.log2(p);
+      });
+
+      const confidence = ((winner[1] / total) * 100).toFixed(1);
+
+      document.getElementById('voteOutput').innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-900 border border-emerald-500/30">
+          <div class="text-[10px] font-mono text-emerald-400 uppercase tracking-wide">Consensus Winner</div>
+          <div class="text-xl font-black text-white mt-1">"${winner[0]}"</div>
+          <div class="text-xs text-slate-400 font-mono mt-0.5">Agreement: ${winner[1]} of ${total} paths (${confidence}%)</div>
+        </div>
+
+        <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 space-y-2">
+          <div class="flex justify-between text-xs font-mono">
+            <span class="text-slate-400">Total Trajectories:</span>
+            <span class="text-white">${total}</span>
+          </div>
+          <div class="flex justify-between text-xs font-mono">
+            <span class="text-slate-400">Reasoning Entropy:</span>
+            <span class="text-indigo-400">${entropy.toFixed(3)} bits (lower = higher consensus)</span>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <div class="text-[10px] font-mono text-slate-400 uppercase">Vote Distribution:</div>
+          ${sorted.map(([ans, count]) => `
+            <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex justify-between items-center text-xs font-mono">
+              <span class="text-slate-300 truncate max-w-[240px]">${ans}</span>
+              <span class="text-indigo-400 font-bold">${count} votes (${((count/total)*100).toFixed(0)}%)</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    document.getElementById('calcVoteBtn').addEventListener('click', computeMajorityVote);
+    computeMajorityVote();
+        
+  </script>
+</body>
+</html>

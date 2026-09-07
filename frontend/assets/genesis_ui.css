@@ -1,0 +1,52 @@
+/* GENESIS DESIGN SYSTEM: CYBERPUNK INDUSTRIAL SPEC */
+:root {
+    --bg-base: #020617;
+    --bg-card: rgba(15, 23, 42, 0.75);
+    --border-card: rgba(51, 65, 85, 0.8);
+    --border-hover: rgba(99, 102, 241, 0.6);
+    --accent-indigo: #6366f1;
+    --accent-emerald: #10b981;
+}
+
+body {
+    background-color: var(--bg-base);
+    color: #f8fafc;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+}
+
+.genesis-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-card);
+    border-radius: 1rem;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.genesis-card:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -8px rgba(99, 102, 241, 0.15);
+}
+
+.glow-pill {
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    color: #a5b4fc;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #020617;
+}
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}

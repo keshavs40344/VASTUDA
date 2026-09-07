@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<title>Glassmorphism CSS & Palette Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
+<style>
+  body {font-family: 'Inter', sans-serif;}
+  .output-card {background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 0.75rem;}
+  .copy-btn:active {transform: scale(0.95);}
+</style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center py-8 px-4">
+
+<h1 class="text-3xl font-bold mb-6">Glassmorphism CSS & Palette Generator</h1>
+
+<div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+
+  <!-- Controls Panel -->
+  <div class="space-y-6">
+    <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
+      <h2 class="text-xl font-semibold mb-4">Settings</h2>
+      <div class="grid grid-cols-1 gap-4">
+
+        <!-- Base Color -->
+        <label class="flex items-center justify-between">
+          <span>Base Color</span>
+          <input type="color" id="baseColor" value="#ffffff" class="w-10 h-10 rounded-full border-2 border-gray-700 cursor-pointer">
+        </label>
+
+        <!-- Blur -->
+        <label class="flex items-center justify-between">
+          <span>Blur (px)</span>
+          <div class="flex items-center space-x-2">
+            <input type="range" id="blur" min="0" max="30" step="1" value="15" class="flex-1">
+            <span id="blurVal" class="w-12 text-right">15</span>
+          </div>
+        </label>
+
+        <!-- Opacity -->
+        <label class="flex items-center justify-between">
+          <span>Opacity</span>
+          <div class="flex items-center space-x-2">
+            <input type="range" id="opacity" min="0" max="1" step="0.01" value="0.2" class="flex-1">
+            <span id="opacityVal" class="w-12 text-right">0.20</span>
+          </div>
+        </label>
+
+        <!-- Border Radius -->
+        <label class="flex items-center justify-between">
+          <span>Border Radius (px)</span>
+          <div class="flex items-center space-x-2">
+            <input type="range" id="radius" min="0" max="30" step="1" value="12" class="flex-1">
+            <span id="radiusVal" class="w-12 text-right">12</span>
+          </div>
+        </label>
+
+        <!-- Gradient Color 1 -->
+        <label class="flex items-center justify-between">
+          <span>Gradient Color 1</span>
+          <input type="color" id="gradColor1" value="#ff7e5f" class="w-10 h-10 rounded-full border-2 border-gray-700 cursor-pointer">
+        </label>
+
+        <!-- Gradient Color 2 -->
+        <label class="flex items-center justify-between">
+          <span>Gradient Color 2</span>
+          <input type="color" id="gradColor2" value="#feb47b" class="w-10 h-10 rounded-full border-2 border-gray-700 cursor-pointer">
+        </label>
+
+        <!-- Gradient Angle -->
+        <label class="flex items-center justify-between">
+          <span>Gradient Angle (°)</span>
+          <div class="flex items-center space-x-2">
+            <input type="range" id="angle" min="0" max="360" step="1" value="45" class="flex-1">
+            <span id="angleVal" class="w-12 text-right">45</span>
+          </div>
+        </label>
+
+      </div>
+    </div>
+
+    <!-- Output Panel -->
+    <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
+      <h2 class="text-xl font-semibold mb-4">Generated CSS</h2>
+      <pre id="cssOutput" class="bg-gray-700 rounded p-4 text-sm overflow-x-auto whitespace-pre-wrap"></pre>
+      <button id="copyBtn" class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-white copy-btn focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <svg class="lucide lucide-copy mr-2" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="12" x="4" y="4" rx="2"></rect><path d="M8 4v-2a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"></path></svg>
+        Copy CSS
+      </button>
+    </div>
+  </div>
+
+  <!-- Preview Panel -->
+  <div class="flex flex-col items-center space-y-6">
+    <div id="previewCard" class="output-card w-80 h-48 flex items-center justify-center text-gray-200 font-medium">
+      Preview Card
+    </div>
+
+    <div class="w-full flex flex-col items-center space-y-2">
+      <h3 class="text-lg font-semibold">Color Palette</h3>
+      <div id="palette" class="flex space-x-4">
+        <!-- Swatches will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Utility functions
+  const hexToRgb = (hex) => {
+    const cleaned = hex.replace('#', '');
+    const bigint = parseInt(cleaned, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return { r, g, b };
+  };
+
+  const rgbToString = ({ r, g, b }) => `${r}, ${g}, ${b}`;
+
+  const updatePreview = () => {
+    const baseColor = document.getElementById('baseColor').value;
+    const blur = document.getElementById('blur').value;
+    const opacity = document.getElementById('opacity').value;
+    const radius = document.getElementById('radius').value;
+    const gradColor1 = document.getElementById('gradColor1').value;
+    const gradColor2 = document.getElementById('gradColor2').value;
+    const angle = document.getElementById('angle').value;
+
+    const baseRgb = hexToRgb(baseColor);
+    const gradRgb1 = hexToRgb(gradColor1);
+    const gradRgb2 = hexToRgb(gradColor2);
+
+    // Build CSS
+    const css = `
+.card {
+  background: linear-gradient(${angle}deg, rgba(${rgbToString(gradRgb1)}, 0.8), rgba(${rgbToString(gradRgb2)}, 0.8));
+  backdrop-filter: blur(${blur}px);
+  border-radius: ${radius}px;
+  border: 1px solid rgba(${rgbToString(baseRgb)}, 0.2);
+  color: #fff;
+  padding: 1.5rem;
+  font-family: 'Inter', sans-serif;
+}
+`.trim();
+
+    // Update preview card
+    const preview = document.getElementById('previewCard');
+    preview.style.background = `linear-gradient(${angle}deg, rgba(${rgbToString(gradRgb1)}, 0.8), rgba(${rgbToString(gradRgb2)}, 0.8))`;
+    preview.style.backdropFilter = `blur(${blur}px)`;
+    preview.style.borderRadius = `${radius}px`;
+    preview.style.border = `1px solid rgba(${rgbToString(baseRgb)}, 0.2)`;
+    preview.style.opacity = opacity;
+
+    // Update CSS output
+    document.getElementById('cssOutput').textContent = css;
+
+    // Update palette
+    const palette = document.getElementById('palette');
+    palette.innerHTML = '';
+    const colors = [baseColor, gradColor1, gradColor2];
+    colors.forEach(col => {
+      const swatch = document.createElement('div');
+      swatch.className = 'w-12 h-12 rounded-full border-2 border-gray-700';
+      swatch.style.backgroundColor = col;
+      palette.appendChild(swatch);
+    });
+  };
+
+  // Event listeners for controls
+  document.querySelectorAll('input[type="range"]').forEach(input => {
+    input.addEventListener('input', () => {
+      const id = input.id;
+      const val = input.value;
+      document.getElementById(id + 'Val').textContent = val;
+      updatePreview();
+    });
+  });
+
+  document.querySelectorAll('input[type="color"]').forEach(input => {
+    input.addEventListener('input', updatePreview);
+  });
+
+  // Copy button
+  document.getElementById('copyBtn').addEventListener('click', async () => {
+    const cssText = document.getElementById('cssOutput').textContent;
+    try {
+      await navigator.clipboard.writeText(cssText);
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy CSS'; }, 1500);
+    } catch (err) {
+      alert('Failed to copy: ' + err);
+    }
+  });
+
+  // Initial render
+  updatePreview();
+  lucide.createIcons();
+</script>
+</body>
+</html>

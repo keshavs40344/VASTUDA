@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniConverter Pro | 100% Private Client-Side Media & Document Transformer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/70 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-sky-400 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white">
+          <i data-lucide="repeat" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-base font-bold tracking-tight text-white">OmniConverter Pro</h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full">Zero-Server Privacy</span>
+          </div>
+          <p class="text-xs text-slate-400">Client-Side PDF Merge, Image WebP/PNG Converter, EXIF Wiper & Compression</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3 text-xs">
+        <span class="flex items-center gap-1.5 text-emerald-400 font-medium px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-800/40">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Airgapped (In-Browser)
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-1 w-full space-y-6">
+    
+    <!-- Tool Mode Switcher Tabs -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <button onclick="switchMode('imgConvert')" id="tabImgConvert" class="p-3.5 rounded-2xl bg-indigo-600 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg transition">
+        <i data-lucide="image" class="w-4 h-4"></i> Image Transformer
+      </button>
+      <button onclick="switchMode('pdfMerge')" id="tabPdfMerge" class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 font-semibold text-xs flex items-center justify-center gap-2 hover:text-white transition">
+        <i data-lucide="files" class="w-4 h-4 text-rose-400"></i> PDF Merge & Stitch
+      </button>
+      <button onclick="switchMode('exifWiper')" id="tabExifWiper" class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 font-semibold text-xs flex items-center justify-center gap-2 hover:text-white transition">
+        <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-400"></i> Photo EXIF GPS Wiper
+      </button>
+      <button onclick="switchMode('svgToPng')" id="tabSvgToPng" class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 font-semibold text-xs flex items-center justify-center gap-2 hover:text-white transition">
+        <i data-lucide="file-code-2" class="w-4 h-4 text-amber-400"></i> SVG Vector to PNG
+      </button>
+    </div>
+
+    <!-- MODULE 1: Image Format Converter & Quality Optimizer -->
+    <div id="secImgConvert" class="space-y-4">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="image-plus" class="w-4 h-4 text-indigo-400"></i>
+              High-Speed Browser Image Converter & Compressor
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Converts JPG, PNG, WEBP, BMP, AVIF instantly with adjustable compression</p>
+          </div>
+          <span class="text-[11px] text-slate-500 mono">Canvas 2D Hardware Acceleration</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+          <!-- Upload Box -->
+          <div class="md:col-span-6 flex flex-col justify-center">
+            <div id="imgDropZone" class="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-2xl p-8 text-center cursor-pointer transition flex flex-col items-center justify-center bg-slate-950/40 min-h-[220px]">
+              <input type="file" id="imgInput" accept="image/*" class="hidden" onchange="handleImageSelect(event)">
+              <i data-lucide="upload-cloud" class="w-10 h-10 text-indigo-400 mb-2"></i>
+              <span class="text-xs font-bold text-slate-200">Click or Drop Image Here</span>
+              <p class="text-[11px] text-slate-400 mt-1">Supports JPG, PNG, WEBP, GIF (up to 50MB)</p>
+            </div>
+          </div>
+
+          <!-- Controls & Preview -->
+          <div class="md:col-span-6 space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <div>
+                <label class="text-xs font-semibold text-slate-300 block mb-1.5">Target Output Format:</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button type="button" onclick="setTargetFormat('image/webp')" id="fmtWebp" class="py-2 px-3 text-xs font-bold rounded-xl bg-indigo-600 text-white transition text-center">WEBP (Smallest)</button>
+                  <button type="button" onclick="setTargetFormat('image/jpeg')" id="fmtJpeg" class="py-2 px-3 text-xs font-semibold rounded-xl bg-slate-950 text-slate-300 border border-slate-800 hover:text-white transition text-center">JPEG</button>
+                  <button type="button" onclick="setTargetFormat('image/png')" id="fmtPng" class="py-2 px-3 text-xs font-semibold rounded-xl bg-slate-950 text-slate-300 border border-slate-800 hover:text-white transition text-center">PNG (Lossless)</button>
+                </div>
+              </div>
+
+              <div id="qualityControlWrap">
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-300 font-medium">Compression Quality:</span>
+                  <span id="lblQuality" class="font-mono font-bold text-indigo-400">85%</span>
+                </div>
+                <input type="range" id="sliderQuality" min="10" max="100" value="85" class="w-full accent-indigo-500 cursor-pointer" oninput="updateQuality(this.value)">
+              </div>
+
+              <!-- Resize Dimension Options -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-[11px] text-slate-400 block mb-1">Max Width (px, 0=original):</label>
+                  <input type="number" id="maxWidth" value="0" min="0" step="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs mono text-slate-200" placeholder="e.g. 1920">
+                </div>
+                <div>
+                  <label class="text-[11px] text-slate-400 block mb-1">Max Height (px, 0=original):</label>
+                  <input type="number" id="maxHeight" value="0" min="0" step="100" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-xs mono text-slate-200" placeholder="e.g. 1080">
+                </div>
+              </div>
+            </div>
+
+            <button id="btnConvertImage" onclick="convertImage()" disabled class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 transition">
+              <i data-lucide="zap" class="w-4 h-4"></i> Convert & Optimize Image Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Result Card -->
+        <div id="imgResultCard" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hidden flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div id="previewThumb" class="w-12 h-12 rounded-lg bg-slate-900 border border-slate-800 bg-cover bg-center"></div>
+            <div>
+              <div class="text-xs font-bold text-white" id="resFileName">optimized-image.webp</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">
+                Original: <span id="resOrigSize" class="mono text-slate-300">0 KB</span> ➔ 
+                Optimized: <span id="resNewSize" class="mono text-emerald-400 font-bold">0 KB</span> 
+                (<span id="resSavings" class="text-emerald-400">0% saved</span>)
+              </div>
+            </div>
+          </div>
+          <a id="btnDownloadImg" href="#" download="converted.webp" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs rounded-xl flex items-center gap-1.5 transition">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i> Download File
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MODULE 2: PDF Merger & Combiner -->
+    <div id="secPdfMerge" class="space-y-4 hidden">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="files" class="w-4 h-4 text-rose-400"></i>
+              Zero-Server PDF Merger & Page Stitcher
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Combines multiple PDF documents directly inside browser memory via pdf-lib</p>
+          </div>
+          <span class="text-[11px] text-slate-500 mono">Encrypted Document Safe</span>
+        </div>
+
+        <div id="pdfDropZone" class="border-2 border-dashed border-slate-700 hover:border-rose-500 rounded-2xl p-8 text-center cursor-pointer transition flex flex-col items-center justify-center bg-slate-950/40 min-h-[160px]">
+          <input type="file" id="pdfInput" accept="application/pdf" multiple class="hidden" onchange="handlePdfSelect(event)">
+          <i data-lucide="file-plus" class="w-8 h-8 text-rose-400 mb-2"></i>
+          <span class="text-xs font-bold text-slate-200">Click or Drop Multiple PDF Files Here</span>
+          <p class="text-[11px] text-slate-400 mt-1">Select 2 or more PDFs to merge into a single seamless document</p>
+        </div>
+
+        <!-- Queued PDF List -->
+        <div id="pdfQueueSection" class="space-y-2 hidden">
+          <div class="flex justify-between items-center text-xs text-slate-400">
+            <span class="font-semibold">Queued Documents (<span id="pdfCount">0</span>):</span>
+            <button onclick="clearPdfQueue()" class="text-rose-400 hover:text-rose-300">Clear All</button>
+          </div>
+          <div id="pdfList" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+          
+          <button id="btnMergePdf" onclick="mergePdfs()" class="w-full py-3 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-rose-600/20 flex items-center justify-center gap-2 transition mt-4">
+            <i data-lucide="combine" class="w-4 h-4"></i> Stitch & Export Combined PDF
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 3: EXIF Metadata Sanitizer -->
+    <div id="secExifWiper" class="space-y-4 hidden">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+              Photo EXIF & GPS Location Wiper
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Re-encodes photographic pixels through a clean Canvas pipeline to strip GPS, camera serials, timestamps & device signatures</p>
+          </div>
+          <span class="text-[11px] text-emerald-400 mono font-bold">Anti-Doxxing Guard</span>
+        </div>
+
+        <div id="exifDropZone" class="border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-2xl p-8 text-center cursor-pointer transition flex flex-col items-center justify-center bg-slate-950/40 min-h-[160px]">
+          <input type="file" id="exifInput" accept="image/jpeg,image/png" class="hidden" onchange="handleExifSelect(event)">
+          <i data-lucide="camera-off" class="w-8 h-8 text-emerald-400 mb-2"></i>
+          <span class="text-xs font-bold text-slate-200">Drop Photos to Strip GPS & Device Metadata</span>
+          <p class="text-[11px] text-slate-400 mt-1">Safe for Twitter, Reddit, Discord, and journalism publishing</p>
+        </div>
+
+        <div id="exifResultCard" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hidden flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-white" id="exifFileName">sanitized.jpg</div>
+            <div class="text-[11px] text-emerald-400 mt-0.5 flex items-center gap-1">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i> GPS Coordinates, Camera Make/Model & Device serials completely erased.
+            </div>
+          </div>
+          <a id="btnDownloadExif" href="#" download="clean-photo.jpg" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs rounded-xl flex items-center gap-1.5 transition">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i> Download Clean Photo
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 4: SVG to PNG Rasterizer -->
+    <div id="secSvgToPng" class="space-y-4 hidden">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="file-code-2" class="w-4 h-4 text-amber-400"></i>
+              SVG Vector Code to High-Res PNG Rasterizer
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Paste raw SVG markup or upload SVG file, choose scale (1x, 2x, 4x, 8x), and export transparent PNGs</p>
+          </div>
+          <span class="text-[11px] text-slate-500 mono">Retina Ready</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-semibold text-slate-300 block mb-1">SVG Source (Paste Code or Drop File):</label>
+            <textarea id="svgText" placeholder="<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 100 100&quot;>...</svg>" class="w-full h-44 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs mono text-amber-300 focus:outline-none focus:border-amber-500"></textarea>
+          </div>
+          <div class="space-y-4 flex flex-col justify-between">
+            <div>
+              <label class="text-xs font-semibold text-slate-300 block mb-1">Render Multiplier:</label>
+              <select id="svgScale" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs mono text-slate-200">
+                <option value="1">1x Standard Resolution</option>
+                <option value="2" selected>2x High DPI (Retina)</option>
+                <option value="4">4x Ultra HD (Print)</option>
+                <option value="8">8x Poster Scale</option>
+              </select>
+            </div>
+            <button onclick="rasterizeSvg()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition">
+              <i data-lucide="sparkles" class="w-4 h-4"></i> Rasterize to Transparent PNG
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+    VASTUDA High-Performance Utilities • Pure Client-Side Computation • Zero Cloud Dependencies
+  </footer>
+
+  <script>
+    let activeMode = 'imgConvert';
+    let targetFormat = 'image/webp';
+    let loadedImage = null;
+    let originalFileSize = 0;
+    let originalFileName = 'image';
+    let queuedPdfs = [];
+
+    function switchMode(mode) {
+      activeMode = mode;
+      const modes = ['imgConvert', 'pdfMerge', 'exifWiper', 'svgToPng'];
+      modes.forEach(m => {
+        const tab = document.getElementById('tab' + m.charAt(0).toUpperCase() + m.slice(1));
+        const sec = document.getElementById('sec' + m.charAt(0).toUpperCase() + m.slice(1));
+        if (m === mode) {
+          tab.className = 'p-3.5 rounded-2xl bg-indigo-600 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-lg transition';
+          sec.classList.remove('hidden');
+        } else {
+          tab.className = 'p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 font-semibold text-xs flex items-center justify-center gap-2 hover:text-white transition';
+          sec.classList.add('hidden');
+        }
+      });
+      lucide.createIcons();
+    }
+
+    function setTargetFormat(fmt) {
+      targetFormat = fmt;
+      document.getElementById('fmtWebp').className = fmt === 'image/webp' ? 'py-2 px-3 text-xs font-bold rounded-xl bg-indigo-600 text-white transition text-center' : 'py-2 px-3 text-xs font-semibold rounded-xl bg-slate-950 text-slate-300 border border-slate-800 hover:text-white transition text-center';
+      document.getElementById('fmtJpeg').className = fmt === 'image/jpeg' ? 'py-2 px-3 text-xs font-bold rounded-xl bg-indigo-600 text-white transition text-center' : 'py-2 px-3 text-xs font-semibold rounded-xl bg-slate-950 text-slate-300 border border-slate-800 hover:text-white transition text-center';
+      document.getElementById('fmtPng').className = fmt === 'image/png' ? 'py-2 px-3 text-xs font-bold rounded-xl bg-indigo-600 text-white transition text-center' : 'py-2 px-3 text-xs font-semibold rounded-xl bg-slate-950 text-slate-300 border border-slate-800 hover:text-white transition text-center';
+      
+      const qWrap = document.getElementById('qualityControlWrap');
+      qWrap.style.display = fmt === 'image/png' ? 'none' : 'block';
+    }
+
+    function updateQuality(val) {
+      document.getElementById('lblQuality').innerText = val + '%';
+    }
+
+    // Image Handlers
+    document.getElementById('imgDropZone').addEventListener('click', () => document.getElementById('imgInput').click());
+
+    function handleImageSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      originalFileSize = file.size;
+      originalFileName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = new Image();
+        img.onload = function() {
+          loadedImage = img;
+          document.getElementById('btnConvertImage').disabled = false;
+          document.getElementById('imgDropZone').innerHTML = `<i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-400 mb-1"></i><span class="text-xs font-bold text-emerald-300">Loaded: ${file.name}</span><span class="text-[11px] text-slate-400">(${img.width}x${img.height}px, ${(file.size/1024).toFixed(1)} KB)</span>`;
+          lucide.createIcons();
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function convertImage() {
+      if (!loadedImage) return;
+
+      const canvas = document.createElement('canvas');
+      let w = loadedImage.width;
+      let h = loadedImage.height;
+
+      const maxW = parseInt(document.getElementById('maxWidth').value) || 0;
+      const maxH = parseInt(document.getElementById('maxHeight').value) || 0;
+
+      if (maxW > 0 && w > maxW) {
+        h = Math.round((h * maxW) / w);
+        w = maxW;
+      }
+      if (maxH > 0 && h > maxH) {
+        w = Math.round((w * maxH) / h);
+        h = maxH;
+      }
+
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(loadedImage, 0, 0, w, h);
+
+      const quality = parseInt(document.getElementById('sliderQuality').value) / 100;
+      const ext = targetFormat === 'image/webp' ? 'webp' : (targetFormat === 'image/jpeg' ? 'jpg' : 'png');
+
+      canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const resCard = document.getElementById('imgResultCard');
+        resCard.classList.remove('hidden');
+
+        document.getElementById('previewThumb').style.backgroundImage = `url(${url})`;
+        document.getElementById('resFileName').innerText = `${originalFileName}.${ext}`;
+        document.getElementById('resOrigSize').innerText = `${(originalFileSize / 1024).toFixed(1)} KB`;
+        document.getElementById('resNewSize').innerText = `${(blob.size / 1024).toFixed(1)} KB`;
+
+        const savings = Math.round(((originalFileSize - blob.size) / originalFileSize) * 100);
+        document.getElementById('resSavings').innerText = `${savings > 0 ? savings : 0}% smaller`;
+
+        const dlBtn = document.getElementById('btnDownloadImg');
+        dlBtn.href = url;
+        dlBtn.download = `${originalFileName}-optimized.${ext}`;
+      }, targetFormat, quality);
+    }
+
+    // PDF Handlers
+    document.getElementById('pdfDropZone').addEventListener('click', () => document.getElementById('pdfInput').click());
+
+    function handlePdfSelect(e) {
+      const files = Array.from(e.target.files);
+      if (!files.length) return;
+
+      files.forEach(f => {
+        queuedPdfs.push(f);
+      });
+      renderPdfQueue();
+    }
+
+    function renderPdfQueue() {
+      const sec = document.getElementById('pdfQueueSection');
+      const list = document.getElementById('pdfList');
+      const count = document.getElementById('pdfCount');
+
+      if (queuedPdfs.length === 0) {
+        sec.classList.add('hidden');
+        return;
+      }
+      sec.classList.remove('hidden');
+      count.innerText = queuedPdfs.length;
+      list.innerHTML = '';
+
+      queuedPdfs.forEach((f, idx) => {
+        const div = document.createElement('div');
+        div.className = 'p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-xs';
+        div.innerHTML = `
+          <div class="flex items-center gap-2 truncate">
+            <span class="mono font-bold text-rose-400">#${idx+1}</span>
+            <span class="text-slate-200 truncate">${f.name}</span>
+            <span class="text-[10px] text-slate-500 mono">(${(f.size/1024).toFixed(1)} KB)</span>
+          </div>
+          <button onclick="removePdf(${idx})" class="text-slate-500 hover:text-rose-400 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+        `;
+        list.appendChild(div);
+      });
+      lucide.createIcons();
+    }
+
+    function removePdf(idx) {
+      queuedPdfs.splice(idx, 1);
+      renderPdfQueue();
+    }
+
+    function clearPdfQueue() {
+      queuedPdfs = [];
+      renderPdfQueue();
+    }
+
+    async function mergePdfs() {
+      if (queuedPdfs.length < 2) {
+        alert('Please add at least 2 PDF files to merge.');
+        return;
+      }
+
+      const mergedPdf = await PDFLib.PDFDocument.create();
+
+      for (const file of queuedPdfs) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
+        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        copiedPages.forEach(p => mergedPdf.addPage(p));
+      }
+
+      const mergedBytes = await mergedPdf.save();
+      const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'merged-sovereign-document.pdf';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // EXIF Wiper
+    document.getElementById('exifDropZone').addEventListener('click', () => document.getElementById('exifInput').click());
+
+    function handleExifSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          canvas.toBlob(blob => {
+            const url = URL.createObjectURL(blob);
+            document.getElementById('exifResultCard').classList.remove('hidden');
+            document.getElementById('exifFileName').innerText = `sanitized-${file.name}`;
+            const a = document.getElementById('btnDownloadExif');
+            a.href = url;
+            a.download = `sanitized-${file.name}`;
+          }, 'image/jpeg', 0.92);
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // SVG Rasterizer
+    function rasterizeSvg() {
+      const svgCode = document.getElementById('svgText').value.trim();
+      if (!svgCode) {
+        alert('Please paste valid SVG markup.');
+        return;
+      }
+
+      const scale = parseFloat(document.getElementById('svgScale').value) || 2;
+      const blob = new Blob([svgCode], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0);
+
+        canvas.toBlob(pngBlob => {
+          const pngUrl = URL.createObjectURL(pngBlob);
+          const a = document.createElement('a');
+          a.href = pngUrl;
+          a.download = `rendered-vector-${scale}x.png`;
+          a.click();
+          URL.revokeObjectURL(pngUrl);
+          URL.revokeObjectURL(url);
+        }, 'image/png');
+      };
+      img.src = url;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

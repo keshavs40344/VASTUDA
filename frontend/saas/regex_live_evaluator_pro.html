@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<title>Regex Live Evaluator Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Tailwind CSS CDN -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Lucide Icons CDN -->
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.256.0/dist/lucide.min.js"></script>
+<!-- PrismJS for syntax highlighting -->
+<link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-regex.min.js"></script>
+<style>
+  body {font-family: 'Inter', sans-serif;}
+  .prism-highlight {background: #2d2d2d; color: #f8f8f2; padding: 0.5rem; border-radius: 0.375rem;}
+  .error {color: #f87171;}
+  .match-item {border-bottom: 1px solid #374151;}
+  .group-table th, .group-table td {border: 1px solid #374151; padding: 0.25rem 0.5rem;}
+</style>
+
+    <!-- DYNAMIC SEO & SOCIAL GRAPH (Auto-Injected) -->
+    <meta name="title" content="Regex Live Evaluator Pro">
+    <meta name="description" content="100% Client-side utility for Regex Live Evaluator Pro. High-speed, private, zero-server data leakage.">
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://keshavs40344.github.io/ai-world-core/saas/regex_live_evaluator_pro.html">
+    <meta property="og:title" content="Regex Live Evaluator Pro">
+    <meta property="og:description" content="100% Client-side utility for Regex Live Evaluator Pro. High-speed, private, zero-server data leakage.">
+    <meta property="og:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Regex%20Live%20Evaluator%20Pro+Studio&font=montserrat">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://keshavs40344.github.io/ai-world-core/saas/regex_live_evaluator_pro.html">
+    <meta name="twitter:title" content="Regex Live Evaluator Pro">
+    <meta name="twitter:description" content="100% Client-side utility for Regex Live Evaluator Pro. High-speed, private, zero-server data leakage.">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/020617/6366f1/png?text=Regex%20Live%20Evaluator%20Pro+Studio&font=montserrat">
+
+    <!-- JSON-LD Structured Data for Googlebot -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Regex Live Evaluator Pro",
+      "url": "https://keshavs40344.github.io/ai-world-core/saas/regex_live_evaluator_pro.html",
+      "description": "100% Client-side utility for Regex Live Evaluator Pro. High-speed, private, zero-server data leakage.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "All modern browsers",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <!-- /SEO BLOCK -->
+    
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+<div class="container mx-auto p-4 flex flex-col lg:flex-row gap-4">
+  <!-- Left Panel: Regex & Flags -->
+  <div class="flex-1 bg-gray-800 rounded-lg p-4 flex flex-col">
+    <h2 class="text-xl font-semibold mb-2">Regex Pattern</h2>
+    <textarea id="regexPattern" class="bg-gray-700 text-gray-100 rounded p-2 flex-1 resize-none" rows="4" placeholder="Enter regex pattern"></textarea>
+    <div class="mt-4">
+      <h3 class="text-lg font-medium mb-1">Flags</h3>
+      <div class="flex flex-wrap gap-2">
+        <label class="flex items-center space-x-1">
+          <input type="checkbox" id="flagG" value="g" class="form-checkbox text-indigo-400">
+          <span>g</span>
+        </label>
+        <label class="flex items-center space-x-1">
+          <input type="checkbox" id="flagI" value="i" class="form-checkbox text-indigo-400">
+          <span>i</span>
+        </label>
+        <label class="flex items-center space-x-1">
+          <input type="checkbox" id="flagM" value="m" class="form-checkbox text-indigo-400">
+          <span>m</span>
+        </label>
+        <label class="flex items-center space-x-1">
+          <input type="checkbox" id="flagS" value="s" class="form-checkbox text-indigo-400">
+          <span>s</span>
+        </label>
+        <label class="flex items-center space-x-1">
+          <input type="checkbox" id="flagU" value="u" class="form-checkbox text-indigo-400">
+          <span>u</span>
+        </label>
+        <label class="flex items-center space-x-1">
+          <input type="checkbox" id="flagY" value="y" class="form-checkbox text-indigo-400">
+          <span>y</span>
+        </label>
+      </div>
+    </div>
+  </div>
+  <!-- Right Panel: Test String -->
+  <div class="flex-1 bg-gray-800 rounded-lg p-4 flex flex-col">
+    <h2 class="text-xl font-semibold mb-2">Test String</h2>
+    <textarea id="testString" class="bg-gray-700 text-gray-100 rounded p-2 flex-1 resize-none" rows="10" placeholder="Enter text to test against the regex"></textarea>
+  </div>
+</div>
+
+<!-- Output Section -->
+<div class="container mx-auto p-4 flex flex-col gap-4">
+  <div class="flex justify-between items-center">
+    <h2 class="text-2xl font-semibold">Results</h2>
+    <div class="flex gap-2">
+      <button id="copyBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded flex items-center space-x-1">
+        <lucide-icon name="copy" size="18"></lucide-icon>
+        <span>Copy JSON</span>
+      </button>
+      <button id="resetBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded flex items-center space-x-1">
+        <lucide-icon name="refresh-ccw" size="18"></lucide-icon>
+        <span>Reset</span>
+      </button>
+    </div>
+  </div>
+  <div id="errorMsg" class="error mb-2 hidden"></div>
+  <div id="matchCount" class="mb-2"></div>
+  <div id="matchesList" class="space-y-2"></div>
+  <div id="groupsTableContainer" class="mt-4"></div>
+</div>
+
+<script>
+  // Utility debounce
+  function debounce(fn, delay) {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+  }
+
+  const regexInput = document.getElementById('regexPattern');
+  const testInput = document.getElementById('testString');
+  const flags = ['flagG', 'flagI', 'flagM', 'flagS', 'flagU', 'flagY'];
+  const errorMsg = document.getElementById('errorMsg');
+  const matchCount = document.getElementById('matchCount');
+  const matchesList = document.getElementById('matchesList');
+  const groupsTableContainer = document.getElementById('groupsTableContainer');
+  const copyBtn = document.getElementById('copyBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  function getFlags() {
+    return flags.filter(id => document.getElementById(id).checked).map(id => document.getElementById(id).value).join('');
+  }
+
+  function highlightPattern(pattern) {
+    const pre = document.createElement('pre');
+    pre.className = 'prism-highlight';
+    pre.innerHTML = Prism.highlight(pattern, Prism.languages.regex, 'regex');
+    return pre;
+  }
+
+  function updateResults() {
+    const pattern = regexInput.value;
+    const text = testInput.value;
+    const flagStr = getFlags();
+
+    // Reset UI
+    errorMsg.classList.add('hidden');
+    matchCount.textContent = '';
+    matchesList.innerHTML = '';
+    groupsTableContainer.innerHTML = '';
+
+    if (!pattern) return;
+
+    let regex;
+    try {
+      regex = new RegExp(pattern, flagStr);
+    } catch (e) {
+      errorMsg.textContent = 'Invalid regex: ' + e.message;
+      errorMsg.classList.remove('hidden');
+      return;
+    }
+
+    const matches = [];
+    if (regex.global) {
+      let match;
+      while ((match = regex.exec(text)) !== null) {
+        matches.push({
+          index: match.index,
+          match: match[0],
+          groups: match.slice(1)
+        });
+        // Avoid infinite loops for zero-length matches
+        if (match.index === regex.lastIndex) regex.lastIndex++;
+      }
+    } else {
+      const match = regex.exec(text);
+      if (match) {
+        matches.push({
+          index: match.index,
+          match: match[0],
+          groups: match.slice(1)
+        });
+      }
+    }
+
+    matchCount.textContent = `Found ${matches.length} match${matches.length !== 1 ? 'es' : ''}.`;
+
+    matches.forEach((m, idx) => {
+      const div = document.createElement('div');
+      div.className = 'match-item p-2 rounded bg-gray-700';
+      const header = document.createElement('div');
+      header.className = 'flex justify-between items-center';
+      header.innerHTML = `<strong>Match ${idx + 1}</strong> <span class="text-gray-400">Index: ${m.index}</span>`;
+      div.appendChild(header);
+      const content = document.createElement('pre');
+      content.className = 'prism-highlight';
+      content.textContent = m.match;
+      div.appendChild(content);
+      if (m.groups.length > 0) {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'mt-2';
+        const table = document.createElement('table');
+        table.className = 'group-table w-full';
+        const thead = document.createElement('thead');
+        thead.innerHTML = '<tr><th class="bg-gray-600">Group #</th><th class="bg-gray-600">Content</th></tr>';
+        const tbody = document.createElement('tbody');
+        m.groups.forEach((g, gi) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td class="text-center">${gi + 1}</td><td>${g !== undefined ? g : ''}</td>`;
+          tbody.appendChild(tr);
+        });
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        groupDiv.appendChild(table);
+        div.appendChild(groupDiv);
+      }
+      matchesList.appendChild(div);
+    });
+
+    // Copy JSON button
+    copyBtn.onclick = () => {
+      const json = JSON.stringify(matches, null, 2);
+      navigator.clipboard.writeText(json).then(() => {
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => { copyBtn.textContent = 'Copy JSON'; }, 1500);
+      }).catch(err => {
+        console.error('Copy failed', err);
+      });
+    };
+  }
+
+  const debouncedUpdate = debounce(updateResults, 300);
+
+  regexInput.addEventListener('input', debouncedUpdate);
+  testInput.addEventListener('input', debouncedUpdate);
+  flags.forEach(id => document.getElementById(id).addEventListener('change', debouncedUpdate));
+
+  resetBtn.onclick = () => {
+    regexInput.value = '';
+    testInput.value = '';
+    flags.forEach(id => document.getElementById(id).checked = false);
+    updateResults();
+  };
+
+  // Initial call
+  updateResults();
+</script>
+</body>
+</html>

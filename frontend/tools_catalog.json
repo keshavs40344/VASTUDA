@@ -1,0 +1,209 @@
+[
+  {
+    "title": "Glassmorphism CSS & Palette Generator",
+    "category": "UI/UX & Frontend",
+    "desc": "Interactive visual slider studio to design backdrop-blur cards, modern gradients, and copy ready-to-use CSS.",
+    "icon": "palette",
+    "filename": "glassmorphism_css_palette_generator.html",
+    "url": "public/saas/glassmorphism_css_palette_generator.html",
+    "created_at": "2026-09-07T10:35:43Z"
+  },
+  {
+    "title": "OmniConverter Pro (Media & Document Studio)",
+    "category": "Private Media & Document Transformation",
+    "desc": "100% In-Browser client-side processing. Multi-file PDF merger via pdf-lib, image compressor/WebP converter, photo EXIF GPS location wiper, and high-DPI SVG rasterizer. Zero cloud leakage.",
+    "icon": "repeat",
+    "filename": "omniconverter-pro.html",
+    "url": "public/saas/omniconverter-pro.html",
+    "created_at": "2026-09-07T14:20:00Z"
+  },
+  {
+    "title": "DevForge Swiss-Knife",
+    "category": "Developer & Data Utilities",
+    "desc": "Essential offline developer tools: JSON \u21c4 YAML \u21c4 CSV matrix transcoder, JWT token debugger, cryptographic SHA-256/512 hasher, live JavaScript regex engine, and Base64 encoder/decoder.",
+    "icon": "wrench",
+    "filename": "devforge-swissknife.html",
+    "url": "public/saas/devforge-swissknife.html",
+    "created_at": "2026-09-07T14:20:00Z"
+  },
+  {
+    "title": "Audio Waveform & Podcast Chapter Studio",
+    "category": "Audio & Podcast Engineering",
+    "desc": "Disrupts Headliner & Descript (/mo). Web Audio API waveform renderer, drag-and-seek audio scrubber, timestamp chapter marker, and instant YouTube/Spotify cuesheet exporter.",
+    "icon": "waveform",
+    "filename": "audio-waveform-chapter-studio.html",
+    "url": "public/saas/audio-waveform-chapter-studio.html",
+    "created_at": "2026-09-07T09:05:00Z"
+  },
+  {
+    "title": "WCAG 2.2 Accessibility & Contrast Suite",
+    "category": "Design & Accessibility Auditing",
+    "desc": "Disrupts Stark Pro & AccessiBe (\u2013/yr). Real-time APCA/WCAG contrast calculation, colorblindness simulation (Protanopia, Deuteranopia, Tritanopia), and interactive component testing.",
+    "icon": "eye",
+    "filename": "wcag-contrast-accessibility-suite.html",
+    "url": "public/saas/wcag-contrast-accessibility-suite.html",
+    "created_at": "2026-09-07T09:00:00Z"
+  },
+  {
+    "title": "SQL Performance Explainer & Index Advisor",
+    "category": "Database & Query Optimization",
+    "desc": "Disrupts EverSQL & DBVisualizer (/mo). In-browser SQL AST analyzer, anti-pattern detector (SELECT *, non-sargable functions, leading wildcards), and automated DDL B-Tree index generator.",
+    "icon": "database",
+    "filename": "sql-explainer-index-advisor.html",
+    "url": "public/saas/sql-explainer-index-advisor.html",
+    "created_at": "2026-09-07T08:55:00Z"
+  },
+  {
+    "title": "Startup Runway & Unit Economics Simulator",
+    "category": "Venture Finance & Unit Economics",
+    "desc": "Disrupts Baremetrics & Finmark (/mo). Deterministic 24-month cash runway simulator, LTV/CAC payback calculator, Default Alive diagnostics, and interactive Chart.js projection.",
+    "icon": "trending-up",
+    "filename": "startup-runway-unit-economics.html",
+    "url": "public/saas/startup-runway-unit-economics.html",
+    "created_at": "2026-09-07T08:50:00Z"
+  },
+  {
+    "title": "Vector QR Studio & Sovereign vCard Generator",
+    "category": "Design & Contact Utilities",
+    "desc": "Disrupts QR Code Generator Pro (/yr). High-resolution SVG and PNG exports up to 2048px, custom color palettes, vCard contact cards, and WiFi credentials with zero expiring links.",
+    "icon": "qr-code",
+    "filename": "vector-qr-studio-vcard.html",
+    "url": "public/saas/vector-qr-studio-vcard.html",
+    "created_at": "2026-09-07T08:45:00Z"
+  },
+  {
+    "title": "Webhook JSON Transformer & Visual Pipe",
+    "category": "Developer APIs & Integration",
+    "desc": "Disrupts Zapier & Make.com (\u2013/mo). Visual JSON schema mapper, dot-notation extractor, data type mutators, and instant Slack/Discord payload formatting with zero paywalls.",
+    "icon": "workflow",
+    "filename": "webhook-json-transformer.html",
+    "url": "public/saas/webhook-json-transformer.html",
+    "created_at": "2026-09-07T08:40:00Z"
+  },
+  {
+    "title": "Invoice & Contract Shield Pro",
+    "category": "Freelance Invoicing & Legal Shield",
+    "desc": "Disrupts FreshBooks & Bonsai (/mo). Tax-compliant GST/VAT invoicing, automatic protective legal IP retention clauses, live currency formatting, and clean 1-click print/PDF.",
+    "icon": "receipt",
+    "filename": "invoice-contract-shield-pro.html",
+    "url": "public/saas/invoice-contract-shield-pro.html",
+    "created_at": "2026-09-07T08:35:00Z"
+  },
+  {
+    "title": "Document Redactor & Privacy Scrubber",
+    "category": "Legal Privacy & Cybersecurity",
+    "desc": "Disrupts Adobe Acrobat Pro & Smallpdf (/yr). Airgapped PII scrubbing for emails, phone numbers, credit cards, national IDs, and deal terms. Zero server upload guarantee.",
+    "icon": "shield-alert",
+    "filename": "pdf-metadata-scrubber-redactor.html",
+    "url": "public/saas/pdf-metadata-scrubber-redactor.html",
+    "created_at": "2026-09-07T08:30:00Z"
+  },
+  {
+    "title": "ATS Resume Matcher & Optimization Studio",
+    "category": "Career & Jobscan Disruptor",
+    "desc": "Disrupts Jobscan & Teal (/qtr). 100% private in-browser ATS scoring, bi-gram keyword density matcher, missing hard tech gap detection, and quantifiable impact metric counter.",
+    "icon": "file-check",
+    "filename": "ats-resume-keyword-matcher.html",
+    "url": "public/saas/ats-resume-keyword-matcher.html",
+    "created_at": "2026-09-07T08:25:00Z"
+  },
+  {
+    "title": "CapTable Pro & Equity Dilution Simulator",
+    "category": "Startup Equity & Cap Table Management",
+    "desc": "Disrupts Carta & Pulley (\u2013/mo). Interactive pre/post-money valuation, SAFE note conversion, unallocated ESOP expansion, multi-round dilution waterfall, and dynamic Chart.js breakdown.",
+    "icon": "pie-chart",
+    "filename": "captable-equity-dilution.html",
+    "url": "public/saas/captable-equity-dilution.html",
+    "created_at": "2026-09-07T08:20:00Z"
+  },
+  {
+    "title": "PhishShield Anti-Scam & Phishing Defense Sentinel",
+    "category": "Cyber Defense & Threat Protection",
+    "desc": "100% in-browser airgapped security. Detects fake KYC banking scams, Cyrillic punycode homograph domain spoofing, urgency traps, and fraudulent invoices. Protects people from identity and financial theft.",
+    "icon": "shield-alert",
+    "filename": "phishshield-scam-sentinel.html",
+    "url": "public/saas/phishshield-scam-sentinel.html",
+    "created_at": "2026-09-07T08:15:00Z"
+  },
+  {
+    "title": "InstantOnPage SEO & Tech Stack Auditor",
+    "category": "SEO & Growth Engineering",
+    "desc": "Disrupts Ahrefs & SEMrush ($129/mo). Live website audit, Core Web Vitals, Google SERP simulator, OpenGraph card preview, heading outline, and keyword density matrix. 100% free.",
+    "icon": "search-check",
+    "filename": "instantonpage-seo-auditor.html",
+    "url": "public/saas/instantonpage-seo-auditor.html",
+    "created_at": "2026-09-07T08:10:00Z"
+  },
+  {
+    "title": "CleanWrite Prose & Readability Sentinel",
+    "category": "Content & Airgapped Privacy",
+    "desc": "Disrupts Grammarly & Hemingway Pro ($30/mo). 100% in-browser airgapped security for sensitive documents. Flesch-Kincaid scoring, passive voice detector, sentence complexity highlights, and 1-click redundancy trimmer.",
+    "icon": "feather",
+    "filename": "cleanwrite-pro-editor.html",
+    "url": "public/saas/cleanwrite-pro-editor.html",
+    "created_at": "2026-09-07T08:10:00Z"
+  },
+  {
+    "title": "VASTUDA Free DCF Visualizer",
+    "category": "Visual Stock Health & DCF Intrinsic Valuation",
+    "desc": "A 100% free, client\u2011side web app that delivers instant, unlimited DCF calculations, real\u2011time data, and fully interactive visualizations\u2014no subscription, no data lock\u2011in, and no monthly check limits.",
+    "icon": "zap",
+    "filename": "vastuda-free-dcf-visualizer.html",
+    "url": "public/saas/vastuda-free-dcf-visualizer.html",
+    "created_at": "2026-09-07T07:59:38Z"
+  },
+  {
+    "title": "Zero-Leakage CSV & JSON Matrix Transcoder",
+    "category": "Data & File Utilities",
+    "desc": "Instant client-side converter between CSV and JSON with dynamic table search, column sorter, and CSV export. 100% private.",
+    "icon": "file-spreadsheet",
+    "filename": "csv_json_matrix_transcoder.html",
+    "url": "public/saas/csv_json_matrix_transcoder.html",
+    "created_at": "2026-09-07T07:13:15Z"
+  },
+  {
+    "title": "Cron Schedule Visualizer & Human Translator",
+    "category": "DevOps & Scheduling",
+    "desc": "Interactive cron expression builder with human-readable English breakdown, next 10 exact execution timestamps, and common presets for Linux & cloud schedulers.",
+    "icon": "calendar-clock",
+    "filename": "cron_expression_visualizer_engine.html",
+    "url": "public/saas/cron_expression_visualizer_engine.html",
+    "created_at": "2026-09-07T07:12:50Z"
+  },
+  {
+    "title": "Private JWT Token Inspector & Signature Auditor",
+    "category": "CyberSecurity & Privacy",
+    "desc": "100% client-side JWT token decoder and audit suite. Inspect headers, payload claims, expiration alerts without sending sensitive production secrets to external cloud servers.",
+    "icon": "shield-alert",
+    "filename": "jwt_token_inspector_sentinel.html",
+    "url": "public/saas/jwt_token_inspector_sentinel.html",
+    "created_at": "2026-09-07T07:12:32Z"
+  },
+  {
+    "title": "Income Tax Regime Comparator (New vs Old)",
+    "category": "FinTech & Taxation",
+    "desc": "Penny-perfect deterministic comparison of Old vs New Tax Regimes with Standard Deduction, 80C, 80D, HRA, Section 87A rebate, and slab-by-slab breakdown. Zero LLM arithmetic hallucinations.",
+    "icon": "receipt",
+    "filename": "income_tax_regime_comparator_pro.html",
+    "url": "public/saas/income_tax_regime_comparator_pro.html",
+    "created_at": "2026-09-07T07:11:18Z"
+  },
+  {
+    "title": "Smart SIP & DCA Compound Simulator",
+    "category": "FinTech & Money",
+    "desc": "Simulate Systematic Investment Plans (SIP) and Dollar-Cost Averaging with inflation adjustment and interactive growth charts.",
+    "icon": "trending-up",
+    "filename": "smart_sip_dca_compound_simulator.html",
+    "url": "public/saas/smart_sip_dca_compound_simulator.html",
+    "created_at": "2026-09-07T07:09:56Z"
+  },
+  {
+    "title": "Regex Live Evaluator Pro",
+    "category": "Developer Tools",
+    "desc": "Real-time regular expression tester with syntax highlighting, flag toggles, and match capture tables.",
+    "icon": "code-2",
+    "filename": "regex_live_evaluator_pro.html",
+    "url": "public/saas/regex_live_evaluator_pro.html",
+    "created_at": "2026-09-07T07:08:30Z"
+  }
+]

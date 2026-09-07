@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI WORLD CORE | Personal Developer & Researcher Workspace</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Firebase SDKs for Auth & Cloud Profile Sync -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="config.js"></script>
+  <script src="assets/genesis_firebase_bridge.js"></script>
+  <script src="assets/genesis_payments_auth.js"></script>
+
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f1f5f9;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    /* Modern SaaS Glass Card */
+    .saas-card {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 1rem;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .saas-card:hover {
+      border-color: rgba(99, 102, 241, 0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px -8px rgba(99, 102, 241, 0.15);
+    }
+    
+    /* Active Nav Item */
+    .nav-active {
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.05) 100%);
+      color: #818cf8 !important;
+      border-left: 3px solid #6366f1;
+      font-weight: 600;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0b0f19; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+  </style>
+
+  <!-- SEO & Open Graph Metadata -->
+  <meta name="title" content="AI WORLD CORE | Personal Developer Workspace">
+  <meta name="description" content="Sovereign, client-side personal workspace for developers, quants, and researchers. 100% private in-browser utilities, personal API tokens, and execution history.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AI WORLD CORE | Personal Developer Workspace">
+  <meta property="og:description" content="Sovereign, client-side personal workspace with 47+ zero-latency tools, API tokens, and personal history.">
+</head>
+
+<body class="min-h-screen flex bg-[#0b0f19] text-slate-100 selection:bg-indigo-500/30 selection:text-indigo-200">
+
+  <!-- ========================================================================= -->
+  <!-- 1. LEFT SIDEBAR NAVIGATION (MODERN SAAS WORKSPACE)                        -->
+  <!-- ========================================================================= -->
+  <aside id="appSidebar" class="w-64 bg-[#0d1322] border-r border-slate-800/80 flex flex-col justify-between shrink-0 z-30 transition-all duration-300 md:translate-x-0 -translate-x-full fixed md:static inset-y-0 left-0">
+    
+    <!-- Top Brand & Workspace Selector -->
+    <div>
+      <div class="p-5 border-b border-slate-800/80 flex items-center justify-between">
+        <a href="index.html" class="flex items-center space-x-3 group">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center font-black text-white text-sm shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+            Ω
+          </div>
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <span class="font-bold text-sm text-white tracking-tight">AI WORLD</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.2 bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">WORKSPACE</span>
+            </div>
+            <p class="text-[10px] text-slate-400">Developer Suite v2.6</p>
+          </div>
+        </a>
+        <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Workspace Switcher Pill -->
+      <div class="px-4 py-3 border-b border-slate-800/40">
+        <label class="block text-[10px] font-mono uppercase tracking-wider text-slate-500 mb-1">Active Space</label>
+        <button class="w-full flex items-center justify-between px-3 py-2 bg-slate-900/90 hover:bg-slate-800/90 rounded-lg border border-slate-700/60 text-xs font-medium text-slate-200 transition">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="truncate">Personal Workspace</span>
+          </div>
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+        </button>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="p-3 space-y-1 text-xs">
+        <div class="px-3 pt-2 pb-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500">
+          Core Workspace
+        </div>
+        
+        <button onclick="switchView('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800/60 hover:text-white transition nav-active text-left">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Overview</span>
+        </button>
+
+        <button onclick="switchView('launchpad')" id="nav-launchpad" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800/60 hover:text-white transition text-left">
+          <div class="flex items-center gap-3">
+            <i data-lucide="grid" class="w-4 h-4 text-indigo-400"></i>
+            <span>App Launchpad</span>
+          </div>
+          <span class="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded" id="totalToolsBadge">47</span>
+        </button>
+
+        <button onclick="switchView('favorites')" id="nav-favorites" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800/60 hover:text-white transition text-left">
+          <div class="flex items-center gap-3">
+            <i data-lucide="star" class="w-4 h-4 text-amber-400"></i>
+            <span>My Bookmarks</span>
+          </div>
+          <span class="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded" id="starredCountBadge">0</span>
+        </button>
+
+        <button onclick="switchView('activity')" id="nav-activity" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800/60 hover:text-white transition text-left">
+          <div class="flex items-center gap-3">
+            <i data-lucide="history" class="w-4 h-4 text-cyan-400"></i>
+            <span>Recent Activity</span>
+          </div>
+          <span class="text-[10px] font-mono bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded" id="activityCountBadge">0</span>
+        </button>
+
+        <div class="px-3 pt-4 pb-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500">
+          Developer & Tokens
+        </div>
+
+        <button onclick="switchView('tokens')" id="nav-tokens" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800/60 hover:text-white transition text-left">
+          <i data-lucide="key" class="w-4 h-4 text-emerald-400"></i>
+          <span>Personal API Tokens</span>
+        </button>
+
+        <button onclick="switchView('sandbox')" id="nav-sandbox" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800/60 hover:text-white transition text-left">
+          <i data-lucide="terminal" class="w-4 h-4 text-purple-400"></i>
+          <span>Payload Sandbox</span>
+        </button>
+
+        <div class="px-3 pt-4 pb-1 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500">
+          Account & System
+        </div>
+
+        <button onclick="switchView('account')" id="nav-account" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800/60 hover:text-white transition text-left">
+          <i data-lucide="user-check" class="w-4 h-4 text-sky-400"></i>
+          <span>Cloud Identity</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Bottom Storage Quota & User Profile Dock -->
+    <div class="p-4 border-t border-slate-800/80 space-y-3">
+      
+      <!-- Client Storage Quota Meter -->
+      <div class="bg-slate-900/80 rounded-lg p-3 border border-slate-800 text-xs">
+        <div class="flex items-center justify-between text-[11px] mb-1.5">
+          <span class="text-slate-400 font-mono">Local Storage</span>
+          <span class="text-emerald-400 font-mono font-semibold" id="storageQuotaText">Checking...</span>
+        </div>
+        <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+          <div id="storageBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 8%;"></div>
+        </div>
+        <p class="text-[10px] text-slate-500 mt-1.5">100% Client-Side Private Storage</p>
+      </div>
+
+      <!-- User Profile Card -->
+      <div class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+        <div class="flex items-center gap-2.5 overflow-hidden">
+          <div id="userAvatarContainer" class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-xs text-white shrink-0 overflow-hidden">
+            U
+          </div>
+          <div class="truncate">
+            <div id="userDisplayName" class="text-xs font-semibold text-white truncate">Guest User</div>
+            <div id="userEmailBadge" class="text-[10px] text-slate-400 truncate">guest@local</div>
+          </div>
+        </div>
+        <button onclick="handleUserAuthAction()" id="btnAuthAction" title="Login / Logout" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+          <i data-lucide="log-in" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div id="sidebarOverlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 hidden md:hidden"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN WORKSPACE CONTAINER & TOP APP HEADER                              -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+    
+    <!-- Top SaaS App Header -->
+    <header class="sticky top-0 z-10 bg-[#0b0f19]/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-8 py-3.5 flex items-center justify-between">
+      
+      <div class="flex items-center gap-3">
+        <button onclick="toggleMobileSidebar()" class="md:hidden p-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
+          <i data-lucide="menu" class="w-4 h-4"></i>
+        </button>
+        <div class="flex items-center gap-2 text-xs font-mono text-slate-400">
+          <span class="hover:text-slate-200">Workspace</span>
+          <span>/</span>
+          <span id="breadcrumbCurrent" class="text-indigo-400 font-medium">Overview</span>
+        </div>
+      </div>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-3">
+        
+        <!-- Search trigger button -->
+        <button onclick="focusSearch()" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition">
+          <i data-lucide="search" class="w-3.5 h-3.5"></i>
+          <span>Search tools...</span>
+          <kbd class="text-[10px] font-mono bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400">/</kbd>
+        </button>
+
+        <!-- Status Tag -->
+        <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          Zero-Cloud Leakage
+        </span>
+
+        <!-- Distinct Admin Console Link -->
+        <a href="admin_dashboard.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold transition">
+          <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span class="hidden sm:inline">Admin Mission Control</span>
+          <span class="sm:hidden">Admin</span> 🔒
+        </a>
+
+        <!-- Home link -->
+        <a href="index.html" class="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition" title="Back to Homepage">
+          <i data-lucide="home" class="w-4 h-4"></i>
+        </a>
+
+      </div>
+    </header>
+
+    <!-- Content Workspace Views -->
+    <main class="p-4 sm:p-8 max-w-7xl mx-auto w-full space-y-8 flex-1">
+
+      <!-- ===================================================================== -->
+      <!-- VIEW 1: WORKSPACE OVERVIEW                                            -->
+      <!-- ===================================================================== -->
+      <section id="view-overview" class="space-y-8">
+        
+        <!-- Welcome Banner -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900/40 via-purple-900/20 to-slate-900/40 border border-indigo-500/20 p-6 sm:p-8">
+          <div class="relative z-10 max-w-2xl space-y-2">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[11px] font-mono text-indigo-300">
+              <i data-lucide="sparkles" class="w-3 h-3"></i> Sovereign Developer Portal
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Welcome to your Workspace, <span id="heroUserName" class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Developer</span>
+            </h1>
+            <p class="text-sm text-slate-300">
+              Your personal, zero-latency in-browser studio. All tools run purely inside your browser memory with zero tracking, zero cloud file uploads, and complete cryptographic privacy.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-3">
+              <button onclick="switchView('launchpad')" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5">
+                <i data-lucide="grid" class="w-3.5 h-3.5"></i> Open App Launchpad
+              </button>
+              <button onclick="switchView('tokens')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs transition flex items-center gap-1.5">
+                <i data-lucide="key" class="w-3.5 h-3.5"></i> Manage API Tokens
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Workspace Metrics -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="saas-card p-5">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-medium">Total Sovereign Tools</span>
+              <span class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400"><i data-lucide="box" class="w-4 h-4"></i></span>
+            </div>
+            <div class="text-2xl font-black text-white mt-2">47</div>
+            <div class="text-[11px] text-emerald-400 font-mono mt-1">100% In-Browser Active</div>
+          </div>
+
+          <div class="saas-card p-5">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-medium">My Bookmarked Tools</span>
+              <span class="p-2 rounded-lg bg-amber-500/10 text-amber-400"><i data-lucide="star" class="w-4 h-4"></i></span>
+            </div>
+            <div class="text-2xl font-black text-white mt-2" id="kpiStarred">0</div>
+            <div class="text-[11px] text-slate-400 font-mono mt-1">Saved to Local Vault</div>
+          </div>
+
+          <div class="saas-card p-5">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-medium">Recent Executions</span>
+              <span class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400"><i data-lucide="play" class="w-4 h-4"></i></span>
+            </div>
+            <div class="text-2xl font-black text-white mt-2" id="kpiExecutions">0</div>
+            <div class="text-[11px] text-cyan-400 font-mono mt-1">Logged in Session</div>
+          </div>
+
+          <div class="saas-card p-5">
+            <div class="flex items-center justify-between text-slate-400 text-xs">
+              <span class="font-medium">Data Privacy Index</span>
+              <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400"><i data-lucide="shield-check" class="w-4 h-4"></i></span>
+            </div>
+            <div class="text-2xl font-black text-white mt-2">100%</div>
+            <div class="text-[11px] text-emerald-400 font-mono mt-1">Airgapped Local RAM</div>
+          </div>
+        </div>
+
+        <!-- Pinned Quick Launch Utilities -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+              <span>Essential Quick-Launch Utilities</span>
+            </h2>
+            <button onclick="switchView('launchpad')" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium">
+              View All 47 Tools <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="quickLaunchGrid">
+            <!-- Dynamic Quick Launch Cards -->
+          </div>
+        </div>
+
+        <!-- Recent Activity Feed Preview -->
+        <div class="saas-card p-6 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 class="font-bold text-sm text-white flex items-center gap-2">
+              <i data-lucide="history" class="w-4 h-4 text-cyan-400"></i>
+              <span>Recent Activity in this Workspace</span>
+            </h3>
+            <button onclick="switchView('activity')" class="text-xs text-slate-400 hover:text-white">View Full History</button>
+          </div>
+          <div id="overviewActivityList" class="space-y-2 text-xs">
+            <div class="text-slate-500 py-3 text-center">No recent tool executions yet. Launch a utility to record activity!</div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- VIEW 2: APP LAUNCHPAD (ALL 47+ TOOLS)                                  -->
+      <!-- ===================================================================== -->
+      <section id="view-launchpad" class="space-y-6 hidden">
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+              <span>Sovereign Application Launchpad</span>
+              <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">47 Tools</span>
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">100% private, client-side, zero server tracking. Star any tool to pin to your personal bookmarks.</p>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-500"></i>
+              <input type="text" id="toolsSearchInput" oninput="filterTools()" placeholder="Search utilities, keywords..." class="w-64 bg-slate-900 border border-slate-700/80 rounded-lg pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+            </div>
+            <button onclick="clearSearch()" class="text-xs text-slate-400 hover:text-white px-2 py-1">Clear</button>
+          </div>
+        </div>
+
+        <!-- Category Filter Pills -->
+        <div class="flex flex-wrap gap-2 text-xs font-medium" id="categoryPills">
+          <button onclick="selectCategory('ALL')" class="cat-pill px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-semibold shadow-sm transition" data-cat="ALL">All Utilities (47)</button>
+          <button onclick="selectCategory('DEV')" class="cat-pill px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition" data-cat="DEV">Developer & DevOps</button>
+          <button onclick="selectCategory('SECURITY')" class="cat-pill px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition" data-cat="SECURITY">Security & Privacy</button>
+          <button onclick="selectCategory('FINTECH')" class="cat-pill px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition" data-cat="FINTECH">FinTech & Venture</button>
+          <button onclick="selectCategory('AI')" class="cat-pill px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition" data-cat="AI">AI & Machine Learning</button>
+          <button onclick="selectCategory('MEDIA')" class="cat-pill px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition" data-cat="MEDIA">Media & Creative</button>
+          <button onclick="selectCategory('SCIENCE')" class="cat-pill px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition" data-cat="SCIENCE">Science & Academic</button>
+        </div>
+
+        <!-- Tool Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="toolsGrid">
+          <!-- Populated by JS -->
+        </div>
+
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- VIEW 3: MY SAVED TOOLS (BOOKMARKS)                                    -->
+      <!-- ===================================================================== -->
+      <section id="view-favorites" class="space-y-6 hidden">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-5">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+              <i data-lucide="star" class="w-5 h-5 text-amber-400"></i>
+              <span>My Bookmarked Utilities</span>
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">Tools you have starred for instant access in this browser.</p>
+          </div>
+          <button onclick="clearAllFavorites()" class="text-xs text-red-400 hover:text-red-300 font-medium">Clear All Bookmarks</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="favoritesGrid">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- VIEW 4: RECENT ACTIVITY & RUN HISTORY                                 -->
+      <!-- ===================================================================== -->
+      <section id="view-activity" class="space-y-6 hidden">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-5">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+              <i data-lucide="history" class="w-5 h-5 text-cyan-400"></i>
+              <span>Recent Executions & Activity History</span>
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">Audit trail of tools launched in this workspace. Stored strictly in local browser memory.</p>
+          </div>
+          <button onclick="clearRunHistory()" class="text-xs text-red-400 hover:text-red-300 font-medium">Clear Run History</button>
+        </div>
+
+        <div class="saas-card p-6" id="historyContainer">
+          <div id="activityFullList" class="space-y-3">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- VIEW 5: PERSONAL API TOKENS                                           -->
+      <!-- ===================================================================== -->
+      <section id="view-tokens" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-5">
+          <div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+              <i data-lucide="key" class="w-5 h-5 text-emerald-400"></i>
+              <span>Personal Client Access Tokens</span>
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">Scoped bearer tokens to integrate client-side utilities with local scripts and developer pipelines.</p>
+          </div>
+          <button onclick="openCreateTokenModal()" class="px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-semibold text-xs transition flex items-center gap-1.5 self-start">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Generate New Token
+          </button>
+        </div>
+
+        <!-- Token Generator Modal / Card -->
+        <div id="createTokenCard" class="saas-card p-6 border-emerald-500/30 space-y-4 hidden">
+          <h3 class="font-bold text-sm text-white flex items-center gap-2">
+            <i data-lucide="shield" class="w-4 h-4 text-emerald-400"></i>
+            <span>Create New Access Token</span>
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-mono text-slate-400 mb-1">Token Label</label>
+              <input type="text" id="newTokenName" placeholder="e.g. Local VSCode Extension" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 mb-1">Permission Scopes</label>
+              <div class="flex flex-wrap gap-2 text-xs">
+                <label class="flex items-center gap-1.5 text-slate-300">
+                  <input type="checkbox" id="scopeExecute" checked class="rounded border-slate-700 text-emerald-500">
+                  <span>execute:tools</span>
+                </label>
+                <label class="flex items-center gap-1.5 text-slate-300">
+                  <input type="checkbox" id="scopeCatalog" checked class="rounded border-slate-700 text-emerald-500">
+                  <span>read:catalog</span>
+                </label>
+                <label class="flex items-center gap-1.5 text-slate-300">
+                  <input type="checkbox" id="scopeHistory" checked class="rounded border-slate-700 text-emerald-500">
+                  <span>store:history</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button onclick="closeCreateTokenModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition">Cancel</button>
+            <button onclick="generateTokenSubmit()" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-semibold text-xs transition">Create Token</button>
+          </div>
+        </div>
+
+        <!-- Active Tokens Table -->
+        <div class="saas-card overflow-hidden">
+          <div class="p-4 border-b border-slate-800 text-xs font-semibold text-slate-300">Active Personal Tokens</div>
+          <div class="divide-y divide-slate-800" id="tokensList">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- VIEW 6: IN-BROWSER PAYLOAD SANDBOX                                    -->
+      <!-- ===================================================================== -->
+      <section id="view-sandbox" class="space-y-6 hidden">
+        <div class="border-b border-slate-800 pb-5">
+          <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <i data-lucide="terminal" class="w-5 h-5 text-purple-400"></i>
+            <span>In-Browser Private Payload Sandbox</span>
+          </h1>
+          <p class="text-xs text-slate-400 mt-1">Compute SHA-256 digests, parse JSON trees, or decode JWT tokens in client memory without transmitting a single byte.</p>
+        </div>
+
+        <div class="saas-card p-6 space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-mono text-slate-400 mb-1">Input Data (JSON, Token, or Text)</label>
+              <textarea id="sandboxInput" rows="7" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500" placeholder='{"user": "researcher", "workspace": "alpha", "algorithm": "sha256"}'></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-slate-400 mb-1">Computed Cryptographic Output</label>
+              <div id="sandboxOutput" class="w-full h-[160px] bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs font-mono text-emerald-400 overflow-y-auto">
+                Ready for client-side evaluation.
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2 justify-end">
+            <button onclick="computeSandboxHash()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-lg transition">
+              Compute SHA-256 Digest
+            </button>
+            <button onclick="prettifySandboxJson()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg transition">
+              Format & Validate JSON
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- VIEW 7: CLOUD PROFILE & ACCOUNT IDENTITY                              -->
+      <!-- ===================================================================== -->
+      <section id="view-account" class="space-y-6 hidden">
+        <div class="border-b border-slate-800 pb-5">
+          <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <i data-lucide="user-check" class="w-5 h-5 text-sky-400"></i>
+            <span>Cloud Identity & Account Security</span>
+          </h1>
+          <p class="text-xs text-slate-400 mt-1">Manage your Firebase authenticated session, active provider links, and browser data retention.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Cloud Profile Details -->
+          <div class="saas-card p-6 space-y-4">
+            <h3 class="text-sm font-bold text-white">Firebase Session Overview</h3>
+            
+            <div class="flex items-center gap-4">
+              <div id="accAvatar" class="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center font-bold text-xl text-white">
+                U
+              </div>
+              <div>
+                <div id="accName" class="font-bold text-base text-white">Guest User</div>
+                <div id="accEmail" class="text-xs text-slate-400">Unauthenticated Guest</div>
+                <div class="mt-1" id="accBadge">
+                  <span class="text-[10px] font-mono bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">LOCAL GUEST</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2 text-xs font-mono bg-slate-950 p-4 rounded-xl border border-slate-900 text-slate-400">
+              <div class="flex justify-between">
+                <span>UID:</span>
+                <span id="accUid" class="text-slate-200">local_guest_session</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Auth Provider:</span>
+                <span id="accProvider" class="text-slate-200">Local Browser Memory</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Session Login:</span>
+                <span id="accLoginAt" class="text-slate-200">Current</span>
+              </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+              <a href="auth.html" class="flex-1 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs text-center transition">
+                Sign In with Firebase Cloud
+              </a>
+              <button onclick="signOutUser()" class="px-4 py-2 rounded-lg bg-red-950/40 hover:bg-red-900/50 text-red-300 border border-red-900/40 text-xs font-medium transition">
+                Sign Out
+              </button>
+            </div>
+          </div>
+
+          <!-- Privacy & Cache Maintenance -->
+          <div class="saas-card p-6 space-y-4">
+            <h3 class="text-sm font-bold text-white">Client-Side Privacy Controls</h3>
+            <p class="text-xs text-slate-400">All data generated in this portal (bookmarks, run logs, personal API keys) is stored locally on this machine. You have total control over wiping this data.</p>
+            
+            <div class="space-y-3 pt-2">
+              <div class="flex items-center justify-between p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+                <div>
+                  <div class="font-semibold text-white">Wipe Bookmarks & History</div>
+                  <div class="text-[11px] text-slate-500">Removes starred utilities and recent executions</div>
+                </div>
+                <button onclick="clearAllUserData()" class="px-3 py-1.5 bg-red-900/20 hover:bg-red-900/30 text-red-400 border border-red-800/40 rounded text-xs transition">
+                  Wipe Data
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+                <div>
+                  <div class="font-semibold text-white">Revoke All Personal Tokens</div>
+                  <div class="text-[11px] text-slate-500">Invalidates all created client API tokens</div>
+                </div>
+                <button onclick="revokeAllTokens()" class="px-3 py-1.5 bg-red-900/20 hover:bg-red-900/30 text-red-400 border border-red-800/40 rounded text-xs transition">
+                  Revoke All
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Workspace Footer -->
+    <footer class="border-t border-slate-800/80 bg-[#0d1322] px-6 py-4 text-xs font-mono text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center space-x-2">
+        <span>AI WORLD CORE &copy; 2026</span>
+        <span>&middot;</span>
+        <span class="text-indigo-400">Personal Workspace Portal</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="index.html" class="hover:text-slate-300">Home Showcase</a>
+        <a href="admin_dashboard.html" class="hover:text-amber-400 flex items-center gap-1 font-semibold text-amber-400/80"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Admin Mission Control 🔒</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    // Master tools database embedded
+    const MASTER_TOOLS = [{"id": "devforge-swissknife", "name": "DevForge Swiss-Knife", "cat": "DEV", "catName": "Developer & DevOps", "icon": "wrench", "desc": "Offline JSON, YAML, CSV matrix transcoder, JWT debugger, SHA-256/512 hasher, and Base64 studio.", "url": "saas/devforge-swissknife.html", "badge": "Popular"}, {"id": "sql-explainer-index-advisor", "name": "SQL Explain & Index Advisor", "cat": "DEV", "catName": "Developer & DevOps", "icon": "database", "desc": "In-browser SQL AST analyzer, anti-pattern detector, and automated B-Tree DDL index generator.", "url": "saas/sql-explainer-index-advisor.html", "badge": "Free"}, {"id": "webhook-json-transformer", "name": "Webhook JSON Transformer", "cat": "DEV", "catName": "Developer & DevOps", "icon": "workflow", "desc": "Visual JSON schema mapper, dot-notation extractor, data mutator, and Slack/Discord webhook formatter.", "url": "saas/webhook-json-transformer.html", "badge": "Core"}, {"id": "chmod_calculator", "name": "Chmod Permissions Calculator", "cat": "DEV", "catName": "Developer & DevOps", "icon": "terminal", "desc": "Interactive octal and symbolic Linux/UNIX file permissions calculator with command generator.", "url": "saas/chmod_calculator.html", "badge": "Utility"}, {"id": "clickhouse_ddl_generator", "name": "ClickHouse DDL Generator", "cat": "DEV", "catName": "Developer & DevOps", "icon": "server", "desc": "High-speed analytical schema generator for ClickHouse MergeTree tables and partitioning keys.", "url": "saas/clickhouse_ddl_generator.html", "badge": "Data"}, {"id": "cloudwatch_metric_filter_builder", "name": "CloudWatch Metric Filter Builder", "cat": "DEV", "catName": "Developer & DevOps", "icon": "activity", "desc": "Generate syntactically flawless AWS CloudWatch metric extraction patterns and regex filters.", "url": "saas/cloudwatch_metric_filter_builder.html", "badge": "Cloud"}, {"id": "cmu_sql_explain_visualizer", "name": "CMU SQL Explain Visualizer", "cat": "DEV", "catName": "Developer & DevOps", "icon": "git-branch", "desc": "Visual query execution plan tree viewer for PostgreSQL and MySQL query performance analysis.", "url": "saas/cmu_sql_explain_visualizer.html", "badge": "Perf"}, {"id": "ansible_playbook_validator", "name": "Ansible Playbook Validator", "cat": "DEV", "catName": "Developer & DevOps", "icon": "file-code", "desc": "YAML syntax linter and task execution order validator for infrastructure automation.", "url": "saas/ansible_playbook_validator.html", "badge": "DevOps"}, {"id": "api_payload_builder", "name": "API Payload Builder & Tester", "cat": "DEV", "catName": "Developer & DevOps", "icon": "send", "desc": "Interactive client-side HTTP request composer and JSON mock generator with curl export.", "url": "saas/api_payload_builder.html", "badge": "REST"}, {"id": "avro_schema_generator", "name": "Apache Avro Schema Generator", "cat": "DEV", "catName": "Developer & DevOps", "icon": "box", "desc": "Convert JSON samples to strict Apache Avro IDL schemas for Kafka streaming architectures.", "url": "saas/avro_schema_generator.html", "badge": "Kafka"}, {"id": "pdf-metadata-scrubber-redactor", "name": "Document Redactor & Privacy Scrubber", "cat": "SECURITY", "catName": "Security & Privacy", "icon": "shield-check", "desc": "Airgapped PII scrubbing for emails, phone numbers, credit cards, national IDs, and deal terms.", "url": "saas/pdf-metadata-scrubber-redactor.html", "badge": "Airgapped"}, {"id": "phishshield-scam-sentinel", "name": "PhishShield Anti-Scam & Phishing Sentinel", "cat": "SECURITY", "catName": "Security & Privacy", "icon": "shield-alert", "desc": "Detects fake KYC banking scams, Cyrillic homograph domain spoofing, and urgency traps.", "url": "saas/phishshield-scam-sentinel.html", "badge": "Security"}, {"id": "api_key_leak_git_history_sanitizer", "name": "API Key Git History Sanitizer", "cat": "SECURITY", "catName": "Security & Privacy", "icon": "key", "desc": "Locate and redact leaked secrets, tokens, AWS keys, and private certificates before commit.", "url": "saas/api_key_leak_git_history_sanitizer.html", "badge": "Crucial"}, {"id": "anti_money_laundering_pep_scanner", "name": "AML & PEP Screening Scanner", "cat": "SECURITY", "catName": "Security & Privacy", "icon": "user-x", "desc": "Client-side Politically Exposed Persons (PEP) and OFAC sanctions list screening simulator.", "url": "saas/anti_money_laundering_pep_scanner.html", "badge": "Compliance"}, {"id": "audit_trail_hash_chain_verifier", "name": "Audit Trail Hash-Chain Verifier", "cat": "SECURITY", "catName": "Security & Privacy", "icon": "link", "desc": "Tamper-evident cryptographic log verification using SHA-256 sequential merkle hash chaining.", "url": "saas/audit_trail_hash_chain_verifier.html", "badge": "Crypto"}, {"id": "browser_fingerprint_canvas_spoof_tester", "name": "Browser Fingerprint & Privacy Tester", "cat": "SECURITY", "catName": "Security & Privacy", "icon": "fingerprint", "desc": "Audit your device canvas entropy, audio buffer hashes, WebGL vendor strings, and tracking resistance.", "url": "saas/browser_fingerprint_canvas_spoof_tester.html", "badge": "Privacy"}, {"id": "burp_raw_http_repeater_parser", "name": "Burp Raw HTTP Repeater Parser", "cat": "SECURITY", "catName": "Security & Privacy", "icon": "radio", "desc": "Parse, reformat, and validate raw Burp Suite HTTP requests, cookies, and injection vectors.", "url": "saas/burp_raw_http_repeater_parser.html", "badge": "SecOps"}, {"id": "clauseguard_contract_auditor", "name": "ClauseGuard Contract Legal Auditor", "cat": "SECURITY", "catName": "Security & Privacy", "icon": "file-text", "desc": "Automated NDA and commercial contract liability risk scanner with redline suggestions.", "url": "saas/clauseguard_contract_auditor.html", "badge": "Legal"}, {"id": "startup-runway-unit-economics", "name": "Startup Runway & Unit Economics", "cat": "FINTECH", "catName": "FinTech & Venture", "icon": "trending-up", "desc": "Deterministic 24-month cash runway simulator, LTV/CAC payback calculator, and Default Alive metrics.", "url": "saas/startup-runway-unit-economics.html", "badge": "Finance"}, {"id": "captable-equity-dilution", "name": "CapTable Pro & Equity Dilution Simulator", "cat": "FINTECH", "catName": "FinTech & Venture", "icon": "pie-chart", "desc": "Interactive pre/post-money valuation, SAFE note conversion, and multi-round waterfall breakdown.", "url": "saas/captable-equity-dilution.html", "badge": "Startup"}, {"id": "invoice-contract-shield-pro", "name": "Invoice & Contract Shield Pro", "cat": "FINTECH", "catName": "FinTech & Venture", "icon": "receipt", "desc": "Tax-compliant GST/VAT invoicing, automatic protective legal IP clauses, and clean PDF export.", "url": "saas/invoice-contract-shield-pro.html", "badge": "Freelance"}, {"id": "black_scholes_option_pricing", "name": "Black-Scholes Options Pricing Calculator", "cat": "FINTECH", "catName": "FinTech & Venture", "icon": "bar-chart-2", "desc": "Calculate European Call & Put premiums, Implied Volatility, and Greeks (Delta, Gamma, Vega, Theta).", "url": "saas/black_scholes_option_pricing.html", "badge": "Quant"}, {"id": "bond_yield_to_maturity", "name": "Bond Yield to Maturity (YTM) Model", "cat": "FINTECH", "catName": "FinTech & Venture", "icon": "percent", "desc": "Calculate exact YTM, Macaulay Duration, and Convexity for fixed-income sovereign bonds.", "url": "saas/bond_yield_to_maturity.html", "badge": "Bonds"}, {"id": "burn_rate_runway_calculator", "name": "Burn Rate & Cash Buffer Calculator", "cat": "FINTECH", "catName": "FinTech & Venture", "icon": "flame", "desc": "Track monthly net burn, gross burn, headcount hiring cost buffers, and cash runway projections.", "url": "saas/burn_rate_runway_calculator.html", "badge": "Capital"}, {"id": "dcf-valuation-model", "name": "VASTUDA Free DCF Intrinsic Visualizer", "cat": "FINTECH", "catName": "FinTech & Venture", "icon": "dollar-sign", "desc": "Discounted Cash Flow intrinsic valuation model with WACC calculator and sensitivity matrix.", "url": "saas/dcf-valuation-model.html", "badge": "Valuation"}, {"id": "attention_head_qk_matrix_visualizer", "name": "Attention Head QK Matrix Visualizer", "cat": "AI", "catName": "AI & Machine Learning", "icon": "eye", "desc": "Visualize transformer multi-head scaled dot-product attention softmax distributions in real-time.", "url": "saas/attention_head_qk_matrix_visualizer.html", "badge": "DeepLearning"}, {"id": "beam_search_decoding_simulator", "name": "Beam Search Decoding Simulator", "cat": "AI", "catName": "AI & Machine Learning", "icon": "git-pull-request", "desc": "Interactive beam search vs greedy search token generation tree visualizer for LLM inference.", "url": "saas/beam_search_decoding_simulator.html", "badge": "NLP"}, {"id": "bleu_score_machine_translation", "name": "BLEU Score Translation Evaluator", "cat": "AI", "catName": "AI & Machine Learning", "icon": "check-circle-2", "desc": "Compute modified n-gram precision and brevity penalty for machine translation benchmarking.", "url": "saas/bleu_score_machine_translation.html", "badge": "Eval"}, {"id": "classifier_confusion_matrix_f1_score", "name": "Confusion Matrix & F1-Score Studio", "cat": "AI", "catName": "AI & Machine Learning", "icon": "grid", "desc": "Calculate Precision, Recall, Specificity, F1-Score, and ROC-AUC from custom classification matrices.", "url": "saas/classifier_confusion_matrix_f1_score.html", "badge": "MLOps"}, {"id": "ai_cost_calculator", "name": "LLM Token Cost & Inference Estimator", "cat": "AI", "catName": "AI & Machine Learning", "icon": "cpu", "desc": "Calculate prompt and completion token costs across GPT-4o, Claude 3.5 Sonnet, and Gemini 1.5 Flash.", "url": "saas/ai_cost_calculator.html", "badge": "Cost"}, {"id": "ai_agent_function_call_orchestrator", "name": "AI Agent Function Call Orchestrator", "cat": "AI", "catName": "AI & Machine Learning", "icon": "layers", "desc": "Test and validate JSON schema tool declarations, multi-turn tool calling, and dispatch loops.", "url": "saas/ai_agent_function_call_orchestrator.html", "badge": "Agents"}, {"id": "agent_memory_sliding_window_summarizer", "name": "Agent Memory Sliding Window Summarizer", "cat": "AI", "catName": "AI & Machine Learning", "icon": "message-square", "desc": "Simulate conversation context compaction, FIFO token pruning, and recursive conversational memory.", "url": "saas/agent_memory_sliding_window_summarizer.html", "badge": "Memory"}, {"id": "omniconverter-pro", "name": "OmniConverter Pro", "cat": "MEDIA", "catName": "Media & Creative", "icon": "repeat", "desc": "Multi-file PDF merger, WebP image compressor, photo EXIF GPS location wiper, and SVG rasterizer.", "url": "saas/omniconverter-pro.html", "badge": "Essential"}, {"id": "audio-waveform-chapter-studio", "name": "Audio Waveform & Podcast Chapter Studio", "cat": "MEDIA", "catName": "Media & Creative", "icon": "audio-lines", "desc": "Web Audio API waveform visualizer, drag-and-seek audio scrubber, and Spotify/YouTube chapter exporter.", "url": "saas/audio-waveform-chapter-studio.html", "badge": "Audio"}, {"id": "wcag-contrast-accessibility-suite", "name": "WCAG 2.2 Accessibility & Contrast Suite", "cat": "MEDIA", "catName": "Media & Creative", "icon": "contrast", "desc": "APCA & WCAG contrast calculation, colorblindness simulation (Protanopia, Deuteranopia), and UI audits.", "url": "saas/wcag-contrast-accessibility-suite.html", "badge": "Design"}, {"id": "vector-qr-studio-vcard", "name": "Vector QR Studio & Sovereign vCard Generator", "cat": "MEDIA", "catName": "Media & Creative", "icon": "qr-code", "desc": "High-resolution SVG and PNG exports up to 2048px, vCard contact cards, and WiFi QR codes.", "url": "saas/vector-qr-studio-vcard.html", "badge": "QR"}, {"id": "cleanwrite-pro-editor", "name": "CleanWrite Prose & Readability Sentinel", "cat": "MEDIA", "catName": "Media & Creative", "icon": "feather", "desc": "Airgapped document editor with Flesch-Kincaid scoring, passive voice detector, and sentence trimmer.", "url": "saas/cleanwrite-pro-editor.html", "badge": "Writing"}, {"id": "aspect_ratio_calculator", "name": "Aspect Ratio & Screen Resolution Studio", "cat": "MEDIA", "catName": "Media & Creative", "icon": "maximize-2", "desc": "Compute 16:9, 4:3, 21:9 ultra-wide scalings, pixel density (PPI), and video crop dimensions.", "url": "saas/aspect_ratio_calculator.html", "badge": "Display"}, {"id": "global_macro_resource_rebalancer", "name": "Planetary Macro Resource Rebalancer", "cat": "SCIENCE", "catName": "Science & Academic", "icon": "globe", "desc": "Supply chain deadlock & global grain-energy parity solver with ZK proof verification.", "url": "saas/global_macro_resource_rebalancer.html", "badge": "Faculty 1"}, {"id": "global_compute_energy_optimizer", "name": "Global Compute Energy Optimizer", "cat": "SCIENCE", "catName": "Science & Academic", "icon": "zap", "desc": "VRAM and compute allocator across planetary clusters with dynamic thermodynamics.", "url": "saas/global_compute_energy_optimizer.html", "badge": "Faculty 2"}, {"id": "global_pathogen_early_warning", "name": "Planetary Pathogen Early Warning", "cat": "SCIENCE", "catName": "Science & Academic", "icon": "shield-plus", "desc": "Biosafety protocols & pandemic signal detector with epidemiological reproduction (R0) modeling.", "url": "saas/global_pathogen_early_warning.html", "badge": "Faculty 3"}, {"id": "universal_pedagogy_accelerator", "name": "Universal Pedagogy Accelerator", "cat": "SCIENCE", "catName": "Science & Academic", "icon": "book-open", "desc": "AI-driven adaptive learning & Socratic logic curriculum synthesizer.", "url": "saas/universal_pedagogy_accelerator.html", "badge": "Faculty 4"}, {"id": "zk_governance_proof_sentinel", "name": "ZK Governance Proof Sentinel", "cat": "SCIENCE", "catName": "Science & Academic", "icon": "lock", "desc": "Zero-knowledge anti-corruption audit terminal for verifiable planetary governance.", "url": "saas/zk_governance_proof_sentinel.html", "badge": "Faculty 5"}, {"id": "fusion_solar_grid_architect", "name": "Fusion-Solar Grid Architect", "cat": "SCIENCE", "catName": "Science & Academic", "icon": "sun", "desc": "Clean energy microgrid planning, tokamak magnetic confinement, and carbon audit array.", "url": "saas/fusion_solar_grid_architect.html", "badge": "Faculty 6"}, {"id": "cell_doubling_time_growth_rate", "name": "Cell Doubling Time & Growth Rate Calculator", "cat": "SCIENCE", "catName": "Science & Academic", "icon": "dna", "desc": "Calculate cell proliferation growth rates, generation time, and log-phase kinetics for biology labs.", "url": "saas/cell_doubling_time_growth_rate.html", "badge": "BioLab"}, {"id": "centrifuge_rcf_rpm_converter", "name": "Centrifuge RCF & RPM Converter", "cat": "SCIENCE", "catName": "Science & Academic", "icon": "rotate-cw", "desc": "Convert Relative Centrifugal Force (g-force) to RPM based on rotor radius in millimeters.", "url": "saas/centrifuge_rcf_rpm_converter.html", "badge": "Physics"}, {"id": "bayes_theorem_posterior_updater", "name": "Bayesian Posterior Probability Studio", "cat": "SCIENCE", "catName": "Science & Academic", "icon": "binary", "desc": "Interactive prior odds and likelihood ratio updater for scientific hypothesis testing.", "url": "saas/bayes_theorem_posterior_updater.html", "badge": "Math"}];
+
+    // State
+    let currentCategory = "ALL";
+    let searchQuery = "";
+
+    // Local Storage Keys
+    const KEY_FAVORITES = "genesis_user_favorites";
+    const KEY_HISTORY = "genesis_user_history";
+    const KEY_TOKENS = "genesis_user_tokens";
+    const KEY_USER = "genesis_current_user";
+
+    // Initialize on DOM ready
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      initStorageEstimate();
+      syncUserProfile();
+      renderQuickLaunch();
+      renderTools();
+      renderFavorites();
+      renderHistory();
+      renderTokens();
+      updateBadges();
+
+      // Keyboard shortcuts
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+          e.preventDefault();
+          focusSearch();
+        }
+      });
+    });
+
+    // Sidebar View Navigation
+    function switchView(viewName) {
+      const views = ["overview", "launchpad", "favorites", "activity", "tokens", "sandbox", "account"];
+      views.forEach(v => {
+        const el = document.getElementById("view-" + v);
+        const navEl = document.getElementById("nav-" + v);
+        if (el) el.classList.add("hidden");
+        if (navEl) navEl.classList.remove("nav-active");
+      });
+
+      const targetEl = document.getElementById("view-" + viewName);
+      const targetNav = document.getElementById("nav-" + viewName);
+      if (targetEl) targetEl.classList.remove("hidden");
+      if (targetNav) targetNav.classList.add("nav-active");
+
+      // Update breadcrumb
+      const breadcrumb = document.getElementById("breadcrumbCurrent");
+      if (breadcrumb) {
+        breadcrumb.textContent = viewName.charAt(0).toUpperCase() + viewName.slice(1);
+      }
+
+      // Re-render specific views if needed
+      if (viewName === "favorites") renderFavorites();
+      if (viewName === "activity") renderHistory();
+      if (viewName === "tokens") renderTokens();
+
+      lucide.createIcons();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleMobileSidebar() {
+      const sb = document.getElementById("appSidebar");
+      const overlay = document.getElementById("sidebarOverlay");
+      if (sb.classList.contains("-translate-x-full")) {
+        sb.classList.remove("-translate-x-full");
+        overlay.classList.remove("hidden");
+      } else {
+        sb.classList.add("-translate-x-full");
+        overlay.classList.add("hidden");
+      }
+    }
+
+    function focusSearch() {
+      switchView("launchpad");
+      setTimeout(() => {
+        const input = document.getElementById("toolsSearchInput");
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }, 100);
+    }
+
+    function clearSearch() {
+      const input = document.getElementById("toolsSearchInput");
+      if (input) {
+        input.value = "";
+        searchQuery = "";
+        renderTools();
+      }
+    }
+
+    // User Profile Sync (Firebase & Local)
+    function syncUserProfile() {
+      try {
+        const raw = localStorage.getItem(KEY_USER);
+        if (raw) {
+          const u = JSON.parse(raw);
+          const name = u.displayName || (u.email ? u.email.split('@')[0] : "Researcher");
+          const email = u.email || "cloud_user@vastuda.net";
+          const initial = name.charAt(0).toUpperCase();
+
+          document.getElementById("userDisplayName").textContent = name;
+          document.getElementById("userEmailBadge").textContent = email;
+          document.getElementById("heroUserName").textContent = name;
+          document.getElementById("accName").textContent = name;
+          document.getElementById("accEmail").textContent = email;
+          document.getElementById("accUid").textContent = u.uid || "cloud_uid_" + Math.floor(Math.random()*10000);
+          document.getElementById("accProvider").textContent = u.provider || "Firebase Cloud";
+          document.getElementById("accLoginAt").textContent = u.loginAt ? new Date(u.loginAt).toLocaleTimeString() : "Just now";
+
+          const avEl = document.getElementById("userAvatarContainer");
+          const accAvEl = document.getElementById("accAvatar");
+          if (u.photoURL) {
+            avEl.innerHTML = `<img src="${u.photoURL}" class="w-full h-full object-cover">`;
+            accAvEl.innerHTML = `<img src="${u.photoURL}" class="w-full h-full object-cover">`;
+          } else {
+            avEl.textContent = initial;
+            accAvEl.textContent = initial;
+          }
+
+          document.getElementById("accBadge").innerHTML = `<span class="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30">CLOUD VERIFIED</span>`;
+          document.getElementById("btnAuthAction").innerHTML = `<i data-lucide="log-out" class="w-4 h-4 text-red-400"></i>`;
+          document.getElementById("btnAuthAction").title = "Sign Out";
+        }
+      } catch (e) {
+        console.error("Profile sync error", e);
+      }
+      lucide.createIcons();
+    }
+
+    function handleUserAuthAction() {
+      const raw = localStorage.getItem(KEY_USER);
+      if (raw) {
+        signOutUser();
+      } else {
+        window.location.href = "auth.html";
+      }
+    }
+
+    function signOutUser() {
+      localStorage.removeItem(KEY_USER);
+      try {
+        if (window.firebase && window.firebase.auth) {
+          window.firebase.auth().signOut().catch(() => {});
+        }
+      } catch {}
+      window.location.reload();
+    }
+
+    // Favorites Logic
+    function getFavorites() {
+      try {
+        const raw = localStorage.getItem(KEY_FAVORITES);
+        return raw ? JSON.parse(raw) : [];
+      } catch { return []; }
+    }
+
+    function toggleFavorite(toolId, event) {
+      if (event) event.stopPropagation();
+      let favs = getFavorites();
+      if (favs.includes(toolId)) {
+        favs = favs.filter(id => id !== toolId);
+      } else {
+        favs.push(toolId);
+      }
+      localStorage.setItem(KEY_FAVORITES, JSON.stringify(favs));
+      updateBadges();
+      renderTools();
+      renderFavorites();
+      renderQuickLaunch();
+    }
+
+    function isFavorite(toolId) {
+      return getFavorites().includes(toolId);
+    }
+
+    function clearAllFavorites() {
+      if (confirm("Clear all your bookmarked tools?")) {
+        localStorage.removeItem(KEY_FAVORITES);
+        updateBadges();
+        renderFavorites();
+        renderTools();
+      }
+    }
+
+    // Run History Tracking
+    function getRunHistory() {
+      try {
+        const raw = localStorage.getItem(KEY_HISTORY);
+        return raw ? JSON.parse(raw) : [];
+      } catch { return []; }
+    }
+
+    function logToolExecution(toolId) {
+      const tool = MASTER_TOOLS.find(t => t.id === toolId);
+      if (!tool) return;
+      let history = getRunHistory();
+      // Unshift new execution
+      history.unshift({
+        id: tool.id,
+        name: tool.name,
+        url: tool.url,
+        icon: tool.icon,
+        time: new Date().toISOString()
+      });
+      // Keep last 30
+      if (history.length > 30) history = history.slice(0, 30);
+      localStorage.setItem(KEY_HISTORY, JSON.stringify(history));
+      updateBadges();
+      renderHistory();
+    }
+
+    function launchTool(toolId, url) {
+      logToolExecution(toolId);
+      window.open(url, "_blank");
+    }
+
+    function clearRunHistory() {
+      localStorage.removeItem(KEY_HISTORY);
+      updateBadges();
+      renderHistory();
+    }
+
+    // Filter and Render Tools
+    function selectCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll(".cat-pill").forEach(btn => {
+        if (btn.dataset.cat === cat) {
+          btn.className = "cat-pill px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-semibold shadow-sm transition";
+        } else {
+          btn.className = "cat-pill px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition";
+        }
+      });
+      renderTools();
+    }
+
+    function filterTools() {
+      const input = document.getElementById("toolsSearchInput");
+      searchQuery = input ? input.value.toLowerCase().trim() : "";
+      renderTools();
+    }
+
+    function renderTools() {
+      const grid = document.getElementById("toolsGrid");
+      if (!grid) return;
+
+      const filtered = MASTER_TOOLS.filter(t => {
+        const matchCat = (currentCategory === "ALL" || t.cat === currentCategory);
+        const matchSearch = (!searchQuery || 
+          t.name.toLowerCase().includes(searchQuery) || 
+          t.desc.toLowerCase().includes(searchQuery) ||
+          t.catName.toLowerCase().includes(searchQuery)
+        );
+        return matchCat && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-500">
+            <i data-lucide="search-x" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+            <p class="text-sm">No utilities match your search "${searchQuery}".</p>
+            <button onclick="clearSearch()" class="mt-2 text-xs text-indigo-400 hover:underline">Clear filter</button>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = filtered.map(t => {
+        const fav = isFavorite(t.id);
+        const starClass = fav ? "text-amber-400 fill-amber-400" : "text-slate-500 hover:text-amber-400";
+        return `
+          <div class="saas-card p-5 flex flex-col justify-between group">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 uppercase tracking-wider font-semibold">
+                  ${t.badge || t.cat}
+                </span>
+                <button onclick="toggleFavorite('${t.id}', event)" class="p-1.5 rounded-lg hover:bg-slate-800 transition" title="${fav ? 'Remove from bookmarks' : 'Add to bookmarks'}">
+                  <i data-lucide="star" class="w-4 h-4 ${starClass}"></i>
+                </button>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <div class="p-2.5 rounded-xl bg-slate-800/80 text-indigo-400 border border-slate-700/60 group-hover:scale-105 transition-transform shrink-0">
+                  <i data-lucide="${t.icon || 'box'}" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-sm text-white group-hover:text-indigo-300 transition-colors">${t.name}</h3>
+                  <p class="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">${t.desc}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+              <span class="text-[10px] font-mono text-slate-500">100% Client RAM</span>
+              <button onclick="launchTool('${t.id}', '${t.url}')" class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 rounded-lg text-xs font-semibold font-mono flex items-center gap-1.5 transition">
+                <span>Launch</span> <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    function renderFavorites() {
+      const grid = document.getElementById("favoritesGrid");
+      if (!grid) return;
+      const favIds = getFavorites();
+      const favTools = MASTER_TOOLS.filter(t => favIds.includes(t.id));
+
+      if (favTools.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-500 saas-card p-8">
+            <i data-lucide="star-off" class="w-8 h-8 mx-auto mb-2 opacity-50 text-amber-400"></i>
+            <p class="text-sm text-slate-300 font-medium">No bookmarked utilities yet</p>
+            <p class="text-xs text-slate-500 mt-1">Browse the App Launchpad and click the star icon on any tool to pin it here.</p>
+            <button onclick="switchView('launchpad')" class="mt-4 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition">
+              Explore 47 Tools
+            </button>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      grid.innerHTML = favTools.map(t => {
+        return `
+          <div class="saas-card p-5 flex flex-col justify-between border-amber-500/20">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30 uppercase tracking-wider font-semibold">
+                  BOOKMARKED
+                </span>
+                <button onclick="toggleFavorite('${t.id}', event)" class="p-1.5 rounded-lg hover:bg-slate-800 transition" title="Remove bookmark">
+                  <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+                </button>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <div class="p-2.5 rounded-xl bg-slate-800/80 text-amber-400 border border-slate-700/60 shrink-0">
+                  <i data-lucide="${t.icon || 'star'}" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-sm text-white">${t.name}</h3>
+                  <p class="text-xs text-slate-400 mt-1 line-clamp-2">${t.desc}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
+              <span class="text-[10px] font-mono text-slate-500">${t.catName}</span>
+              <button onclick="launchTool('${t.id}', '${t.url}')" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-xs font-semibold font-mono flex items-center gap-1.5 transition">
+                <span>Launch</span> <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    function renderQuickLaunch() {
+      const container = document.getElementById("quickLaunchGrid");
+      if (!container) return;
+
+      // Prefer favorited tools, otherwise pick popular tools
+      let favIds = getFavorites();
+      let picks = MASTER_TOOLS.filter(t => favIds.includes(t.id));
+      if (picks.length < 4) {
+        const defaults = ["devforge-swissknife", "omniconverter-pro", "sql-explainer-index-advisor", "startup-runway-unit-economics"];
+        defaults.forEach(id => {
+          if (!picks.some(p => p.id === id)) {
+            const found = MASTER_TOOLS.find(t => t.id === id);
+            if (found) picks.push(found);
+          }
+        });
+      }
+      picks = picks.slice(0, 4);
+
+      container.innerHTML = picks.map(t => `
+        <div onclick="launchTool('${t.id}', '${t.url}')" class="saas-card p-4 flex items-center gap-3 cursor-pointer group">
+          <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 group-hover:bg-indigo-500/20 transition shrink-0">
+            <i data-lucide="${t.icon || 'zap'}" class="w-4 h-4"></i>
+          </div>
+          <div class="truncate">
+            <div class="font-bold text-xs text-white group-hover:text-indigo-300 transition truncate">${t.name}</div>
+            <div class="text-[10px] text-slate-500 font-mono">${t.catName}</div>
+          </div>
+        </div>
+      `).join("");
+
+      lucide.createIcons();
+    }
+
+    function renderHistory() {
+      const listEl = document.getElementById("activityFullList");
+      const overviewListEl = document.getElementById("overviewActivityList");
+      const history = getRunHistory();
+
+      if (history.length === 0) {
+        if (listEl) listEl.innerHTML = `<div class="py-8 text-center text-slate-500 text-xs">No recorded tool runs yet.</div>`;
+        if (overviewListEl) overviewListEl.innerHTML = `<div class="py-3 text-center text-slate-500 text-xs">No recent tool executions yet. Launch a utility to record activity!</div>`;
+        return;
+      }
+
+      const renderItem = (item) => `
+        <div class="flex items-center justify-between p-3 rounded-lg bg-slate-950/70 border border-slate-800/80 text-xs">
+          <div class="flex items-center gap-3">
+            <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
+              <i data-lucide="${item.icon || 'play'}" class="w-3.5 h-3.5"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-white">${item.name}</div>
+              <div class="text-[10px] font-mono text-slate-500">${new Date(item.time).toLocaleString()}</div>
+            </div>
+          </div>
+          <button onclick="launchTool('${item.id}', '${item.url}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px] font-mono flex items-center gap-1 transition">
+            Re-run <i data-lucide="external-link" class="w-3 h-3"></i>
+          </button>
+        </div>
+      `;
+
+      if (listEl) listEl.innerHTML = history.map(renderItem).join("");
+      if (overviewListEl) overviewListEl.innerHTML = history.slice(0, 4).map(renderItem).join("");
+      lucide.createIcons();
+    }
+
+    // Personal API Tokens Management
+    function getTokens() {
+      try {
+        const raw = localStorage.getItem(KEY_TOKENS);
+        return raw ? JSON.parse(raw) : [
+          { name: "Default Client Token", token: "pat_live_8f7b2c9a1e4d88e0", scopes: ["execute:tools", "read:catalog"], createdAt: new Date().toISOString() }
+        ];
+      } catch { return []; }
+    }
+
+    function renderTokens() {
+      const list = document.getElementById("tokensList");
+      if (!list) return;
+      const tokens = getTokens();
+
+      if (tokens.length === 0) {
+        list.innerHTML = `<div class="p-6 text-center text-xs text-slate-500">No active access tokens. Generate one to interact programmatically.</div>`;
+        return;
+      }
+
+      list.innerHTML = tokens.map((t, idx) => `
+        <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-xs text-white">${t.name}</span>
+              <span class="text-[10px] font-mono text-slate-500">Created ${new Date(t.createdAt).toLocaleDateString()}</span>
+            </div>
+            <div class="flex items-center gap-2 mt-1">
+              <code class="text-[11px] font-mono bg-slate-950 px-2 py-0.5 rounded border border-slate-800 text-emerald-400">${t.token.slice(0, 12)}••••••••${t.token.slice(-4)}</code>
+              <button onclick="copyToken('${t.token}')" class="text-xs text-slate-400 hover:text-white" title="Copy Token"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+            </div>
+            <div class="flex gap-1.5 mt-2">
+              ${(t.scopes || []).map(s => `<span class="text-[9px] font-mono bg-indigo-500/10 text-indigo-300 px-1.5 py-0.2 rounded border border-indigo-500/20">${s}</span>`).join("")}
+            </div>
+          </div>
+          <button onclick="revokeToken(${idx})" class="px-3 py-1 bg-red-950/40 hover:bg-red-900/50 text-red-300 border border-red-900/40 rounded text-xs transition self-start sm:self-center">
+            Revoke
+          </button>
+        </div>
+      `).join("");
+      lucide.createIcons();
+    }
+
+    function openCreateTokenModal() {
+      document.getElementById("createTokenCard").classList.remove("hidden");
+    }
+
+    function closeCreateTokenModal() {
+      document.getElementById("createTokenCard").classList.add("hidden");
+    }
+
+    function generateTokenSubmit() {
+      const nameInput = document.getElementById("newTokenName");
+      const name = nameInput.value.trim() || "My API Key";
+      const scopes = [];
+      if (document.getElementById("scopeExecute").checked) scopes.push("execute:tools");
+      if (document.getElementById("scopeCatalog").checked) scopes.push("read:catalog");
+      if (document.getElementById("scopeHistory").checked) scopes.push("store:history");
+
+      // Random hex token
+      const randomHex = Array.from(crypto.getRandomValues(new Uint8Array(16))).map(b => b.toString(16).padStart(2, '0')).join('');
+      const newToken = "pat_live_" + randomHex;
+
+      let tokens = getTokens();
+      tokens.unshift({
+        name,
+        token: newToken,
+        scopes,
+        createdAt: new Date().toISOString()
+      });
+      localStorage.setItem(KEY_TOKENS, JSON.stringify(tokens));
+      nameInput.value = "";
+      closeCreateTokenModal();
+      renderTokens();
+      alert("Token generated: " + newToken + "\n\nCopy it now! It will be masked in the dashboard.");
+    }
+
+    function copyToken(token) {
+      navigator.clipboard.writeText(token).then(() => {
+        alert("Token copied to clipboard!");
+      });
+    }
+
+    function revokeToken(idx) {
+      if (confirm("Are you sure you want to revoke this token?")) {
+        let tokens = getTokens();
+        tokens.splice(idx, 1);
+        localStorage.setItem(KEY_TOKENS, JSON.stringify(tokens));
+        renderTokens();
+      }
+    }
+
+    function revokeAllTokens() {
+      if (confirm("Revoke all active personal tokens?")) {
+        localStorage.removeItem(KEY_TOKENS);
+        renderTokens();
+      }
+    }
+
+    function clearAllUserData() {
+      if (confirm("Wipe all bookmarks, recent execution logs, and sandbox cache?")) {
+        localStorage.removeItem(KEY_FAVORITES);
+        localStorage.removeItem(KEY_HISTORY);
+        updateBadges();
+        renderFavorites();
+        renderHistory();
+        renderTools();
+        alert("Workspace data wiped successfully.");
+      }
+    }
+
+    // In-Browser Sandbox Logic
+    async function computeSandboxHash() {
+      const input = document.getElementById("sandboxInput").value;
+      const output = document.getElementById("sandboxOutput");
+      if (!input) {
+        output.textContent = "Error: Input is empty.";
+        return;
+      }
+      const enc = new TextEncoder();
+      const hashBuf = await crypto.subtle.digest("SHA-256", enc.encode(input));
+      const hashArray = Array.from(new Uint8Array(hashBuf));
+      const hex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      output.innerHTML = `
+        <div class="text-indigo-300 font-bold mb-1">SHA-256 Digest (Client-Side):</div>
+        <div class="text-white select-all break-all">${hex}</div>
+        <div class="text-slate-500 text-[10px] mt-2">Payload length: ${input.length} bytes &middot; 0 Network Packets Sent</div>
+      `;
+    }
+
+    function prettifySandboxJson() {
+      const input = document.getElementById("sandboxInput");
+      const output = document.getElementById("sandboxOutput");
+      try {
+        const obj = JSON.parse(input.value);
+        input.value = JSON.stringify(obj, null, 2);
+        output.innerHTML = `
+          <div class="text-emerald-400 font-bold mb-1">JSON Validated:</div>
+          <div class="text-slate-300 text-xs">Top-level keys: ${Object.keys(obj).join(", ")}</div>
+        `;
+      } catch (e) {
+        output.innerHTML = `<div class="text-red-400 font-bold">JSON Syntax Error: ${e.message}</div>`;
+      }
+    }
+
+    // Storage Quota Calculator
+    async function initStorageEstimate() {
+      const textEl = document.getElementById("storageQuotaText");
+      const barEl = document.getElementById("storageBar");
+      if (navigator.storage && navigator.storage.estimate) {
+        try {
+          const est = await navigator.storage.estimate();
+          const usedMB = (est.usage / (1024 * 1024)).toFixed(1);
+          const totalMB = (est.quota / (1024 * 1024)).toFixed(0);
+          const pct = Math.min(100, Math.max(5, ((est.usage / est.quota) * 100).toFixed(1)));
+          if (textEl) textEl.textContent = `${usedMB} MB used`;
+          if (barEl) barEl.style.width = `${pct}%`;
+        } catch {
+          if (textEl) textEl.textContent = "Private (Active)";
+        }
+      } else {
+        if (textEl) textEl.textContent = "Private (Active)";
+      }
+    }
+
+    // Badge Counters Update
+    function updateBadges() {
+      const favs = getFavorites();
+      const history = getRunHistory();
+
+      const starBadge = document.getElementById("starredCountBadge");
+      const actBadge = document.getElementById("activityCountBadge");
+      const kpiStar = document.getElementById("kpiStarred");
+      const kpiExec = document.getElementById("kpiExecutions");
+
+      if (starBadge) starBadge.textContent = favs.length;
+      if (actBadge) actBadge.textContent = history.length;
+      if (kpiStar) kpiStar.textContent = favs.length;
+      if (kpiExec) kpiExec.textContent = history.length;
+    }
+  </script>
+</body>
+</html>

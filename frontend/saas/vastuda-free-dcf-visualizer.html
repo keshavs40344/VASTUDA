@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VASTUDA Sovereign DCF & Intrinsic Value Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #030712;
+      color: #f3f4f6;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    input[type=range] {
+      accent-color: #10b981;
+    }
+    .badge-buy { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-hold { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-overvalued { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
+
+  <!-- Header -->
+  <header class="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg shadow-emerald-950">
+          <i data-lucide="trending-up" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm font-bold tracking-tight text-white font-mono">VASTUDA DCF VALUATION PRO</h1>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800/60 text-[10px] font-mono">100% FREE DISRUPTOR</span>
+          </div>
+          <p class="text-[11px] font-mono text-zinc-400">Replaces Simply Wall St & Koyfin ($39–$99/mo) • Zero Paywalls</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="flex bg-zinc-900 border border-zinc-800 rounded-lg p-0.5 text-xs font-mono">
+          <button id="currUSD" onclick="setCurrency('USD')" class="px-2.5 py-1 rounded-md bg-emerald-600 text-white font-bold transition">USD ($)</button>
+          <button id="currINR" onclick="setCurrency('INR')" class="px-2.5 py-1 rounded-md text-zinc-400 hover:text-white transition">INR (₹)</button>
+        </div>
+        <button onclick="exportCSV()" class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-mono flex items-center gap-1.5 transition">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Export CSV</span>
+        </button>
+        <button onclick="copyAnalysis()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold flex items-center gap-1.5 transition">
+          <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+          <span id="copyBtnText">Copy Verdict</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Quick Presets -->
+  <div class="bg-zinc-950/60 border-b border-zinc-900 py-2.5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-2 overflow-x-auto text-xs font-mono">
+      <span class="text-zinc-500 shrink-0">Quick Presets:</span>
+      <button onclick="loadPreset('AAPL')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Apple (AAPL)</button>
+      <button onclick="loadPreset('MSFT')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Microsoft (MSFT)</button>
+      <button onclick="loadPreset('NVDA')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Nvidia (NVDA)</button>
+      <button onclick="loadPreset('GOOGL')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Alphabet (GOOGL)</button>
+      <button onclick="loadPreset('TSLA')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Tesla (TSLA)</button>
+      <button onclick="loadPreset('RELIANCE')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Reliance Ind (NSE)</button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
+
+    <!-- Top Row: Valuation Verdict Hero -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Intrinsic Value -->
+      <div class="glass-panel p-5 rounded-2xl relative overflow-hidden">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Intrinsic Value / Share</span>
+        <div class="text-3xl font-extrabold text-emerald-400 font-mono mt-1" id="vIntrinsic">$238.45</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono">10-Yr Discounted Cash Flow</p>
+      </div>
+
+      <!-- Current Market Price -->
+      <div class="glass-panel p-5 rounded-2xl">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Current Market Price</span>
+        <div class="text-3xl font-extrabold text-white font-mono mt-1" id="vCurrentPrice">$185.00</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono" id="vTickerLabel">Ticker: AAPL</p>
+      </div>
+
+      <!-- Upside / Downside -->
+      <div class="glass-panel p-5 rounded-2xl">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Implied Upside / Margin</span>
+        <div class="text-3xl font-extrabold font-mono mt-1" id="vUpside">+28.89%</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono" id="vMarginOfSafety">Margin of Safety: 22.4%</p>
+      </div>
+
+      <!-- Final Verdict -->
+      <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between">
+        <div>
+          <span class="text-xs font-mono text-zinc-400 uppercase">Algorithm Verdict</span>
+          <div class="mt-2">
+            <span id="verdictBadge" class="px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase badge-buy">STRONG UNDERVALUED</span>
+          </div>
+        </div>
+        <p class="text-[11px] text-zinc-400 font-mono mt-2" id="verdictSummary">Trading below intrinsic value with margin of safety.</p>
+      </div>
+    </div>
+
+    <!-- Main Grid: Inputs Column & Outputs / Charts Column -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: Controls (5 Cols) -->
+      <div class="lg:col-span-5 space-y-5">
+        <div class="glass-panel p-6 rounded-2xl space-y-4">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i>
+              <span>Financial Inputs & Assumptions</span>
+            </h2>
+            <!-- Scenario Buttons -->
+            <div class="flex bg-zinc-900 border border-zinc-800 rounded-lg p-0.5 text-xs font-mono">
+              <button onclick="setScenario('bear')" id="scenBear" class="px-2 py-0.5 rounded text-zinc-400 hover:text-white transition">Bear</button>
+              <button onclick="setScenario('base')" id="scenBase" class="px-2 py-0.5 rounded bg-zinc-800 text-white font-bold transition">Base</button>
+              <button onclick="setScenario('bull')" id="scenBull" class="px-2 py-0.5 rounded text-zinc-400 hover:text-white transition">Bull</button>
+            </div>
+          </div>
+
+          <!-- Live Quote Search Bar -->
+          <div class="p-3 bg-zinc-950/80 rounded-xl border border-zinc-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-mono text-zinc-400 uppercase flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Live Market Feed Connector</span>
+              </span>
+              <span id="liveFeedStatus" class="text-[10px] font-mono text-emerald-400">Ready</span>
+            </div>
+            <div class="flex gap-2">
+              <input type="text" id="liveTickerSearch" placeholder="Type any ticker (e.g. TSLA, NVDA, RELIANCE.NS)..." value="AAPL" onkeydown="if(event.key==='Enter')fetchLiveQuote()" class="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs font-mono text-white uppercase focus:outline-none focus:border-emerald-500">
+              <button onclick="fetchLiveQuote()" id="fetchQuoteBtn" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold transition flex items-center gap-1">
+                <i data-lucide="radio" class="w-3 h-3"></i>
+                <span>Fetch Live</span>
+              </button>
+            </div>
+            <div id="liveQuotePill" class="hidden text-[11px] font-mono text-zinc-400 flex items-center justify-between pt-1 border-t border-zinc-900">
+              <span id="liveQuoteInfo">Price: $319.97</span>
+              <span id="liveQuoteChange" class="text-emerald-400 font-bold">+1.24%</span>
+            </div>
+          </div>
+
+          <!-- Ticker & Company -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-[11px] font-mono text-zinc-400 uppercase">Stock Ticker</label>
+              <input type="text" id="inTicker" value="AAPL" oninput="recalculate()" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500 uppercase mt-1">
+            </div>
+            <div>
+              <label class="text-[11px] font-mono text-zinc-400 uppercase">Current Share Price</label>
+              <input type="number" id="inPrice" value="185.00" step="0.5" oninput="recalculate()" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500 mt-1">
+            </div>
+          </div>
+
+          <!-- FCF & Shares -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-[11px] font-mono text-zinc-400 uppercase">Base FCF (<span class="currSym">$</span>M)</label>
+              <input type="number" id="inFCF" value="108000" step="1000" oninput="recalculate()" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500 mt-1">
+            </div>
+            <div>
+              <label class="text-[11px] font-mono text-zinc-400 uppercase">Shares Outstanding (M)</label>
+              <input type="number" id="inShares" value="15400" step="100" oninput="recalculate()" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500 mt-1">
+            </div>
+          </div>
+
+          <!-- Net Debt -->
+          <div>
+            <div class="flex justify-between items-center">
+              <label class="text-[11px] font-mono text-zinc-400 uppercase">Net Debt (<span class="currSym">$</span>M) <span class="text-zinc-600 text-[10px]">(Total Debt - Cash)</span></label>
+              <span class="text-xs font-mono text-zinc-300" id="valNetDebt">$50,000 M</span>
+            </div>
+            <input type="number" id="inNetDebt" value="50000" step="1000" oninput="recalculate()" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500 mt-1">
+          </div>
+
+          <!-- Sliders Section -->
+          <div class="pt-2 border-t border-zinc-800/80 space-y-4">
+            
+            <!-- Growth Rate 1-5 -->
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <span class="text-zinc-400">FCF Growth Rate (Yr 1-5):</span>
+                <span class="text-emerald-400 font-bold" id="valGrowth1">12.0%</span>
+              </div>
+              <input type="range" id="slGrowth1" min="-10" max="40" step="0.5" value="12" oninput="syncSlider('Growth1')" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer">
+            </div>
+
+            <!-- Growth Rate 6-10 -->
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <span class="text-zinc-400">FCF Growth Rate (Yr 6-10):</span>
+                <span class="text-emerald-400 font-bold" id="valGrowth2">8.0%</span>
+              </div>
+              <input type="range" id="slGrowth2" min="-5" max="30" step="0.5" value="8" oninput="syncSlider('Growth2')" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer">
+            </div>
+
+            <!-- Discount Rate (WACC) -->
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <span class="text-zinc-400">Discount Rate (WACC):</span>
+                <span class="text-cyan-400 font-bold" id="valDiscount">9.0%</span>
+              </div>
+              <input type="range" id="slDiscount" min="5" max="18" step="0.25" value="9" oninput="syncSlider('Discount')" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer">
+            </div>
+
+            <!-- Terminal Growth Rate -->
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <span class="text-zinc-400">Terminal Growth Rate:</span>
+                <span class="text-purple-400 font-bold" id="valTerminal">3.0%</span>
+              </div>
+              <input type="range" id="slTerminal" min="1" max="5" step="0.1" value="3.0" oninput="syncSlider('Terminal')" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer">
+            </div>
+
+            <!-- Desired Margin of Safety -->
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <span class="text-zinc-400">Target Margin of Safety:</span>
+                <span class="text-amber-400 font-bold" id="valMoS">20.0%</span>
+              </div>
+              <input type="range" id="slMoS" min="5" max="40" step="1" value="20" oninput="syncSlider('MoS')" class="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer">
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right Column: Visualization & Breakdown (7 Cols) -->
+      <div class="lg:col-span-7 space-y-5">
+        
+        <!-- Cash Flow Chart -->
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="bar-chart-2" class="w-4 h-4 text-cyan-400"></i>
+              <span>10-Year Cash Flow Projections (Undiscounted vs Discounted PV)</span>
+            </h3>
+            <span class="text-[11px] font-mono text-zinc-500">In Millions (<span class="currSym">$</span>)</span>
+          </div>
+          <div class="h-64 w-full">
+            <canvas id="cashFlowChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Valuation Breakdown Metrics -->
+        <div class="grid grid-cols-3 gap-4">
+          <div class="glass-panel p-4 rounded-xl">
+            <span class="text-[11px] font-mono text-zinc-400">Sum of 10-Yr PVs</span>
+            <div class="text-lg font-bold font-mono text-white mt-1" id="vSumPV">$948,210 M</div>
+          </div>
+          <div class="glass-panel p-4 rounded-xl">
+            <span class="text-[11px] font-mono text-zinc-400">PV of Terminal Value</span>
+            <div class="text-lg font-bold font-mono text-white mt-1" id="vPVTerminal">$2,773,190 M</div>
+          </div>
+          <div class="glass-panel p-4 rounded-xl">
+            <span class="text-[11px] font-mono text-zinc-400">Total Enterprise Value</span>
+            <div class="text-lg font-bold font-mono text-emerald-400 mt-1" id="vEV">$3,721,400 M</div>
+          </div>
+        </div>
+
+        <!-- Sensitivity Matrix (Discount Rate vs Terminal Growth) -->
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="grid" class="w-4 h-4 text-purple-400"></i>
+              <span>Sensitivity Matrix: Intrinsic Value per Share</span>
+            </h3>
+            <span class="text-[11px] font-mono text-zinc-400">WACC (Rows) vs Terminal Growth (Cols)</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs font-mono text-center border-collapse" id="matrixTable">
+              <!-- Dynamically populated -->
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="border-t border-zinc-800/80 bg-zinc-950 py-4 text-center text-xs font-mono text-zinc-500">
+    VASTUDA Sovereign Core • 100% Client-Side Privacy • Deterministic Financial Mathematics
+  </footer>
+
+  <script>
+    let currency = 'USD';
+    let currSymbol = '$';
+    let chartInstance = null;
+
+    const PRESETS = {
+      'AAPL': { price: 185.00, fcf: 108000, shares: 15400, netDebt: 50000, g1: 12.0, g2: 8.0, wacc: 9.0, term: 3.0 },
+      'MSFT': { price: 415.00, fcf: 74000, shares: 7430, netDebt: -15000, g1: 15.0, g2: 10.0, wacc: 8.5, term: 3.2 },
+      'NVDA': { price: 118.00, fcf: 39000, shares: 24500, netDebt: -25000, g1: 28.0, g2: 14.0, wacc: 10.5, term: 3.5 },
+      'GOOGL': { price: 175.00, fcf: 70000, shares: 12300, netDebt: -80000, g1: 14.0, g2: 9.0, wacc: 8.8, term: 3.0 },
+      'TSLA': { price: 210.00, fcf: 4500, shares: 3190, netDebt: -18000, g1: 22.0, g2: 12.0, wacc: 11.0, term: 3.0 },
+      'RELIANCE': { price: 3020.00, fcf: 72000, shares: 6760, netDebt: 115000, g1: 13.5, g2: 8.5, wacc: 11.5, term: 4.0 }
+    };
+
+    function setCurrency(curr) {
+      currency = curr;
+      currSymbol = curr === 'USD' ? '$' : '₹';
+      document.querySelectorAll('.currSym').forEach(el => el.innerText = currSymbol);
+      if (curr === 'USD') {
+        document.getElementById('currUSD').className = 'px-2.5 py-1 rounded-md bg-emerald-600 text-white font-bold transition';
+        document.getElementById('currINR').className = 'px-2.5 py-1 rounded-md text-zinc-400 hover:text-white transition';
+      } else {
+        document.getElementById('currINR').className = 'px-2.5 py-1 rounded-md bg-emerald-600 text-white font-bold transition';
+        document.getElementById('currUSD').className = 'px-2.5 py-1 rounded-md text-zinc-400 hover:text-white transition';
+      }
+      recalculate();
+    }
+
+    async function fetchLiveQuote() {
+      const tickerInput = document.getElementById('liveTickerSearch').value.trim().toUpperCase();
+      if (!tickerInput) return;
+
+      const statusEl = document.getElementById('liveFeedStatus');
+      const btn = document.getElementById('fetchQuoteBtn');
+      statusEl.innerText = "Fetching...";
+      statusEl.className = "text-[10px] font-mono text-cyan-400";
+      btn.disabled = true;
+
+      try {
+        let quote = null;
+        // 1. Try local web server quote endpoint
+        try {
+          const res = await fetch(`/api/quote?ticker=${encodeURIComponent(tickerInput)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.price && !data.error) {
+              quote = data;
+            }
+          }
+        } catch (e) {}
+
+        // 2. Fallback to direct Yahoo Finance query if local server not running
+        if (!quote) {
+          try {
+            const url = `https://query1.finance.yahoo.com/v8/finance/chart/${tickerInput}?interval=1d&range=1d`;
+            const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+            if (res.ok) {
+              const raw = await res.json();
+              const meta = raw.chart.result[0].meta;
+              quote = {
+                ticker: tickerInput,
+                price: meta.regularMarketPrice,
+                currency: meta.currency || 'USD',
+                change_pct: ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100
+              };
+            }
+          } catch (e) {}
+        }
+
+        if (quote && quote.price) {
+          document.getElementById('inTicker').value = quote.ticker;
+          document.getElementById('inPrice').value = parseFloat(quote.price).toFixed(2);
+          
+          if (quote.currency === 'INR') {
+            setCurrency('INR');
+          } else {
+            setCurrency('USD');
+          }
+
+          document.getElementById('liveQuoteInfo').innerText = `Live Price: ${currSymbol}${parseFloat(quote.price).toFixed(2)}`;
+          const chg = quote.change_pct ? quote.change_pct.toFixed(2) : '0.00';
+          document.getElementById('liveQuoteChange').innerText = `${quote.change_pct >= 0 ? '+' : ''}${chg}% Today`;
+          document.getElementById('liveQuoteChange').className = quote.change_pct >= 0 ? "text-emerald-400 font-bold" : "text-rose-400 font-bold";
+          document.getElementById('liveQuotePill').classList.remove('hidden');
+
+          statusEl.innerText = "Live Synced";
+          statusEl.className = "text-[10px] font-mono text-emerald-400";
+
+          recalculate();
+        } else {
+          if (PRESETS[tickerInput]) {
+            loadPreset(tickerInput);
+            statusEl.innerText = "Preset Loaded";
+            statusEl.className = "text-[10px] font-mono text-amber-400";
+          } else {
+            statusEl.innerText = "Ticker Not Found";
+            statusEl.className = "text-[10px] font-mono text-rose-400";
+          }
+        }
+      } catch (err) {
+        statusEl.innerText = "Fetch Error";
+        statusEl.className = "text-[10px] font-mono text-rose-400";
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function loadPreset(ticker) {
+      const p = PRESETS[ticker];
+      if (!p) return;
+      document.getElementById('inTicker').value = ticker;
+      document.getElementById('inPrice').value = p.price;
+      document.getElementById('inFCF').value = p.fcf;
+      document.getElementById('inShares').value = p.shares;
+      document.getElementById('inNetDebt').value = p.netDebt;
+      document.getElementById('slGrowth1').value = p.g1;
+      document.getElementById('slGrowth2').value = p.g2;
+      document.getElementById('slDiscount').value = p.wacc;
+      document.getElementById('slTerminal').value = p.term;
+
+      syncSlider('Growth1');
+      syncSlider('Growth2');
+      syncSlider('Discount');
+      syncSlider('Terminal');
+
+      if (ticker === 'RELIANCE') {
+        setCurrency('INR');
+      } else {
+        setCurrency('USD');
+      }
+    }
+
+    function syncSlider(name) {
+      const val = parseFloat(document.getElementById('sl' + name).value);
+      document.getElementById('val' + name).innerText = val.toFixed(1) + '%';
+      recalculate();
+    }
+
+    function setScenario(scen) {
+      ['scenBear', 'scenBase', 'scenBull'].forEach(id => {
+        document.getElementById(id).className = 'px-2 py-0.5 rounded text-zinc-400 hover:text-white transition';
+      });
+      document.getElementById('scen' + scen.charAt(0).toUpperCase() + scen.slice(1)).className = 'px-2 py-0.5 rounded bg-zinc-800 text-white font-bold transition';
+
+      const baseG1 = parseFloat(document.getElementById('slGrowth1').dataset.base || document.getElementById('slGrowth1').value);
+      document.getElementById('slGrowth1').dataset.base = baseG1;
+
+      if (scen === 'bear') {
+        document.getElementById('slGrowth1').value = Math.max(-5, (baseG1 * 0.7)).toFixed(1);
+      } else if (scen === 'bull') {
+        document.getElementById('slGrowth1').value = (baseG1 * 1.35).toFixed(1);
+      } else {
+        document.getElementById('slGrowth1').value = baseG1.toFixed(1);
+      }
+      syncSlider('Growth1');
+    }
+
+    function calculateDCFValue(fcf, shares, netDebt, g1Pct, g2Pct, waccPct, termPct) {
+      const g1 = g1Pct / 100;
+      const g2 = g2Pct / 100;
+      const r = waccPct / 100;
+      const gTerm = termPct / 100;
+
+      if (r <= gTerm) return null;
+
+      let currentFCF = fcf;
+      let sumPV = 0;
+      const projections = [];
+
+      for (let yr = 1; yr <= 10; yr++) {
+        const growth = yr <= 5 ? g1 : g2;
+        currentFCF = currentFCF * (1 + growth);
+        const discountFactor = Math.pow(1 + r, yr);
+        const pv = currentFCF / discountFactor;
+        sumPV += pv;
+        projections.push({
+          year: yr,
+          fcf: currentFCF,
+          pv: pv
+        });
+      }
+
+      const terminalValue = (currentFCF * (1 + gTerm)) / (r - gTerm);
+      const pvTerminal = terminalValue / Math.pow(1 + r, 10);
+      const enterpriseValue = sumPV + pvTerminal;
+      const equityValue = enterpriseValue - netDebt;
+      const intrinsicPerShare = equityValue / shares;
+
+      return {
+        sumPV,
+        terminalValue,
+        pvTerminal,
+        enterpriseValue,
+        equityValue,
+        intrinsicPerShare,
+        projections
+      };
+    }
+
+    function recalculate() {
+      const ticker = document.getElementById('inTicker').value || 'STOCK';
+      const curPrice = parseFloat(document.getElementById('inPrice').value) || 0;
+      const fcf = parseFloat(document.getElementById('inFCF').value) || 0;
+      const shares = parseFloat(document.getElementById('inShares').value) || 1;
+      const netDebt = parseFloat(document.getElementById('inNetDebt').value) || 0;
+
+      const g1 = parseFloat(document.getElementById('slGrowth1').value);
+      const g2 = parseFloat(document.getElementById('slGrowth2').value);
+      const wacc = parseFloat(document.getElementById('slDiscount').value);
+      const term = parseFloat(document.getElementById('slTerminal').value);
+      const mos = parseFloat(document.getElementById('slMoS').value);
+
+      document.getElementById('valNetDebt').innerText = `${currSymbol}${netDebt.toLocaleString()} M`;
+      document.getElementById('vTickerLabel').innerText = `Ticker: ${ticker.toUpperCase()}`;
+      document.getElementById('vCurrentPrice').innerText = `${currSymbol}${curPrice.toFixed(2)}`;
+
+      const res = calculateDCFValue(fcf, shares, netDebt, g1, g2, wacc, term);
+      if (!res || isNaN(res.intrinsicPerShare)) {
+        document.getElementById('vIntrinsic').innerText = 'Err: WACC ≤ Term';
+        return;
+      }
+
+      const intrinsic = res.intrinsicPerShare;
+      document.getElementById('vIntrinsic').innerText = `${currSymbol}${intrinsic.toFixed(2)}`;
+      document.getElementById('vSumPV').innerText = `${currSymbol}${Math.round(res.sumPV).toLocaleString()} M`;
+      document.getElementById('vPVTerminal').innerText = `${currSymbol}${Math.round(res.pvTerminal).toLocaleString()} M`;
+      document.getElementById('vEV').innerText = `${currSymbol}${Math.round(res.enterpriseValue).toLocaleString()} M`;
+
+      // Upside & Margin of Safety
+      const upside = ((intrinsic - curPrice) / curPrice) * 100;
+      const upsideEl = document.getElementById('vUpside');
+      upsideEl.innerText = `${upside >= 0 ? '+' : ''}${upside.toFixed(2)}%`;
+      upsideEl.className = `text-3xl font-extrabold font-mono mt-1 ${upside >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+
+      const buyBelowPrice = intrinsic * (1 - (mos / 100));
+      document.getElementById('vMarginOfSafety').innerText = `Buy Below with ${mos}% MoS: ${currSymbol}${buyBelowPrice.toFixed(2)}`;
+
+      // Verdict
+      const badge = document.getElementById('verdictBadge');
+      const summary = document.getElementById('verdictSummary');
+      if (curPrice <= buyBelowPrice) {
+        badge.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase badge-buy';
+        badge.innerText = 'STRONG BUY / UNDERVALUED';
+        summary.innerText = `Trading at a ${upside.toFixed(1)}% discount with your desired ${mos}% margin of safety buffer.`;
+      } else if (curPrice < intrinsic) {
+        badge.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase badge-hold';
+        badge.innerText = 'MODERATE / FAIR VALUE';
+        summary.innerText = `Trading near fair value. Upside is +${upside.toFixed(1)}%, but inside the margin of safety threshold.`;
+      } else {
+        badge.className = 'px-3 py-1.5 rounded-lg text-xs font-bold font-mono uppercase badge-overvalued';
+        badge.innerText = 'OVERVALUED / TRIM';
+        summary.innerText = `Trading ${(Math.abs(upside)).toFixed(1)}% above DCF intrinsic value. High valuation multiples.`;
+      }
+
+      // Update Chart
+      updateChart(res.projections);
+
+      // Update Sensitivity Matrix
+      buildSensitivityMatrix(fcf, shares, netDebt, g1, g2, wacc, term, curPrice);
+    }
+
+    function updateChart(projections) {
+      const labels = projections.map(p => `Year ${p.year}`);
+      const fcfData = projections.map(p => Math.round(p.fcf));
+      const pvData = projections.map(p => Math.round(p.pv));
+
+      if (chartInstance) {
+        chartInstance.data.labels = labels;
+        chartInstance.data.datasets[0].data = fcfData;
+        chartInstance.data.datasets[1].data = pvData;
+        chartInstance.update();
+        return;
+      }
+
+      const ctx = document.getElementById('cashFlowChart').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Undiscounted FCF',
+              data: fcfData,
+              backgroundColor: 'rgba(56, 189, 248, 0.4)',
+              borderColor: '#38bdf8',
+              borderWidth: 1
+            },
+            {
+              label: 'Discounted PV',
+              data: pvData,
+              backgroundColor: 'rgba(16, 185, 129, 0.6)',
+              borderColor: '#10b981',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: '#9ca3af', font: { family: 'JetBrains Mono', size: 11 } }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#9ca3af', font: { family: 'JetBrains Mono', size: 10 } }
+            },
+            y: {
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: { color: '#9ca3af', font: { family: 'JetBrains Mono', size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    function buildSensitivityMatrix(fcf, shares, netDebt, g1, g2, baseWacc, baseTerm, curPrice) {
+      const table = document.getElementById('matrixTable');
+      const waccOffsets = [-1.5, -0.75, 0, 0.75, 1.5];
+      const termOffsets = [-0.5, 0, 0.5, 1.0];
+
+      let html = '<thead><tr class="text-zinc-500 border-b border-zinc-800"><th class="py-2 px-2 text-left">WACC \\ Term</th>';
+      termOffsets.forEach(to => {
+        const tVal = (baseTerm + to).toFixed(1);
+        html += `<th class="py-2 px-2 text-zinc-300">${tVal}%</th>`;
+      });
+      html += '</tr></thead><tbody>';
+
+      waccOffsets.forEach(wo => {
+        const wVal = (baseWacc + wo).toFixed(2);
+        const isBaseRow = wo === 0;
+        html += `<tr class="border-b border-zinc-900 ${isBaseRow ? 'bg-emerald-950/20' : ''}"><td class="py-2 px-2 text-left font-bold text-zinc-400">${wVal}%</td>`;
+        termOffsets.forEach(to => {
+          const tVal = baseTerm + to;
+          const matrixRes = calculateDCFValue(fcf, shares, netDebt, g1, g2, baseWacc + wo, tVal);
+          if (matrixRes && !isNaN(matrixRes.intrinsicPerShare)) {
+            const val = matrixRes.intrinsicPerShare;
+            const isCheaper = curPrice < val;
+            const isBaseCell = wo === 0 && to === 0;
+            const colorClass = isCheaper ? 'text-emerald-400' : 'text-rose-400';
+            const cellBorder = isBaseCell ? 'border-2 border-emerald-500 rounded font-extrabold' : '';
+            html += `<td class="py-2 px-2 ${colorClass} ${cellBorder}">${currSymbol}${val.toFixed(1)}</td>`;
+          } else {
+            html += `<td class="py-2 px-2 text-zinc-600">N/A</td>`;
+          }
+        });
+        html += '</tr>';
+      });
+
+      html += '</tbody>';
+      table.innerHTML = html;
+    }
+
+    function exportCSV() {
+      const ticker = document.getElementById('inTicker').value;
+      const curPrice = document.getElementById('inPrice').value;
+      const intrinsic = document.getElementById('vIntrinsic').innerText;
+      const upside = document.getElementById('vUpside').innerText;
+      const verdict = document.getElementById('verdictBadge').innerText;
+
+      let csv = "Ticker,CurrentPrice,IntrinsicValue,Upside,Verdict\n";
+      csv += `"${ticker}","${curPrice}","${intrinsic}","${upside}","${verdict}"\n`;
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `DCF_Valuation_${ticker}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function copyAnalysis() {
+      const ticker = document.getElementById('inTicker').value;
+      const curPrice = document.getElementById('inPrice').value;
+      const intrinsic = document.getElementById('vIntrinsic').innerText;
+      const upside = document.getElementById('vUpside').innerText;
+      const verdict = document.getElementById('verdictBadge').innerText;
+      const text = `[VASTUDA DCF Valuation Verdict]\nTicker: ${ticker}\nCurrent Price: ${currSymbol}${curPrice}\nIntrinsic Value: ${intrinsic}\nUpside: ${upside}\nVerdict: ${verdict}\nEngine: 100% Free Sovereign DCF Evaluator`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtnText');
+        btn.innerText = 'Copied!';
+        setTimeout(() => { btn.innerText = 'Copy Verdict'; }, 2000);
+      });
+    }
+
+    window.onload = () => {
+      lucide.createIcons();
+      loadPreset('AAPL');
+    };
+  </script>
+</body>
+</html>

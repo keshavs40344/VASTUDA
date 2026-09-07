@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VASTUDA PhishShield // Sovereign Anti-Scam & Phishing Defense Sentinel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #030712;
+      color: #f3f4f6;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .badge-safe { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-warn { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.5); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
+
+  <!-- Header -->
+  <header class="border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg shadow-emerald-950">
+          <i data-lucide="shield-alert" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm font-bold tracking-tight text-white font-mono">PHISHSHIELD SENTINEL</h1>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800/60 text-[10px] font-mono">DEFENSIVE CYBER AI</span>
+          </div>
+          <p class="text-[11px] font-mono text-zinc-400">100% In-Browser Anti-Phishing, Smishing & Scam URL Diagnostic Guard</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-zinc-400">Airgapped Protection:</span>
+          <span class="text-emerald-400 font-bold">ACTIVE</span>
+        </div>
+        <button onclick="clearAll()" class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 text-xs font-mono transition">
+          Clear
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Quick Presets for Demo -->
+  <div class="bg-zinc-950/60 border-b border-zinc-900 py-2.5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-2 overflow-x-auto text-xs font-mono">
+      <span class="text-zinc-500 shrink-0">Test Scam Samples:</span>
+      <button onclick="loadSample('bank_kyc')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-rose-500/50 text-zinc-300 hover:text-rose-400 transition">Fake Bank KYC Alert</button>
+      <button onclick="loadSample('paypal_invoice')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-rose-500/50 text-zinc-300 hover:text-rose-400 transition">Fake $899 PayPal Invoice</button>
+      <button onclick="loadSample('homograph')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-rose-500/50 text-zinc-300 hover:text-rose-400 transition">Homograph Domain URL</button>
+      <button onclick="loadSample('safe_receipt')" class="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-300 hover:text-emerald-400 transition">Legitimate Receipt (Safe)</button>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
+
+    <!-- Threat Score Banner -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <!-- Risk Score -->
+      <div class="glass-panel p-5 rounded-2xl relative overflow-hidden flex items-center gap-4">
+        <div class="relative w-20 h-20 flex items-center justify-center shrink-0">
+          <svg class="w-20 h-20 transform -rotate-90">
+            <circle cx="40" cy="40" r="32" stroke="#1f2937" stroke-width="6" fill="transparent" />
+            <circle id="riskGauge" cx="40" cy="40" r="32" stroke="#ef4444" stroke-width="6" fill="transparent" stroke-dasharray="201.06" stroke-dashoffset="20" style="transition: stroke-dashoffset 0.8s ease-in-out;" />
+          </svg>
+          <div class="absolute flex flex-col items-center">
+            <span class="text-xl font-extrabold font-mono text-white" id="riskScore">92</span>
+            <span class="text-[9px] font-mono text-zinc-400">/ 100</span>
+          </div>
+        </div>
+        <div>
+          <span class="text-xs font-mono text-zinc-400 uppercase">Threat Level</span>
+          <div class="text-base font-bold font-mono mt-0.5 text-rose-400" id="threatVerdict">CRITICAL SCAM DETECTED</div>
+          <p class="text-[11px] text-zinc-400 mt-1 font-mono" id="flagsSummary">4 Critical Red Flags Found</p>
+        </div>
+      </div>
+
+      <!-- Urgency Triggers -->
+      <div class="glass-panel p-5 rounded-2xl">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Psychological Urgency</span>
+        <div class="text-lg font-bold font-mono mt-1 text-amber-400" id="vUrgencyStatus">High Pressure Detected</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono" id="vUrgencyDetail">Contains 24h deadline / panic threats</p>
+      </div>
+
+      <!-- Impersonation Check -->
+      <div class="glass-panel p-5 rounded-2xl">
+        <span class="text-xs font-mono text-zinc-400 uppercase">Brand Impersonation</span>
+        <div class="text-lg font-bold font-mono mt-1 text-cyan-400" id="vBrandDetected">Target: State Bank / PayPal</div>
+        <p class="text-[11px] text-zinc-400 mt-2 font-mono" id="vSenderMismatch">Sender domain does not match brand</p>
+      </div>
+
+      <!-- Airgapped Privacy Status -->
+      <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono text-zinc-400 uppercase">User Protection</span>
+          <i data-lucide="lock" class="w-4 h-4 text-emerald-400"></i>
+        </div>
+        <div>
+          <div class="text-lg font-bold text-emerald-400 font-mono">100% Client-Side</div>
+          <p class="text-[11px] text-zinc-400 mt-1 font-mono">Your private messages are never sent to any server</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workspace Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: Input Inspectors (7 Cols) -->
+      <div class="lg:col-span-7 space-y-5">
+        
+        <!-- URL Scanner Box -->
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="link" class="w-4 h-4 text-cyan-400"></i>
+              <span>Suspicious URL & Domain Analyzer</span>
+            </h2>
+            <span class="text-[10px] font-mono text-zinc-500">Punycode & Typosquatting Check</span>
+          </div>
+
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <i data-lucide="globe" class="w-4 h-4 text-zinc-500 absolute left-3 top-3"></i>
+              <input type="text" id="inputUrl" placeholder="Enter suspicious link (e.g. http://192.168.1.1/login or http://pаypal-support.xyz)..." oninput="runFullDiagnostic()" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-9 pr-4 py-2.5 text-xs font-mono text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-cyan-500">
+            </div>
+            <button onclick="runFullDiagnostic()" class="px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-xs font-bold transition flex items-center gap-1.5">
+              <i data-lucide="search" class="w-3.5 h-3.5"></i>
+              <span>Inspect</span>
+            </button>
+          </div>
+
+          <div id="urlDiagnosticPill" class="hidden p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-1 text-xs font-mono">
+            <div class="flex justify-between">
+              <span class="text-zinc-400">Extracted Domain:</span>
+              <span class="text-white font-bold" id="diagDomain">-</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-zinc-400">Punycode / Homograph Attack:</span>
+              <span class="text-emerald-400" id="diagPunycode">None Detected</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-zinc-400">SSL / Protocol Security:</span>
+              <span class="text-rose-400" id="diagProtocol">Insecure HTTP</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message / Email Content Analyzer -->
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="mail-warning" class="w-4 h-4 text-amber-400"></i>
+              <span>Email / SMS / WhatsApp Message Body Inspector</span>
+            </h2>
+            <span class="text-[10px] font-mono text-zinc-500">Real-Time Pattern Scanning</span>
+          </div>
+
+          <textarea id="inputText" oninput="runFullDiagnostic()" placeholder="Paste suspicious email text, SMS alert, job offer, or message here..." class="w-full h-48 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-xs font-mono text-zinc-200 placeholder-zinc-500 leading-relaxed focus:outline-none focus:border-amber-500 resize-y"></textarea>
+
+          <!-- Highlighted Text Findings -->
+          <div class="p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-1.5">
+            <span class="text-[11px] font-mono text-zinc-400 uppercase">Visual Threat Heatmap</span>
+            <div id="textHeatmap" class="text-xs text-zinc-300 font-mono leading-relaxed max-h-36 overflow-y-auto whitespace-pre-wrap">
+              Type or paste suspicious text above to see flagged scam indicators...
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Findings & Defensive Action Plan (5 Cols) -->
+      <div class="lg:col-span-5 space-y-5">
+        
+        <!-- Detected Red Flags Checklist -->
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-400"></i>
+              <span>Diagnostic Red Flags</span>
+            </h3>
+            <span class="text-[10px] font-mono text-zinc-500" id="flagsCount">4 Detected</span>
+          </div>
+
+          <div class="space-y-2.5 max-h-72 overflow-y-auto" id="redFlagsContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Safe Defensive Recommendations -->
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+          <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-zinc-800 pb-3">
+            <i data-lucide="life-buoy" class="w-4 h-4 text-emerald-400"></i>
+            <span>Recommended Defensive Actions</span>
+          </h3>
+
+          <div class="space-y-2 text-xs font-mono" id="actionPlanContainer">
+            <div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-900/40 text-emerald-300">
+              <span class="font-bold">1. DO NOT CLICK ANY LINKS:</span> Never enter passwords, OTPs, or bank account numbers from unverified messages.
+            </div>
+            <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300">
+              <span class="font-bold">2. VERIFY INDEPENDENTLY:</span> Open the official bank/service app directly on your phone or type the known domain in your browser.
+            </div>
+            <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300">
+              <span class="font-bold">3. REPORT & BLOCK:</span> Report the sender to anti-phishing authorities (e.g. cybercrime.gov.in / reportphishing@apwg.org) and block the number.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="border-t border-zinc-800/80 bg-zinc-950 py-4 text-center text-xs font-mono text-zinc-500">
+    VASTUDA Sovereign Core • 100% Client-Side Privacy • Deterministic Defensive Security
+  </footer>
+
+  <script>
+    const SAMPLES = {
+      bank_kyc: {
+        url: "http://sbi-kyc-update-portal88.xyz/login.php",
+        text: "URGENT NOTICE: Dear Customer, your State Bank account will be SUSPENDED within 24 hours due to pending KYC verification. Please click the link immediately to update your Aadhaar and PAN details to avoid permanent deactivation: http://sbi-kyc-update-portal88.xyz/login.php. Do not ignore this message."
+      },
+      paypal_invoice: {
+        url: "http://192.168.4.12/paypal/invoice_confirm.html",
+        text: "Invoice #INV-92841 from PayPal Services for $899.00 USD. If you did not make this transaction, call our fraud department immediately at +1-800-555-0199 or click here to cancel order: http://192.168.4.12/paypal/invoice_confirm.html. Failure to respond in 12 hours will finalize billing."
+      },
+      homograph: {
+        url: "https://pаypal.com/security/login", // Cyrillic 'а' (U+0430)
+        text: "Security Alert: An unauthorized login from Russia was detected on your account. Please confirm your credentials immediately at https://pаypal.com/security/login."
+      },
+      safe_receipt: {
+        url: "https://store.steampowered.com/account/history",
+        text: "Thank you for your recent purchase on Steam. Your transaction of $19.99 for Software has been processed successfully. You can view your purchase history at https://store.steampowered.com/account/history anytime."
+      }
+    };
+
+    // Heuristic Pattern Libraries
+    const URGENCY_WORDS = [
+      "immediately", "within 24 hours", "account suspended", "permanent deactivation",
+      "urgent notice", "action required", "unauthorized login", "critical security",
+      "failure to respond", "will be blocked", "restricted immediately", "warning"
+    ];
+
+    const CREDENTIAL_WORDS = [
+      "verify your password", "update your kyc", "enter your otp", "aadhaar details",
+      "pan card details", "confirm your credentials", "verify billing details", "login to cancel"
+    ];
+
+    const FINANCIAL_WORDS = [
+      "invoice", "$899", "refund", "wire transfer", "gift card", "bitcoin", "crypto payment"
+    ];
+
+    const SUSPICIOUS_TLDS = ['.xyz', '.top', '.tk', '.ml', '.ga', '.cf', '.buzz', '.click', '.monster', '.work', '.rest'];
+
+    function loadSample(key) {
+      const s = SAMPLES[key];
+      if (!s) return;
+      document.getElementById('inputUrl').value = s.url;
+      document.getElementById('inputText').value = s.text;
+      runFullDiagnostic();
+    }
+
+    function clearAll() {
+      document.getElementById('inputUrl').value = '';
+      document.getElementById('inputText').value = '';
+      runFullDiagnostic();
+    }
+
+    function checkHomograph(urlStr) {
+      // Check for non-ASCII characters in domain
+      for (let i = 0; i < urlStr.length; i++) {
+        const code = urlStr.charCodeAt(i);
+        if (code > 127) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function runFullDiagnostic() {
+      const rawUrl = document.getElementById('inputUrl').value.trim();
+      const rawText = document.getElementById('inputText').value.trim();
+
+      if (!rawUrl && !rawText) {
+        resetUI();
+        return;
+      }
+
+      let threatScore = 5;
+      const flags = [];
+      let urgencyDetected = false;
+      let credentialDetected = false;
+      let brandFound = "None Detected";
+
+      // 1. Analyze URL
+      if (rawUrl) {
+        document.getElementById('urlDiagnosticPill').classList.remove('hidden');
+        let domain = "";
+        try {
+          const parsed = new URL(rawUrl.startsWith('http') ? rawUrl : 'http://' + rawUrl);
+          domain = parsed.hostname;
+        } catch (e) {
+          domain = rawUrl.split('/')[0];
+        }
+
+        document.getElementById('diagDomain').innerText = domain;
+
+        // Check Homograph / Punycode
+        const hasHomograph = checkHomograph(domain);
+        const punyEl = document.getElementById('diagPunycode');
+        if (hasHomograph) {
+          threatScore += 45;
+          punyEl.innerText = "CRITICAL: Non-ASCII Cyrillic Homograph Detected!";
+          punyEl.className = "text-rose-400 font-bold";
+          flags.push({
+            type: "HOMOGRAPH_ATTACK",
+            title: "Deceptive Lookalike Domain (Homograph Attack)",
+            desc: `The domain uses foreign characters (e.g. Cyrillic 'а') that mimic a legitimate brand like PayPal or Apple.`
+          });
+        } else {
+          punyEl.innerText = "Clean (ASCII)";
+          punyEl.className = "text-emerald-400";
+        }
+
+        // Check Protocol
+        const isHttp = rawUrl.startsWith('http://');
+        const isIp = /^(\d{1,3}\.){3}\d{1,3}/.test(domain);
+        const protoEl = document.getElementById('diagProtocol');
+
+        if (isIp) {
+          threatScore += 40;
+          flags.push({
+            type: "RAW_IP_URL",
+            title: "Direct IP Address Link Detected",
+            desc: `Legitimate institutions use branded domain names, not bare IP addresses (${domain}).`
+          });
+        }
+
+        if (isHttp) {
+          threatScore += 20;
+          protoEl.innerText = "Insecure (HTTP)";
+          protoEl.className = "text-rose-400";
+          flags.push({
+            type: "INSECURE_HTTP",
+            title: "Unencrypted Connection (HTTP)",
+            desc: "The link lacks SSL encryption. Authentic banking/e-commerce services strictly enforce HTTPS."
+          });
+        } else {
+          protoEl.innerText = "Encrypted (HTTPS)";
+          protoEl.className = "text-emerald-400";
+        }
+
+        // Check TLD
+        for (const tld of SUSPICIOUS_TLDS) {
+          if (domain.endsWith(tld)) {
+            threatScore += 30;
+            flags.push({
+              type: "SUSPICIOUS_TLD",
+              title: `High-Risk TLD: ${tld}`,
+              desc: `Free or cheap TLDs (${tld}) are statistically favored by automated phishing kits.`
+            });
+            break;
+          }
+        }
+      } else {
+        document.getElementById('urlDiagnosticPill').classList.add('hidden');
+      }
+
+      // 2. Analyze Text Message
+      const lowerText = rawText.toLowerCase();
+
+      // Check Urgency
+      const foundUrgency = URGENCY_WORDS.filter(w => lowerText.includes(w));
+      if (foundUrgency.length > 0) {
+        urgencyDetected = true;
+        threatScore += Math.min(30, foundUrgency.length * 15);
+        flags.push({
+          type: "URGENCY_TRIGGER",
+          title: "Artificial Time Pressure & Coercion",
+          desc: `Message uses panic phrases: "${foundUrgency.slice(0, 2).join('", "')}". Attackers use panic to prevent rational verification.`
+        });
+      }
+
+      // Check Credential Harvesting
+      const foundCred = CREDENTIAL_WORDS.filter(w => lowerText.includes(w));
+      if (foundCred.length > 0) {
+        credentialDetected = true;
+        threatScore += 35;
+        flags.push({
+          type: "CREDENTIAL_HARVEST",
+          title: "Sensitive Identity & Credential Request",
+          desc: `Asks for private details: "${foundCred.slice(0, 2).join('", "')}". Banks and genuine providers never ask for OTPs or passwords via SMS/email.`
+        });
+      }
+
+      // Brand mentions
+      const BRANDS = ["paypal", "sbi", "state bank", "netflix", "amazon", "apple", "google", "hdfc", "microsoft", "steam"];
+      for (const b of BRANDS) {
+        if (lowerText.includes(b)) {
+          brandFound = b.toUpperCase();
+          break;
+        }
+      }
+
+      threatScore = Math.min(100, threatScore);
+
+      // Update UI Vitals
+      document.getElementById('riskScore').innerText = threatScore;
+      const offset = 201.06 - (201.06 * (threatScore / 100));
+      const gauge = document.getElementById('riskGauge');
+      gauge.style.strokeDashoffset = offset;
+
+      const verdictEl = document.getElementById('threatVerdict');
+      if (threatScore >= 70) {
+        verdictEl.innerText = "CRITICAL SCAM DETECTED";
+        verdictEl.className = "text-base font-bold font-mono mt-0.5 text-rose-400";
+        gauge.setAttribute('stroke', '#ef4444');
+      } else if (threatScore >= 35) {
+        verdictEl.innerText = "SUSPICIOUS PATTERNS FOUND";
+        verdictEl.className = "text-base font-bold font-mono mt-0.5 text-amber-400";
+        gauge.setAttribute('stroke', '#f59e0b');
+      } else {
+        verdictEl.innerText = "LIKELY LEGITIMATE (LOW RISK)";
+        verdictEl.className = "text-base font-bold font-mono mt-0.5 text-emerald-400";
+        gauge.setAttribute('stroke', '#10b981');
+      }
+
+      document.getElementById('flagsSummary').innerText = `${flags.length} Red Flag${flags.length === 1 ? '' : 's'} Identified`;
+      document.getElementById('flagsCount').innerText = `${flags.length} Detected`;
+
+      document.getElementById('vUrgencyStatus').innerText = urgencyDetected ? "High Urgency Coercion" : "Standard Tone";
+      document.getElementById('vUrgencyStatus').className = `text-lg font-bold font-mono mt-1 ${urgencyDetected ? 'text-amber-400' : 'text-emerald-400'}`;
+
+      document.getElementById('vBrandDetected').innerText = `Target: ${brandFound}`;
+
+      // Render Red Flags
+      const cBox = document.getElementById('redFlagsContainer');
+      cBox.innerHTML = '';
+      if (flags.length === 0) {
+        cBox.innerHTML = '<div class="p-3 rounded-xl bg-emerald-950/20 border border-emerald-900/40 text-emerald-300 text-xs font-mono">No obvious phishing or scam markers detected. Always verify sender identity directly.</div>';
+      } else {
+        flags.forEach(f => {
+          const div = document.createElement('div');
+          div.className = 'p-3 rounded-xl bg-zinc-950 border border-zinc-800/80 space-y-1';
+          div.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono border bg-rose-950 text-rose-400 border-rose-800 font-bold">${f.type}</span>
+              <h4 class="text-xs font-bold text-zinc-200 font-mono">${f.title}</h4>
+            </div>
+            <p class="text-[11px] text-zinc-400 font-mono leading-relaxed">${f.desc}</p>
+          `;
+          cBox.appendChild(div);
+        });
+      }
+
+      // Visual Heatmap
+      let highlighted = rawText;
+      URGENCY_WORDS.forEach(w => {
+        const reg = new RegExp(`(${w})`, 'gi');
+        highlighted = highlighted.replace(reg, '<span class="bg-amber-500/30 text-amber-300 px-1 rounded">$1</span>');
+      });
+      CREDENTIAL_WORDS.forEach(w => {
+        const reg = new RegExp(`(${w})`, 'gi');
+        highlighted = highlighted.replace(reg, '<span class="bg-rose-500/30 text-rose-300 px-1 rounded font-bold">$1</span>');
+      });
+      document.getElementById('textHeatmap').innerHTML = highlighted || 'Clean text.';
+
+      lucide.createIcons();
+    }
+
+    function resetUI() {
+      document.getElementById('riskScore').innerText = "0";
+      document.getElementById('riskGauge').style.strokeDashoffset = "201.06";
+      document.getElementById('threatVerdict').innerText = "READY TO AUDIT";
+      document.getElementById('threatVerdict').className = "text-base font-bold font-mono mt-0.5 text-zinc-400";
+      document.getElementById('flagsSummary').innerText = "No content entered";
+      document.getElementById('redFlagsContainer').innerHTML = '<p class="text-zinc-500 text-xs font-mono italic">Enter a URL or message to scan.</p>';
+      document.getElementById('textHeatmap').innerText = "Type or paste suspicious text above...";
+      document.getElementById('urlDiagnosticPill').classList.add('hidden');
+    }
+
+    window.onload = () => {
+      lucide.createIcons();
+      loadSample('bank_kyc');
+    };
+  </script>
+</body>
+</html>
