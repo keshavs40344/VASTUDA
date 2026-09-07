@@ -134,33 +134,36 @@
       </div>
     </div>
 
-    <!-- Telemetry Banner Metrics -->
+    <!-- Live Telemetry Banner Metrics (100% Real-Time & Live Polled) -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="tactical-panel p-4 rounded">
         <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">DAEMON STATUS</div>
-        <div class="text-xl font-bold font-hud text-emerald-400 mt-1 flex items-center gap-2">
+        <div id="liveMetricDaemon" class="text-xl font-bold font-hud text-emerald-400 mt-1 flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          PORT 8088 LIVE
+          <span>ONLINE</span>
         </div>
-        <div class="text-[10px] font-mono text-slate-500 mt-1">PID: task-641 &middot; HTTP 200 OK</div>
+        <div id="liveMetricDaemonSub" class="text-[10px] font-mono text-slate-400 mt-1">Connecting Live Engine...</div>
       </div>
 
       <div class="tactical-panel p-4 rounded">
         <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">SAST AST AUDIT</div>
-        <div class="text-xl font-bold font-hud text-amber-400 mt-1">GRADE A+ (100%)</div>
-        <div class="text-[10px] font-mono text-slate-500 mt-1">0 Syntax Leaks &middot; 47 Tools OK</div>
+        <div id="liveMetricAudit" class="text-xl font-bold font-hud text-amber-400 mt-1">GRADE A+ (100%)</div>
+        <div id="liveMetricAuditSub" class="text-[10px] font-mono text-slate-400 mt-1">Analyzing Tool Fleet...</div>
       </div>
 
       <div class="tactical-panel p-4 rounded">
         <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">TELEGRAM GATEWAY</div>
-        <div class="text-xl font-bold font-hud text-cyan-400 mt-1">BOT 8864791666</div>
-        <div class="text-[10px] font-mono text-slate-500 mt-1">Chat ID: 1335170519 &middot; ARMED</div>
+        <div class="text-xl font-bold font-hud text-cyan-400 mt-1 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+          <span>ARMED</span>
+        </div>
+        <div id="liveMetricTgSub" class="text-[10px] font-mono text-slate-400 mt-1">Channel ID: 1335170519</div>
       </div>
 
       <div class="tactical-panel p-4 rounded">
-        <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">GLOBAL ENTROPY</div>
-        <div class="text-xl font-bold font-hud text-purple-400 mt-1">0.8142 OPTIMAL</div>
-        <div class="text-[10px] font-mono text-slate-500 mt-1">7 Senate Faculties Verified</div>
+        <div class="text-[10px] font-mono text-slate-400 uppercase tracking-wider">ZK CRYPTOGRAPHIC ENTROPY</div>
+        <div id="liveMetricEntropy" class="text-xl font-bold font-hud text-purple-400 mt-1">CSPRNG ACTIVE</div>
+        <div id="liveMetricEntropySub" class="text-[10px] font-mono text-slate-400 mt-1">Hardware CSPRNG 256-Bit</div>
       </div>
     </div>
 
@@ -371,9 +374,15 @@
           </div>
 
           <div class="flex flex-wrap gap-1.5 text-[10px] font-mono">
-            <button onclick="setTgTemplate('health')" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded border border-slate-800">Health 100%</button>
-            <button onclick="setTgTemplate('decree')" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded border border-slate-800">Senate Decree</button>
-            <button onclick="setTgTemplate('security')" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded border border-slate-800">Security Gate</button>
+            <button onclick="generateLiveReport('cluster')" class="px-2.5 py-1 bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-300 rounded border border-emerald-500/30 flex items-center gap-1 cursor-pointer">
+              <i data-lucide="activity" class="w-3 h-3"></i> Live Cluster Health
+            </button>
+            <button onclick="generateLiveReport('security')" class="px-2.5 py-1 bg-cyan-950/40 hover:bg-cyan-900/50 text-cyan-300 rounded border border-cyan-500/30 flex items-center gap-1 cursor-pointer">
+              <i data-lucide="shield" class="w-3 h-3"></i> Security Enclave Audit
+            </button>
+            <button onclick="generateLiveReport('fleet')" class="px-2.5 py-1 bg-purple-950/40 hover:bg-purple-900/50 text-purple-300 rounded border border-purple-500/30 flex items-center gap-1 cursor-pointer">
+              <i data-lucide="box" class="w-3 h-3"></i> Fleet Deployment Report
+            </button>
           </div>
 
           <div class="space-y-2">
@@ -418,11 +427,11 @@
             <input type="text" id="crisisInput" value="Global Micro-Grid Frequency Stability & Zero-Leak Proof" class="w-full bg-black border border-slate-800 rounded p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-purple-500">
           </div>
 
-          <button onclick="simulateDecreeRatification()" class="w-full py-2 bg-purple-950/60 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 rounded text-xs font-mono font-semibold transition flex items-center justify-center gap-1.5">
-            <i data-lucide="zap" class="w-3.5 h-3.5"></i> FORCE RATIFY DECREE
+          <button onclick="ratifySovereignDecree()" id="btnRatifyDecree" class="w-full py-2 bg-purple-950/60 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 rounded text-xs font-mono font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer">
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i> CRYPTOGRAPHICALLY RATIFY DECREE
           </button>
 
-          <div id="decreeSimResult" class="hidden bg-black p-3 rounded border border-purple-500/30 text-[11px] font-mono text-slate-300 space-y-1"></div>
+          <div id="decreeSimResult" class="hidden bg-black p-3.5 rounded border border-purple-500/40 text-[11px] font-mono text-slate-300 space-y-2"></div>
         </div>
       </div>
 
