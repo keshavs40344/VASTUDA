@@ -6,7 +6,9 @@
     "icon": "palette",
     "filename": "glassmorphism_css_palette_generator.html",
     "url": "public/saas/glassmorphism_css_palette_generator.html",
-    "created_at": "2026-09-07T10:35:43Z"
+    "created_at": "2026-09-07T10:35:43Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "OmniConverter Pro (Media & Document Studio)",
@@ -15,7 +17,9 @@
     "icon": "repeat",
     "filename": "omniconverter-pro.html",
     "url": "public/saas/omniconverter-pro.html",
-    "created_at": "2026-09-07T14:20:00Z"
+    "created_at": "2026-09-07T14:20:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "DevForge Swiss-Knife",
@@ -24,7 +28,9 @@
     "icon": "wrench",
     "filename": "devforge-swissknife.html",
     "url": "public/saas/devforge-swissknife.html",
-    "created_at": "2026-09-07T14:20:00Z"
+    "created_at": "2026-09-07T14:20:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Audio Waveform & Podcast Chapter Studio",
@@ -33,7 +39,9 @@
     "icon": "waveform",
     "filename": "audio-waveform-chapter-studio.html",
     "url": "public/saas/audio-waveform-chapter-studio.html",
-    "created_at": "2026-09-07T09:05:00Z"
+    "created_at": "2026-09-07T09:05:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "WCAG 2.2 Accessibility & Contrast Suite",
@@ -42,7 +50,9 @@
     "icon": "eye",
     "filename": "wcag-contrast-accessibility-suite.html",
     "url": "public/saas/wcag-contrast-accessibility-suite.html",
-    "created_at": "2026-09-07T09:00:00Z"
+    "created_at": "2026-09-07T09:00:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "SQL Performance Explainer & Index Advisor",
@@ -51,7 +61,9 @@
     "icon": "database",
     "filename": "sql-explainer-index-advisor.html",
     "url": "public/saas/sql-explainer-index-advisor.html",
-    "created_at": "2026-09-07T08:55:00Z"
+    "created_at": "2026-09-07T08:55:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Startup Runway & Unit Economics Simulator",
@@ -60,7 +72,9 @@
     "icon": "trending-up",
     "filename": "startup-runway-unit-economics.html",
     "url": "public/saas/startup-runway-unit-economics.html",
-    "created_at": "2026-09-07T08:50:00Z"
+    "created_at": "2026-09-07T08:50:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Vector QR Studio & Sovereign vCard Generator",
@@ -69,7 +83,9 @@
     "icon": "qr-code",
     "filename": "vector-qr-studio-vcard.html",
     "url": "public/saas/vector-qr-studio-vcard.html",
-    "created_at": "2026-09-07T08:45:00Z"
+    "created_at": "2026-09-07T08:45:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Webhook JSON Transformer & Visual Pipe",
@@ -78,7 +94,9 @@
     "icon": "workflow",
     "filename": "webhook-json-transformer.html",
     "url": "public/saas/webhook-json-transformer.html",
-    "created_at": "2026-09-07T08:40:00Z"
+    "created_at": "2026-09-07T08:40:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Invoice & Contract Shield Pro",
@@ -87,7 +105,9 @@
     "icon": "receipt",
     "filename": "invoice-contract-shield-pro.html",
     "url": "public/saas/invoice-contract-shield-pro.html",
-    "created_at": "2026-09-07T08:35:00Z"
+    "created_at": "2026-09-07T08:35:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Document Redactor & Privacy Scrubber",
@@ -96,7 +116,9 @@
     "icon": "shield-alert",
     "filename": "pdf-metadata-scrubber-redactor.html",
     "url": "public/saas/pdf-metadata-scrubber-redactor.html",
-    "created_at": "2026-09-07T08:30:00Z"
+    "created_at": "2026-09-07T08:30:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "ATS Resume Matcher & Optimization Studio",
@@ -105,7 +127,9 @@
     "icon": "file-check",
     "filename": "ats-resume-keyword-matcher.html",
     "url": "public/saas/ats-resume-keyword-matcher.html",
-    "created_at": "2026-09-07T08:25:00Z"
+    "created_at": "2026-09-07T08:25:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "CapTable Pro & Equity Dilution Simulator",
@@ -114,7 +138,9 @@
     "icon": "pie-chart",
     "filename": "captable-equity-dilution.html",
     "url": "public/saas/captable-equity-dilution.html",
-    "created_at": "2026-09-07T08:20:00Z"
+    "created_at": "2026-09-07T08:20:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "PhishShield Anti-Scam & Phishing Defense Sentinel",
@@ -123,7 +149,9 @@
     "icon": "shield-alert",
     "filename": "phishshield-scam-sentinel.html",
     "url": "public/saas/phishshield-scam-sentinel.html",
-    "created_at": "2026-09-07T08:15:00Z"
+    "created_at": "2026-09-07T08:15:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "InstantOnPage SEO & Tech Stack Auditor",
@@ -132,7 +160,9 @@
     "icon": "search-check",
     "filename": "instantonpage-seo-auditor.html",
     "url": "public/saas/instantonpage-seo-auditor.html",
-    "created_at": "2026-09-07T08:10:00Z"
+    "created_at": "2026-09-07T08:10:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "CleanWrite Prose & Readability Sentinel",
@@ -141,7 +171,9 @@
     "icon": "feather",
     "filename": "cleanwrite-pro-editor.html",
     "url": "public/saas/cleanwrite-pro-editor.html",
-    "created_at": "2026-09-07T08:10:00Z"
+    "created_at": "2026-09-07T08:10:00Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "VASTUDA Free DCF Visualizer",
@@ -150,7 +182,9 @@
     "icon": "zap",
     "filename": "vastuda-free-dcf-visualizer.html",
     "url": "public/saas/vastuda-free-dcf-visualizer.html",
-    "created_at": "2026-09-07T07:59:38Z"
+    "created_at": "2026-09-07T07:59:38Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Zero-Leakage CSV & JSON Matrix Transcoder",
@@ -159,7 +193,9 @@
     "icon": "file-spreadsheet",
     "filename": "csv_json_matrix_transcoder.html",
     "url": "public/saas/csv_json_matrix_transcoder.html",
-    "created_at": "2026-09-07T07:13:15Z"
+    "created_at": "2026-09-07T07:13:15Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Cron Schedule Visualizer & Human Translator",
@@ -168,7 +204,9 @@
     "icon": "calendar-clock",
     "filename": "cron_expression_visualizer_engine.html",
     "url": "public/saas/cron_expression_visualizer_engine.html",
-    "created_at": "2026-09-07T07:12:50Z"
+    "created_at": "2026-09-07T07:12:50Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Private JWT Token Inspector & Signature Auditor",
@@ -177,7 +215,9 @@
     "icon": "shield-alert",
     "filename": "jwt_token_inspector_sentinel.html",
     "url": "public/saas/jwt_token_inspector_sentinel.html",
-    "created_at": "2026-09-07T07:12:32Z"
+    "created_at": "2026-09-07T07:12:32Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Income Tax Regime Comparator (New vs Old)",
@@ -186,7 +226,9 @@
     "icon": "receipt",
     "filename": "income_tax_regime_comparator_pro.html",
     "url": "public/saas/income_tax_regime_comparator_pro.html",
-    "created_at": "2026-09-07T07:11:18Z"
+    "created_at": "2026-09-07T07:11:18Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Smart SIP & DCA Compound Simulator",
@@ -195,7 +237,9 @@
     "icon": "trending-up",
     "filename": "smart_sip_dca_compound_simulator.html",
     "url": "public/saas/smart_sip_dca_compound_simulator.html",
-    "created_at": "2026-09-07T07:09:56Z"
+    "created_at": "2026-09-07T07:09:56Z",
+    "visible": false,
+    "status": "development"
   },
   {
     "title": "Regex Live Evaluator Pro",
@@ -204,6 +248,8 @@
     "icon": "code-2",
     "filename": "regex_live_evaluator_pro.html",
     "url": "public/saas/regex_live_evaluator_pro.html",
-    "created_at": "2026-09-07T07:08:30Z"
+    "created_at": "2026-09-07T07:08:30Z",
+    "visible": false,
+    "status": "development"
   }
 ]

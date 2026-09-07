@@ -186,6 +186,115 @@ def verify_firebase_token():
 
 # --- Frontend Static Routes ---
 
+
+# ------------------------------------------------------------------------------
+# DYNAMIC SOVEREIGN TOOLS & SERVICES GOVERNANCE API
+# ------------------------------------------------------------------------------
+TOOLS_CATALOG_PATH = os.path.join(FRONTEND_DIR, "tools_catalog.json")
+
+def load_catalog_data():
+    if os.path.exists(TOOLS_CATALOG_PATH):
+        try:
+            with open(TOOLS_CATALOG_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return []
+    return []
+
+def save_catalog_data(data):
+    try:
+        with open(TOOLS_CATALOG_PATH, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+        return True
+    except Exception as e:
+        logger.error(f"Failed to save tools catalog: {e}")
+        return False
+
+@app.route("/api/tools", methods=["GET"])
+def get_public_tools():
+    """
+    Public endpoint: Returns ONLY tools where visible is True.
+    """
+    all_tools = load_catalog_data()
+    visible_tools = [t for t in all_tools if t.get("visible") is True]
+    return jsonify({
+        "status": "success",
+        "count": len(visible_tools),
+        "tools": visible_tools
+    }), 200
+
+@app.route("/api/admin/tools", methods=["GET"])
+def get_admin_tools():
+    """
+    Admin endpoint: Returns ALL tools with their visibility state.
+    """
+    all_tools = load_catalog_data()
+    return jsonify({
+        "status": "success",
+        "total_count": len(all_tools),
+        "visible_count": sum(1 for t in all_tools if t.get("visible") is True),
+        "tools": all_tools
+    }), 200
+
+@app.route("/api/admin/tools/toggle", methods=["POST"])
+def toggle_admin_tool():
+    """
+    Admin endpoint: Toggle visibility for a tool by filename or title.
+    """
+    payload = request.get_json() or {}
+    tool_id = payload.get("id") or payload.get("filename")
+    target_state = payload.get("visible")
+
+    if not tool_id:
+        return jsonify({"status": "error", "message": "Tool id/filename required"}), 400
+
+    all_tools = load_catalog_data()
+    updated = False
+    for t in all_tools:
+        if t.get("filename") == tool_id or t.get("title") == tool_id or t.get("id") == tool_id:
+            if target_state is not None:
+                t["visible"] = bool(target_state)
+            else:
+                t["visible"] = not t.get("visible", False)
+            t["status"] = "live" if t["visible"] else "development"
+            updated = True
+            break
+
+    if updated:
+        save_catalog_data(all_tools)
+        return jsonify({
+            "status": "success",
+            "message": f"Tool '{tool_id}' visibility updated",
+            "visible_count": sum(1 for t in all_tools if t.get("visible") is True)
+        }), 200
+    else:
+        return jsonify({"status": "error", "message": f"Tool '{tool_id}' not found"}), 404
+
+@app.route("/api/admin/tools/bulk", methods=["POST"])
+def bulk_admin_tools():
+    """
+    Admin endpoint: Bulk hide or publish all tools.
+    """
+    payload = request.get_json() or {}
+    action = payload.get("action") # "hide_all" or "publish_all"
+
+    all_tools = load_catalog_data()
+    if action == "hide_all":
+        for t in all_tools:
+            t["visible"] = False
+            t["status"] = "development"
+    elif action == "publish_all":
+        for t in all_tools:
+            t["visible"] = True
+            t["status"] = "live"
+
+    save_catalog_data(all_tools)
+    return jsonify({
+        "status": "success",
+        "action": action,
+        "visible_count": sum(1 for t in all_tools if t.get("visible") is True)
+    }), 200
+
 @app.route("/admin")
 @app.route("/admin-dashboard.html")
 def serve_admin():

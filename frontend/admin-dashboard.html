@@ -164,6 +164,81 @@
       </div>
     </div>
 
+    
+    <!-- ========================================================================= -->
+    <!-- SOVEREIGN TOOLS & SERVICES GOVERNANCE MATRIX (PUBLIC SITE VISIBILITY) -->
+    <!-- ========================================================================= -->
+    <div class="tactical-panel p-6 rounded-xl border border-amber-500/30 space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-amber-500/20 pb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+            <h2 class="font-hud font-bold text-lg text-white tracking-wide">
+              PUBLIC SITE SERVICES &amp; TOOLS GOVERNANCE
+            </h2>
+          </div>
+          <p class="text-xs font-mono text-slate-400 mt-1">
+            Toggle which tools are published live on the public homepage vs kept private in development.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+          <div class="px-3 py-1.5 rounded bg-black/60 border border-white/10 flex items-center gap-2">
+            <span class="text-slate-400">Public Live:</span>
+            <span id="govVisibleCount" class="font-bold text-emerald-400">0</span>
+            <span class="text-slate-600">/</span>
+            <span id="govTotalCount" class="text-slate-400">0</span>
+          </div>
+          <button onclick="ToolGovernance.bulkAction('hide_all')" class="px-3 py-1.5 rounded bg-red-950/40 hover:bg-red-900/50 text-red-300 border border-red-500/30 transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="eye-off" class="w-3.5 h-3.5"></i> Hide All from Public
+          </button>
+          <button onclick="ToolGovernance.bulkAction('publish_all')" class="px-3 py-1.5 rounded bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-300 border border-emerald-500/30 transition flex items-center gap-1.5 cursor-pointer">
+            <i data-lucide="eye" class="w-3.5 h-3.5"></i> Publish All
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters & Search -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <button onclick="ToolGovernance.setFilter('all')" id="govFilter-all" class="px-3 py-1 rounded text-xs font-mono bg-amber-500 text-black font-bold">All Tools</button>
+          <button onclick="ToolGovernance.setFilter('visible')" id="govFilter-visible" class="px-3 py-1 rounded text-xs font-mono bg-slate-800 text-slate-400 hover:text-white">Live on Public Site</button>
+          <button onclick="ToolGovernance.setFilter('hidden')" id="govFilter-hidden" class="px-3 py-1 rounded text-xs font-mono bg-slate-800 text-slate-400 hover:text-white">In Development (Hidden)</button>
+        </div>
+
+        <div class="relative">
+          <input 
+            id="govSearchInput" 
+            type="text" 
+            placeholder="Filter tools by title or category..." 
+            oninput="ToolGovernance.render()"
+            class="w-full sm:w-64 px-3 py-1.5 rounded bg-black/60 border border-white/10 text-white text-xs font-mono focus:outline-none focus:border-amber-400"
+          >
+        </div>
+      </div>
+
+      <!-- Tools Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left font-mono text-xs border-collapse">
+          <thead>
+            <tr class="border-b border-white/10 text-slate-400 text-[11px] uppercase">
+              <th class="py-2.5 px-3">Service / Tool</th>
+              <th class="py-2.5 px-3">Category</th>
+              <th class="py-2.5 px-3">File URL</th>
+              <th class="py-2.5 px-3 text-center">Status</th>
+              <th class="py-2.5 px-3 text-right">Public Visibility</th>
+            </tr>
+          </thead>
+          <tbody id="govToolsTableBody" class="divide-y divide-white/5">
+            <tr>
+              <td colspan="5" class="py-8 text-center text-slate-500">Loading sovereign tool catalog...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
     <!-- 3-Column Tactical NOC Operations Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
