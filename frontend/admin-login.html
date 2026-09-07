@@ -237,7 +237,12 @@
         const isAuthorized = isRoot || (adminSnap && adminSnap.exists() && adminSnap.data().role === "admin" && adminSnap.data().isActive === true);
 
         if (isAuthorized) {
-          // Authorized Admin: Store session indicators and forward
+          // Cryptographic Token Storage
+          try {
+            const idToken = await user.getIdToken();
+            sessionStorage.setItem("SOVEREIGN_ID_TOKEN", idToken);
+          } catch(e) {}
+
           sessionStorage.setItem("SOVEREIGN_ADMIN_UNLOCKED", "true");
           sessionStorage.setItem("SOVEREIGN_UNLOCKED_AT", Date.now().toString());
           sessionStorage.setItem("SOVEREIGN_ADMIN_EMAIL", user.email || "");

@@ -2538,15 +2538,16 @@
 
       async function loadCatalog() {
         try {
-          // 1. Check Cloud Firestore / Server Overrides
-          let cloudOverrides = null;
+          // 1. Authoritative Cloud Firestore & Server Governance (Zero Client Spoofing)
+          let cloudOverrides = {};
           if (window.fetchCloudVisibility) {
-            cloudOverrides = await window.fetchCloudVisibility();
+            try {
+              cloudOverrides = await window.fetchCloudVisibility() || {};
+            } catch(e) {}
           }
-          const localOverrides = cloudOverrides || JSON.parse(localStorage.getItem('vastuda_tool_visibility') || '{}');
 
           let raw = [];
-          // Try backend API first
+          // 2. Fetch authoritative public tools from backend
           try {
             const res = await fetch('/api/tools');
             if (res.ok) {
@@ -2555,17 +2556,13 @@
             }
           } catch(e) {}
 
-          // Fallback to tools_catalog.json
-          if (raw.length === 0) {
-            const res2 = await fetch('tools_catalog.json');
-            if (res2.ok) {
-              const allRaw = await res2.json();
-              raw = allRaw.filter(item => {
-                const key = item.filename || item.title;
-                if (key in localOverrides) return localOverrides[key] === true;
-                return item.visible === true;
-              });
-            }
+          // 3. Filter strictly based on verified server / cloud status (ignoring any untrusted client localStorage)
+          if (Object.keys(cloudOverrides).length > 0) {
+            raw = raw.filter(item => {
+              const key = item.filename || item.title;
+              if (key in cloudOverrides) return cloudOverrides[key] === true;
+              return item.visible === true;
+            });
           }
 
           APPS_DATA = raw.map((item, idx) => ({

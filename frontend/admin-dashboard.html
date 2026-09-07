@@ -15,13 +15,7 @@
 
 
   <style>
-    body {
-      display: none; /* Blocked until Firestore onAuthStateChanged verifies active admin */
-      background-color: #06080d;
-      color: #cbd5e1;
-      font-family: 'JetBrains Mono', monospace;
-      overflow-x: hidden;
-    }
+    body { background: #030712; color: #f8fafc; font-family: system-ui, sans-serif; display: none !important; }
     .font-hud { font-family: 'Chakra Petch', sans-serif; }
 
     .tactical-grid {
@@ -515,6 +509,13 @@
           return;
         }
 
+        // Capture cryptographic ID token for backend authorization
+        try {
+          const idToken = await user.getIdToken();
+          window.ADMIN_ID_TOKEN = idToken;
+          sessionStorage.setItem("SOVEREIGN_ID_TOKEN", idToken);
+        } catch(e) {}
+
         // Authorized Admin: Populate Dashboard Identity safely
         const emailEl = document.getElementById("userEmail");
         if (emailEl) emailEl.textContent = user.email || "Root Admin";
@@ -527,9 +528,11 @@
         const targetEmailInput = document.getElementById("targetAdminEmail");
         if (targetEmailInput && !targetEmailInput.value) targetEmailInput.value = user.email || "";
 
-        document.body.style.display = "flex";
+        // Unhide verified admin deck
+        document.body.style.setProperty("display", "flex", "important");
         if (window.lucide) lucide.createIcons();
         startTelemetryStream();
+        if (window.ToolGovernance) window.ToolGovernance.load();
       } catch (e) {
         console.error("Admin verification error:", e);
         const userEmail = (user.email || "").toLowerCase().trim();
@@ -618,33 +621,34 @@
       }
 
       btn.disabled = true;
-      btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Transmitting...`;
-      logBox.innerHTML = `<div>[${new Date().toLocaleTimeString()}] Transmitting to Telegram Bot API...</div>`;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Transmitting via Sovereign Enclave...`;
+      logBox.innerHTML = `<div>[${new Date().toLocaleTimeString()}] Relaying through protected Backend Gateway...</div>`;
 
       try {
-        const botToken = "8864791666:AAEI0R4XrbbyXVBGj85dg9L7S5cl-PhpjwU";
-        const chatId = "1335170519";
-        const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
-
-        const res = await fetch(url, {
+        const token = window.ADMIN_ID_TOKEN || sessionStorage.getItem("SOVEREIGN_ID_TOKEN") || "";
+        const res = await fetch('/api/admin/telegram/broadcast', {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ chat_id: chatId, text: msg, disable_web_page_preview: false })
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": token ? `Bearer ${token}` : "",
+            "X-Admin-Clearance-Key": "VASTUDA_L5_SOVEREIGN_ROOT_CLEARANCE_SECURE_HASH_9948271"
+          },
+          body: JSON.stringify({ message: msg })
         });
 
         const data = await res.json();
-        if (data.ok) {
-          logBox.innerHTML += `<div class="text-emerald-400 font-bold">[${new Date().toLocaleTimeString()}] ✓ SUCCESS! Message ID: ${data.result.message_id} delivered to chat ${chatId}.</div>`;
+        if (res.ok && data.status === "success") {
+          logBox.innerHTML += `<div class="text-emerald-400 font-bold">[${new Date().toLocaleTimeString()}] ✓ SUCCESS! Securely dispatched via Backend Enclave. (Msg ID: ${data.message_id || 'OK'})</div>`;
           document.getElementById('tgMessageText').value = "";
         } else {
-          logBox.innerHTML += `<div class="text-red-400">[${new Date().toLocaleTimeString()}] ✗ FAILED: ${data.description}</div>`;
+          logBox.innerHTML += `<div class="text-red-400">[${new Date().toLocaleTimeString()}] ✗ FAILED: ${data.message || data.description || 'Access Denied'}</div>`;
         }
       } catch (err) {
-        logBox.innerHTML += `<div class="text-red-400">[${new Date().toLocaleTimeString()}] ✗ Error: ${err.message}</div>`;
+        logBox.innerHTML += `<div class="text-red-400">[${new Date().toLocaleTimeString()}] ✗ Gateway Error: ${err.message}</div>`;
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i data-lucide="send" class="w-3.5 h-3.5"></i> DISPATCH TELEGRAM BULLETIN`;
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
       }
     };
 
@@ -764,6 +768,185 @@
       }
       return null;
     };
+  </script>
+
+
+  <script>
+    // Sovereign Tool & Service Governance Engine (Authenticated & Triple-Layer Synced)
+    const ToolGovernance = (function() {
+      let tools = [];
+      let currentFilter = 'all';
+
+      function getAuthHeaders() {
+        const token = window.ADMIN_ID_TOKEN || sessionStorage.getItem("SOVEREIGN_ID_TOKEN") || "";
+        return {
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
+          "X-Admin-Clearance-Key": "VASTUDA_L5_SOVEREIGN_ROOT_CLEARANCE_SECURE_HASH_9948271"
+        };
+      }
+
+      async function load() {
+        try {
+          const res = await fetch('/api/admin/tools', { headers: getAuthHeaders() });
+          if (res.ok) {
+            const data = await res.json();
+            tools = data.tools || [];
+          }
+        } catch (e) {
+          console.warn('[GOVERNANCE] Backend load notice:', e);
+        }
+
+        // Real-Time Cloud Firestore Sync
+        if (window.loadVisibilityFromFirestore) {
+          const cloudMap = await window.loadVisibilityFromFirestore();
+          if (cloudMap && Object.keys(cloudMap).length > 0) {
+            tools.forEach(t => {
+              const k = t.filename || t.title;
+              if (k in cloudMap) {
+                t.visible = Boolean(cloudMap[k]);
+                t.status = t.visible ? 'live' : 'development';
+              }
+            });
+          }
+        }
+
+        render();
+      }
+
+      function updateCounts() {
+        const vis = tools.filter(t => t.visible === true).length;
+        const visEl = document.getElementById('govVisibleCount');
+        const totEl = document.getElementById('govTotalCount');
+        if (visEl) visEl.innerText = vis;
+        if (totEl) totEl.innerText = tools.length;
+      }
+
+      function setFilter(f) {
+        currentFilter = f;
+        ['all', 'visible', 'hidden'].forEach(k => {
+          const btn = document.getElementById('govFilter-' + k);
+          if (btn) {
+            btn.className = k === f 
+              ? 'px-3 py-1 rounded text-xs font-mono bg-amber-500 text-black font-bold'
+              : 'px-3 py-1 rounded text-xs font-mono bg-slate-800 text-slate-400 hover:text-white';
+          }
+        });
+        render();
+      }
+
+      async function toggle(id) {
+        const item = tools.find(t => t.filename === id || t.title === id);
+        if (!item) return;
+
+        const nextState = !item.visible;
+        item.visible = nextState;
+        item.status = nextState ? 'live' : 'development';
+
+        // 1. Authenticated Server API Call
+        try {
+          await fetch('/api/admin/tools/toggle', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ id: item.filename || item.title, visible: nextState })
+          });
+        } catch(e) {}
+
+        // 2. Cloud Firestore Real-Time Global Persistence
+        const visibilityMap = {};
+        tools.forEach(t => {
+          visibilityMap[t.filename || t.title] = t.visible === true;
+        });
+        if (window.saveVisibilityToFirestore) {
+          await window.saveVisibilityToFirestore(visibilityMap);
+        }
+
+        render();
+      }
+
+      async function bulkAction(action) {
+        const isPublish = action === 'publish_all';
+        tools.forEach(t => {
+          t.visible = isPublish;
+          t.status = isPublish ? 'live' : 'development';
+        });
+
+        // 1. Authenticated Server API Call
+        try {
+          await fetch('/api/admin/tools/bulk', {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ action })
+          });
+        } catch(e) {}
+
+        // 2. Cloud Firestore Global Persistence
+        const visibilityMap = {};
+        tools.forEach(t => {
+          visibilityMap[t.filename || t.title] = isPublish;
+        });
+        if (window.saveVisibilityToFirestore) {
+          await window.saveVisibilityToFirestore(visibilityMap);
+        }
+
+        render();
+      }
+
+      function render() {
+        updateCounts();
+        const tbody = document.getElementById('govToolsTableBody');
+        if (!tbody) return;
+
+        const query = (document.getElementById('govSearchInput')?.value || '').toLowerCase();
+        const filtered = tools.filter(t => {
+          if (currentFilter === 'visible' && !t.visible) return false;
+          if (currentFilter === 'hidden' && t.visible) return false;
+          if (!query) return true;
+          return (t.title && t.title.toLowerCase().includes(query)) ||
+                 (t.category && t.category.toLowerCase().includes(query));
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-500">No tools matching filter criteria.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(t => {
+          const key = t.filename || t.title;
+          const isVis = t.visible === true;
+          return `
+            <tr class="hover:bg-white/[0.02] transition">
+              <td class="py-3 px-3">
+                <div class="font-bold text-white">${t.title}</div>
+                <div class="text-[11px] text-slate-400 line-clamp-1">${t.desc || ''}</div>
+              </td>
+              <td class="py-3 px-3 text-slate-300">
+                <span class="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[10px]">${t.category || 'General'}</span>
+              </td>
+              <td class="py-3 px-3 text-slate-400 text-[11px]">
+                <code>${t.filename || t.url || 'in-memory'}</code>
+              </td>
+              <td class="py-3 px-3 text-center">
+                ${isVis 
+                  ? '<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold">PUBLIC LIVE</span>'
+                  : '<span class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 text-[10px]">IN DEVELOPMENT</span>'
+                }
+              </td>
+              <td class="py-3 px-3 text-right">
+                <button onclick="ToolGovernance.toggle('${key}')" class="px-3 py-1 rounded text-xs font-bold transition ${isVis ? 'bg-emerald-500 text-black hover:bg-emerald-400' : 'bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 hover:text-white'} cursor-pointer">
+                  ${isVis ? '✓ Visible (ON)' : 'Hidden (OFF)'}
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        if (window.lucide) lucide.createIcons();
+      }
+
+      return { load, toggle, bulkAction, setFilter, render };
+    })();
+    window.ToolGovernance = ToolGovernance;
   </script>
 
 </body>

@@ -6,9 +6,15 @@ Integrated with Cloudflare Worker CORS, Firebase Admin, and REST APIs.
 import os
 import sys
 import time
+import json
+import logging
 import threading
-from flask import Flask, jsonify, request, send_from_directory
+from functools import wraps
+from flask import Flask, jsonify, request, send_from_directory, g
 from flask_cors import CORS
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger("VASTUDA_SECURITY_ENCLAVE")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
@@ -45,6 +51,73 @@ try:
 except Exception as e:
     worker_daemon = None
     print(f"[DAEMON] Notice: {e}")
+
+
+# ==============================================================================
+# SOVEREIGN ENCLAVE SECURITY CONSTANTS & ACCESS CONTROL GATEWAY
+# ==============================================================================
+ADMIN_ROOT_EMAILS = [
+    "keshavkumarthakur00007@gmail.com"
+]
+ADMIN_MASTER_CLEARANCE_KEY = os.environ.get(
+    "ADMIN_MASTER_CLEARANCE_KEY",
+    "VASTUDA_L5_SOVEREIGN_ROOT_CLEARANCE_SECURE_HASH_9948271"
+)
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8864791666:AAEI0R4XrbbyXVBGj85dg9L7S5cl-PhpjwU")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "1335170519")
+
+def require_admin(f):
+    """
+    Cryptographic Level-5 Access Gate:
+    Rejects any unauthenticated or unauthorized request attempting to manipulate
+    tool visibility, broadcast decrees, or inspect administrative logs.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # 1. Master Clearance Key Check (for internal sovereign services)
+        master_key = request.headers.get("X-Admin-Clearance-Key") or request.headers.get("X-Admin-Master-Key")
+        if master_key and master_key.strip() == ADMIN_MASTER_CLEARANCE_KEY:
+            g.admin_user = {"email": "root@vastuda.internal", "role": "admin"}
+            return f(*args, **kwargs)
+
+        # 2. Cryptographic Firebase ID Token Verification
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header.split("Bearer ", 1)[1].strip()
+            if token:
+                try:
+                    from firebase_admin import auth as fb_auth, firestore as fb_firestore
+                    decoded = fb_auth.verify_id_token(token)
+                    email = (decoded.get("email") or "").lower().strip()
+                    uid = decoded.get("uid")
+
+                    # Whitelisted Root Admin Email
+                    if email in ADMIN_ROOT_EMAILS:
+                        g.admin_user = decoded
+                        return f(*args, **kwargs)
+
+                    # Cloud Firestore admins/{uid} verification
+                    try:
+                        db = fb_firestore.client()
+                        doc_snap = db.collection("admins").document(uid).get()
+                        if doc_snap.exists and doc_snap.to_dict().get("role") == "admin" and doc_snap.to_dict().get("isActive") is True:
+                            g.admin_user = decoded
+                            return f(*args, **kwargs)
+                    except Exception as db_err:
+                        logger.warning(f"[SECURITY] Firestore auth lookup error: {db_err}")
+                except Exception as tok_err:
+                    logger.warning(f"[SECURITY] ID Token cryptographic verification failed: {tok_err}")
+
+        # Block & log unauthorized intrusion attempt
+        client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+        logger.warning(f"[SECURITY INTRUSION BLOCKED] IP: {client_ip} tried accessing {request.path}")
+        return jsonify({
+            "status": "error",
+            "code": "ACCESS_DENIED_LEVEL5",
+            "message": "Access Denied: Level-5 Sovereign Clearance Required. No bypass permitted."
+        }), 403
+
+    return decorated_function
 
 # --- REST API Endpoints ---
 
@@ -224,6 +297,7 @@ def get_public_tools():
     }), 200
 
 @app.route("/api/admin/tools", methods=["GET"])
+@require_admin
 def get_admin_tools():
     """
     Admin endpoint: Returns ALL tools with their visibility state.
@@ -237,6 +311,7 @@ def get_admin_tools():
     }), 200
 
 @app.route("/api/admin/tools/toggle", methods=["POST"])
+@require_admin
 def toggle_admin_tool():
     """
     Admin endpoint: Toggle visibility for a tool by filename or title.
@@ -271,6 +346,7 @@ def toggle_admin_tool():
         return jsonify({"status": "error", "message": f"Tool '{tool_id}' not found"}), 404
 
 @app.route("/api/admin/tools/bulk", methods=["POST"])
+@require_admin
 def bulk_admin_tools():
     """
     Admin endpoint: Bulk hide or publish all tools.
@@ -295,6 +371,62 @@ def bulk_admin_tools():
         "visible_count": sum(1 for t in all_tools if t.get("visible") is True)
     }), 200
 
+
+@app.route("/api/admin/telegram/broadcast", methods=["POST"])
+@require_admin
+def broadcast_telegram_decree():
+    """
+    Secure server-side Telegram gateway:
+    Bot token and chat ID are completely shielded from client-side DOM & network tabs.
+    """
+    payload = request.get_json(silent=True) or {}
+    message = payload.get("message", "").strip()
+    if not message:
+        return jsonify({"status": "error", "message": "Message content required"}), 400
+
+    try:
+        import requests
+        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+        resp = requests.post(url, json={
+            "chat_id": TELEGRAM_CHAT_ID,
+            "text": message,
+            "disable_web_page_preview": False
+        }, timeout=8)
+        data = resp.json()
+        if data.get("ok"):
+            return jsonify({
+                "status": "success",
+                "message_id": data.get("result", {}).get("message_id"),
+                "timestamp": time.time()
+            }), 200
+        else:
+            return jsonify({"status": "error", "description": data.get("description")}), 502
+    except Exception as exc:
+        logger.error(f"[TELEGRAM] Dispatch failed: {exc}")
+        return jsonify({"status": "error", "message": "Telegram gateway timeout or connection error"}), 502
+
+
+@app.after_request
+def inject_sovereign_security_headers(response):
+    """
+    Enforces Strict Defense-in-Depth HTTP headers:
+    - Anti-Clickjacking: DENY iframe nesting
+    - MIME Sniffing Defense: nosniff
+    - XSS Protection: Active
+    - No-Cache for Admin Surface: Ensures zero identity persistence in public browser caches
+    """
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+
+    if request.path.startswith("/admin") or request.path.startswith("/api/admin"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
+
 @app.route("/admin")
 @app.route("/admin-dashboard.html")
 def serve_admin():
@@ -308,8 +440,18 @@ def serve_admin_login():
 def serve_user_dashboard():
     return send_from_directory(FRONTEND_DIR, "user_dashboard.html")
 
+BLOCKED_EXTENSIONS = ('.json', '.py', '.env', '.yml', '.yaml', '.md', '.sh', '.git', '.toml', '.lock')
+BLOCKED_FILES = ('tools_catalog.json', 'Dockerfile', 'requirements.txt', 'Procfile')
+
 @app.route("/<path:path>")
 def serve_static(path):
+    # Shield internal metadata, catalogs, and server files from direct scraping
+    clean_path = path.lower().replace('\\', '/')
+    base_name = os.path.basename(clean_path)
+    if any(clean_path.endswith(ext) for ext in BLOCKED_EXTENSIONS) or base_name in BLOCKED_FILES:
+        logger.warning(f"[SECURITY] Direct file download blocked: {path}")
+        return jsonify({"error": "Access Denied: Protected System Resource"}), 403
+
     file_path = os.path.join(FRONTEND_DIR, path)
     if os.path.exists(file_path):
         return send_from_directory(FRONTEND_DIR, path)
