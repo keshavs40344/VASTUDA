@@ -309,44 +309,11 @@
           </div>
         </a>
 
-        <!-- Center: Quick Search Trigger & Core Links -->
-        <div class="hidden md:flex items-center space-x-3 text-xs font-mono">
-          <!-- Quick Search Button -->
-          <button onclick="document.getElementById('heroSearchInput').focus(); document.getElementById('heroSearchInput').scrollIntoView({behavior: 'smooth', block: 'center'});" class="flex items-center space-x-2.5 px-3 py-1.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-emerald-500/40 text-slate-400 hover:text-slate-200 transition group cursor-pointer">
-            <i data-lucide="search" class="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform"></i>
-            <span class="text-[11px]">Search 47 tools...</span>
-            <kbd class="px-1.5 py-0.5 rounded bg-black/50 border border-white/10 text-[9px] text-slate-400 font-mono">⌘K</kbd>
-          </button>
-
-          <!-- Core Navigation Links -->
-          <a href="#catalogue" class="hover:text-emerald-400 text-slate-300 transition-colors flex items-center gap-1.5 py-1 px-2.5 rounded-lg hover:bg-white/5">
-            <i data-lucide="cpu" class="w-3.5 h-3.5 text-emerald-400"></i>
-            <span>Utilities (47)</span>
-          </a>
-          <a href="#sandbox" class="hover:text-cyan-400 text-slate-300 transition-colors flex items-center gap-1.5 py-1 px-2.5 rounded-lg hover:bg-white/5">
-            <i data-lucide="terminal" class="w-3.5 h-3.5 text-cyan-400"></i>
-            <span>Sandbox</span>
-          </a>
-
-          <!-- Active Privacy Badge -->
-          <div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-400">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>100% In-Browser</span>
-          </div>
-        </div>
-
-        <!-- Right: Action & Ultra-Futuristic Sign Up -->
-        <div class="flex items-center space-x-2.5 sm:space-x-3">
-          <button onclick="GenesisAuth.openModal('login')" class="text-xs font-mono text-slate-300 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition">
-            Log In
-          </button>
-
-          <button onclick="GenesisAuth.openModal('register')" class="relative group px-4 sm:px-5 py-1.5 sm:py-2 rounded-xl text-xs font-mono font-bold text-slate-950 overflow-hidden transition-all duration-300 hover:scale-[1.03] shadow-lg shadow-emerald-500/25 cursor-pointer">
-            <span class="absolute inset-0 bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 group-hover:from-emerald-300 group-hover:to-cyan-300 transition-all"></span>
-            <span class="relative flex items-center gap-1.5">
-              <span>Sign Up Free</span>
-              <span class="text-[10px] group-hover:translate-x-0.5 transition-transform">⚡</span>
-            </span>
+        <!-- Right: ONLY Log In (Ultra-Futuristic Sleek Button) -->
+        <div class="flex items-center space-x-3">
+          <button onclick="GenesisAuth.openModal('login')" class="relative group px-5 py-2 rounded-xl text-xs sm:text-sm font-mono font-semibold text-white bg-slate-900/90 hover:bg-slate-800 border border-emerald-500/40 hover:border-emerald-400 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/25 transition-all duration-200 flex items-center gap-2 cursor-pointer">
+            <i data-lucide="log-in" class="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-0.5 transition-transform"></i>
+            <span>Log In</span>
           </button>
           <div id="genesisAuthWidget" class="hidden"></div>
         </div>
