@@ -1,102 +1,110 @@
 """
-VASTUDA SaaS Core - FastAPI Production Web Server
-Serves the frontend static assets and exposes REST APIs for cloud agents.
+VASTUDA SaaS Core - Flask & Gunicorn Production Web Server
+Integrated with Firebase Admin SDK, REST APIs, and static frontend routing.
 """
 
 import os
 import time
-import asyncio
-from typing import Dict, Any
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.middleware.cors import CORSMiddleware
-from core.daemons import BackgroundWorkerDaemon
-
-app = FastAPI(
-    title="VASTUDA Autonomous SaaS Engine",
-    description="Production-grade API and Web Server with Background Daemons",
-    version="2.0.0"
-)
-
-# Enable CORS for cross-origin clients and Cloudflare CDN
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+import threading
+from flask import Flask, jsonify, request, send_from_directory
+import requests
+import firebase_admin
+from firebase_admin import credentials, auth as fb_auth, firestore as fb_firestore
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 
+app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
+
+# Initialize Firebase Admin SDK if not already initialized
+try:
+    if not firebase_admin._apps:
+        # Defaults to Application Default Credentials or Project ID
+        firebase_admin.initialize_app(options={
+            "projectId": "saas-34243"
+        })
+        print("[FIREBASE-ADMIN] Initialized successfully for project: saas-34243")
+except Exception as e:
+    print(f"[FIREBASE-ADMIN] Notice: {e}")
+
 # Initialize Background Daemon
+from core.daemons import BackgroundWorkerDaemon
 worker_daemon = BackgroundWorkerDaemon()
-
-@app.on_event("startup")
-async def startup_event():
-    # Start background scraper and telemetry loops
-    asyncio.create_task(worker_daemon.start_loop())
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    worker_daemon.stop()
+daemon_thread = threading.Thread(target=worker_daemon.start_loop, daemon=True)
+daemon_thread.start()
 
 # --- REST API Endpoints ---
 
-@app.get("/api/health")
-async def health_check():
+@app.route("/api/health", methods=["GET"])
+def health_check():
     """Layer 1 & 2 Health Check Endpoint"""
-    return {
+    return jsonify({
         "status": "healthy",
+        "engine": "Flask/Gunicorn",
         "service": "vastuda-saas-core",
         "timestamp": time.time(),
         "memory": worker_daemon.get_memory_usage(),
         "daemon_status": worker_daemon.is_running
-    }
+    }), 200
 
-@app.get("/api/stats")
-async def get_system_stats():
+@app.route("/api/stats", methods=["GET"])
+def get_system_stats():
     """Live system telemetry and agent counts"""
-    return worker_daemon.get_stats()
+    return jsonify(worker_daemon.get_stats()), 200
 
-@app.post("/api/scrape")
-async def trigger_scrape_job(payload: Dict[str, Any]):
-    """Trigger an autonomous data scraping task"""
+@app.route("/api/scrape", methods=["POST"])
+def trigger_scrape_job():
+    """Trigger an autonomous data scraping task via requests"""
+    payload = request.get_json(silent=True) or {}
     target_url = payload.get("url", "https://news.ycombinator.com")
-    result = await worker_daemon.execute_scrape_job(target_url)
-    return {"status": "success", "data": result}
+    result = worker_daemon.execute_scrape_job(target_url)
+    return jsonify({"status": "success", "data": result}), 200
+
+@app.route("/api/verify-token", methods=["POST"])
+def verify_firebase_token():
+    """Verify Firebase ID Token server-side via firebase-admin"""
+    payload = request.get_json(silent=True) or {}
+    id_token = payload.get("token")
+    if not id_token:
+        return jsonify({"error": "Missing token"}), 400
+
+    try:
+        decoded_token = fb_auth.verify_id_token(id_token)
+        uid = decoded_token["uid"]
+        return jsonify({
+            "status": "valid",
+            "uid": uid,
+            "email": decoded_token.get("email")
+        }), 200
+    except Exception as err:
+        return jsonify({"status": "invalid", "error": str(err)}), 401
 
 # --- Frontend Static Routes ---
 
-@app.get("/", response_class=HTMLResponse)
-async def serve_index():
-    index_path = os.path.join(FRONTEND_DIR, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return HTMLResponse("<h1>VASTUDA SaaS Engine Online</h1>")
+@app.route("/")
+def serve_index():
+    return send_from_directory(FRONTEND_DIR, "index.html")
 
-@app.get("/admin", response_class=HTMLResponse)
-@app.get("/admin-dashboard.html", response_class=HTMLResponse)
-async def serve_admin():
-    admin_path = os.path.join(FRONTEND_DIR, "admin-dashboard.html")
-    if os.path.exists(admin_path):
-        return FileResponse(admin_path)
-    return HTMLResponse("<h1>Admin Dashboard</h1>")
+@app.route("/admin")
+@app.route("/admin-dashboard.html")
+def serve_admin():
+    return send_from_directory(FRONTEND_DIR, "admin-dashboard.html")
 
-@app.get("/admin-login.html", response_class=HTMLResponse)
-async def serve_admin_login():
-    login_path = os.path.join(FRONTEND_DIR, "admin-login.html")
-    if os.path.exists(login_path):
-        return FileResponse(login_path)
-    return HTMLResponse("<h1>Admin Login</h1>")
+@app.route("/admin-login.html")
+def serve_admin_login():
+    return send_from_directory(FRONTEND_DIR, "admin-login.html")
 
-# Mount any remaining frontend files if directory exists
-if os.path.exists(FRONTEND_DIR):
-    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+@app.route("/user_dashboard.html")
+def serve_user_dashboard():
+    return send_from_directory(FRONTEND_DIR, "user_dashboard.html")
+
+@app.route("/<path:path>")
+def serve_static(path):
+    file_path = os.path.join(FRONTEND_DIR, path)
+    if os.path.exists(file_path):
+        return send_from_directory(FRONTEND_DIR, path)
+    return jsonify({"error": "Not Found", "path": path}), 404
 
 if __name__ == "__main__":
-    import uvicorn
     port = int(os.environ.get("PORT", 8088))
-    uvicorn.run("core.web_server:app", host="0.0.0.0", port=port, reload=False)
+    app.run(host="0.0.0.0", port=port, debug=False)

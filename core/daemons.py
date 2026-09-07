@@ -1,11 +1,10 @@
 """
-VASTUDA SaaS Core - Autonomous Background Worker & Scraper Daemon
-Runs periodic tasks, health monitoring, and data harvesting in the cloud.
+VASTUDA SaaS Core - Background Worker & Scraper Daemon (Thread-Safe)
 """
 
 import time
-import asyncio
 import os
+import requests
 
 class BackgroundWorkerDaemon:
     def __init__(self):
@@ -14,34 +13,40 @@ class BackgroundWorkerDaemon:
         self.iteration_count = 0
         self.collected_data = []
 
-    async def start_loop(self):
+    def start_loop(self):
         self.is_running = True
-        print(f"[DAEMON] Background worker started at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"[DAEMON] Threaded worker daemon active at {time.strftime('%Y-%m-%d %H:%M:%S')}")
         while self.is_running:
             try:
                 self.iteration_count += 1
-                # Periodic maintenance task
-                await self.perform_scheduled_task()
-                await asyncio.sleep(60) # Run every minute
+                self.perform_scheduled_task()
+                time.sleep(60) # Interval 60s
             except Exception as e:
-                print(f"[DAEMON ERROR] Exception in worker loop: {e}")
-                await asyncio.sleep(10)
+                print(f"[DAEMON ERROR] {e}")
+                time.sleep(10)
 
-    async def perform_scheduled_task(self):
-        """Simulate autonomous data collection & system health checkpoint"""
+    def perform_scheduled_task(self):
         timestamp = time.strftime("%H:%M:%S")
-        # Heartbeat log
         if self.iteration_count % 5 == 0:
             print(f"[DAEMON] Heartbeat checkpoint #{self.iteration_count} at {timestamp}")
 
-    async def execute_scrape_job(self, url: str) -> dict:
-        """Execute a lightweight data harvest job"""
+    def execute_scrape_job(self, url: str) -> dict:
+        start_t = time.time()
+        try:
+            resp = requests.get(url, timeout=5, headers={"User-Agent": "VASTUDA-Bot/2.0"})
+            status_code = resp.status_code
+            content_length = len(resp.text)
+        except Exception as e:
+            status_code = 0
+            content_length = 0
+
+        latency_ms = int((time.time() - start_t) * 1000)
         return {
             "target": url,
-            "harvested_at": time.time(),
-            "status": "completed",
-            "items_found": 12,
-            "latency_ms": 142
+            "status_code": status_code,
+            "bytes_fetched": content_length,
+            "latency_ms": latency_ms,
+            "harvested_at": time.time()
         }
 
     def get_memory_usage(self) -> str:
@@ -53,12 +58,11 @@ class BackgroundWorkerDaemon:
             return "Active (Normal)"
 
     def get_stats(self) -> dict:
-        uptime_seconds = int(time.time() - self.started_at)
         return {
-            "uptime_seconds": uptime_seconds,
+            "uptime_seconds": int(time.time() - self.started_at),
             "iteration_count": self.iteration_count,
             "daemon_active": self.is_running,
-            "total_harvested_events": len(self.collected_data),
+            "engine": "Flask/Gunicorn Worker",
             "cloud_provider": os.environ.get("RENDER_INSTANCE_ID", "Cloud Native")
         }
 
