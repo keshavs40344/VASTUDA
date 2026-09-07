@@ -277,7 +277,7 @@
 
 
         loginAsGuest: function() {
-            window.location.href = 'login.html';
+            window.location.href = 'login';
             return { success: false, message: 'Guest login permanently disabled. Pure Firebase authentication required.' };
         },
 
@@ -320,8 +320,8 @@
             } else {
                 authContainer.innerHTML = `
                     <div class="flex items-center gap-2">
-                        <a href="login.html" class="text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-xl hover:bg-slate-800/80 transition font-sans inline-flex items-center">Log In</a>
-                        <a href="login.html#register" class="text-xs font-bold text-slate-950 hover:text-black px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 shadow-md shadow-emerald-500/20 transition font-sans inline-flex items-center gap-1.5 group">
+                        <a href="login" class="text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-xl hover:bg-slate-800/80 transition font-sans inline-flex items-center">Log In</a>
+                        <a href="login#register" class="text-xs font-bold text-slate-950 hover:text-black px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 shadow-md shadow-emerald-500/20 transition font-sans inline-flex items-center gap-1.5 group">
                             <span>Sign Up Free</span>
                             <span class="group-hover:translate-x-0.5 transition-transform text-[11px]">→</span>
                         </a>
@@ -337,7 +337,7 @@
 
 
         openModal: function(mode = 'login') {
-            window.location.href = (mode === 'register') ? 'login.html#register' : 'login.html';
+            window.location.href = (mode === 'register') ? 'login#register' : 'login';
         },
 
 
@@ -566,7 +566,7 @@
 
                 alert(`Welcome @${res.user.displayName}! Successfully authenticated with GitHub via Firebase.`);
 
-                if (window.location.pathname.endsWith("login.html")) {
+                if (window.location.pathname.endsWith("login")) {
 
                     window.location.href = "dashboard.html";
 
@@ -600,7 +600,7 @@
 
                 alert(`Welcome ${res.user.displayName}! Signed in securely with Google Firebase.`);
 
-                if (window.location.pathname.endsWith("login.html")) {
+                if (window.location.pathname.endsWith("login")) {
 
                     window.location.href = "dashboard.html";
 
