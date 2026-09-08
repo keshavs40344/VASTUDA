@@ -47,6 +47,47 @@
       outline: none;
     }
   </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What does CleanWrite Prose & Readability Sentinel do?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It analyzes written English for readability scores (Flesch-Kincaid, Coleman-Liau), detects passive voice, highlights clich\u00e9s, and suggests concise alternatives."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my writing monitored or used for AI training?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No! CleanWrite does not transmit your text to any server or AI model. All natural language statistics run entirely inside your browser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Who should use CleanWrite?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Students writing academic research papers, developers drafting documentation, and job seekers polishing cover letters."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the standalone site address?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Launch it at /tools/cleanwrite-pro-editor."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
 
@@ -233,7 +274,60 @@
 
     </div>
 
-  </main>
+  
+    <!-- Standalone Tool Site FAQ & Knowledge Base -->
+    <section class="mt-16 max-w-4xl mx-auto space-y-6 pt-10 border-t border-white/10 no-print">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+          <span>Standalone Knowledge Base &amp; FAQ</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">Frequently Asked Questions</h2>
+        <p class="text-xs text-slate-400">Everything you need to know about using this standalone tool.</p>
+      </div>
+
+      <div class="space-y-3 font-sans">
+        
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What does CleanWrite Prose & Readability Sentinel do?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>It analyzes written English for readability scores (Flesch-Kincaid, Coleman-Liau), detects passive voice, highlights clichés, and suggests concise alternatives.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Is my writing monitored or used for AI training?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>No! CleanWrite does not transmit your text to any server or AI model. All natural language statistics run entirely inside your browser.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Who should use CleanWrite?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Students writing academic research papers, developers drafting documentation, and job seekers polishing cover letters.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is the standalone site address?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Launch it at /tools/cleanwrite-pro-editor.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+</main>
 
   <footer class="border-t border-zinc-800/80 bg-zinc-950 py-4 text-center text-xs font-mono text-zinc-500">
     VASTUDA Sovereign Core • 100% Client-Side Airgapped Security • Mathematical Prose Analysis

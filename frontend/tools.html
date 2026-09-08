@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Standalone Tools &amp; Web Apps Directory | VASTUDA</title>
+  <meta name="description" content="Explore VASTUDA's complete suite of free, standalone developer and student tools. Every tool is an independent site with its own dedicated web address, live preview, and in-browser privacy.">
+
+  <!-- OpenGraph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="VASTUDA Tools Directory - Standalone Web Apps with Dedicated Addresses">
+  <meta property="og:description" content="100% Free, privacy-first tools for AI/ML students, software engineers, and cybersecurity pros. Every tool has its own dedicated URL address.">
+
+  <!-- Lucide & Tailwind -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            display: ['Space Grotesk', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #030712;
+      color: #f3f4f6;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(at 15% 15%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+        radial-gradient(at 85% 75%, rgba(6, 182, 212, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+
+    /* Ambient Floating Aurora Mesh */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 9999px;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+      animation: floatOrb 22s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+    @keyframes floatOrb {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(70px, -45px, 0) scale(1.15); }
+      100% { transform: translate3d(-50px, 55px, 0) scale(0.92); }
+    }
+
+    /* Luxury Spotlight Card */
+    .tool-site-card {
+      position: relative;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(10, 15, 29, 0.88) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 12px 30px -10px rgba(0, 0, 0, 0.7);
+      border-radius: 1.25rem;
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+                  box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+                  border-color 0.25s ease;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .tool-site-card:hover {
+      border-color: rgba(52, 211, 153, 0.45);
+      transform: translateY(-5px) scale(1.01);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 
+                  0 20px 40px -10px rgba(16, 185, 129, 0.25);
+    }
+
+    .address-pill {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      padding: 0.3rem 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      color: #94a3b8;
+      transition: all 0.2s ease;
+    }
+    .address-pill:hover {
+      border-color: rgba(52, 211, 153, 0.4);
+      color: #34d399;
+    }
+
+    .cyber-btn {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2));
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+      transition: all 0.22s ease;
+    }
+    .cyber-btn:hover {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 182, 212, 0.35));
+      border-color: #34d399;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
+      transform: translateY(-2px);
+    }
+  </style>
+
+  <!-- Structured JSON-LD Schema for Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "VASTUDA Standalone Tools Directory",
+    "description": "Comprehensive index of free, standalone developer and student web applications with dedicated URLs.",
+    "numberOfItems": 48,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "AI Online Resume Builder",
+        "url": "https://web-production-2ac2a.up.railway.app/tools/resume-builder"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "ATS Resume & Job Skill Matcher",
+        "url": "https://web-production-2ac2a.up.railway.app/tools/ats-resume-skill-matcher"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Big-O DSA Complexity Analyzer",
+        "url": "https://web-production-2ac2a.up.railway.app/tools/dsa-complexity-analyzer"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "CSV Dataset EDA & Auto-ML Studio",
+        "url": "https://web-production-2ac2a.up.railway.app/tools/csv-eda-ml-preprocessor"
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body class="min-h-screen font-sans antialiased selection:bg-emerald-500 selection:text-black flex flex-col justify-between relative">
+
+  <!-- Ambient Floating Aurora Mesh -->
+  <div class="ambient-orb w-[650px] h-[650px] -top-32 -left-32 bg-emerald-500/10"></div>
+  <div class="ambient-orb w-[600px] h-[600px] top-1/2 -right-40 bg-cyan-500/10" style="animation-delay: -9s;"></div>
+  <div class="ambient-orb w-[700px] h-[700px] -bottom-40 left-1/3 bg-purple-500/10" style="animation-delay: -16s;"></div>
+
+  <!-- Header Navigation -->
+  <header class="sticky top-3 z-50 max-w-7xl mx-auto px-4 sm:px-6 w-full">
+    <div class="rounded-2xl bg-[#060914]/90 backdrop-blur-2xl border border-white/10 shadow-2xl px-5 py-3.5 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="/" class="flex items-center space-x-3 group">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 via-cyan-500 to-indigo-500 p-[1.5px] flex items-center justify-center">
+          <div class="w-full h-full bg-[#070b18] rounded-[10px] flex items-center justify-center">
+            <span class="font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 text-sm tracking-wider">V</span>
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center space-x-2">
+            <span class="font-display font-black text-xl tracking-wider text-white">VASTUDA</span>
+            <span class="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
+              TOOLS HUB
+            </span>
+          </div>
+          <span class="text-[9px] font-mono text-slate-400">STANDALONE WEB APPS WITH DEDICATED ADDRESSES</span>
+        </div>
+      </a>
+
+      <!-- Right Nav CTAs -->
+      <div class="flex items-center space-x-3 text-xs font-mono">
+        <a href="/" class="hidden sm:inline text-slate-400 hover:text-white transition-colors px-3 py-1.5">
+          Home
+        </a>
+        <a href="/user_dashboard.html" class="text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 px-3.5 py-2 rounded-xl transition-all flex items-center space-x-2">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span>Workspace</span>
+        </a>
+        <a href="/login" class="cyber-btn text-white font-semibold px-4 py-2 rounded-xl flex items-center space-x-2">
+          <i data-lucide="log-in" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>Login</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-12 space-y-12 flex-1 w-full relative z-10">
+    
+    <div class="text-center space-y-4 max-w-3xl mx-auto">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-medium">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>48+ Standalone Tool Sites &bull; 100% Free &bull; Zero Paywalls</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black font-display text-white tracking-tight leading-tight">
+        Every Tool is a <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400">Separate Site</span> With Its Own Address.
+      </h1>
+
+      <p class="text-sm sm:text-base text-slate-300 font-sans leading-relaxed">
+        Browse our full catalog of specialized engineering, placement prep, AI/ML, and security tools. Each tool functions as an independent, ad-free web application with live real-time previews, rich FAQs, and strict in-browser privacy.
+      </p>
+    </div>
+
+    <!-- Search & Category Filters Bar -->
+    <div class="max-w-4xl mx-auto space-y-4">
+      <!-- Search Input -->
+      <div class="relative">
+        <i data-lucide="search" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <input 
+          type="text" 
+          id="toolsSearchInput"
+          placeholder="Search by name, skill, or keyword (e.g. 'resume', 'Big-O', 'EDA', 'SQL', 'QR', 'DCF')..." 
+          class="w-full pl-12 pr-28 py-3.5 rounded-2xl bg-slate-900/80 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 text-sm font-sans transition-all shadow-xl"
+          oninput="filterTools()"
+        >
+        <div class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-mono text-slate-400 bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">
+          <span id="activeCountBadge">48</span> Tools
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="flex flex-wrap items-center justify-center gap-2 font-mono text-xs" id="categoryFilterContainer">
+        <button onclick="setCategory('ALL')" data-cat="ALL" class="cat-pill active-cat px-3.5 py-1.5 rounded-xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300 font-semibold transition-all">
+          All Tools (48)
+        </button>
+        <button onclick="setCategory('STUDENT')" data-cat="STUDENT" class="cat-pill px-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:text-white transition-all">
+          🎓 Student &amp; Campus Prep
+        </button>
+        <button onclick="setCategory('AI_ML')" data-cat="AI_ML" class="cat-pill px-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:text-white transition-all">
+          🧠 AI &amp; Machine Learning
+        </button>
+        <button onclick="setCategory('DEV')" data-cat="DEV" class="cat-pill px-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:text-white transition-all">
+          ⚡ Software Engineering
+        </button>
+        <button onclick="setCategory('SECURITY')" data-cat="SECURITY" class="cat-pill px-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:text-white transition-all">
+          🛡️ Security &amp; Privacy
+        </button>
+        <button onclick="setCategory('FINANCE')" data-cat="FINANCE" class="cat-pill px-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:text-white transition-all">
+          📊 FinTech &amp; Economics
+        </button>
+      </div>
+    </div>
+
+    <!-- Standalone Tools Grid -->
+    <div id="toolsCardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+      <!-- Injected via JavaScript -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptySearchState" class="hidden text-center py-16 space-y-3">
+      <i data-lucide="help-circle" class="w-12 h-12 mx-auto text-slate-600"></i>
+      <h3 class="text-lg font-bold text-white">No Matching Tools Found</h3>
+      <p class="text-xs text-slate-400">Try searching for a different keyword or switch the category filter.</p>
+    </div>
+
+    <!-- Platform Value Comparison Section -->
+    <section class="mt-16 rounded-3xl bg-slate-900/60 border border-white/10 p-8 sm:p-12 space-y-8 relative overflow-hidden">
+      <div class="text-center space-y-2 max-w-2xl mx-auto">
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">
+          Why VASTUDA Standalone Sites are Different
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-400">
+          Built for students and autonomous engineers who need real tools without commercial traps.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs leading-relaxed">
+        <div class="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+          <div class="flex items-center space-x-2 text-emerald-400 font-bold text-sm">
+            <i data-lucide="link" class="w-4 h-4"></i>
+            <span>Dedicated Web Address</span>
+          </div>
+          <p class="text-slate-300">
+            Every tool has its own direct, shareable URL (e.g. <code>/tools/resume-builder</code>). Bookmark, share with classmates, or link directly from your portfolio.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+          <div class="flex items-center space-x-2 text-cyan-400 font-bold text-sm">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>100% In-Browser Privacy</span>
+          </div>
+          <p class="text-slate-300">
+            All file processing, resume generation, code AST analysis, and dataset calculations execute locally inside your browser's V8 engine. Zero data telemetry egress.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+          <div class="flex items-center space-x-2 text-purple-400 font-bold text-sm">
+            <i data-lucide="unlock" class="w-4 h-4"></i>
+            <span>No Paywalls or Hidden Subscriptions</span>
+          </div>
+          <p class="text-slate-300">
+            Unlike commercial platforms that charge $2.95 - $24 at the download screen, all VASTUDA tools provide 100% free vector PDF, code, and JSON downloads without watermarks.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comprehensive Platform FAQs Accordion -->
+    <section class="mt-12 space-y-6 max-w-4xl mx-auto">
+      <div class="text-center space-y-2">
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">Frequently Asked Questions</h2>
+        <p class="text-xs text-slate-400">Everything you need to know about using VASTUDA's standalone web apps.</p>
+      </div>
+
+      <div class="space-y-3 font-sans">
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Can I access each tool directly using its own website address?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed space-y-2 border-t border-white/5 mt-3">
+            <p>Yes, absolutely! Every single tool in our catalog is engineered as an independent standalone website with its own clean, canonical web address (e.g. <code>https://.../tools/resume-builder</code> or <code>https://.../resume-builder</code>). You can copy any tool's direct address by clicking the "Copy Address" pill on its card.</p>
+          </div>
+        </details>
+
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Are these tools really 100% free without watermarks or hidden charges?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed space-y-2 border-t border-white/5 mt-3">
+            <p>Yes. Commercial platforms lure students by advertising "free tools" and then lock downloads behind a $2.95 trial or $24/month recurring subscription. VASTUDA is completely open: you get high-resolution vector PDF exports, copyable code, and full analytical features with <strong>zero watermarks and zero payment required</strong>.</p>
+          </div>
+        </details>
+
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Do I need to create an account or login to use the tools?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed space-y-2 border-t border-white/5 mt-3">
+            <p>No login is required to use any of our standalone tools. You can immediately open any tool site and generate resumes, analyze algorithms, or process datasets. Creating an account is optional and gives you cross-device cloud profile synchronization and custom favoriting inside the central Workspace.</p>
+          </div>
+        </details>
+
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Is my personal data or resume stored on your servers?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed space-y-2 border-t border-white/5 mt-3">
+            <p>No. We practice strict zero-data-egress architecture. All personal details, code snippets, CSV files, and resume text remain strictly inside your browser's local memory (RAM). When you close the tab, nothing is kept on our backend.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="mt-20 border-t border-white/10 bg-[#060914] py-10 px-4 sm:px-6 relative z-10 font-mono text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+      <div class="space-y-1">
+        <div class="flex items-center justify-center md:justify-start space-x-2">
+          <span class="font-display font-black text-base text-white">VASTUDA</span>
+          <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">TOOLS SUITE</span>
+        </div>
+        <p class="text-[11px] text-slate-500">Decentralized Autonomous Engineering Fabric &bull; Sovereign Developer Tools</p>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-6">
+        <a href="/" class="hover:text-white transition">Home</a>
+        <a href="/tools" class="text-emerald-400 hover:text-emerald-300 transition">All Tools</a>
+        <a href="/user_dashboard.html" class="hover:text-white transition">Workspace</a>
+        <a href="/login" class="hover:text-white transition">Login</a>
+      </div>
+
+      <div class="text-[10px] text-slate-600">
+        &copy; 2026 VASTUDA Sovereign Enclave. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script to Render & Filter All Standalone Tool Sites -->
+  <script>
+    const TOOLS = [
+  {
+    "id": "resume-builder",
+    "name": "AI Online Resume Builder",
+    "cat": "STUDENT",
+    "catName": "Student & Campus Prep",
+    "icon": "file-text",
+    "desc": "Build professional ATS-friendly resumes with live A4 preview, 4 modern templates, AI suggestions, and 100% free vector PDF export.",
+    "url": "saas/resume-builder.html",
+    "badge": "Flagship"
+  },
+  {
+    "id": "ats-resume-skill-matcher",
+    "name": "ATS Resume & Job Skill Matcher",
+    "cat": "STUDENT",
+    "catName": "Student & Campus Prep",
+    "icon": "file-check-2",
+    "desc": "Scan your resume against technical Job Descriptions. Calculate real ATS match score, uncover missing keywords, and get action-verb tips.",
+    "url": "saas/ats-resume-skill-matcher.html",
+    "badge": "Placement"
+  },
+  {
+    "id": "dsa-complexity-analyzer",
+    "name": "Big-O DSA Complexity Analyzer",
+    "cat": "STUDENT",
+    "catName": "Student & Campus Prep",
+    "icon": "gauge",
+    "desc": "Calculate Time (Worst, Best) and Space Complexity for C++, Java, and Python. Detect nested loops, recursion depth, and optimization advice.",
+    "url": "saas/dsa-complexity-analyzer.html",
+    "badge": "DSA Prep"
+  },
+  {
+    "id": "csv-eda-ml-preprocessor",
+    "name": "CSV Dataset EDA & Auto-ML Studio",
+    "cat": "STUDENT",
+    "catName": "Student & Campus Prep",
+    "icon": "table",
+    "desc": "100% in-browser CSV Exploratory Data Analysis. Inspect nulls, outliers, and generate instant copy-paste Python Pandas & Scikit-Learn code.",
+    "url": "saas/csv-eda-ml-preprocessor.html",
+    "badge": "AI/ML Lab"
+  },
+  {
+    "id": "neural-network-architect",
+    "name": "Neural Network Architect & Generator",
+    "cat": "STUDENT",
+    "catName": "Student & Campus Prep",
+    "icon": "network",
+    "desc": "Visual Deep Learning layer designer. Validate dimension alignment, compute trainable parameters, and export PyTorch & Keras training code.",
+    "url": "saas/neural-network-architect.html",
+    "badge": "Deep Learning"
+  },
+  {
+    "id": "viva-exam-prep-studio",
+    "name": "Engineering Viva & Technical Prep",
+    "cat": "STUDENT",
+    "catName": "Student & Campus Prep",
+    "icon": "graduation-cap",
+    "desc": "Master frequently asked college viva questions, technical interview fundamentals, and tricky professor trap follow-ups (DBMS, OS, CN, OOPs, ML).",
+    "url": "saas/viva-exam-prep-studio.html",
+    "badge": "Exam Ready"
+  },
+  {
+    "id": "devforge-swissknife",
+    "name": "DevForge Swiss-Knife",
+    "cat": "DEV",
+    "catName": "Developer & DevOps",
+    "icon": "wrench",
+    "desc": "Offline JSON, YAML, CSV matrix transcoder, JWT debugger, SHA-256/512 hasher, and Base64 studio.",
+    "url": "saas/devforge-swissknife.html",
+    "badge": "Popular"
+  },
+  {
+    "id": "sql-explainer-index-advisor",
+    "name": "SQL Explain & Index Advisor",
+    "cat": "DEV",
+    "catName": "Developer & DevOps",
+    "icon": "database",
+    "desc": "In-browser SQL AST analyzer, anti-pattern detector, and automated B-Tree DDL index generator.",
+    "url": "saas/sql-explainer-index-advisor.html",
+    "badge": "Free"
+  },
+  {
+    "id": "webhook-json-transformer",
+    "name": "Webhook JSON Transformer",
+    "cat": "DEV",
+    "catName": "Developer & DevOps",
+    "icon": "workflow",
+    "desc": "Visual JSON schema mapper, dot-notation extractor, data mutator, and Slack/Discord webhook formatter.",
+    "url": "saas/webhook-json-transformer.html",
+    "badge": "Core"
+  },
+  {
+    "id": "chmod_calculator",
+    "name": "Chmod Permissions Calculator",
+    "cat": "DEV",
+    "catName": "Developer & DevOps",
+    "icon": "terminal",
+    "desc": "Interactive octal and symbolic Linux/UNIX file permissions calculator with command generator.",
+    "url": "saas/chmod_calculator.html",
+    "badge": "Utility"
+  },
+  {
+    "id": "clickhouse_ddl_generator",
+    "name": "ClickHouse DDL Generator",
+    "cat": "DEV",
+    "catName": "Developer & DevOps",
+    "icon": "server",
+    "desc": "High-speed analytical schema generator for ClickHouse MergeTree tables and partitioning keys.",
+    "url": "saas/clickhouse_ddl_generator.html",
+    "badge": "Data"
+  },
+  {
+    "id": "cloudwatch_metric_filter_builder",
+    "name": "CloudWatch Metric Filter Builder",
+    "cat": "DEV",
+    "catName": "Developer & DevOps",
+    "icon": "activity",
+    "desc": "Generate syntactically flawless AWS CloudWatch metric extraction patterns and regex filters.",
+    "url": "saas/cloudwatch_metric_filter_builder.html",
+    "badge": "Cloud"
+  },
+  {
+    "id": "cmu_sql_explain_visualizer",
+    "name": "CMU SQL Explain Visualizer",
+    "cat": "DEV",
+    "catName": "Developer & DevOps",
+    "icon": "git-branch",
+    "desc": "Visual query execution plan tree viewer for PostgreSQL and MySQL query performance analysis.",
+    "url": "saas/cmu_sql_explain_visualizer.html",
+    "badge": "Perf"
+  },
+  {
+    "id": "ansible_playbook_validator",
+    "name": "Ansible Playbook Validator",
+    "cat": "DEV",
+    "catName": "Developer & DevOps",
+    "icon": "file-code",
+    "desc": "YAML syntax linter and task execution order validator for infrastructure automation.",
+    "url": "saas/ansible_playbook_validator.html",
+    "badge": "DevOps"
+  },
+  {
+    "id": "api_payload_builder",
+    "name": "API Payload Builder & Tester",
+    "cat": "DEV",
+    "catName": "Developer & DevOps",
+    "icon": "send",
+    "desc": "Interactive client-side HTTP request composer and JSON mock generator with curl export.",
+    "url": "saas/api_payload_builder.html",
+    "badge": "REST"
+  },
+  {
+    "id": "avro_schema_generator",
+    "name": "Apache Avro Schema Generator",
+    "cat": "DEV",
+    "catName": "Developer & DevOps",
+    "icon": "box",
+    "desc": "Convert JSON samples to strict Apache Avro IDL schemas for Kafka streaming architectures.",
+    "url": "saas/avro_schema_generator.html",
+    "badge": "Kafka"
+  },
+  {
+    "id": "pdf-metadata-scrubber-redactor",
+    "name": "Document Redactor & Privacy Scrubber",
+    "cat": "SECURITY",
+    "catName": "Security & Privacy",
+    "icon": "shield-check",
+    "desc": "Airgapped PII scrubbing for emails, phone numbers, credit cards, national IDs, and deal terms.",
+    "url": "saas/pdf-metadata-scrubber-redactor.html",
+    "badge": "Airgapped"
+  },
+  {
+    "id": "phishshield-scam-sentinel",
+    "name": "PhishShield Anti-Scam & Phishing Sentinel",
+    "cat": "SECURITY",
+    "catName": "Security & Privacy",
+    "icon": "shield-alert",
+    "desc": "Detects fake KYC banking scams, Cyrillic homograph domain spoofing, and urgency traps.",
+    "url": "saas/phishshield-scam-sentinel.html",
+    "badge": "Security"
+  },
+  {
+    "id": "api_key_leak_git_history_sanitizer",
+    "name": "API Key Git History Sanitizer",
+    "cat": "SECURITY",
+    "catName": "Security & Privacy",
+    "icon": "key",
+    "desc": "Locate and redact leaked secrets, tokens, AWS keys, and private certificates before commit.",
+    "url": "saas/api_key_leak_git_history_sanitizer.html",
+    "badge": "Crucial"
+  },
+  {
+    "id": "anti_money_laundering_pep_scanner",
+    "name": "AML & PEP Screening Scanner",
+    "cat": "SECURITY",
+    "catName": "Security & Privacy",
+    "icon": "user-x",
+    "desc": "Client-side Politically Exposed Persons (PEP) and OFAC sanctions list screening simulator.",
+    "url": "saas/anti_money_laundering_pep_scanner.html",
+    "badge": "Compliance"
+  },
+  {
+    "id": "audit_trail_hash_chain_verifier",
+    "name": "Audit Trail Hash-Chain Verifier",
+    "cat": "SECURITY",
+    "catName": "Security & Privacy",
+    "icon": "link",
+    "desc": "Tamper-evident cryptographic log verification using SHA-256 sequential merkle hash chaining.",
+    "url": "saas/audit_trail_hash_chain_verifier.html",
+    "badge": "Crypto"
+  },
+  {
+    "id": "browser_fingerprint_canvas_spoof_tester",
+    "name": "Browser Fingerprint & Privacy Tester",
+    "cat": "SECURITY",
+    "catName": "Security & Privacy",
+    "icon": "fingerprint",
+    "desc": "Audit your device canvas entropy, audio buffer hashes, WebGL vendor strings, and tracking resistance.",
+    "url": "saas/browser_fingerprint_canvas_spoof_tester.html",
+    "badge": "Privacy"
+  },
+  {
+    "id": "burp_raw_http_repeater_parser",
+    "name": "Burp Raw HTTP Repeater Parser",
+    "cat": "SECURITY",
+    "catName": "Security & Privacy",
+    "icon": "radio",
+    "desc": "Parse, reformat, and validate raw Burp Suite HTTP requests, cookies, and injection vectors.",
+    "url": "saas/burp_raw_http_repeater_parser.html",
+    "badge": "SecOps"
+  },
+  {
+    "id": "clauseguard_contract_auditor",
+    "name": "ClauseGuard Contract Legal Auditor",
+    "cat": "SECURITY",
+    "catName": "Security & Privacy",
+    "icon": "file-text",
+    "desc": "Automated NDA and commercial contract liability risk scanner with redline suggestions.",
+    "url": "saas/clauseguard_contract_auditor.html",
+    "badge": "Legal"
+  },
+  {
+    "id": "startup-runway-unit-economics",
+    "name": "Startup Runway & Unit Economics",
+    "cat": "FINTECH",
+    "catName": "FinTech & Venture",
+    "icon": "trending-up",
+    "desc": "Deterministic 24-month cash runway simulator, LTV/CAC payback calculator, and Default Alive metrics.",
+    "url": "saas/startup-runway-unit-economics.html",
+    "badge": "Finance"
+  },
+  {
+    "id": "captable-equity-dilution",
+    "name": "CapTable Pro & Equity Dilution Simulator",
+    "cat": "FINTECH",
+    "catName": "FinTech & Venture",
+    "icon": "pie-chart",
+    "desc": "Interactive pre/post-money valuation, SAFE note conversion, and multi-round waterfall breakdown.",
+    "url": "saas/captable-equity-dilution.html",
+    "badge": "Startup"
+  },
+  {
+    "id": "invoice-contract-shield-pro",
+    "name": "Invoice & Contract Shield Pro",
+    "cat": "FINTECH",
+    "catName": "FinTech & Venture",
+    "icon": "receipt",
+    "desc": "Tax-compliant GST/VAT invoicing, automatic protective legal IP clauses, and clean PDF export.",
+    "url": "saas/invoice-contract-shield-pro.html",
+    "badge": "Freelance"
+  },
+  {
+    "id": "black_scholes_option_pricing",
+    "name": "Black-Scholes Options Pricing Calculator",
+    "cat": "FINTECH",
+    "catName": "FinTech & Venture",
+    "icon": "bar-chart-2",
+    "desc": "Calculate European Call & Put premiums, Implied Volatility, and Greeks (Delta, Gamma, Vega, Theta).",
+    "url": "saas/black_scholes_option_pricing.html",
+    "badge": "Quant"
+  },
+  {
+    "id": "bond_yield_to_maturity",
+    "name": "Bond Yield to Maturity (YTM) Model",
+    "cat": "FINTECH",
+    "catName": "FinTech & Venture",
+    "icon": "percent",
+    "desc": "Calculate exact YTM, Macaulay Duration, and Convexity for fixed-income sovereign bonds.",
+    "url": "saas/bond_yield_to_maturity.html",
+    "badge": "Bonds"
+  },
+  {
+    "id": "burn_rate_runway_calculator",
+    "name": "Burn Rate & Cash Buffer Calculator",
+    "cat": "FINTECH",
+    "catName": "FinTech & Venture",
+    "icon": "flame",
+    "desc": "Track monthly net burn, gross burn, headcount hiring cost buffers, and cash runway projections.",
+    "url": "saas/burn_rate_runway_calculator.html",
+    "badge": "Capital"
+  },
+  {
+    "id": "dcf-valuation-model",
+    "name": "VASTUDA Free DCF Intrinsic Visualizer",
+    "cat": "FINTECH",
+    "catName": "FinTech & Venture",
+    "icon": "dollar-sign",
+    "desc": "Discounted Cash Flow intrinsic valuation model with WACC calculator and sensitivity matrix.",
+    "url": "saas/dcf-valuation-model.html",
+    "badge": "Valuation"
+  },
+  {
+    "id": "attention_head_qk_matrix_visualizer",
+    "name": "Attention Head QK Matrix Visualizer",
+    "cat": "AI",
+    "catName": "AI & Machine Learning",
+    "icon": "eye",
+    "desc": "Visualize transformer multi-head scaled dot-product attention softmax distributions in real-time.",
+    "url": "saas/attention_head_qk_matrix_visualizer.html",
+    "badge": "DeepLearning"
+  },
+  {
+    "id": "beam_search_decoding_simulator",
+    "name": "Beam Search Decoding Simulator",
+    "cat": "AI",
+    "catName": "AI & Machine Learning",
+    "icon": "git-pull-request",
+    "desc": "Interactive beam search vs greedy search token generation tree visualizer for LLM inference.",
+    "url": "saas/beam_search_decoding_simulator.html",
+    "badge": "NLP"
+  },
+  {
+    "id": "bleu_score_machine_translation",
+    "name": "BLEU Score Translation Evaluator",
+    "cat": "AI",
+    "catName": "AI & Machine Learning",
+    "icon": "check-circle-2",
+    "desc": "Compute modified n-gram precision and brevity penalty for machine translation benchmarking.",
+    "url": "saas/bleu_score_machine_translation.html",
+    "badge": "Eval"
+  },
+  {
+    "id": "classifier_confusion_matrix_f1_score",
+    "name": "Confusion Matrix & F1-Score Studio",
+    "cat": "AI",
+    "catName": "AI & Machine Learning",
+    "icon": "grid",
+    "desc": "Calculate Precision, Recall, Specificity, F1-Score, and ROC-AUC from custom classification matrices.",
+    "url": "saas/classifier_confusion_matrix_f1_score.html",
+    "badge": "MLOps"
+  },
+  {
+    "id": "ai_cost_calculator",
+    "name": "LLM Token Cost & Inference Estimator",
+    "cat": "AI",
+    "catName": "AI & Machine Learning",
+    "icon": "cpu",
+    "desc": "Calculate prompt and completion token costs across GPT-4o, Claude 3.5 Sonnet, and Gemini 1.5 Flash.",
+    "url": "saas/ai_cost_calculator.html",
+    "badge": "Cost"
+  },
+  {
+    "id": "ai_agent_function_call_orchestrator",
+    "name": "AI Agent Function Call Orchestrator",
+    "cat": "AI",
+    "catName": "AI & Machine Learning",
+    "icon": "layers",
+    "desc": "Test and validate JSON schema tool declarations, multi-turn tool calling, and dispatch loops.",
+    "url": "saas/ai_agent_function_call_orchestrator.html",
+    "badge": "Agents"
+  },
+  {
+    "id": "agent_memory_sliding_window_summarizer",
+    "name": "Agent Memory Sliding Window Summarizer",
+    "cat": "AI",
+    "catName": "AI & Machine Learning",
+    "icon": "message-square",
+    "desc": "Simulate conversation context compaction, FIFO token pruning, and recursive conversational memory.",
+    "url": "saas/agent_memory_sliding_window_summarizer.html",
+    "badge": "Memory"
+  },
+  {
+    "id": "omniconverter-pro",
+    "name": "OmniConverter Pro",
+    "cat": "MEDIA",
+    "catName": "Media & Creative",
+    "icon": "repeat",
+    "desc": "Multi-file PDF merger, WebP image compressor, photo EXIF GPS location wiper, and SVG rasterizer.",
+    "url": "saas/omniconverter-pro.html",
+    "badge": "Essential"
+  },
+  {
+    "id": "audio-waveform-chapter-studio",
+    "name": "Audio Waveform & Podcast Chapter Studio",
+    "cat": "MEDIA",
+    "catName": "Media & Creative",
+    "icon": "audio-lines",
+    "desc": "Web Audio API waveform visualizer, drag-and-seek audio scrubber, and Spotify/YouTube chapter exporter.",
+    "url": "saas/audio-waveform-chapter-studio.html",
+    "badge": "Audio"
+  },
+  {
+    "id": "wcag-contrast-accessibility-suite",
+    "name": "WCAG 2.2 Accessibility & Contrast Suite",
+    "cat": "MEDIA",
+    "catName": "Media & Creative",
+    "icon": "contrast",
+    "desc": "APCA & WCAG contrast calculation, colorblindness simulation (Protanopia, Deuteranopia), and UI audits.",
+    "url": "saas/wcag-contrast-accessibility-suite.html",
+    "badge": "Design"
+  },
+  {
+    "id": "vector-qr-studio-vcard",
+    "name": "Vector QR Studio & Sovereign vCard Generator",
+    "cat": "MEDIA",
+    "catName": "Media & Creative",
+    "icon": "qr-code",
+    "desc": "High-resolution SVG and PNG exports up to 2048px, vCard contact cards, and WiFi QR codes.",
+    "url": "saas/vector-qr-studio-vcard.html",
+    "badge": "QR"
+  },
+  {
+    "id": "cleanwrite-pro-editor",
+    "name": "CleanWrite Prose & Readability Sentinel",
+    "cat": "MEDIA",
+    "catName": "Media & Creative",
+    "icon": "feather",
+    "desc": "Airgapped document editor with Flesch-Kincaid scoring, passive voice detector, and sentence trimmer.",
+    "url": "saas/cleanwrite-pro-editor.html",
+    "badge": "Writing"
+  },
+  {
+    "id": "aspect_ratio_calculator",
+    "name": "Aspect Ratio & Screen Resolution Studio",
+    "cat": "MEDIA",
+    "catName": "Media & Creative",
+    "icon": "maximize-2",
+    "desc": "Compute 16:9, 4:3, 21:9 ultra-wide scalings, pixel density (PPI), and video crop dimensions.",
+    "url": "saas/aspect_ratio_calculator.html",
+    "badge": "Display"
+  },
+  {
+    "id": "universal_pedagogy_accelerator",
+    "name": "Universal Pedagogy Accelerator",
+    "cat": "SCIENCE",
+    "catName": "Science & Academic",
+    "icon": "book-open",
+    "desc": "AI-driven adaptive learning & Socratic logic curriculum synthesizer.",
+    "url": "saas/universal_pedagogy_accelerator.html",
+    "badge": "Faculty 4"
+  },
+  {
+    "id": "cell_doubling_time_growth_rate",
+    "name": "Cell Doubling Time & Growth Rate Calculator",
+    "cat": "SCIENCE",
+    "catName": "Science & Academic",
+    "icon": "dna",
+    "desc": "Calculate cell proliferation growth rates, generation time, and log-phase kinetics for biology labs.",
+    "url": "saas/cell_doubling_time_growth_rate.html",
+    "badge": "BioLab"
+  },
+  {
+    "id": "centrifuge_rcf_rpm_converter",
+    "name": "Centrifuge RCF & RPM Converter",
+    "cat": "SCIENCE",
+    "catName": "Science & Academic",
+    "icon": "rotate-cw",
+    "desc": "Convert Relative Centrifugal Force (g-force) to RPM based on rotor radius in millimeters.",
+    "url": "saas/centrifuge_rcf_rpm_converter.html",
+    "badge": "Physics"
+  },
+  {
+    "id": "bayes_theorem_posterior_updater",
+    "name": "Bayesian Posterior Probability Studio",
+    "cat": "SCIENCE",
+    "catName": "Science & Academic",
+    "icon": "binary",
+    "desc": "Interactive prior odds and likelihood ratio updater for scientific hypothesis testing.",
+    "url": "saas/bayes_theorem_posterior_updater.html",
+    "badge": "Math"
+  }
+];
+
+    let activeCategory = "ALL";
+    let activeQuery = "";
+
+    function getBaseUrl() {
+      return window.location.origin;
+    }
+
+    function getToolDirectAddress(tool) {
+      const cleanSlug = tool.id;
+      return `${getBaseUrl()}/tools/${cleanSlug}`;
+    }
+
+    function copyToolAddress(url, btnEl) {
+      navigator.clipboard.writeText(url).then(() => {
+        const originalHtml = btnEl.innerHTML;
+        btnEl.innerHTML = '<i data-lucide="check" class="w-3 h-3 text-emerald-400"></i><span class="text-emerald-400">Copied!</span>';
+        lucide.createIcons();
+        setTimeout(() => {
+          btnEl.innerHTML = originalHtml;
+          lucide.createIcons();
+        }, 1800);
+      }).catch(() => {
+        prompt("Copy tool direct address:", url);
+      });
+    }
+
+    function renderToolsGrid(list) {
+      const container = document.getElementById("toolsCardGrid");
+      const emptyState = document.getElementById("emptySearchState");
+      const countBadge = document.getElementById("activeCountBadge");
+
+      if (countBadge) countBadge.textContent = list.length;
+
+      if (!list.length) {
+        container.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+
+      container.innerHTML = list.map(tool => {
+        const directUrl = getToolDirectAddress(tool);
+        const shortPath = `/tools/${tool.id}`;
+
+        return `
+          <div class="tool-site-card p-6 space-y-5">
+            <!-- Top Card Header -->
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <i data-lucide="${tool.icon || 'code'}" class="w-5 h-5"></i>
+                </div>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-semibold">
+                  ${tool.badge || 'Standalone'}
+                </span>
+              </div>
+
+              <div>
+                <h3 class="text-base font-bold text-white font-display">${tool.name}</h3>
+                <span class="text-[11px] font-mono text-slate-400">${tool.catName || 'Engineering'}</span>
+              </div>
+
+              <p class="text-xs text-slate-300 line-clamp-3 leading-relaxed">
+                ${tool.desc}
+              </p>
+            </div>
+
+            <!-- Bottom Card Actions & Dedicated Address -->
+            <div class="space-y-3 pt-2 border-t border-white/5">
+              <!-- Direct Address Pill -->
+              <div class="address-pill group" title="Canonical Standalone Site Address">
+                <div class="flex items-center space-x-1.5 truncate">
+                  <i data-lucide="globe" class="w-3 h-3 text-emerald-400 shrink-0"></i>
+                  <span class="truncate">${shortPath}</span>
+                </div>
+                <button 
+                  onclick="copyToolAddress('${directUrl}', this)" 
+                  class="p-1 hover:text-white transition-colors shrink-0 flex items-center space-x-1 text-[10px] text-slate-400"
+                  title="Copy direct address"
+                >
+                  <i data-lucide="copy" class="w-3 h-3"></i>
+                  <span>Copy</span>
+                </button>
+              </div>
+
+              <!-- Open Standalone Site Button -->
+              <a 
+                href="${shortPath}" 
+                class="w-full cyber-btn py-2.5 px-4 rounded-xl text-xs font-mono font-semibold text-white flex items-center justify-center space-x-2 text-center"
+              >
+                <span>Open Standalone Site</span>
+                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-emerald-300"></i>
+              </a>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    function filterTools() {
+      const query = (document.getElementById("toolsSearchInput").value || "").toLowerCase().trim();
+      activeQuery = query;
+
+      let filtered = TOOLS;
+
+      if (activeCategory !== "ALL") {
+        filtered = filtered.filter(t => {
+          if (activeCategory === "STUDENT") return t.cat === "STUDENT";
+          if (activeCategory === "AI_ML") return t.cat === "AI_ML" || t.id.includes("ai") || t.id.includes("model") || t.id.includes("matrix");
+          if (activeCategory === "DEV") return t.cat === "DEV" || t.id.includes("api") || t.id.includes("sql") || t.id.includes("json");
+          if (activeCategory === "SECURITY") return t.cat === "SECURITY" || t.id.includes("shield") || t.id.includes("audit") || t.id.includes("leak");
+          if (activeCategory === "FINANCE") return t.cat === "FINANCE" || t.id.includes("equity") || t.id.includes("runway") || t.id.includes("dcf");
+          return true;
+        });
+      }
+
+      if (query) {
+        filtered = filtered.filter(t => 
+          (t.name && t.name.toLowerCase().includes(query)) ||
+          (t.desc && t.desc.toLowerCase().includes(query)) ||
+          (t.id && t.id.toLowerCase().includes(query)) ||
+          (t.catName && t.catName.toLowerCase().includes(query))
+        );
+      }
+
+      renderToolsGrid(filtered);
+    }
+
+    function setCategory(cat) {
+      activeCategory = cat;
+
+      document.querySelectorAll(".cat-pill").forEach(btn => {
+        if (btn.getAttribute("data-cat") === cat) {
+          btn.className = "cat-pill active-cat px-3.5 py-1.5 rounded-xl border bg-emerald-500/20 border-emerald-500/40 text-emerald-300 font-semibold transition-all";
+        } else {
+          btn.className = "cat-pill px-3.5 py-1.5 rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:text-white transition-all";
+        }
+      });
+
+      filterTools();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      renderToolsGrid(TOOLS);
+    });
+  </script>
+</body>
+</html>

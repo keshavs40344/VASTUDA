@@ -12,6 +12,47 @@
     body { font-family: 'Inter', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
   </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What does the Startup Runway & Unit Economics tool calculate?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It models your startup's monthly gross burn, net burn, cash runway in months, Customer Acquisition Cost (CAC), and Lifetime Value (LTV)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is runway calculation critical for early-stage founders?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Accurate runway forecasting helps technical founders plan fundraising timing, control hiring burn, and avoid sudden insolvency."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is financial data confidential?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. All financial models are computed strictly in your browser session. No financial numbers are transmitted or stored."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the URL for this tool?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can access the standalone model at /tools/startup-runway-unit-economics."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-white">
 
@@ -168,7 +209,60 @@
 
     </div>
 
-  </main>
+  
+    <!-- Standalone Tool Site FAQ & Knowledge Base -->
+    <section class="mt-16 max-w-4xl mx-auto space-y-6 pt-10 border-t border-white/10 no-print">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+          <span>Standalone Knowledge Base &amp; FAQ</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">Frequently Asked Questions</h2>
+        <p class="text-xs text-slate-400">Everything you need to know about using this standalone tool.</p>
+      </div>
+
+      <div class="space-y-3 font-sans">
+        
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What does the Startup Runway & Unit Economics tool calculate?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>It models your startup's monthly gross burn, net burn, cash runway in months, Customer Acquisition Cost (CAC), and Lifetime Value (LTV).</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Why is runway calculation critical for early-stage founders?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Accurate runway forecasting helps technical founders plan fundraising timing, control hiring burn, and avoid sudden insolvency.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Is financial data confidential?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Yes. All financial models are computed strictly in your browser session. No financial numbers are transmitted or stored.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is the URL for this tool?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>You can access the standalone model at /tools/startup-runway-unit-economics.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+</main>
 
   <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
     Vastuda Sovereign Suite • 100% Free Autonomous Software • Replaces $100/mo Baremetrics/Finmark Paywalls

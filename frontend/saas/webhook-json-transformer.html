@@ -11,6 +11,47 @@
     body { font-family: 'Inter', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
   </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Webhook JSON Transformer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It is an interactive studio to transform, map, and reshape incoming JSON webhook payloads (from Stripe, GitHub, Razorpay, etc.) into target REST payloads in real-time."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I test jq-style JSON path expressions?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, you can extract nested keys, format arrays, filter null values, and preview output payloads instantly."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are webhook payloads logged on the server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Never. The JSON parser and mapping engine run completely client-side in your browser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where is this tool hosted?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It is a standalone site available directly at /tools/webhook-json-transformer."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white">
 
@@ -105,7 +146,60 @@
       <textarea id="outputJson" readonly placeholder="Output payload ready for consumption in external APIs will appear here..." class="w-full flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-3.5 text-xs mono text-emerald-300 focus:outline-none resize-none h-[520px] shadow-xl"></textarea>
     </div>
 
-  </main>
+  
+    <!-- Standalone Tool Site FAQ & Knowledge Base -->
+    <section class="mt-16 max-w-4xl mx-auto space-y-6 pt-10 border-t border-white/10 no-print">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+          <span>Standalone Knowledge Base &amp; FAQ</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">Frequently Asked Questions</h2>
+        <p class="text-xs text-slate-400">Everything you need to know about using this standalone tool.</p>
+      </div>
+
+      <div class="space-y-3 font-sans">
+        
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is Webhook JSON Transformer?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>It is an interactive studio to transform, map, and reshape incoming JSON webhook payloads (from Stripe, GitHub, Razorpay, etc.) into target REST payloads in real-time.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Can I test jq-style JSON path expressions?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Yes, you can extract nested keys, format arrays, filter null values, and preview output payloads instantly.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Are webhook payloads logged on the server?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Never. The JSON parser and mapping engine run completely client-side in your browser.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Where is this tool hosted?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>It is a standalone site available directly at /tools/webhook-json-transformer.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+</main>
 
   <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
     Vastuda Sovereign Suite • 100% Free Autonomous Software • Replaces $50/mo Zapier/Make Webhook Paywalls

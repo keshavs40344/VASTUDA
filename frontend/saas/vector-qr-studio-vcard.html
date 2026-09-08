@@ -12,6 +12,47 @@
     body { font-family: 'Inter', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
   </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What formats can I export QR codes in?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can generate and export high-resolution SVG vector files, PNG raster images, and vCard 3.0 digital business cards."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do these QR codes expire or have tracking redirects?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Unlike commercial QR generators that force redirect links through their paywalled domains, VASTUDA generates direct static QR codes that never expire."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it 100% free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, unlimited vector QR codes with customized error correction and colors for $0."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the direct URL?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Access it directly at /tools/vector-qr-studio-vcard."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-purple-500 selection:text-white">
 
@@ -183,7 +224,60 @@
 
     </div>
 
-  </main>
+  
+    <!-- Standalone Tool Site FAQ & Knowledge Base -->
+    <section class="mt-16 max-w-4xl mx-auto space-y-6 pt-10 border-t border-white/10 no-print">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+          <span>Standalone Knowledge Base &amp; FAQ</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">Frequently Asked Questions</h2>
+        <p class="text-xs text-slate-400">Everything you need to know about using this standalone tool.</p>
+      </div>
+
+      <div class="space-y-3 font-sans">
+        
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What formats can I export QR codes in?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>You can generate and export high-resolution SVG vector files, PNG raster images, and vCard 3.0 digital business cards.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Do these QR codes expire or have tracking redirects?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>No. Unlike commercial QR generators that force redirect links through their paywalled domains, VASTUDA generates direct static QR codes that never expire.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Is it 100% free?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Yes, unlimited vector QR codes with customized error correction and colors for $0.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is the direct URL?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Access it directly at /tools/vector-qr-studio-vcard.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+</main>
 
   <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
     Vastuda Sovereign Suite • 100% Free Autonomous Software • Replaces $120/yr QR Paywalls

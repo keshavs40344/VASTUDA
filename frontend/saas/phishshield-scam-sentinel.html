@@ -23,6 +23,47 @@
     .badge-warn { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
     .badge-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.5); }
   </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is PhishShield Anti-Scam & Phishing Sentinel?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It is an advanced threat analysis engine that inspects suspicious URLs, email headers, domain typosquatting, IDN homograph attacks, and suspicious redirect chains."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it expose my IP to the malicious domain?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No, PhishShield performs static heuristic lexical and certificate checks without forcing your browser to execute malicious scripts."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Who should use this tool?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Students, software engineers, and IT administrators looking to verify suspicious placement offers, job links, or domain authenticity."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is its standalone address?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can visit it anytime at /tools/phishshield-scam-sentinel."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
 
@@ -225,7 +266,60 @@
 
     </div>
 
-  </main>
+  
+    <!-- Standalone Tool Site FAQ & Knowledge Base -->
+    <section class="mt-16 max-w-4xl mx-auto space-y-6 pt-10 border-t border-white/10 no-print">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+          <span>Standalone Knowledge Base &amp; FAQ</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">Frequently Asked Questions</h2>
+        <p class="text-xs text-slate-400">Everything you need to know about using this standalone tool.</p>
+      </div>
+
+      <div class="space-y-3 font-sans">
+        
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is PhishShield Anti-Scam & Phishing Sentinel?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>It is an advanced threat analysis engine that inspects suspicious URLs, email headers, domain typosquatting, IDN homograph attacks, and suspicious redirect chains.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Does it expose my IP to the malicious domain?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>No, PhishShield performs static heuristic lexical and certificate checks without forcing your browser to execute malicious scripts.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Who should use this tool?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Students, software engineers, and IT administrators looking to verify suspicious placement offers, job links, or domain authenticity.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is its standalone address?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>You can visit it anytime at /tools/phishshield-scam-sentinel.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+</main>
 
   <footer class="border-t border-zinc-800/80 bg-zinc-950 py-4 text-center text-xs font-mono text-zinc-500">
     VASTUDA Sovereign Core • 100% Client-Side Privacy • Deterministic Defensive Security

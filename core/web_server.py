@@ -1760,12 +1760,66 @@ def serve_auth():
 def serve_user_dashboard():
     return send_from_directory(FRONTEND_DIR, "user_dashboard.html")
 
+# ==============================================================================
+# FIRST-CLASS STANDALONE TOOL SITES & DEDICATED WEB ADDRESS ROUTING
+# ==============================================================================
+
+@app.route("/tools")
+@app.route("/tools/")
+def serve_tools_directory():
+    """Serves the central VASTUDA Standalone Tools Directory Hub."""
+    tools_file = os.path.join(FRONTEND_DIR, "tools.html")
+    if os.path.exists(tools_file):
+        return send_from_directory(FRONTEND_DIR, "tools.html")
+    return send_from_directory(FRONTEND_DIR, "user_dashboard.html")
+
+@app.route("/tools/assets/<path:asset_path>")
+def serve_tools_nested_assets(asset_path):
+    """Ensures static assets resolve cleanly when loaded from /tools/<tool-id> URLs."""
+    return send_from_directory(os.path.join(FRONTEND_DIR, "assets"), asset_path)
+
+@app.route("/tools/config.js")
+def serve_tools_config():
+    """Ensures config.js resolves cleanly when loaded from /tools/<tool-id> URLs."""
+    return send_from_directory(FRONTEND_DIR, "config.js")
+
+@app.route("/tools/<path:tool_id>")
+def serve_tool_site(tool_id):
+    """
+    Dedicated Standalone Tool Site Address Resolver:
+    Resolves /tools/<name> or /tools/<name>.html to the dedicated tool site.
+    Supports both hyphenated and underscored names.
+    """
+    clean_id = tool_id.strip("/").lower()
+    if clean_id.endswith(".html"):
+        clean_id = clean_id[:-5]
+
+    candidates = [
+        f"{clean_id}.html",
+        f"{clean_id.replace('-', '_')}.html",
+        f"{clean_id.replace('_', '-')}.html",
+    ]
+
+    saas_dir = os.path.join(FRONTEND_DIR, "saas")
+    for cand in candidates:
+        cand_path = os.path.join(saas_dir, cand)
+        if os.path.isfile(cand_path):
+            return send_from_directory(saas_dir, cand)
+
+    for cand in candidates:
+        cand_path = os.path.join(FRONTEND_DIR, cand)
+        if os.path.isfile(cand_path):
+            return send_from_directory(FRONTEND_DIR, cand)
+
+    return jsonify({"error": "Tool Not Found", "address": f"/tools/{tool_id}"}), 404
+
 @app.route("/<path:path>")
 def serve_static(path):
     """
-    Airtight Static File Gateway:
+    Airtight Static File Gateway & Smart Address Resolver:
     - Path Traversal Block: Enforces canonical realpath boundary within FRONTEND_DIR.
     - File Extension Filter: Blocks all .py, .env, .json, .sh, .git, etc.
+    - Smart Address Resolver: Automatically resolves clean tool slugs to saas/<tool>.html.
     """
     clean_path = path.replace('\\', '/')
     base_name = os.path.basename(clean_path).lower()
@@ -1784,10 +1838,65 @@ def serve_static(path):
         if os.path.isfile(resolved_abs):
             rel_file = os.path.relpath(resolved_abs, canonical_frontend)
             return send_from_directory(canonical_frontend, rel_file)
+
+        # Smart clean-URL fallback: if requested path is a tool (e.g. /resume-builder)
+        if not any(clean_path.startswith(prefix) for prefix in ("api/", "assets/")):
+            slug = clean_path.split("/")[-1].lower()
+            if slug.endswith(".html"):
+                slug = slug[:-5]
+            candidates = [
+                f"{slug}.html",
+                f"{slug.replace('-', '_')}.html",
+                f"{slug.replace('_', '-')}.html",
+            ]
+            saas_dir = os.path.join(FRONTEND_DIR, "saas")
+            for cand in candidates:
+                cand_path = os.path.join(saas_dir, cand)
+                if os.path.isfile(cand_path):
+                    return send_from_directory(saas_dir, cand)
     except Exception as e:
         logger.error(f"[STATIC SERVE ERROR] {e}")
 
     return jsonify({"error": "Not Found", "path": path}), 404
+
+@app.errorhandler(404)
+def handle_clean_tool_address_fallback(e):
+    """
+    Intelligent Standalone Tool Address Resolver (404 Fallback):
+    Enables users to open any tool using its clean direct address:
+    - /resume-builder -> frontend/saas/resume-builder.html
+    - /dsa-complexity-analyzer -> frontend/saas/dsa-complexity-analyzer.html
+    - /tools/<name> -> frontend/saas/<name>.html
+    """
+    raw_path = request.path.strip("/").lower()
+    if raw_path.startswith("api/") or raw_path.startswith("assets/"):
+        return e
+
+    clean_slug = raw_path
+    if clean_slug.startswith("tools/"):
+        clean_slug = clean_slug[6:]
+    if clean_slug.endswith(".html"):
+        clean_slug = clean_slug[:-5]
+
+    saas_dir = os.path.join(FRONTEND_DIR, "saas")
+    candidates = [
+        f"{clean_slug}.html",
+        f"{clean_slug.replace('-', '_')}.html",
+        f"{clean_slug.replace('_', '-')}.html",
+    ]
+
+    for cand in candidates:
+        cand_path = os.path.join(saas_dir, cand)
+        if os.path.isfile(cand_path):
+            return send_from_directory(saas_dir, cand)
+
+    # Check root frontend directory
+    for cand in candidates:
+        cand_path = os.path.join(FRONTEND_DIR, cand)
+        if os.path.isfile(cand_path):
+            return send_from_directory(FRONTEND_DIR, cand)
+
+    return e
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

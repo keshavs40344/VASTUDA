@@ -11,6 +11,47 @@
     body { font-family: 'Inter', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
   </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Why should I scrub metadata from PDFs before sharing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "PDF files often contain hidden sensitive metadata including the author's full name, operating system, company name, printer serials, GPS coordinates, and edit timestamps. Scrubbing metadata eliminates forensic tracking."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does this scrubber work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It reads the PDF binary buffer in your browser, parses the Info dictionary and XMP metadata trees, and zeroes out tracking keys."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are my PDF documents uploaded to the cloud?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No! All file operations use the HTML5 FileReader and WebAssembly binary decoders entirely in your local browser memory."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the canonical address for this tool?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Access it directly at /tools/pdf-metadata-scrubber-redactor."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-rose-500 selection:text-white">
 
@@ -186,7 +227,60 @@
 
     </div>
 
-  </main>
+  
+    <!-- Standalone Tool Site FAQ & Knowledge Base -->
+    <section class="mt-16 max-w-4xl mx-auto space-y-6 pt-10 border-t border-white/10 no-print">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+          <span>Standalone Knowledge Base &amp; FAQ</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">Frequently Asked Questions</h2>
+        <p class="text-xs text-slate-400">Everything you need to know about using this standalone tool.</p>
+      </div>
+
+      <div class="space-y-3 font-sans">
+        
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Why should I scrub metadata from PDFs before sharing?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>PDF files often contain hidden sensitive metadata including the author's full name, operating system, company name, printer serials, GPS coordinates, and edit timestamps. Scrubbing metadata eliminates forensic tracking.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>How does this scrubber work?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>It reads the PDF binary buffer in your browser, parses the Info dictionary and XMP metadata trees, and zeroes out tracking keys.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Are my PDF documents uploaded to the cloud?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>No! All file operations use the HTML5 FileReader and WebAssembly binary decoders entirely in your local browser memory.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is the canonical address for this tool?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Access it directly at /tools/pdf-metadata-scrubber-redactor.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+</main>
 
   <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
     Vastuda Sovereign Document Suite • 100% Client-Side Legal Sanity Check • Zero Cloud Logging

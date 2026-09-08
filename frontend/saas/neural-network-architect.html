@@ -81,10 +81,22 @@
   <!-- Top Header -->
   <header class="glass border-b border-white/5 px-6 py-3.5 sticky top-0 z-40">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
-      <a href="../user_dashboard.html" class="flex items-center gap-2 text-sm font-mono text-slate-400 hover:text-indigo-400 transition">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i>
-        <span>VASTUDA WORKSPACE</span>
-      </a>
+      <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center gap-1.5 text-xs font-mono text-slate-400 hover:text-white transition font-bold tracking-wider text-white">
+          <span>VASTUDA</span>
+        </a>
+        <span class="text-slate-600">&bull;</span>
+        <a href="/tools" class="flex items-center gap-1.5 text-xs font-mono text-slate-400 hover:text-emerald-400 transition">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span>All Tools</span>
+        </a>
+        <span class="text-slate-600 hidden sm:inline">&bull;</span>
+        <div class="hidden md:flex items-center gap-1.5 bg-black/40 border border-white/10 px-2.5 py-1 rounded-lg text-[11px] font-mono text-slate-300">
+          <i data-lucide="globe" class="w-3 h-3 text-emerald-400"></i>
+          <span class="text-emerald-400 font-semibold">Site Address:</span>
+          <span>/tools/neural-network-architect</span>
+        </div>
+      </div>
       <div class="flex items-center gap-3">
         <span class="text-[10px] font-mono px-2.5 py-0.5 rounded border bg-indigo-500/10 text-indigo-400 border-indigo-500/30">
           DEEP LEARNING LAB

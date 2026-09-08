@@ -11,6 +11,47 @@
     body { font-family: 'Inter', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
   </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What does the SQL Explain & Index Advisor do?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It parses complex PostgreSQL, MySQL, and SQLite queries, explains execution plans in plain English, and recommends missing composite B-Tree indexes to eliminate full table scans."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does it calculate estimated performance gain?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It analyzes JOIN predicates, WHERE clauses, and ORDER BY columns to evaluate indexing selectivity and estimates I/O reduction."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it safe to paste proprietary database schemas?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. All query parsing and index heuristic calculations run entirely in client-side JavaScript. Nothing is sent to our servers."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the direct website address of this tool?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can launch it directly at /tools/sql-explainer-index-advisor."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
 
@@ -115,7 +156,60 @@
 
     </div>
 
-  </main>
+  
+    <!-- Standalone Tool Site FAQ & Knowledge Base -->
+    <section class="mt-16 max-w-4xl mx-auto space-y-6 pt-10 border-t border-white/10 no-print">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+          <span>Standalone Knowledge Base &amp; FAQ</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">Frequently Asked Questions</h2>
+        <p class="text-xs text-slate-400">Everything you need to know about using this standalone tool.</p>
+      </div>
+
+      <div class="space-y-3 font-sans">
+        
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What does the SQL Explain & Index Advisor do?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>It parses complex PostgreSQL, MySQL, and SQLite queries, explains execution plans in plain English, and recommends missing composite B-Tree indexes to eliminate full table scans.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>How does it calculate estimated performance gain?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>It analyzes JOIN predicates, WHERE clauses, and ORDER BY columns to evaluate indexing selectivity and estimates I/O reduction.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Is it safe to paste proprietary database schemas?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Yes. All query parsing and index heuristic calculations run entirely in client-side JavaScript. Nothing is sent to our servers.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is the direct website address of this tool?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>You can launch it directly at /tools/sql-explainer-index-advisor.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+</main>
 
   <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
     Vastuda Sovereign Suite • 100% Free Autonomous Software • Replaces $79/mo EverSQL Paywalls

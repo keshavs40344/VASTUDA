@@ -11,6 +11,47 @@
     body { font-family: 'Inter', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
   </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is WCAG 2.2 contrast compliance?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Web Content Accessibility Guidelines (WCAG) specify minimum contrast ratios (4.5:1 for normal text, 3:1 for large text) between foreground and background colors to ensure accessibility."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does this tool support APCA (Advanced Perceptual Contrast Algorithm)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, it evaluates both classic WCAG 2.1/2.2 mathematical ratios and modern perceptual color contrast algorithms."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Who is this tool for?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Frontend developers, UI/UX designers, and students building accessible web applications."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the direct address?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Visit it directly at /tools/wcag-contrast-accessibility-suite."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
 
@@ -166,7 +207,60 @@
 
     </div>
 
-  </main>
+  
+    <!-- Standalone Tool Site FAQ & Knowledge Base -->
+    <section class="mt-16 max-w-4xl mx-auto space-y-6 pt-10 border-t border-white/10 no-print">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+          <span>Standalone Knowledge Base &amp; FAQ</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">Frequently Asked Questions</h2>
+        <p class="text-xs text-slate-400">Everything you need to know about using this standalone tool.</p>
+      </div>
+
+      <div class="space-y-3 font-sans">
+        
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is WCAG 2.2 contrast compliance?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>The Web Content Accessibility Guidelines (WCAG) specify minimum contrast ratios (4.5:1 for normal text, 3:1 for large text) between foreground and background colors to ensure accessibility.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Does this tool support APCA (Advanced Perceptual Contrast Algorithm)?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Yes, it evaluates both classic WCAG 2.1/2.2 mathematical ratios and modern perceptual color contrast algorithms.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Who is this tool for?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Frontend developers, UI/UX designers, and students building accessible web applications.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is the direct address?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Visit it directly at /tools/wcag-contrast-accessibility-suite.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+</main>
 
   <footer class="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
     Vastuda Sovereign Suite • 100% Free Autonomous Software • Replaces $490/yr Stark & AccessiBe Paywalls

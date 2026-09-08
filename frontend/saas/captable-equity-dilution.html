@@ -13,6 +13,47 @@
     .font-mono { font-family: 'JetBrains Mono', monospace; }
     .glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.08); }
   </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is CapTable Pro?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CapTable Pro is an interactive equity dilution simulator that models founder shares, ESOP option pools, SAFE convertible notes, and priced Series A/B rounds."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does it handle pre-money vs post-money SAFEs?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It provides exact mathematical modeling for both pre-money and post-money SAFE dilution mechanisms so founders know their exact post-round ownership."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my cap table data private?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, 100% private. Calculations are performed locally in browser memory without any server persistence."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the direct address?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It is available at /tools/captable-equity-dilution."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
 
@@ -160,7 +201,60 @@
 
     </div>
 
-  </main>
+  
+    <!-- Standalone Tool Site FAQ & Knowledge Base -->
+    <section class="mt-16 max-w-4xl mx-auto space-y-6 pt-10 border-t border-white/10 no-print">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+          <span>Standalone Knowledge Base &amp; FAQ</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">Frequently Asked Questions</h2>
+        <p class="text-xs text-slate-400">Everything you need to know about using this standalone tool.</p>
+      </div>
+
+      <div class="space-y-3 font-sans">
+        
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is CapTable Pro?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>CapTable Pro is an interactive equity dilution simulator that models founder shares, ESOP option pools, SAFE convertible notes, and priced Series A/B rounds.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>How does it handle pre-money vs post-money SAFEs?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>It provides exact mathematical modeling for both pre-money and post-money SAFE dilution mechanisms so founders know their exact post-round ownership.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Is my cap table data private?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Yes, 100% private. Calculations are performed locally in browser memory without any server persistence.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What is the direct address?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>It is available at /tools/captable-equity-dilution.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+</main>
 
   <footer class="border-t border-zinc-800/80 bg-zinc-950 py-4 text-center text-xs font-mono text-zinc-500">
     VASTUDA Sovereign Core • 100% Client-Side Privacy • Deterministic Financial Mathematics

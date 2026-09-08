@@ -12,6 +12,47 @@
     body { font-family: 'Inter', sans-serif; }
     .mono { font-family: 'JetBrains Mono', monospace; }
   </style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What utilities are included in DevForge Swiss-Knife?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "DevForge includes Base64 encoder/decoder, JSON beautifier and minifier, URL parser, UNIX timestamp converter, hash generation (SHA-256, MD5), and UUID v4 generator."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does DevForge Swiss-Knife send any data to external servers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. DevForge operates 100% locally in your browser RAM. Your tokens, API keys, and payloads never leave your computer."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why use DevForge instead of random online formatters?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Most online formatters log submitted payloads to backend analytics or search indexes, causing severe API key and credential leaks. DevForge guarantees complete zero-egress airgap isolation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I bookmark or share this tool directly?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! DevForge has its own dedicated address at /tools/devforge-swissknife, accessible directly from any browser."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white">
 
@@ -222,7 +263,60 @@
       </div>
     </div>
 
-  </main>
+  
+    <!-- Standalone Tool Site FAQ & Knowledge Base -->
+    <section class="mt-16 max-w-4xl mx-auto space-y-6 pt-10 border-t border-white/10 no-print">
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+          <span>Standalone Knowledge Base &amp; FAQ</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-bold font-display text-white">Frequently Asked Questions</h2>
+        <p class="text-xs text-slate-400">Everything you need to know about using this standalone tool.</p>
+      </div>
+
+      <div class="space-y-3 font-sans">
+        
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>What utilities are included in DevForge Swiss-Knife?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>DevForge includes Base64 encoder/decoder, JSON beautifier and minifier, URL parser, UNIX timestamp converter, hash generation (SHA-256, MD5), and UUID v4 generator.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Does DevForge Swiss-Knife send any data to external servers?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>No. DevForge operates 100% locally in your browser RAM. Your tokens, API keys, and payloads never leave your computer.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Why use DevForge instead of random online formatters?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Most online formatters log submitted payloads to backend analytics or search indexes, causing severe API key and credential leaks. DevForge guarantees complete zero-egress airgap isolation.</p>
+          </div>
+        </details>
+        <details class="group rounded-2xl bg-slate-900/60 border border-white/10 p-5 transition-all open:border-emerald-500/30">
+          <summary class="flex items-center justify-between cursor-pointer list-none font-semibold text-sm sm:text-base text-white">
+            <span>Can I bookmark or share this tool directly?</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform"></i>
+          </summary>
+          <div class="pt-3 text-xs sm:text-sm text-slate-300 leading-relaxed border-t border-white/5 mt-3">
+            <p>Yes! DevForge has its own dedicated address at /tools/devforge-swissknife, accessible directly from any browser.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+</main>
 
   <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500">
     DevForge Swiss-Knife • 100% In-Browser Execution • Private & Sovereign

@@ -184,9 +184,13 @@
         </div>
       </a>
 
-      <!-- Right: Login -->
+      <!-- Right: Login & Tools Directory -->
       <div class="flex items-center space-x-3">
-        <a href="saas/resume-builder.html" class="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition-all">
+        <a href="/tools" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-cyan-400 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 transition-all">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+          <span>Tools Directory</span>
+        </a>
+        <a href="/tools/resume-builder" class="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition-all">
           <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
           <span>Free Resume Builder</span>
         </a>
@@ -208,9 +212,9 @@
   <main class="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 space-y-24 flex-1 w-full relative z-10">
     
     <div class="relative text-center space-y-6 max-w-4xl mx-auto">
-      <canvas id="indexHeroCanvas" class="absolute inset-x-0 -top-24 w-full h-[520px] pointer-events-none opacity-40 z-0"></canvas>
+      <canvas id="indexHeroCanvas" class="absolute inset-x-0 -top-24 w-full h-[520px] pointer-events-none opacity-60"></canvas>
       <div class="relative z-10 space-y-6">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono shadow-sm shadow-emerald-500/15">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono">
           <span class="w-2 h-2 rounded-full bg-emerald-400 cyber-radar"></span>
           <span>PRIVATE ENTERPRISE AI COMPUTE FABRIC</span>
         </div>
@@ -225,17 +229,17 @@
         </p>
 
         <div class="flex flex-wrap items-center justify-center gap-4 pt-4 font-mono text-xs">
-          <a href="saas/resume-builder.html" class="cyber-btn px-7 py-3.5 rounded-xl font-bold text-white flex items-center gap-2">
+          <a href="/tools/resume-builder" class="cyber-btn px-7 py-3.5 rounded-xl font-bold text-white flex items-center gap-2">
             <i data-lucide="sparkles" class="w-4 h-4 text-emerald-400"></i>
-            <span>AI Resume Builder (100% Free)</span>
+            <span>AI Resume Builder (Free)</span>
           </a>
-          <a href="/login" class="px-7 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-white/10 flex items-center gap-2 transition-all">
+          <a href="/tools" class="px-6 py-3.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 flex items-center gap-2 transition-all">
+            <i data-lucide="layout-grid" class="w-4 h-4 text-cyan-400"></i>
+            <span>All Standalone Tools (48+)</span>
+          </a>
+          <a href="/login" class="px-6 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-white/10 flex items-center gap-2 transition-all">
             <i data-lucide="log-in" class="w-4 h-4 text-emerald-400"></i>
             <span>Workspace Login</span>
-          </a>
-          <a href="#features" class="px-7 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-white/10 hover:border-white/25 transition flex items-center gap-2 btn-tactile shadow-sm">
-            <i data-lucide="cpu" class="w-4 h-4 text-cyan-400"></i>
-            <span>Platform Overview</span>
           </a>
         </div>
       </div>
@@ -374,6 +378,8 @@
         <span>&copy; 2026 Sovereign Autonomous Systems. All rights reserved.</span>
       </div>
       <div class="flex items-center space-x-4 text-[11px]">
+        <a href="/tools" class="hover:text-cyan-400 transition">All Tools</a>
+        <span>&bull;</span>
         <a href="/login" class="hover:text-emerald-400 transition">Login</a>
         <span>&bull;</span>
         <span>ISO 27001 &amp; SOC2 Type II Architecture</span>
