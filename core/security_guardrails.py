@@ -30,12 +30,13 @@ INJECTION_SIGNATURES = [
 
 # Sensitive Data Redaction Regex Patterns
 PII_PATTERNS = [
-    (r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b', "[REDACTED_EMAIL]"),
+    (r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', "[REDACTED_EMAIL]"),
     (r'\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})\b', "[REDACTED_CREDIT_CARD]"),
-    (r'(?:AIza[0-9A-Za-z-_]{35}|sk-[A-Za-z0-9]{32,}|AQ\.[A-Za-z0-9-_]{40,})', "[REDACTED_API_KEY]"),
+    (r'(?:AIza[0-9A-Za-z-_]{35}|sk-[A-Za-z0-9-_]{10,}|AQ\.[A-Za-z0-9-_]{30,})', "[REDACTED_API_KEY]"),
     (r'eyJ[A-Za-z0-9-_]+\.eyJ[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+', "[REDACTED_JWT_TOKEN]"),
     (r'\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b', "[REDACTED_PHONE_NUMBER]"),
 ]
+
 
 # Zero-Trust Role-Based Access Control (RBAC) Enclave Matrix
 RBAC_PERMISSIONS: Dict[str, List[str]] = {
