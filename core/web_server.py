@@ -727,6 +727,59 @@ def get_level5_harvester_feed():
         "timestamp": time.time()
     }), 200
 
+# ==============================================================================
+# LAYER 6: AUTONOMOUS AGENT FACTORY & LLM REASONING CORE APIS
+# ==============================================================================
+try:
+    from core.agent_factory import agent_factory
+except Exception as e:
+    logger.error(f"[AGENT CORE] Init notice: {e}")
+    agent_factory = None
+
+@app.route("/api/level6/agent-status", methods=["GET"])
+def get_level6_agent_status():
+    """
+    Level 6: Autonomous Agent Factory & LLM Reasoning Core Telemetry.
+    Reports operational mode (Gemini vs Sovereign Fallback), active agents,
+    total dispatches, and registered system tools.
+    """
+    if not agent_factory:
+        return jsonify({"status": "error", "message": "Agent factory uninitialized"}), 503
+    return jsonify(agent_factory.get_status()), 200
+
+@app.route("/api/level6/dispatch", methods=["POST"])
+def dispatch_level6_agent_task():
+    """
+    Dispatches a high-level task to an autonomous agent.
+    Executes multi-step ReAct reasoning loop (Gemini 2.5 Flash function calling)
+    and interacts dynamically with Level 3, Level 4, and Level 5 tools.
+    """
+    if not agent_factory:
+        return jsonify({"status": "error", "message": "Agent factory uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    prompt = payload.get("prompt", "").strip()
+    role = payload.get("role", "Autonomous Systems Engineer").strip()
+    if not prompt:
+        return jsonify({"status": "error", "message": "Task prompt required"}), 400
+
+    result = agent_factory.dispatch_task(prompt=prompt, agent_role=role)
+    return jsonify(result), 200
+
+@app.route("/api/level6/history", methods=["GET"])
+def get_level6_agent_history():
+    """
+    Returns recent autonomous agent task executions and tool call traces.
+    """
+    if not agent_factory:
+        return jsonify({"status": "error", "message": "Agent factory uninitialized"}), 503
+    limit = int(request.args.get("limit", 10))
+    return jsonify({
+        "status": "success",
+        "history": agent_factory.execution_history[:limit],
+        "timestamp": time.time()
+    }), 200
+
+
 
 @app.route("/api/scrape", methods=["POST"])
 def trigger_scrape_job():

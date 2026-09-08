@@ -207,3 +207,4 @@ class SovereignMicroSandbox:
 
 # Global Sandbox Singleton
 micro_sandbox = SovereignMicroSandbox(timeout_sec=3.0, memory_cap_mb=50.0)
+sandbox_engine = micro_sandbox

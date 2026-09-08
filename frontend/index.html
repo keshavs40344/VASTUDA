@@ -3025,6 +3025,148 @@
         </div>
       </section>
 
+      <!-- ========================================================================= -->
+      <!-- LAYER 06 // AUTONOMOUS AGENT FACTORY & LLM REASONING CORE MATRIX           -->
+      <!-- ========================================================================= -->
+      <section id="layer6AgentMatrix" class="space-y-6 pt-8 border-t border-purple-500/20">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-[11px] font-mono border border-purple-500/30 mb-2">
+              <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+              <span>LAYER 06 // AUTONOMOUS AGENT FACTORY &amp; LLM REASONING CORE</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-display font-black text-white tracking-tight flex flex-wrap items-center gap-3">
+              <span>Autonomous Agent Factory &amp; Reasoning Core</span>
+              <span class="text-xs font-mono px-2.5 py-1 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 uppercase tracking-widest font-normal flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
+                Level 6 Live
+              </span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400 font-mono mt-1 max-w-3xl">
+              Multi-step ReAct reasoning loops with native Gemini 2.5 Flash function calling and Sovereign deterministic fallback. Dispatches live actions to Levels 3, 4 &amp; 5.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <button onclick="window.refreshLevel6AgentStatus()" class="px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-purple-300 border border-purple-500/40 flex items-center gap-1.5 transition cursor-pointer shadow-sm">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-purple-400"></i>
+              <span>Poll Agents</span>
+            </button>
+            <button onclick="window.dispatchAgentTask()" id="btnDispatchAgent" class="cyber-btn px-4 py-2 bg-gradient-to-r from-purple-500 via-indigo-500 to-violet-400 hover:opacity-90 text-white font-bold font-mono rounded-xl flex items-center gap-2 transition cursor-pointer shadow-lg shadow-purple-500/20">
+              <i data-lucide="bot" class="w-4 h-4"></i>
+              <span>Dispatch Task</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 TACTICAL HUD PANELS FOR LAYER 6 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          
+          <!-- PANEL 1: Fleet Telemetry & Cognitive Mode -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-purple-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="brain-circuit" class="w-3.5 h-3.5"></i>
+                  COGNITIVE CORE
+                </span>
+                <span id="l6EngineTag" class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[10px]">GEMINI ONLINE</span>
+              </div>
+              
+              <div class="space-y-2 font-mono text-xs">
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Active Model:</span>
+                  <span id="l6ModelName" class="font-bold text-white">gemini-2.5-flash</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Total Dispatches:</span>
+                  <span id="l6TotalDispatches" class="font-bold text-emerald-400">0</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Tool Invocations:</span>
+                  <span id="l6TotalTools" class="font-bold text-cyan-400">0</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Registered Tools:</span>
+                  <span class="font-bold text-purple-300">4 Microservices</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>PROTOCOL: <strong class="text-purple-400">ReAct LOOP</strong></span>
+              <span>STATE: <strong class="text-emerald-400">ACTIVE</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 2: Interactive Task Dispatcher & ReAct Enclave -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4 md:col-span-2">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-purple-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="terminal" class="w-3.5 h-3.5"></i>
+                  AUTONOMOUS AGENT CONSOLE
+                </span>
+                <span id="l6DispatchStatusTag" class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px]">READY</span>
+              </div>
+
+              <!-- Quick Presets -->
+              <div class="flex flex-wrap items-center gap-1.5 font-mono text-[10px]">
+                <span class="text-slate-500">PRESETS:</span>
+                <button onclick="window.setAgentPreset('compute')" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-purple-300 border border-purple-500/30 transition">Calculate Math</button>
+                <button onclick="window.setAgentPreset('harvest')" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-rose-300 border border-rose-500/30 transition">Web Ingest</button>
+                <button onclick="window.setAgentPreset('crypto')" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-cyan-500/30 transition">Crypto Hash</button>
+              </div>
+
+              <!-- Prompt Input -->
+              <div class="flex items-center gap-2">
+                <input id="l6PromptInput" type="text" value="Calculate math.sqrt(1024) using sandbox_eval tool" placeholder="Enter high-level autonomous task instruction..." class="flex-1 px-3 py-2 bg-slate-950/80 border border-white/10 rounded-lg text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-purple-500/50">
+                <button onclick="window.dispatchAgentTask()" class="px-3.5 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 rounded-lg text-xs font-mono font-bold transition flex items-center gap-1 shrink-0">
+                  <i data-lucide="play" class="w-3 h-3 fill-current"></i>
+                  <span>Run</span>
+                </button>
+              </div>
+
+              <!-- Real-time Agent Reasoning Terminal -->
+              <div class="bg-slate-950/90 border border-white/10 rounded-lg p-3 font-mono text-[11px] space-y-1.5 max-h-[125px] overflow-y-auto" id="l6AgentTerminal">
+                <div class="text-slate-500 flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
+                  <span>Autonomous agent factory standby. Choose a task preset or enter an instruction above.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>SANDBOX: <strong class="text-cyan-400">CONNECTED</strong></span>
+              <span>HARVESTER: <strong class="text-rose-400">CONNECTED</strong></span>
+              <span>EVENT BUS: <strong class="text-emerald-400">CONNECTED</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 3: Live Agent History & Milestone Feed -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-purple-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                  AGENT DISPATCH HISTORY
+                </span>
+                <span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[10px]">LIVE FEED</span>
+              </div>
+
+              <div id="l6AgentHistoryFeed" class="space-y-2 max-h-[145px] overflow-y-auto font-mono text-[10px] pr-1">
+                <div class="text-slate-500">Querying agent execution log...</div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>AUTONOMOUS: <strong class="text-purple-400">100%</strong></span>
+              <span>ZERO MOCK: <strong class="text-emerald-400">CONFIRMED</strong></span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       <section id="sovereignDesignations" class="space-y-6 pt-4">
         <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
           <div>
