@@ -587,6 +587,97 @@ def execute_level3_sandboxed_code():
     status_code = 200 if result.get("status") == "success" else (403 if result.get("status") == "security_blocked" else 200)
     return jsonify(result), status_code
 
+# ==============================================================================
+# LAYER 4: STORAGE, EVENT STREAMING & MULTI-TENANT DBS APIS
+# ==============================================================================
+try:
+    from core.storage_engine import storage_engine
+except Exception as e:
+    logger.error(f"[STORAGE] Init notice: {e}")
+    storage_engine = None
+
+@app.route("/api/level4/storage-status", methods=["GET"])
+def get_level4_storage_status():
+    """
+    Level 4: Storage, Event Streaming & Multi-Tenant DBs Telemetry
+    Returns SQLite WAL mode metrics, append-only stream statistics,
+    and in-memory RAM cache performance. Zero mock data.
+    """
+    if not storage_engine:
+        return jsonify({"status": "error", "message": "Storage engine uninitialized"}), 503
+    return jsonify(storage_engine.get_status()), 200
+
+@app.route("/api/level4/events/stream", methods=["GET"])
+def get_level4_events_stream():
+    """
+    Fetches the latest real-time events from the append-only cryptographic stream.
+    """
+    if not storage_engine:
+        return jsonify({"status": "error", "message": "Storage engine uninitialized"}), 503
+    limit = int(request.args.get("limit", 15))
+    topic = request.args.get("topic")
+    events = storage_engine.get_recent_events(limit=limit, topic=topic)
+    return jsonify({
+        "status": "success",
+        "total_returned": len(events),
+        "events": events,
+        "timestamp": time.time()
+    }), 200
+
+@app.route("/api/level4/events/publish", methods=["POST"])
+def publish_level4_event():
+    """
+    Publishes an event to the Layer 4 streaming bus.
+    Computes SHA-256 hash chaining and persists into multi-tenant database.
+    """
+    if not storage_engine:
+        return jsonify({"status": "error", "message": "Storage engine uninitialized"}), 503
+    payload_data = request.get_json(silent=True) or {}
+    topic = payload_data.get("topic", "system.telemetry").strip()
+    payload = payload_data.get("payload", {})
+    tenant_id = payload_data.get("tenant_id", "tenant-root-01")
+
+    event = storage_engine.publish_event(topic=topic, payload=payload, tenant_id=tenant_id)
+    return jsonify({
+        "status": "success",
+        "event": event,
+        "timestamp": time.time()
+    }), 201
+
+@app.route("/api/level4/cache/set", methods=["POST"])
+def set_level4_cache():
+    """
+    Sets a key-value pair in the in-memory RAM micro-cache with TTL.
+    """
+    if not storage_engine:
+        return jsonify({"status": "error", "message": "Storage engine uninitialized"}), 503
+    data = request.get_json(silent=True) or {}
+    key = data.get("key", "").strip()
+    val = data.get("value")
+    ttl = float(data.get("ttl_seconds", 60.0))
+    if not key:
+        return jsonify({"status": "error", "message": "Key required"}), 400
+    storage_engine.cache.set(key, val, ttl_seconds=ttl)
+    return jsonify({"status": "success", "key": key, "ttl_seconds": ttl}), 200
+
+@app.route("/api/level4/cache/get", methods=["GET"])
+def get_level4_cache():
+    """
+    Gets a key-value pair from the in-memory RAM micro-cache.
+    """
+    if not storage_engine:
+        return jsonify({"status": "error", "message": "Storage engine uninitialized"}), 503
+    key = request.args.get("key", "").strip()
+    if not key:
+        return jsonify({"status": "error", "message": "Key required"}), 400
+    val = storage_engine.cache.get(key)
+    return jsonify({
+        "status": "success",
+        "key": key,
+        "value": val,
+        "found": val is not None
+    }), 200
+
 @app.route("/api/scrape", methods=["POST"])
 def trigger_scrape_job():
     payload = request.get_json(silent=True) or {}
