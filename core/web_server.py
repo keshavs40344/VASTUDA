@@ -229,6 +229,14 @@ def enforce_global_security_firewall():
             }), 429
     return None
 
+@app.after_request
+def add_security_headers(response):
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
 @app.route("/api/status", methods=["GET"])
 def health():
     uptime = worker_daemon.get_stats()["uptime_seconds"] if worker_daemon else 0
