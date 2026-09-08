@@ -968,6 +968,89 @@ def get_level9_swarm_history():
         "timestamp": time.time()
     }), 200
 
+# ==============================================================================
+# LAYER 10: OMNICHANNEL INGRESS/EGRESS GATEWAYS APIS
+# ==============================================================================
+try:
+    from core.gateway_engine import gateway_engine
+except Exception as e:
+    logger.error(f"[GATEWAY CORE] Init notice: {e}")
+    gateway_engine = None
+
+@app.route("/api/level10/gateway-status", methods=["GET"])
+def get_level10_gateway_status():
+    """
+    Level 10: Omnichannel Ingress/Egress Gateway Telemetry.
+    Reports inbound webhook volume, outbound deliveries, signing algorithms,
+    and SSE streaming status.
+    """
+    if not gateway_engine:
+        return jsonify({"status": "error", "message": "Gateway engine uninitialized"}), 503
+    return jsonify(gateway_engine.get_status()), 200
+
+@app.route("/api/level10/webhook/inbound/<source>", methods=["POST"])
+def receive_level10_inbound_webhook(source):
+    """
+    Secures inbound webhooks via HMAC-SHA256 signature verification.
+    Streams verified events to Level 4 Event Stream.
+    """
+    if not gateway_engine:
+        return jsonify({"status": "error", "message": "Gateway engine uninitialized"}), 503
+    raw_data = request.get_data()
+    payload = request.get_json(silent=True) or {}
+    signature = request.headers.get("X-VASTUDA-Signature") or request.headers.get("X-Signature", "")
+
+    result = gateway_engine.process_inbound_webhook(
+        source=source,
+        payload=payload,
+        signature=signature,
+        raw_bytes=raw_data
+    )
+    return jsonify(result), 200
+
+@app.route("/api/level10/webhook/dispatch", methods=["POST"])
+def dispatch_level10_outbound_webhook():
+    """
+    Dispatches outbound webhook notification with HMAC-SHA256 signature header.
+    """
+    if not gateway_engine:
+        return jsonify({"status": "error", "message": "Gateway engine uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    target_url = payload.get("target_url", "").strip()
+    event_type = payload.get("event_type", "order.completed").strip()
+    data = payload.get("data", {})
+    if not target_url:
+        return jsonify({"status": "error", "message": "Target URL required"}), 400
+
+    result = gateway_engine.dispatch_outbound_webhook(
+        target_url=target_url,
+        event_type=event_type,
+        data=data
+    )
+    return jsonify(result), 200
+
+@app.route("/api/level10/events/sse", methods=["GET"])
+def stream_level10_sse():
+    """
+    Server-Sent Events (SSE) live streaming gateway.
+    Pushes real-time platform events to connected clients.
+    """
+    def event_stream():
+        from core.storage_engine import storage_engine
+        last_seen = 0
+        for _ in range(6):  # Stream active burst
+            if storage_engine:
+                evts = storage_engine.get_recent_events(limit=3)
+                for e in evts:
+                    if e.get("created_at", 0) > last_seen:
+                        last_seen = e.get("created_at", 0)
+                        yield f"data: {json.dumps(e)}\n\n"
+            time.sleep(1.0)
+
+    from flask import Response
+    return Response(event_stream(), mimetype="text/event-stream")
+
+
 
 
 
