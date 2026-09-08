@@ -544,6 +544,49 @@ def run_level2_egress_audit():
         "timestamp": time.time()
     }), 200
 
+# ==============================================================================
+# LAYER 3: EPHEMERAL SANDBOXES & CODE EXECUTION MICROVMS
+# ==============================================================================
+try:
+    from core.sandbox_engine import micro_sandbox
+except Exception as e:
+    logger.error(f"[SANDBOX] Init notice: {e}")
+    micro_sandbox = None
+
+@app.route("/api/level3/sandbox-status", methods=["GET"])
+def get_level3_sandbox_status():
+    """
+    Level 3: Ephemeral Sandboxes & Code Execution MicroVMs Telemetry
+    Returns active sandbox isolation tier, memory ceilings, allowed modules,
+    and security enforcement metrics. Zero mock data.
+    """
+    if not micro_sandbox:
+        return jsonify({"status": "error", "message": "Sandbox engine uninitialized"}), 503
+    return jsonify(micro_sandbox.get_status()), 200
+
+@app.route("/api/level3/sandbox-execute", methods=["POST"])
+def execute_level3_sandboxed_code():
+    """
+    Live Ephemeral Sandboxed Code Execution:
+    Enforces AST taint analysis, isolated namespace execution, and a 3-second watchdog timer.
+    Rejects unauthorized modules, OS reflection attacks, and dangerous built-ins.
+    """
+    if not micro_sandbox:
+        return jsonify({"status": "error", "message": "Sandbox engine uninitialized"}), 503
+
+    payload = request.get_json(silent=True) or {}
+    code = payload.get("code", "").strip()
+
+    if not code:
+        return jsonify({
+            "status": "error",
+            "message": "Empty code payload received"
+        }), 400
+
+    result = micro_sandbox.execute(code)
+    status_code = 200 if result.get("status") == "success" else (403 if result.get("status") == "security_blocked" else 200)
+    return jsonify(result), status_code
+
 @app.route("/api/scrape", methods=["POST"])
 def trigger_scrape_job():
     payload = request.get_json(silent=True) or {}
