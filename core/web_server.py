@@ -678,6 +678,56 @@ def get_level4_cache():
         "found": val is not None
     }), 200
 
+# ==============================================================================
+# LAYER 5: DATA HARVESTERS & WEB INGESTION ENGINE APIS
+# ==============================================================================
+try:
+    from core.harvester_engine import data_harvester
+except Exception as e:
+    logger.error(f"[HARVESTER] Init notice: {e}")
+    data_harvester = None
+
+@app.route("/api/level5/harvester-status", methods=["GET"])
+def get_level5_harvester_status():
+    """
+    Level 5: Data Harvesters & Ingestion Engine Telemetry.
+    Returns total pages indexed, KB ingested, average latency, and configuration.
+    """
+    if not data_harvester:
+        return jsonify({"status": "error", "message": "Harvester engine uninitialized"}), 503
+    return jsonify(data_harvester.get_status()), 200
+
+@app.route("/api/level5/harvester-job", methods=["POST"])
+def trigger_level5_harvester_job():
+    """
+    Ingests and parses target web document, extracts OpenGraph tags,
+    word count, links, and produces SHA-256 content verification hash.
+    """
+    if not data_harvester:
+        return jsonify({"status": "error", "message": "Harvester engine uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    target_url = payload.get("url", "").strip()
+    if not target_url:
+        return jsonify({"status": "error", "message": "Target URL required"}), 400
+    
+    result = data_harvester.harvest(target_url)
+    return jsonify(result), 200
+
+@app.route("/api/level5/harvester-feed", methods=["GET"])
+def get_level5_harvester_feed():
+    """
+    Returns recent pages harvested and indexed by the Level 5 ingestion swarm.
+    """
+    if not data_harvester:
+        return jsonify({"status": "error", "message": "Harvester engine uninitialized"}), 503
+    limit = int(request.args.get("limit", 10))
+    return jsonify({
+        "status": "success",
+        "recent_harvests": data_harvester.get_recent_harvests(limit=limit),
+        "timestamp": time.time()
+    }), 200
+
+
 @app.route("/api/scrape", methods=["POST"])
 def trigger_scrape_job():
     payload = request.get_json(silent=True) or {}

@@ -2889,6 +2889,142 @@
         </div>
       </section>
 
+      <!-- ========================================================================= -->
+      <!-- LAYER 05 // DATA HARVESTERS & WEB INGESTION ENGINE MATRIX                   -->
+      <!-- ========================================================================= -->
+      <section id="layer5HarvesterMatrix" class="space-y-6 pt-8 border-t border-rose-500/20">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 text-rose-400 text-[11px] font-mono border border-rose-500/30 mb-2">
+              <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+              <span>LAYER 05 // DATA HARVESTERS &amp; WEB INGESTION ENGINE</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-display font-black text-white tracking-tight flex flex-wrap items-center gap-3">
+              <span>Web Ingestion &amp; Metadata Harvester</span>
+              <span class="text-xs font-mono px-2.5 py-1 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 uppercase tracking-widest font-normal flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
+                Level 5 Live
+              </span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400 font-mono mt-1 max-w-3xl">
+              Automated public document parsing, OpenGraph metadata extraction, outbound link discovery, and cryptographic SHA-256 integrity hashing with Layer 4 event streaming.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <button onclick="window.refreshLevel5HarvesterStatus()" class="px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-rose-300 border border-rose-500/40 flex items-center gap-1.5 transition cursor-pointer shadow-sm">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-rose-400"></i>
+              <span>Poll Harvester</span>
+            </button>
+            <button onclick="window.triggerLiveHarvestJob()" id="btnHarvestUrl" class="cyber-btn px-4 py-2 bg-gradient-to-r from-rose-500 via-pink-500 to-red-500 hover:opacity-90 text-white font-bold font-mono rounded-xl flex items-center gap-2 transition cursor-pointer shadow-lg shadow-rose-500/20">
+              <i data-lucide="globe" class="w-4 h-4"></i>
+              <span>Harvest Target URL</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 TACTICAL HUD PANELS FOR LAYER 5 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          
+          <!-- PANEL 1: Fleet Ingestion Telemetry -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-rose-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                  HARVEST FLEET TELEMETRY
+                </span>
+                <span class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20 text-[10px]">REAL NETWORK</span>
+              </div>
+              
+              <div class="space-y-2 font-mono text-xs">
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Pages Ingested:</span>
+                  <span id="l5PagesHarvested" class="font-bold text-white">0</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Volume Indexed:</span>
+                  <span id="l5VolumeIngested" class="font-bold text-emerald-400">0.00 KB</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Domains Indexed:</span>
+                  <span id="l5DomainsCount" class="font-bold text-cyan-400">0 Unique</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Avg Ingest Latency:</span>
+                  <span id="l5AvgLatency" class="font-bold text-rose-300">0.0 ms</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>TIMEOUT: <strong class="text-amber-400">6.0s CEILING</strong></span>
+              <span>DOC CAP: <strong class="text-emerald-400">500 KB</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 2: Interactive URL Harvester -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4 md:col-span-2">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-rose-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="scan" class="w-3.5 h-3.5"></i>
+                  URL HARVEST &amp; METADATA EXTRACTOR
+                </span>
+                <span id="l5HarvestStatusTag" class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px]">READY</span>
+              </div>
+
+              <!-- Input Bar -->
+              <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                  <i data-lucide="link" class="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                  <input id="l5TargetUrlInput" type="text" value="https://www.google.com" placeholder="Enter target URL (e.g. https://example.com)..." class="w-full pl-9 pr-3 py-2 bg-slate-950/80 border border-white/10 rounded-lg text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-rose-500/50">
+                </div>
+                <button onclick="window.triggerLiveHarvestJob()" class="px-3 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 rounded-lg text-xs font-mono font-bold transition flex items-center gap-1 shrink-0">
+                  <i data-lucide="play" class="w-3 h-3 fill-current"></i>
+                  <span>Harvest</span>
+                </button>
+              </div>
+
+              <!-- Real-time Ingestion Result Terminal -->
+              <div class="bg-slate-950/90 border border-white/10 rounded-lg p-3 font-mono text-[11px] space-y-1.5 max-h-[120px] overflow-y-auto" id="l5ResultTerminal">
+                <div class="text-slate-500 flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
+                  <span>Awaiting ingestion query. Enter a valid web URL and execute extraction.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>OG METADATA: <strong class="text-rose-400">EXTRACTED</strong></span>
+              <span>EVENT BUS: <strong class="text-emerald-400">AUTO-STREAMED</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 3: Live Ingest Feed & Cryptographic Hashes -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-rose-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                  RECENT HARVEST FEED
+                </span>
+                <span class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20 text-[10px]">SHA-256 VERIFIED</span>
+              </div>
+
+              <div id="l5HarvestFeed" class="space-y-2 max-h-[145px] overflow-y-auto font-mono text-[10px] pr-1">
+                <div class="text-slate-500">Querying harvester registry...</div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>TAMPER PROOF: <strong class="text-emerald-400">100%</strong></span>
+              <span>INTEGRITY: <strong class="text-cyan-400">SHA-256</strong></span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       <section id="sovereignDesignations" class="space-y-6 pt-4">
         <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
           <div>
