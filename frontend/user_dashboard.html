@@ -634,7 +634,7 @@
       </div>
       <div class="flex items-center space-x-4">
         <a href="index.html" class="hover:text-slate-300">Home Showcase</a>
-        <a href="admin_dashboard.html" class="hover:text-amber-400 flex items-center gap-1 font-semibold text-amber-400/80"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Admin Mission Control 🔒</a>
+        <span class="text-emerald-400 text-xs font-mono">Cloud Session Encrypted</span>
       </div>
     </footer>
 
@@ -660,6 +660,7 @@
       lucide.createIcons();
       initStorageEstimate();
       syncUserProfile();
+      initFirebaseCloudSync();
       renderQuickLaunch();
       renderTools();
       renderFavorites();
@@ -796,6 +797,92 @@
       window.location.reload();
     }
 
+
+    // =========================================================================
+    // REAL-TIME FIRESTORE CLOUD DATA PERSISTENCE FOR USER GMAIL SESSIONS
+    // =========================================================================
+    let cloudDb = null;
+    let currentAuthUser = null;
+
+    function initFirebaseCloudSync() {
+      try {
+        if (window.firebase) {
+          if (!window.firebase.apps || !window.firebase.apps.length) {
+            if (window.FIREBASE_CONFIG) {
+              window.firebase.initializeApp(window.FIREBASE_CONFIG);
+            }
+          }
+          if (window.firebase.firestore) {
+            cloudDb = window.firebase.firestore();
+          }
+          if (window.firebase.auth) {
+            window.firebase.auth().onAuthStateChanged(async (user) => {
+              if (user) {
+                currentAuthUser = user;
+                // 1. Sync profile
+                const u = {
+                  uid: user.uid,
+                  email: user.email,
+                  displayName: user.displayName || (user.email ? user.email.split("@")[0] : "Researcher"),
+                  provider: user.providerData && user.providerData[0] ? user.providerData[0].providerId : "google.com",
+                  photoURL: user.photoURL || null,
+                  loginAt: Date.now()
+                };
+                localStorage.setItem(KEY_USER, JSON.stringify(u));
+                syncUserProfile();
+
+                // 2. Fetch and merge saved favorites & enrolled tools from Cloud Firestore
+                await loadCloudUserData(user.uid);
+              }
+            });
+          }
+        }
+      } catch (err) {
+        console.warn("Firebase cloud init note:", err);
+      }
+    }
+
+    async function loadCloudUserData(uid) {
+      if (!cloudDb || !uid) return;
+      try {
+        const docRef = cloudDb.collection("users").doc(uid);
+        const snap = await docRef.get();
+        if (snap.exists) {
+          const cloudData = snap.data();
+          if (cloudData.favorites && Array.isArray(cloudData.favorites)) {
+            const localFavs = getFavorites();
+            // Merge cloud favorites with local favorites (cloud takes precedence for persistence across devices)
+            const merged = Array.from(new Set([...cloudData.favorites, ...localFavs]));
+            localStorage.setItem(KEY_FAVORITES, JSON.stringify(merged));
+            updateBadges();
+            renderFavorites();
+            renderTools();
+            renderQuickLaunch();
+            console.log("%c☁️ Cloud Favorites Synced for user: " + uid, "color:#10b981;font-weight:bold;");
+          }
+        }
+      } catch (err) {
+        console.warn("Could not fetch cloud data for user:", err);
+      }
+    }
+
+    async function persistFavoriteToCloud() {
+      const raw = localStorage.getItem(KEY_USER);
+      if (!raw || !cloudDb) return;
+      try {
+        const u = JSON.parse(raw);
+        if (!u.uid) return;
+        const currentFavs = getFavorites();
+        await cloudDb.collection("users").doc(u.uid).set({
+          favorites: currentFavs,
+          lastActiveAt: window.firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        console.log("%c☁️ Saved favorites to Firestore for " + u.email, "color:#38bdf8;");
+      } catch (err) {
+        console.warn("Cloud favorite save note:", err);
+      }
+    }
+
     // Favorites Logic
     function getFavorites() {
       try {
@@ -813,6 +900,7 @@
         favs.push(toolId);
       }
       localStorage.setItem(KEY_FAVORITES, JSON.stringify(favs));
+      persistFavoriteToCloud();
       updateBadges();
       renderTools();
       renderFavorites();
@@ -826,6 +914,7 @@
     function clearAllFavorites() {
       if (confirm("Clear all your bookmarked tools?")) {
         localStorage.removeItem(KEY_FAVORITES);
+        persistFavoriteToCloud();
         updateBadges();
         renderFavorites();
         renderTools();
@@ -1180,6 +1269,7 @@
     function clearAllUserData() {
       if (confirm("Wipe all bookmarks, recent execution logs, and sandbox cache?")) {
         localStorage.removeItem(KEY_FAVORITES);
+        persistFavoriteToCloud();
         localStorage.removeItem(KEY_HISTORY);
         updateBadges();
         renderFavorites();
