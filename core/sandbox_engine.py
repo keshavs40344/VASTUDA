@@ -23,9 +23,16 @@ FORBIDDEN_MODULES = {
 }
 
 FORBIDDEN_BUILTINS = {
-    'eval', 'exec', 'compile', '__import__', 'open', 'input', 'breakpoint',
+    'eval', 'exec', 'compile', 'open', 'input', 'breakpoint',
     'globals', 'locals', 'getattr', 'setattr', 'delattr', 'exit', 'quit'
 }
+
+def safe_import(name, *args, **kwargs):
+    root = name.split('.')[0]
+    if root not in ALLOWED_MODULES or root in FORBIDDEN_MODULES:
+        raise ImportError(f"Security Violation: Module '{name}' is strictly blocked in Level-3 Airgap Enclave")
+    import importlib
+    return importlib.import_module(name)
 
 SAFE_BUILTINS = {
     'print': print, 'range': range, 'len': len, 'int': int, 'float': float, 
@@ -34,7 +41,8 @@ SAFE_BUILTINS = {
     'round': round, 'sorted': sorted, 'enumerate': enumerate, 'zip': zip, 
     'map': map, 'filter': filter, 'isinstance': isinstance, 'any': any, 
     'all': all, 'chr': chr, 'ord': ord, 'divmod': divmod, 'pow': pow, 
-    'reversed': reversed, 'bin': bin, 'hex': hex, 'oct': oct
+    'reversed': reversed, 'bin': bin, 'hex': hex, 'oct': oct,
+    '__import__': safe_import
 }
 
 
