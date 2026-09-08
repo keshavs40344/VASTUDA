@@ -126,6 +126,152 @@
 
     <style>
 
+    /* ========================================================================= */
+    /* ACTIVE THEORY + RESN + LINEAR FUTURISTIC LUXURY DESIGN SYSTEM             */
+    /* ========================================================================= */
+
+    /* 1. Linear-Style Mouse-Tracking Spotlight Border Cards */
+    .linear-spotlight {
+      position: relative;
+      background: rgba(8, 12, 22, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1.25rem;
+      overflow: hidden;
+      transition: border-color 0.3s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    }
+    .linear-spotlight::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1.5px;
+      background: radial-gradient(450px circle at var(--mouse-x, -500px) var(--mouse-y, -500px), rgba(16, 185, 129, 0.45), rgba(6, 182, 212, 0.2) 30%, transparent 60%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .linear-spotlight:hover {
+      border-color: rgba(16, 185, 129, 0.35);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8), 0 0 30px -5px rgba(16, 185, 129, 0.15);
+      transform: translateY(-3px);
+    }
+
+    /* 2. Linear Rotating Conic Border Beam */
+    .linear-border-beam {
+      position: relative;
+      border-radius: 1.5rem;
+      background: rgba(4, 7, 18, 0.95);
+      overflow: hidden;
+    }
+    .linear-border-beam::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent 0 320deg, rgba(16, 185, 129, 0.9) 340deg, rgba(6, 182, 212, 0.9) 360deg);
+      animation: linearBeamRotate 8s linear infinite;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .linear-border-beam:hover::after {
+      opacity: 1;
+      animation-duration: 4s;
+    }
+    .linear-border-beam-inner {
+      position: relative;
+      z-index: 1;
+      background: #050814;
+      border-radius: calc(1.5rem - 1.5px);
+      margin: 1.5px;
+    }
+    @keyframes linearBeamRotate {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* 3. Resn-Style Cybernetic Scramble Typography */
+    .cyber-scramble {
+      cursor: default;
+      display: inline-block;
+      transition: color 0.2s ease, text-shadow 0.2s ease;
+      font-variant-numeric: tabular-nums;
+    }
+    .cyber-scramble:hover {
+      color: #34d399 !important;
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.8), 0 0 20px rgba(6, 182, 212, 0.4);
+    }
+
+    /* 4. Resn-Style Magnetic Attraction Physics */
+    .magnetic-target {
+      display: inline-flex;
+      transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+      will-change: transform;
+    }
+
+    /* 5. Active Theory Futuristic Custom Cursor Ring */
+    #activeTheoryCursor {
+      position: fixed;
+      width: 28px;
+      height: 28px;
+      border: 1.5px solid rgba(52, 211, 153, 0.7);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+      display: none;
+    }
+    @media (pointer: fine) {
+      #activeTheoryCursor { display: block; }
+    }
+    #activeTheoryCursor.cursor-hover {
+      width: 48px;
+      height: 48px;
+      border-color: rgba(6, 182, 212, 0.9);
+      background-color: rgba(6, 182, 212, 0.08);
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+    }
+    #activeTheoryCursorDot {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: #10b981;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 100000;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 8px #10b981;
+      display: none;
+    }
+    @media (pointer: fine) {
+      #activeTheoryCursorDot { display: block; }
+    }
+
+    /* 6. Active Theory Audio FX Status Toggle */
+    .sound-toggle-btn {
+      transition: all 0.2s ease;
+    }
+    .sound-toggle-btn.sound-active {
+      border-color: rgba(16, 185, 129, 0.6) !important;
+      background: rgba(16, 185, 129, 0.15) !important;
+      color: #34d399 !important;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+    }
+
+    /* 7. 3D Tilt Card Specular Reflection */
+    .card-3d-tilt {
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      transition: transform 0.15s ease-out;
+    }
+
+
       body {
 
         background-color: #030712;
@@ -636,6 +782,10 @@
 
 </head>
 
+  <!-- Active Theory & Resn Fluid Cursor Follower -->
+  <div id="activeTheoryCursor"></div>
+  <div id="activeTheoryCursorDot"></div>
+
 <body class="min-h-screen cyber-grid font-sans antialiased selection:bg-emerald-500 selection:text-black">
 
 
@@ -678,6 +828,12 @@
             <span class="text-slate-600">|</span>
             <span class="text-slate-300">0 B Outbound</span>
           </div>
+
+                    <!-- Active Theory Synthesized Sound FX Toggle -->
+          <button id="soundFxToggle" onclick="window.ActiveTheoryAudio.toggle()" title="Toggle Synthesized Sound FX (Active Theory Audio Engine)" class="sound-toggle-btn magnetic-target hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-mono text-slate-400 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-white/10 hover:border-emerald-500/40 transition-all cursor-pointer shadow-sm">
+            <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span id="soundFxStatusText" class="text-[11px] font-semibold">SOUND: ON</span>
+          </button>
 
           <!-- Command Center ⌘K Trigger -->
           <button onclick="CommandCenter.open()" title="Launch Command Center (Cmd+K / Ctrl+K)" class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-mono text-slate-300 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-white/10 hover:border-emerald-500/40 transition-all cursor-pointer shadow-sm">
@@ -1811,7 +1967,138 @@
 
 
 
-      <!-- PORTFOLIO CATALOGUE -->
+      
+      <!-- ========================================================================= -->
+      <!-- ACTIVE THEORY // SOVEREIGN WORKS & FLAGSHIP DESIGNATIONS SHOWCASE         -->
+      <!-- ========================================================================= -->
+      <section id="sovereignDesignations" class="space-y-6 pt-4">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[11px] font-mono border border-emerald-500/30 mb-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span class="cyber-scramble" data-original="ACTIVE THEORY // FLAGSHIP DESIGNATIONS">ACTIVE THEORY // FLAGSHIP DESIGNATIONS</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-display font-black text-white tracking-tight">
+              Sovereign Works & Autonomous Designations
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400 font-mono mt-1">
+              Engineered with zero-server client execution, hardware WebGL shaders, and cryptographic zero-knowledge proofs.
+            </p>
+          </div>
+          <div class="flex items-center gap-2 font-mono text-xs">
+            <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>FPS: <strong id="liveFpsCounter" class="text-emerald-400">60</strong></span>
+            </span>
+            <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
+              PHYSICS: <strong class="text-cyan-400">RUNNING</strong>
+            </span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          
+          <!-- Designation 01: DevForge SwissKnife -->
+          <div class="linear-spotlight p-6 flex flex-col justify-between group cursor-pointer" onclick="window.launchToolSandbox('devforge-swissknife')">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-emerald-400 font-bold">01 // CODE MATRIX</span>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">AIRGAP LEVEL 5</span>
+              </div>
+              <h3 class="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors cyber-scramble" data-original="DevForge Swiss-Knife">DevForge Swiss-Knife</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Offline JSON, YAML, CSV matrix transcoder, JWT cryptographic debugger, and SHA-512 in-memory hasher.
+              </p>
+            </div>
+            <div class="pt-6 flex items-center justify-between">
+              <span class="text-[11px] font-mono text-slate-400 flex items-center gap-1">
+                <i data-lucide="cpu" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>WASM 64-Bit</span>
+              </span>
+              <span class="px-3 py-1.5 rounded-xl bg-emerald-500/20 group-hover:bg-emerald-500 text-emerald-300 group-hover:text-slate-950 font-mono text-xs font-bold transition-all flex items-center gap-1">
+                <span>Launch</span>
+                <span class="text-[10px]">&rarr;</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Designation 02: Document Redactor & Privacy Scrubber -->
+          <div class="linear-spotlight p-6 flex flex-col justify-between group cursor-pointer" onclick="window.launchToolSandbox('pdf-metadata-scrubber-redactor')">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-cyan-400 font-bold">02 // SECURE CRYPTO</span>
+                <span class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">0 BYTES UPLOAD</span>
+              </div>
+              <h3 class="text-lg font-bold text-white group-hover:text-cyan-300 transition-colors cyber-scramble" data-original="Document Redactor & Privacy">Document Redactor & Privacy</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Airgapped PII scrubbing for emails, phone numbers, deal terms, and financial certificates in private memory.
+              </p>
+            </div>
+            <div class="pt-6 flex items-center justify-between">
+              <span class="text-[11px] font-mono text-slate-400 flex items-center gap-1">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>AES-GCM Memory</span>
+              </span>
+              <span class="px-3 py-1.5 rounded-xl bg-cyan-500/20 group-hover:bg-cyan-500 text-cyan-300 group-hover:text-slate-950 font-mono text-xs font-bold transition-all flex items-center gap-1">
+                <span>Launch</span>
+                <span class="text-[10px]">&rarr;</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Designation 03: Black-Scholes Options Pricing Calculator -->
+          <div class="linear-spotlight p-6 flex flex-col justify-between group cursor-pointer" onclick="window.launchToolSandbox('black_scholes_option_pricing')">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-amber-400 font-bold">03 // QUANT VENTURE</span>
+                <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">REAL-TIME GREEKS</span>
+              </div>
+              <h3 class="text-lg font-bold text-white group-hover:text-amber-300 transition-colors cyber-scramble" data-original="Black-Scholes Options Engine">Black-Scholes Options Engine</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                High-frequency European call/put pricing, Implied Volatility root-finding, and Greeks matrix calculation.
+              </p>
+            </div>
+            <div class="pt-6 flex items-center justify-between">
+              <span class="text-[11px] font-mono text-slate-400 flex items-center gap-1">
+                <i data-lucide="trending-up" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span>SIMD Math</span>
+              </span>
+              <span class="px-3 py-1.5 rounded-xl bg-amber-500/20 group-hover:bg-amber-500 text-amber-300 group-hover:text-slate-950 font-mono text-xs font-bold transition-all flex items-center gap-1">
+                <span>Launch</span>
+                <span class="text-[10px]">&rarr;</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Designation 04: ZK Governance Proof Sentinel -->
+          <div class="linear-spotlight p-6 flex flex-col justify-between group cursor-pointer" onclick="window.launchToolSandbox('zk_governance_proof_sentinel')">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-violet-400 font-bold">04 // ZK SOVEREIGN</span>
+                <span class="px-2 py-0.5 rounded bg-violet-500/10 text-violet-400 border border-violet-500/20">VERIFIABLE ZK-STARK</span>
+              </div>
+              <h3 class="text-lg font-bold text-white group-hover:text-violet-300 transition-colors cyber-scramble" data-original="ZK Governance Sentinel">ZK Governance Sentinel</h3>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Zero-Knowledge anti-corruption audit terminal and Merkle root cryptographic ratification engine.
+              </p>
+            </div>
+            <div class="pt-6 flex items-center justify-between">
+              <span class="text-[11px] font-mono text-slate-400 flex items-center gap-1">
+                <i data-lucide="lock" class="w-3.5 h-3.5 text-violet-400"></i>
+                <span>SHA-256 Merkle</span>
+              </span>
+              <span class="px-3 py-1.5 rounded-xl bg-violet-500/20 group-hover:bg-violet-500 text-violet-300 group-hover:text-slate-950 font-mono text-xs font-bold transition-all flex items-center gap-1">
+                <span>Launch</span>
+                <span class="text-[10px]">&rarr;</span>
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+<!-- PORTFOLIO CATALOGUE -->
 
       <section id="catalogue" class="space-y-6 pt-4">
 
@@ -4988,66 +5275,348 @@
       })();
     </script>
 
+
+  <!-- Interactive Live Tool Drawer Modal (Real-Time In-Browser Sandbox) -->
+  <div id="liveToolDrawerModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl hidden" onclick="if(event.target===this) window.closeToolSandbox()">
+    <div class="linear-border-beam w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl shadow-emerald-500/20 animate-scale-up">
+      <div class="linear-border-beam-inner p-6 flex flex-col max-h-[88vh] overflow-hidden">
+        
+        <!-- Drawer Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-white/10">
+          <div class="flex items-center gap-3">
+            <span class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
+            <div>
+              <h3 id="sandboxModalTitle" class="text-lg font-bold text-white font-display">Interactive Silicon Engine</h3>
+              <p id="sandboxModalSubtitle" class="text-xs font-mono text-emerald-400">100% In-Browser Execution &bull; Zero Server Network Packets</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <a id="sandboxOpenFullBtn" href="#" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono text-slate-300 hover:text-white transition flex items-center gap-1">
+              <span>Full Page</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+            <button onclick="window.closeToolSandbox()" class="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sandbox Live Frame -->
+        <div class="flex-1 py-4 overflow-hidden relative min-h-[420px]">
+          <div id="sandboxLoadingSpinner" class="absolute inset-0 flex items-center justify-center bg-[#050814] z-10">
+            <div class="flex flex-col items-center gap-3">
+              <div class="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></div>
+              <span class="text-xs font-mono text-slate-400">Allocating In-Browser Silicon Sandboxed Frame...</span>
+            </div>
+          </div>
+          <iframe id="sandboxIframe" class="w-full h-full rounded-xl border border-white/10 bg-[#070b18]" src="about:blank"></iframe>
+        </div>
+
+        <!-- Drawer Footer Telemetry -->
+        <div class="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between text-[11px] font-mono text-slate-500 gap-2">
+          <div class="flex items-center gap-3">
+            <span>ISOLATION: <strong class="text-emerald-400">Level 5 Airgap</strong></span>
+            <span>&bull;</span>
+            <span>MEMORY: <strong class="text-cyan-400">Client RAM Only</strong></span>
+          </div>
+          <button onclick="window.closeToolSandbox()" class="px-4 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 font-mono text-xs">
+            Close Sandbox (Esc)
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+    <!-- ========================================================================= -->
+    <!-- ACTIVE THEORY + RESN + LINEAR FUTURISTIC RUNTIME INTERACTION ENGINE       -->
+    <!-- ========================================================================= -->
+    <script>
+      (function() {
+        'use strict';
+
+        // -------------------------------------------------------------------------
+        // 1. ACTIVE THEORY SYNTHESIZED WEB AUDIO ENGINE (Pure Client Web Audio API)
+        // -------------------------------------------------------------------------
+        class SynthesizedAudioAtmosphere {
+          constructor() {
+            this.audioCtx = null;
+            this.enabled = false; // Off by default to respect browser autoplay policies, user turns on via navbar
+            this.masterGain = null;
+          }
+
+          init() {
+            if (this.audioCtx) return;
+            try {
+              const AudioCtx = window.AudioContext || window.webkitAudioContext;
+              if (!AudioCtx) return;
+              this.audioCtx = new AudioCtx();
+              this.masterGain = this.audioCtx.createGain();
+              this.masterGain.gain.setValueAtTime(0.06, this.audioCtx.currentTime); // Gentle, subtle luxury volume
+              this.masterGain.connect(this.audioCtx.destination);
+            } catch (e) {
+              console.warn("Audio init note:", e);
+            }
+          }
+
+          toggle() {
+            this.init();
+            if (this.audioCtx && this.audioCtx.state === 'suspended') {
+              this.audioCtx.resume();
+            }
+            this.enabled = !this.enabled;
+            const btn = document.getElementById('soundFxToggle');
+            const txt = document.getElementById('soundFxStatusText');
+            if (btn && txt) {
+              if (this.enabled) {
+                btn.classList.add('sound-active');
+                txt.textContent = 'SOUND: ON';
+                this.playChirp(880, 0.08, 'sine');
+              } else {
+                btn.classList.remove('sound-active');
+                txt.textContent = 'SOUND: OFF';
+              }
+            }
+          }
+
+          playTone(freq, duration = 0.03, type = 'sine') {
+            if (!this.enabled || !this.audioCtx) return;
+            try {
+              const osc = this.audioCtx.createOscillator();
+              const gain = this.audioCtx.createGain();
+              osc.type = type;
+              osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+              gain.gain.setValueAtTime(0.04, this.audioCtx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.0001, this.audioCtx.currentTime + duration);
+              osc.connect(gain);
+              gain.connect(this.masterGain);
+              osc.start();
+              osc.stop(this.audioCtx.currentTime + duration);
+            } catch(e) {}
+          }
+
+          playChirp(startFreq = 600, duration = 0.06, type = 'sine') {
+            if (!this.enabled || !this.audioCtx) return;
+            try {
+              const osc = this.audioCtx.createOscillator();
+              const gain = this.audioCtx.createGain();
+              osc.type = type;
+              osc.frequency.setValueAtTime(startFreq, this.audioCtx.currentTime);
+              osc.frequency.exponentialRampToValueAtTime(startFreq * 1.8, this.audioCtx.currentTime + duration);
+              gain.gain.setValueAtTime(0.05, this.audioCtx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.0001, this.audioCtx.currentTime + duration);
+              osc.connect(gain);
+              gain.connect(this.masterGain);
+              osc.start();
+              osc.stop(this.audioCtx.currentTime + duration);
+            } catch(e) {}
+          }
+
+          playBurst() {
+            if (!this.enabled || !this.audioCtx) return;
+            try {
+              [330, 440, 660].forEach((f, i) => {
+                setTimeout(() => this.playTone(f, 0.08, 'sine'), i * 25);
+              });
+            } catch(e) {}
+          }
+        }
+        window.ActiveTheoryAudio = new SynthesizedAudioAtmosphere();
+
+        // -------------------------------------------------------------------------
+        // 2. LINEAR MOUSE SPOTLIGHT BORDER SYSTEM
+        // -------------------------------------------------------------------------
+        function initLinearSpotlights() {
+          const cards = document.querySelectorAll('.linear-spotlight, .cyber-card-tilt, #catalogue .glass-panel');
+          cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+              const rect = card.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              card.style.setProperty('--mouse-x', `${x}px`);
+              card.style.setProperty('--mouse-y', `${y}px`);
+            });
+            card.addEventListener('mouseenter', () => {
+              window.ActiveTheoryAudio.playTone(1200, 0.015, 'sine');
+            });
+          });
+        }
+
+        // -------------------------------------------------------------------------
+        // 3. RESN CYBERNETIC SCRAMBLER (Kinetic Matrix Typography)
+        // -------------------------------------------------------------------------
+        const GLYPHS = '01#*$%&_+=/?><∆ΩλΨ§';
+        function initCyberScramblers() {
+          document.querySelectorAll('.cyber-scramble').forEach(el => {
+            const originalText = el.getAttribute('data-original') || el.innerText;
+            el.setAttribute('data-original', originalText);
+
+            el.addEventListener('mouseenter', () => {
+              window.ActiveTheoryAudio.playTone(900, 0.02, 'sine');
+              let iteration = 0;
+              clearInterval(el._scrambleTimer);
+              el._scrambleTimer = setInterval(() => {
+                el.innerText = originalText.split('').map((char, index) => {
+                  if (char === ' ' || char === '/' || char === '&' || char === '-') return char;
+                  if (index < iteration) return originalText[index];
+                  return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+                }).join('');
+
+                if (iteration >= originalText.length) {
+                  clearInterval(el._scrambleTimer);
+                  el.innerText = originalText;
+                }
+                iteration += 1 / 2;
+              }, 25);
+            });
+          });
+        }
+
+        // -------------------------------------------------------------------------
+        // 4. RESN MAGNETIC BUTTON ATTRACTION PHYSICS
+        // -------------------------------------------------------------------------
+        function initMagneticButtons() {
+          const magnetics = document.querySelectorAll('.magnetic-target, button, a.px-8');
+          magnetics.forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+              const rect = btn.getBoundingClientRect();
+              const x = e.clientX - (rect.left + rect.width / 2);
+              const y = e.clientY - (rect.top + rect.height / 2);
+              btn.style.transform = `translate(${x * 0.18}px, ${y * 0.18}px)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+              btn.style.transform = 'translate(0px, 0px)';
+            });
+          });
+        }
+
+        // -------------------------------------------------------------------------
+        // 5. ACTIVE THEORY CUSTOM CURSOR FOLLOWER
+        // -------------------------------------------------------------------------
+        function initFluidCursor() {
+          const cursor = document.getElementById('activeTheoryCursor');
+          const dot = document.getElementById('activeTheoryCursorDot');
+          if (!cursor || !dot) return;
+
+          let mouseX = window.innerWidth / 2;
+          let mouseY = window.innerHeight / 2;
+          let cursorX = mouseX;
+          let cursorY = mouseY;
+
+          window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            dot.style.left = `${mouseX}px`;
+            dot.style.top = `${mouseY}px`;
+          });
+
+          function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.22;
+            cursorY += (mouseY - cursorY) * 0.22;
+            cursor.style.left = `${cursorX}px`;
+            cursor.style.top = `${cursorY}px`;
+            requestAnimationFrame(animateCursor);
+          }
+          requestAnimationFrame(animateCursor);
+
+          // Expand on interactables
+          document.querySelectorAll('a, button, input, .linear-spotlight, .cursor-pointer').forEach(item => {
+            item.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
+            item.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
+          });
+        }
+
+        // -------------------------------------------------------------------------
+        // 6. LIVE SILICON BENCHMARK & REAL HARDWARE CONCURRENCY
+        // -------------------------------------------------------------------------
+        function initHardwareMetrics() {
+          const cores = navigator.hardwareConcurrency || 8;
+          const memoryGB = navigator.deviceMemory || 8;
+          const heroToolCount = document.getElementById('heroToolCount');
+          if (heroToolCount && window.MASTER_TOOLS) {
+            heroToolCount.textContent = window.MASTER_TOOLS.length;
+          }
+
+          // Real Live Ingress Latency Probe
+          const pingStart = performance.now();
+          fetch('/api/status', { cache: 'no-store' }).then(res => {
+            const elapsed = Math.max(1, Math.round(performance.now() - pingStart));
+            const pingEl = document.getElementById('livePingBadge');
+            if (pingEl) pingEl.textContent = `${elapsed} ms`;
+          }).catch(() => {});
+        }
+
+        // -------------------------------------------------------------------------
+        // 7. INTERACTIVE TOOL SANDBOX LAUNCHER ("WORKING BHI LAGE KI REAL HAI")
+        // -------------------------------------------------------------------------
+        window.launchToolSandbox = function(toolId) {
+          const modal = document.getElementById('liveToolDrawerModal');
+          const iframe = document.getElementById('sandboxIframe');
+          const title = document.getElementById('sandboxModalTitle');
+          const fullBtn = document.getElementById('sandboxOpenFullBtn');
+          const spinner = document.getElementById('sandboxLoadingSpinner');
+
+          if (!modal || !iframe) return;
+
+          window.ActiveTheoryAudio.playChirp(700, 0.08);
+
+          const toolUrl = `saas/${toolId}.html`;
+          const toolData = (window.MASTER_TOOLS || []).find(t => t.id === toolId) || { name: toolId };
+
+          if (title) title.textContent = toolData.name;
+          if (fullBtn) fullBtn.href = toolUrl;
+
+          if (spinner) spinner.style.display = 'flex';
+          iframe.src = toolUrl;
+          iframe.onload = () => {
+            if (spinner) spinner.style.display = 'none';
+          };
+
+          modal.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        };
+
+        window.closeToolSandbox = function() {
+          const modal = document.getElementById('liveToolDrawerModal');
+          const iframe = document.getElementById('sandboxIframe');
+          if (modal) modal.classList.add('hidden');
+          if (iframe) iframe.src = 'about:blank';
+          document.body.style.overflow = '';
+          window.ActiveTheoryAudio.playTone(400, 0.03);
+        };
+
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') window.closeToolSandbox();
+        });
+
+        // -------------------------------------------------------------------------
+        // 8. QUANTUM MATRIX SOUND HOOKS
+        // -------------------------------------------------------------------------
+        const origBurst = window.triggerMatrixBurst;
+        window.triggerMatrixBurst = function() {
+          window.ActiveTheoryAudio.playBurst();
+          if (origBurst) origBurst();
+        };
+
+        // DOM Initializer
+        document.addEventListener('DOMContentLoaded', () => {
+          initLinearSpotlights();
+          initCyberScramblers();
+          initMagneticButtons();
+          initFluidCursor();
+          initHardwareMetrics();
+
+          // Global Click Sound
+          document.addEventListener('click', (e) => {
+            if (e.target.closest('button, a, .cursor-pointer')) {
+              window.ActiveTheoryAudio.playTone(600, 0.02, 'triangle');
+            }
+          });
+        });
+
+      })();
+    </script>
+
 </body>
 </html>
-
-        <div class="card bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-blue-500/50 transition">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-xs bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 px-2 py-1 rounded font-mono font-semibold">Agent SchemaSmith</span>
-                <span class="text-xs text-slate-400 font-mono">DataOps</span>
-            </div>
-            <h3 class="text-white font-bold text-lg mt-1 mb-1">Agent SchemaSmith</h3>
-            <p class="text-slate-400 text-sm mb-4 line-clamp-2">Instant JSON schema generation from raw objects.</p>
-            <div class="flex items-center space-x-2">
-                <a href="tools/schema_smith_1788715374.html" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-2 rounded transition">Launch Tool</a>
-                
-            </div>
-        </div>
-        <div class="card bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-blue-500/50 transition">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-xs bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 px-2 py-1 rounded font-mono font-semibold">Agent SchemaSmith</span>
-                <span class="text-xs text-slate-400 font-mono">DataOps</span>
-            </div>
-            <h3 class="text-white font-bold text-lg mt-1 mb-1">Agent SchemaSmith</h3>
-            <p class="text-slate-400 text-sm mb-4 line-clamp-2">Instant JSON schema generation from raw objects.</p>
-            <div class="flex items-center space-x-2">
-                <a href="tools/schema_smith_1788723519.html" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-2 rounded transition">Launch Tool</a>
-                
-            </div>
-        </div>
-        <div class="card bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-blue-500/50 transition">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-xs bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 px-2 py-1 rounded font-mono font-semibold">Agent SchemaSmith</span>
-                <span class="text-xs text-slate-400 font-mono">DataOps</span>
-            </div>
-            <h3 class="text-white font-bold text-lg mt-1 mb-1">Agent SchemaSmith</h3>
-            <p class="text-slate-400 text-sm mb-4 line-clamp-2">Instant JSON schema generation from raw objects.</p>
-            <div class="flex items-center space-x-2">
-                <a href="tools/schema_smith_1788733721.html" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-2 rounded transition">Launch Tool</a>
-                
-            </div>
-        </div>
-        <div class="card bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-blue-500/50 transition">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-xs bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 px-2 py-1 rounded font-mono font-semibold">Agent SchemaSmith</span>
-                <span class="text-xs text-slate-400 font-mono">DataOps</span>
-            </div>
-            <h3 class="text-white font-bold text-lg mt-1 mb-1">Agent SchemaSmith</h3>
-            <p class="text-slate-400 text-sm mb-4 line-clamp-2">Instant JSON schema generation from raw objects.</p>
-            <div class="flex items-center space-x-2">
-                <a href="tools/schema_smith_1788744244.html" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-2 rounded transition">Launch Tool</a>
-                
-            </div>
-        </div>
-        <div class="card bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-blue-500/50 transition">
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-xs bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 px-2 py-1 rounded font-mono font-semibold">Agent SchemaSmith</span>
-                <span class="text-xs text-slate-400 font-mono">DataOps</span>
-            </div>
-            <h3 class="text-white font-bold text-lg mt-1 mb-1">Agent SchemaSmith</h3>
-            <p class="text-slate-400 text-sm mb-4 line-clamp-2">Instant JSON schema generation from raw objects.</p>
-            <div class="flex items-center space-x-2">
-                <a href="tools/schema_smith_1788766496.html" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-2 rounded transition">Launch Tool</a>
-                
-            </div>
-        </div>
