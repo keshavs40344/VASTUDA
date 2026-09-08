@@ -1170,6 +1170,77 @@ def rollback_level11_hot_patch():
     result = self_healing_watchdog.hot_patch_engine.rollback_patch(patch_id)
     return jsonify(result), 200
 
+# ==============================================================================
+# LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER PROTOCOL APIS
+# ==============================================================================
+try:
+    from core.planetary_nexus import planetary_nexus
+except Exception as e:
+    logger.error(f"[PLANETARY NEXUS CORE] Init notice: {e}")
+    planetary_nexus = None
+
+@app.route("/api/level12/nexus-status", methods=["GET"])
+def get_level12_nexus_status():
+    """
+    Level 12: Global Planetary Nexus Telemetry.
+    Reports multi-region node cluster topology, active peers, consensus epoch height,
+    Merkle state root hash, and global latency averages.
+    """
+    if not planetary_nexus:
+        return jsonify({"status": "error", "message": "Planetary nexus uninitialized"}), 503
+    return jsonify(planetary_nexus.get_status()), 200
+
+@app.route("/api/level12/peer-ping", methods=["POST"])
+def probe_level12_peer_latencies():
+    """
+    Triggers live latency RTT benchmark across planetary mesh peer nodes.
+    """
+    if not planetary_nexus:
+        return jsonify({"status": "error", "message": "Planetary nexus uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    target_node = payload.get("target_node_id")
+    result = planetary_nexus.probe_peer_latencies(target_node_id=target_node)
+    return jsonify(result), 200
+
+@app.route("/api/level12/sync-ledger", methods=["POST"])
+def sync_level12_distributed_state():
+    """
+    Advances planetary consensus epoch height, computes new Merkle state root,
+    and synchronizes replicated state across all regional nodes.
+    """
+    if not planetary_nexus:
+        return jsonify({"status": "error", "message": "Planetary nexus uninitialized"}), 503
+    result = planetary_nexus.sync_distributed_state()
+    return jsonify(result), 200
+
+@app.route("/api/level12/handshake", methods=["POST"])
+def register_level12_peer_handshake():
+    """
+    Authenticates and registers a planetary node handshake with HMAC-SHA256 signature.
+    """
+    if not planetary_nexus:
+        return jsonify({"status": "error", "message": "Planetary nexus uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    node_id = payload.get("node_id", "").strip()
+    region = payload.get("region", "custom-edge").strip()
+    location = payload.get("location", "Unknown Location").strip()
+    coords = payload.get("coords", [0.0, 0.0])
+    timestamp = float(payload.get("timestamp", time.time()))
+    signature = payload.get("signature", "").strip()
+
+    if not node_id or not signature:
+        return jsonify({"success": False, "error": "node_id and signature required"}), 400
+
+    result = planetary_nexus.verify_and_register_peer(
+        node_id=node_id,
+        region=region,
+        location=location,
+        coords=coords,
+        timestamp=timestamp,
+        signature=signature
+    )
+    return jsonify(result), (200 if result.get("success") else 401)
+
 
 
 

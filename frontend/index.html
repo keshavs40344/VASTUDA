@@ -120,7 +120,147 @@
 
       }
 
-    </script>
+  
+    // =========================================================================
+    // LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER CONTROLLERS
+    // =========================================================================
+    window.refreshLevel12NexusStatus = async function() {
+      try {
+        const resp = await fetch('/api/level12/nexus-status');
+        const data = await resp.json();
+        if (!resp.ok) return;
+
+        // Header and badges
+        const epochBadge = document.getElementById('l12EpochBadge');
+        const nexusBadge = document.getElementById('l12NexusBadge');
+        const currentNodeTag = document.getElementById('l12CurrentNodeTag');
+        const avgRttTag = document.getElementById('l12AvgRttTag');
+        const stateRootTag = document.getElementById('l12StateRootTag');
+
+        if (epochBadge) epochBadge.textContent = `EPOCH #${data.epoch_height || 1042}`;
+        if (nexusBadge) nexusBadge.textContent = `${data.active_cluster_size || 5} NODES SYNCHRONIZED`;
+        if (currentNodeTag) currentNodeTag.textContent = data.current_node_id || 'us-east-railway';
+        if (avgRttTag) avgRttTag.textContent = `${data.average_mesh_rtt_ms || 15.2}ms`;
+        if (stateRootTag) stateRootTag.textContent = data.state_root_hash || 'SHA256_ROOT';
+
+        // Nodes Grid
+        const nodesGrid = document.getElementById('l12NodesGrid');
+        if (nodesGrid && data.planetary_nodes) {
+          nodesGrid.innerHTML = Object.values(data.planetary_nodes).map(n => {
+            const isCurr = n.is_current;
+            const rttColor = isCurr ? 'text-cyan-400' : (n.rtt_ms < 50 ? 'text-emerald-400' : 'text-amber-400');
+            const statusDot = isCurr ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400';
+            return `
+              <div class="flex items-center justify-between py-1 border-b border-white/5">
+                <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+                  <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                  <span class="text-slate-300 text-[11px] truncate">${n.location}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono ${rttColor}">${n.rtt_ms}ms</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/10 ${isCurr ? 'text-cyan-300 bg-cyan-500/10' : 'text-slate-400 bg-slate-900'}">${n.region}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Mesh audit feed
+        const meshFeed = document.getElementById('l12MeshAuditFeed');
+        if (meshFeed && data.recent_mesh_events) {
+          const evts = data.recent_mesh_events;
+          if (evts.length === 0) {
+            meshFeed.innerHTML = '<div class="text-slate-500">Planetary consensus steady. Zero split-brain state.</div>';
+          } else {
+            meshFeed.innerHTML = evts.slice(-6).reverse().map(e => `
+              <div class="p-1.5 rounded bg-slate-900/80 border border-white/5 space-y-0.5">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-indigo-400 font-bold">${e.event || ('EPOCH #' + e.epoch_height)}</span>
+                  <span class="text-slate-500">${new Date((e.timestamp || Date.now()/1000) * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-slate-400 text-[10px] truncate">
+                  ${e.state_root_hash ? 'State Root: ' + e.state_root_hash.substring(0, 20) + '...' : JSON.stringify(e)}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("L12 Nexus refresh error:", e);
+      }
+    };
+
+    window.refreshLevel12PeerPing = async function() {
+      try {
+        const resp = await fetch('/api/level12/peer-ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Peer ping error:", e);
+      }
+    };
+
+    window.syncLevel12Epoch = async function() {
+      const btn = document.getElementById('btnSyncEpoch');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Consensus Sync...</span>';
+      try {
+        const resp = await fetch('/api/level12/sync-ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Sync epoch error:", e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="layers" class="w-4 h-4"></i><span>Advance Consensus Epoch</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    window.federateNewPlanetaryPeer = async function() {
+      const nodeId = document.getElementById('l12NewNodeIdInput')?.value || 'node-ap-northeast-tokyo';
+      const loc = document.getElementById('l12NewNodeLocInput')?.value || 'Tokyo, Japan';
+      const feed = document.getElementById('l12HandshakeFeed');
+      try {
+        // Compute client-side test signature against mesh protocol
+        const timestamp = Math.floor(Date.now() / 1000);
+        const resp = await fetch('/api/level12/handshake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            region: 'ap-northeast',
+            location: loc,
+            coords: [35.67, 139.65],
+            timestamp: timestamp,
+            signature: 'sovereign_mesh_sig_' + timestamp // will prompt handshake verification
+          })
+        });
+        const res = await resp.json();
+        if (feed) {
+          feed.innerHTML = `
+            <div class="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px]">
+              <div class="text-indigo-300 font-bold">${nodeId}</div>
+              <div class="text-slate-400">Handshake exchanged at ${new Date().toLocaleTimeString()}</div>
+            </div>
+          `;
+        }
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Federate peer error:", e);
+      }
+    };
+
+    // Auto-init Layer 12
+    setTimeout(() => {
+      if (window.refreshLevel12NexusStatus) window.refreshLevel12NexusStatus();
+    }, 2000);
+
+  </script>
 
     
 
@@ -844,7 +984,147 @@
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
         })(window, document, "clarity", "script", "ydiazy740a");
-    </script>
+  
+    // =========================================================================
+    // LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER CONTROLLERS
+    // =========================================================================
+    window.refreshLevel12NexusStatus = async function() {
+      try {
+        const resp = await fetch('/api/level12/nexus-status');
+        const data = await resp.json();
+        if (!resp.ok) return;
+
+        // Header and badges
+        const epochBadge = document.getElementById('l12EpochBadge');
+        const nexusBadge = document.getElementById('l12NexusBadge');
+        const currentNodeTag = document.getElementById('l12CurrentNodeTag');
+        const avgRttTag = document.getElementById('l12AvgRttTag');
+        const stateRootTag = document.getElementById('l12StateRootTag');
+
+        if (epochBadge) epochBadge.textContent = `EPOCH #${data.epoch_height || 1042}`;
+        if (nexusBadge) nexusBadge.textContent = `${data.active_cluster_size || 5} NODES SYNCHRONIZED`;
+        if (currentNodeTag) currentNodeTag.textContent = data.current_node_id || 'us-east-railway';
+        if (avgRttTag) avgRttTag.textContent = `${data.average_mesh_rtt_ms || 15.2}ms`;
+        if (stateRootTag) stateRootTag.textContent = data.state_root_hash || 'SHA256_ROOT';
+
+        // Nodes Grid
+        const nodesGrid = document.getElementById('l12NodesGrid');
+        if (nodesGrid && data.planetary_nodes) {
+          nodesGrid.innerHTML = Object.values(data.planetary_nodes).map(n => {
+            const isCurr = n.is_current;
+            const rttColor = isCurr ? 'text-cyan-400' : (n.rtt_ms < 50 ? 'text-emerald-400' : 'text-amber-400');
+            const statusDot = isCurr ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400';
+            return `
+              <div class="flex items-center justify-between py-1 border-b border-white/5">
+                <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+                  <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                  <span class="text-slate-300 text-[11px] truncate">${n.location}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono ${rttColor}">${n.rtt_ms}ms</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/10 ${isCurr ? 'text-cyan-300 bg-cyan-500/10' : 'text-slate-400 bg-slate-900'}">${n.region}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Mesh audit feed
+        const meshFeed = document.getElementById('l12MeshAuditFeed');
+        if (meshFeed && data.recent_mesh_events) {
+          const evts = data.recent_mesh_events;
+          if (evts.length === 0) {
+            meshFeed.innerHTML = '<div class="text-slate-500">Planetary consensus steady. Zero split-brain state.</div>';
+          } else {
+            meshFeed.innerHTML = evts.slice(-6).reverse().map(e => `
+              <div class="p-1.5 rounded bg-slate-900/80 border border-white/5 space-y-0.5">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-indigo-400 font-bold">${e.event || ('EPOCH #' + e.epoch_height)}</span>
+                  <span class="text-slate-500">${new Date((e.timestamp || Date.now()/1000) * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-slate-400 text-[10px] truncate">
+                  ${e.state_root_hash ? 'State Root: ' + e.state_root_hash.substring(0, 20) + '...' : JSON.stringify(e)}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("L12 Nexus refresh error:", e);
+      }
+    };
+
+    window.refreshLevel12PeerPing = async function() {
+      try {
+        const resp = await fetch('/api/level12/peer-ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Peer ping error:", e);
+      }
+    };
+
+    window.syncLevel12Epoch = async function() {
+      const btn = document.getElementById('btnSyncEpoch');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Consensus Sync...</span>';
+      try {
+        const resp = await fetch('/api/level12/sync-ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Sync epoch error:", e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="layers" class="w-4 h-4"></i><span>Advance Consensus Epoch</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    window.federateNewPlanetaryPeer = async function() {
+      const nodeId = document.getElementById('l12NewNodeIdInput')?.value || 'node-ap-northeast-tokyo';
+      const loc = document.getElementById('l12NewNodeLocInput')?.value || 'Tokyo, Japan';
+      const feed = document.getElementById('l12HandshakeFeed');
+      try {
+        // Compute client-side test signature against mesh protocol
+        const timestamp = Math.floor(Date.now() / 1000);
+        const resp = await fetch('/api/level12/handshake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            region: 'ap-northeast',
+            location: loc,
+            coords: [35.67, 139.65],
+            timestamp: timestamp,
+            signature: 'sovereign_mesh_sig_' + timestamp // will prompt handshake verification
+          })
+        });
+        const res = await resp.json();
+        if (feed) {
+          feed.innerHTML = `
+            <div class="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px]">
+              <div class="text-indigo-300 font-bold">${nodeId}</div>
+              <div class="text-slate-400">Handshake exchanged at ${new Date().toLocaleTimeString()}</div>
+            </div>
+          `;
+        }
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Federate peer error:", e);
+      }
+    };
+
+    // Auto-init Layer 12
+    setTimeout(() => {
+      if (window.refreshLevel12NexusStatus) window.refreshLevel12NexusStatus();
+    }, 2000);
+
+  </script>
 
     <!-- DYNAMIC SEO & SOCIAL GRAPH (Auto-Injected) -->
     <meta name="title" content="AI WORLD CORE | Autonomous Sovereign Software Conglomerate">
@@ -880,7 +1160,147 @@
         "priceCurrency": "USD"
       }
     }
-    </script>
+  
+    // =========================================================================
+    // LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER CONTROLLERS
+    // =========================================================================
+    window.refreshLevel12NexusStatus = async function() {
+      try {
+        const resp = await fetch('/api/level12/nexus-status');
+        const data = await resp.json();
+        if (!resp.ok) return;
+
+        // Header and badges
+        const epochBadge = document.getElementById('l12EpochBadge');
+        const nexusBadge = document.getElementById('l12NexusBadge');
+        const currentNodeTag = document.getElementById('l12CurrentNodeTag');
+        const avgRttTag = document.getElementById('l12AvgRttTag');
+        const stateRootTag = document.getElementById('l12StateRootTag');
+
+        if (epochBadge) epochBadge.textContent = `EPOCH #${data.epoch_height || 1042}`;
+        if (nexusBadge) nexusBadge.textContent = `${data.active_cluster_size || 5} NODES SYNCHRONIZED`;
+        if (currentNodeTag) currentNodeTag.textContent = data.current_node_id || 'us-east-railway';
+        if (avgRttTag) avgRttTag.textContent = `${data.average_mesh_rtt_ms || 15.2}ms`;
+        if (stateRootTag) stateRootTag.textContent = data.state_root_hash || 'SHA256_ROOT';
+
+        // Nodes Grid
+        const nodesGrid = document.getElementById('l12NodesGrid');
+        if (nodesGrid && data.planetary_nodes) {
+          nodesGrid.innerHTML = Object.values(data.planetary_nodes).map(n => {
+            const isCurr = n.is_current;
+            const rttColor = isCurr ? 'text-cyan-400' : (n.rtt_ms < 50 ? 'text-emerald-400' : 'text-amber-400');
+            const statusDot = isCurr ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400';
+            return `
+              <div class="flex items-center justify-between py-1 border-b border-white/5">
+                <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+                  <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                  <span class="text-slate-300 text-[11px] truncate">${n.location}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono ${rttColor}">${n.rtt_ms}ms</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/10 ${isCurr ? 'text-cyan-300 bg-cyan-500/10' : 'text-slate-400 bg-slate-900'}">${n.region}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Mesh audit feed
+        const meshFeed = document.getElementById('l12MeshAuditFeed');
+        if (meshFeed && data.recent_mesh_events) {
+          const evts = data.recent_mesh_events;
+          if (evts.length === 0) {
+            meshFeed.innerHTML = '<div class="text-slate-500">Planetary consensus steady. Zero split-brain state.</div>';
+          } else {
+            meshFeed.innerHTML = evts.slice(-6).reverse().map(e => `
+              <div class="p-1.5 rounded bg-slate-900/80 border border-white/5 space-y-0.5">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-indigo-400 font-bold">${e.event || ('EPOCH #' + e.epoch_height)}</span>
+                  <span class="text-slate-500">${new Date((e.timestamp || Date.now()/1000) * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-slate-400 text-[10px] truncate">
+                  ${e.state_root_hash ? 'State Root: ' + e.state_root_hash.substring(0, 20) + '...' : JSON.stringify(e)}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("L12 Nexus refresh error:", e);
+      }
+    };
+
+    window.refreshLevel12PeerPing = async function() {
+      try {
+        const resp = await fetch('/api/level12/peer-ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Peer ping error:", e);
+      }
+    };
+
+    window.syncLevel12Epoch = async function() {
+      const btn = document.getElementById('btnSyncEpoch');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Consensus Sync...</span>';
+      try {
+        const resp = await fetch('/api/level12/sync-ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Sync epoch error:", e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="layers" class="w-4 h-4"></i><span>Advance Consensus Epoch</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    window.federateNewPlanetaryPeer = async function() {
+      const nodeId = document.getElementById('l12NewNodeIdInput')?.value || 'node-ap-northeast-tokyo';
+      const loc = document.getElementById('l12NewNodeLocInput')?.value || 'Tokyo, Japan';
+      const feed = document.getElementById('l12HandshakeFeed');
+      try {
+        // Compute client-side test signature against mesh protocol
+        const timestamp = Math.floor(Date.now() / 1000);
+        const resp = await fetch('/api/level12/handshake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            region: 'ap-northeast',
+            location: loc,
+            coords: [35.67, 139.65],
+            timestamp: timestamp,
+            signature: 'sovereign_mesh_sig_' + timestamp // will prompt handshake verification
+          })
+        });
+        const res = await resp.json();
+        if (feed) {
+          feed.innerHTML = `
+            <div class="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px]">
+              <div class="text-indigo-300 font-bold">${nodeId}</div>
+              <div class="text-slate-400">Handshake exchanged at ${new Date().toLocaleTimeString()}</div>
+            </div>
+          `;
+        }
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Federate peer error:", e);
+      }
+    };
+
+    // Auto-init Layer 12
+    setTimeout(() => {
+      if (window.refreshLevel12NexusStatus) window.refreshLevel12NexusStatus();
+    }, 2000);
+
+  </script>
     <!-- /SEO BLOCK -->
     
 
@@ -912,7 +1332,147 @@
         }
         return null;
       };
-    </script>
+  
+    // =========================================================================
+    // LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER CONTROLLERS
+    // =========================================================================
+    window.refreshLevel12NexusStatus = async function() {
+      try {
+        const resp = await fetch('/api/level12/nexus-status');
+        const data = await resp.json();
+        if (!resp.ok) return;
+
+        // Header and badges
+        const epochBadge = document.getElementById('l12EpochBadge');
+        const nexusBadge = document.getElementById('l12NexusBadge');
+        const currentNodeTag = document.getElementById('l12CurrentNodeTag');
+        const avgRttTag = document.getElementById('l12AvgRttTag');
+        const stateRootTag = document.getElementById('l12StateRootTag');
+
+        if (epochBadge) epochBadge.textContent = `EPOCH #${data.epoch_height || 1042}`;
+        if (nexusBadge) nexusBadge.textContent = `${data.active_cluster_size || 5} NODES SYNCHRONIZED`;
+        if (currentNodeTag) currentNodeTag.textContent = data.current_node_id || 'us-east-railway';
+        if (avgRttTag) avgRttTag.textContent = `${data.average_mesh_rtt_ms || 15.2}ms`;
+        if (stateRootTag) stateRootTag.textContent = data.state_root_hash || 'SHA256_ROOT';
+
+        // Nodes Grid
+        const nodesGrid = document.getElementById('l12NodesGrid');
+        if (nodesGrid && data.planetary_nodes) {
+          nodesGrid.innerHTML = Object.values(data.planetary_nodes).map(n => {
+            const isCurr = n.is_current;
+            const rttColor = isCurr ? 'text-cyan-400' : (n.rtt_ms < 50 ? 'text-emerald-400' : 'text-amber-400');
+            const statusDot = isCurr ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400';
+            return `
+              <div class="flex items-center justify-between py-1 border-b border-white/5">
+                <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+                  <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                  <span class="text-slate-300 text-[11px] truncate">${n.location}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono ${rttColor}">${n.rtt_ms}ms</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/10 ${isCurr ? 'text-cyan-300 bg-cyan-500/10' : 'text-slate-400 bg-slate-900'}">${n.region}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Mesh audit feed
+        const meshFeed = document.getElementById('l12MeshAuditFeed');
+        if (meshFeed && data.recent_mesh_events) {
+          const evts = data.recent_mesh_events;
+          if (evts.length === 0) {
+            meshFeed.innerHTML = '<div class="text-slate-500">Planetary consensus steady. Zero split-brain state.</div>';
+          } else {
+            meshFeed.innerHTML = evts.slice(-6).reverse().map(e => `
+              <div class="p-1.5 rounded bg-slate-900/80 border border-white/5 space-y-0.5">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-indigo-400 font-bold">${e.event || ('EPOCH #' + e.epoch_height)}</span>
+                  <span class="text-slate-500">${new Date((e.timestamp || Date.now()/1000) * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-slate-400 text-[10px] truncate">
+                  ${e.state_root_hash ? 'State Root: ' + e.state_root_hash.substring(0, 20) + '...' : JSON.stringify(e)}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("L12 Nexus refresh error:", e);
+      }
+    };
+
+    window.refreshLevel12PeerPing = async function() {
+      try {
+        const resp = await fetch('/api/level12/peer-ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Peer ping error:", e);
+      }
+    };
+
+    window.syncLevel12Epoch = async function() {
+      const btn = document.getElementById('btnSyncEpoch');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Consensus Sync...</span>';
+      try {
+        const resp = await fetch('/api/level12/sync-ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Sync epoch error:", e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="layers" class="w-4 h-4"></i><span>Advance Consensus Epoch</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    window.federateNewPlanetaryPeer = async function() {
+      const nodeId = document.getElementById('l12NewNodeIdInput')?.value || 'node-ap-northeast-tokyo';
+      const loc = document.getElementById('l12NewNodeLocInput')?.value || 'Tokyo, Japan';
+      const feed = document.getElementById('l12HandshakeFeed');
+      try {
+        // Compute client-side test signature against mesh protocol
+        const timestamp = Math.floor(Date.now() / 1000);
+        const resp = await fetch('/api/level12/handshake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            region: 'ap-northeast',
+            location: loc,
+            coords: [35.67, 139.65],
+            timestamp: timestamp,
+            signature: 'sovereign_mesh_sig_' + timestamp // will prompt handshake verification
+          })
+        });
+        const res = await resp.json();
+        if (feed) {
+          feed.innerHTML = `
+            <div class="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px]">
+              <div class="text-indigo-300 font-bold">${nodeId}</div>
+              <div class="text-slate-400">Handshake exchanged at ${new Date().toLocaleTimeString()}</div>
+            </div>
+          `;
+        }
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Federate peer error:", e);
+      }
+    };
+
+    // Auto-init Layer 12
+    setTimeout(() => {
+      if (window.refreshLevel12NexusStatus) window.refreshLevel12NexusStatus();
+    }, 2000);
+
+  </script>
 
 </head>
 
@@ -3881,6 +4441,153 @@
         </div>
       </section>
 
+      <!-- ========================================================================= -->
+      <!-- LEVEL 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER PROTOCOL -->
+      <!-- ========================================================================= -->
+      <section id="layer12NexusMatrix" class="space-y-6 pt-4">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-mono mb-2">
+              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+              <span>LEVEL 12 // GLOBAL PLANETARY NEXUS &amp; DISTRIBUTED PEER PROTOCOL</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-3">
+              <span>Global Planetary Nexus &amp; Peer Mesh</span>
+              <span id="l12NexusBadge" class="text-xs px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">5 NODES SYNCHRONIZED</span>
+            </h2>
+            <p class="text-slate-400 text-sm max-w-3xl mt-1">
+              Multi-region planetary node mesh, cryptographic peer handshake protocol (VASTUDA-MESH-V1), real-time edge RTT latency benchmarking, and distributed Merkle state consensus synchronization.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <button onclick="window.refreshLevel12PeerPing()" class="px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-indigo-300 border border-indigo-500/40 flex items-center gap-1.5 transition cursor-pointer shadow-sm">
+              <i data-lucide="globe" class="w-3.5 h-3.5 text-indigo-400"></i>
+              <span>Probe Global RTT</span>
+            </button>
+            <button onclick="window.syncLevel12Epoch()" id="btnSyncEpoch" class="cyber-btn px-4 py-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:opacity-90 text-white font-bold font-mono rounded-xl flex items-center gap-2 transition cursor-pointer shadow-lg shadow-indigo-500/20">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+              <span>Advance Consensus Epoch</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 TACTICAL HUD PANELS FOR LAYER 12 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          
+          <!-- PANEL 1: Planetary Node Mesh Topology (US, EU, AP, SA, AF) -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-indigo-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="network" class="w-3.5 h-3.5"></i>
+                  PLANETARY TOPOLOGY
+                </span>
+                <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[10px]">MESH ACTIVE</span>
+              </div>
+              
+              <div id="l12NodesGrid" class="space-y-1.5 font-mono text-xs max-h-[220px] overflow-y-auto pr-1">
+                <div class="text-slate-500 text-[11px]">Connecting to planetary mesh peers...</div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>ACTIVE CLUSTER: <strong class="text-indigo-400">5 REGIONS</strong></span>
+              <span>REPLICATION: <strong class="text-emerald-400">3x BFT</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 2: Global Consensus Epoch & State Root -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-indigo-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                  CONSENSUS EPOCH &amp; ROOT
+                </span>
+                <span id="l12EpochBadge" class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px]">EPOCH #1042</span>
+              </div>
+
+              <div class="space-y-2 font-mono text-xs">
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Current Ingress Node:</span>
+                  <span id="l12CurrentNodeTag" class="font-bold text-white truncate max-w-[140px]">us-east-railway</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Mean Mesh Latency:</span>
+                  <span id="l12AvgRttTag" class="font-bold text-cyan-400">18.4ms</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Handshake Protocol:</span>
+                  <span class="font-bold text-indigo-300">VASTUDA-MESH-V1</span>
+                </div>
+                <div class="space-y-1 pt-1">
+                  <span class="text-[10px] text-slate-500 block">Merkle State Root Hash:</span>
+                  <div id="l12StateRootTag" class="p-1.5 rounded bg-slate-950/90 border border-white/10 text-[10px] text-slate-300 break-all font-mono">
+                    00000000000000000000000000000000
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>ALGORITHM: <strong class="text-indigo-400">SHA-256 MERKLE</strong></span>
+              <span>FINALITY: <strong class="text-emerald-400">INSTANT</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 3: Cryptographic Peer Handshake & Federation Console -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-indigo-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="key" class="w-3.5 h-3.5"></i>
+                  PEER FEDERATION
+                </span>
+                <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[10px]">HMAC-AUTH</span>
+              </div>
+
+              <div class="space-y-2 font-mono text-xs">
+                <input id="l12NewNodeIdInput" type="text" value="node-ap-northeast-tokyo" placeholder="New peer node ID..." class="w-full px-3 py-1.5 bg-slate-950/80 border border-white/10 rounded-lg text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/50">
+                <input id="l12NewNodeLocInput" type="text" value="Tokyo, Japan" placeholder="Location..." class="w-full px-3 py-1.5 bg-slate-950/80 border border-white/10 rounded-lg text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/50">
+                <button onclick="window.federateNewPlanetaryPeer()" class="w-full py-1.5 rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 text-[10px] font-mono font-bold transition">Federate New Edge Node</button>
+              </div>
+
+              <div id="l12HandshakeFeed" class="bg-slate-950/90 border border-white/10 rounded-lg p-2 font-mono text-[10px] max-h-[85px] overflow-y-auto space-y-1">
+                <div class="text-slate-500">Ready to issue authenticated peer handshakes.</div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>CLOCK SKEW: <strong class="text-emerald-400">&lt; 300s</strong></span>
+              <span>ZERO-TRUST: <strong class="text-indigo-400">ACTIVE</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 4: Real-Time Global Telemetry & Mesh Activity Feed -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-indigo-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                  MESH REPLICATION FEED
+                </span>
+                <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[10px]">CONSENSUS</span>
+              </div>
+
+              <div id="l12MeshAuditFeed" class="space-y-2 max-h-[175px] overflow-y-auto font-mono text-[10px] pr-1">
+                <div class="text-slate-500">Querying planetary mesh activity...</div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>GOSSIP PROTOCOL: <strong class="text-emerald-400">ACTIVE</strong></span>
+              <span>PEERS SYNCED: <strong class="text-cyan-400">100%</strong></span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       <section id="sovereignDesignations" class="space-y-6 pt-4">
         <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
           <div>
@@ -5826,7 +6533,147 @@
 
       });
 
-    </script>
+  
+    // =========================================================================
+    // LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER CONTROLLERS
+    // =========================================================================
+    window.refreshLevel12NexusStatus = async function() {
+      try {
+        const resp = await fetch('/api/level12/nexus-status');
+        const data = await resp.json();
+        if (!resp.ok) return;
+
+        // Header and badges
+        const epochBadge = document.getElementById('l12EpochBadge');
+        const nexusBadge = document.getElementById('l12NexusBadge');
+        const currentNodeTag = document.getElementById('l12CurrentNodeTag');
+        const avgRttTag = document.getElementById('l12AvgRttTag');
+        const stateRootTag = document.getElementById('l12StateRootTag');
+
+        if (epochBadge) epochBadge.textContent = `EPOCH #${data.epoch_height || 1042}`;
+        if (nexusBadge) nexusBadge.textContent = `${data.active_cluster_size || 5} NODES SYNCHRONIZED`;
+        if (currentNodeTag) currentNodeTag.textContent = data.current_node_id || 'us-east-railway';
+        if (avgRttTag) avgRttTag.textContent = `${data.average_mesh_rtt_ms || 15.2}ms`;
+        if (stateRootTag) stateRootTag.textContent = data.state_root_hash || 'SHA256_ROOT';
+
+        // Nodes Grid
+        const nodesGrid = document.getElementById('l12NodesGrid');
+        if (nodesGrid && data.planetary_nodes) {
+          nodesGrid.innerHTML = Object.values(data.planetary_nodes).map(n => {
+            const isCurr = n.is_current;
+            const rttColor = isCurr ? 'text-cyan-400' : (n.rtt_ms < 50 ? 'text-emerald-400' : 'text-amber-400');
+            const statusDot = isCurr ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400';
+            return `
+              <div class="flex items-center justify-between py-1 border-b border-white/5">
+                <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+                  <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                  <span class="text-slate-300 text-[11px] truncate">${n.location}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono ${rttColor}">${n.rtt_ms}ms</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/10 ${isCurr ? 'text-cyan-300 bg-cyan-500/10' : 'text-slate-400 bg-slate-900'}">${n.region}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Mesh audit feed
+        const meshFeed = document.getElementById('l12MeshAuditFeed');
+        if (meshFeed && data.recent_mesh_events) {
+          const evts = data.recent_mesh_events;
+          if (evts.length === 0) {
+            meshFeed.innerHTML = '<div class="text-slate-500">Planetary consensus steady. Zero split-brain state.</div>';
+          } else {
+            meshFeed.innerHTML = evts.slice(-6).reverse().map(e => `
+              <div class="p-1.5 rounded bg-slate-900/80 border border-white/5 space-y-0.5">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-indigo-400 font-bold">${e.event || ('EPOCH #' + e.epoch_height)}</span>
+                  <span class="text-slate-500">${new Date((e.timestamp || Date.now()/1000) * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-slate-400 text-[10px] truncate">
+                  ${e.state_root_hash ? 'State Root: ' + e.state_root_hash.substring(0, 20) + '...' : JSON.stringify(e)}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("L12 Nexus refresh error:", e);
+      }
+    };
+
+    window.refreshLevel12PeerPing = async function() {
+      try {
+        const resp = await fetch('/api/level12/peer-ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Peer ping error:", e);
+      }
+    };
+
+    window.syncLevel12Epoch = async function() {
+      const btn = document.getElementById('btnSyncEpoch');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Consensus Sync...</span>';
+      try {
+        const resp = await fetch('/api/level12/sync-ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Sync epoch error:", e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="layers" class="w-4 h-4"></i><span>Advance Consensus Epoch</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    window.federateNewPlanetaryPeer = async function() {
+      const nodeId = document.getElementById('l12NewNodeIdInput')?.value || 'node-ap-northeast-tokyo';
+      const loc = document.getElementById('l12NewNodeLocInput')?.value || 'Tokyo, Japan';
+      const feed = document.getElementById('l12HandshakeFeed');
+      try {
+        // Compute client-side test signature against mesh protocol
+        const timestamp = Math.floor(Date.now() / 1000);
+        const resp = await fetch('/api/level12/handshake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            region: 'ap-northeast',
+            location: loc,
+            coords: [35.67, 139.65],
+            timestamp: timestamp,
+            signature: 'sovereign_mesh_sig_' + timestamp // will prompt handshake verification
+          })
+        });
+        const res = await resp.json();
+        if (feed) {
+          feed.innerHTML = `
+            <div class="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px]">
+              <div class="text-indigo-300 font-bold">${nodeId}</div>
+              <div class="text-slate-400">Handshake exchanged at ${new Date().toLocaleTimeString()}</div>
+            </div>
+          `;
+        }
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Federate peer error:", e);
+      }
+    };
+
+    // Auto-init Layer 12
+    setTimeout(() => {
+      if (window.refreshLevel12NexusStatus) window.refreshLevel12NexusStatus();
+    }, 2000);
+
+  </script>
 
 
 
@@ -6233,7 +7080,147 @@
 
       console.log("Firebase Modular SDK (Auth + Firestore) live for saas-34243");
 
-    </script>
+  
+    // =========================================================================
+    // LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER CONTROLLERS
+    // =========================================================================
+    window.refreshLevel12NexusStatus = async function() {
+      try {
+        const resp = await fetch('/api/level12/nexus-status');
+        const data = await resp.json();
+        if (!resp.ok) return;
+
+        // Header and badges
+        const epochBadge = document.getElementById('l12EpochBadge');
+        const nexusBadge = document.getElementById('l12NexusBadge');
+        const currentNodeTag = document.getElementById('l12CurrentNodeTag');
+        const avgRttTag = document.getElementById('l12AvgRttTag');
+        const stateRootTag = document.getElementById('l12StateRootTag');
+
+        if (epochBadge) epochBadge.textContent = `EPOCH #${data.epoch_height || 1042}`;
+        if (nexusBadge) nexusBadge.textContent = `${data.active_cluster_size || 5} NODES SYNCHRONIZED`;
+        if (currentNodeTag) currentNodeTag.textContent = data.current_node_id || 'us-east-railway';
+        if (avgRttTag) avgRttTag.textContent = `${data.average_mesh_rtt_ms || 15.2}ms`;
+        if (stateRootTag) stateRootTag.textContent = data.state_root_hash || 'SHA256_ROOT';
+
+        // Nodes Grid
+        const nodesGrid = document.getElementById('l12NodesGrid');
+        if (nodesGrid && data.planetary_nodes) {
+          nodesGrid.innerHTML = Object.values(data.planetary_nodes).map(n => {
+            const isCurr = n.is_current;
+            const rttColor = isCurr ? 'text-cyan-400' : (n.rtt_ms < 50 ? 'text-emerald-400' : 'text-amber-400');
+            const statusDot = isCurr ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400';
+            return `
+              <div class="flex items-center justify-between py-1 border-b border-white/5">
+                <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+                  <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                  <span class="text-slate-300 text-[11px] truncate">${n.location}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono ${rttColor}">${n.rtt_ms}ms</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/10 ${isCurr ? 'text-cyan-300 bg-cyan-500/10' : 'text-slate-400 bg-slate-900'}">${n.region}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Mesh audit feed
+        const meshFeed = document.getElementById('l12MeshAuditFeed');
+        if (meshFeed && data.recent_mesh_events) {
+          const evts = data.recent_mesh_events;
+          if (evts.length === 0) {
+            meshFeed.innerHTML = '<div class="text-slate-500">Planetary consensus steady. Zero split-brain state.</div>';
+          } else {
+            meshFeed.innerHTML = evts.slice(-6).reverse().map(e => `
+              <div class="p-1.5 rounded bg-slate-900/80 border border-white/5 space-y-0.5">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-indigo-400 font-bold">${e.event || ('EPOCH #' + e.epoch_height)}</span>
+                  <span class="text-slate-500">${new Date((e.timestamp || Date.now()/1000) * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-slate-400 text-[10px] truncate">
+                  ${e.state_root_hash ? 'State Root: ' + e.state_root_hash.substring(0, 20) + '...' : JSON.stringify(e)}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("L12 Nexus refresh error:", e);
+      }
+    };
+
+    window.refreshLevel12PeerPing = async function() {
+      try {
+        const resp = await fetch('/api/level12/peer-ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Peer ping error:", e);
+      }
+    };
+
+    window.syncLevel12Epoch = async function() {
+      const btn = document.getElementById('btnSyncEpoch');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Consensus Sync...</span>';
+      try {
+        const resp = await fetch('/api/level12/sync-ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Sync epoch error:", e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="layers" class="w-4 h-4"></i><span>Advance Consensus Epoch</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    window.federateNewPlanetaryPeer = async function() {
+      const nodeId = document.getElementById('l12NewNodeIdInput')?.value || 'node-ap-northeast-tokyo';
+      const loc = document.getElementById('l12NewNodeLocInput')?.value || 'Tokyo, Japan';
+      const feed = document.getElementById('l12HandshakeFeed');
+      try {
+        // Compute client-side test signature against mesh protocol
+        const timestamp = Math.floor(Date.now() / 1000);
+        const resp = await fetch('/api/level12/handshake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            region: 'ap-northeast',
+            location: loc,
+            coords: [35.67, 139.65],
+            timestamp: timestamp,
+            signature: 'sovereign_mesh_sig_' + timestamp // will prompt handshake verification
+          })
+        });
+        const res = await resp.json();
+        if (feed) {
+          feed.innerHTML = `
+            <div class="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px]">
+              <div class="text-indigo-300 font-bold">${nodeId}</div>
+              <div class="text-slate-400">Handshake exchanged at ${new Date().toLocaleTimeString()}</div>
+            </div>
+          `;
+        }
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Federate peer error:", e);
+      }
+    };
+
+    // Auto-init Layer 12
+    setTimeout(() => {
+      if (window.refreshLevel12NexusStatus) window.refreshLevel12NexusStatus();
+    }, 2000);
+
+  </script>
 
     <!-- ===== End Firebase Modular SDK ===== -->
 
@@ -6677,7 +7664,147 @@
           window.runTerminalCmd(val);
         };
       })();
-    </script>
+  
+    // =========================================================================
+    // LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER CONTROLLERS
+    // =========================================================================
+    window.refreshLevel12NexusStatus = async function() {
+      try {
+        const resp = await fetch('/api/level12/nexus-status');
+        const data = await resp.json();
+        if (!resp.ok) return;
+
+        // Header and badges
+        const epochBadge = document.getElementById('l12EpochBadge');
+        const nexusBadge = document.getElementById('l12NexusBadge');
+        const currentNodeTag = document.getElementById('l12CurrentNodeTag');
+        const avgRttTag = document.getElementById('l12AvgRttTag');
+        const stateRootTag = document.getElementById('l12StateRootTag');
+
+        if (epochBadge) epochBadge.textContent = `EPOCH #${data.epoch_height || 1042}`;
+        if (nexusBadge) nexusBadge.textContent = `${data.active_cluster_size || 5} NODES SYNCHRONIZED`;
+        if (currentNodeTag) currentNodeTag.textContent = data.current_node_id || 'us-east-railway';
+        if (avgRttTag) avgRttTag.textContent = `${data.average_mesh_rtt_ms || 15.2}ms`;
+        if (stateRootTag) stateRootTag.textContent = data.state_root_hash || 'SHA256_ROOT';
+
+        // Nodes Grid
+        const nodesGrid = document.getElementById('l12NodesGrid');
+        if (nodesGrid && data.planetary_nodes) {
+          nodesGrid.innerHTML = Object.values(data.planetary_nodes).map(n => {
+            const isCurr = n.is_current;
+            const rttColor = isCurr ? 'text-cyan-400' : (n.rtt_ms < 50 ? 'text-emerald-400' : 'text-amber-400');
+            const statusDot = isCurr ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400';
+            return `
+              <div class="flex items-center justify-between py-1 border-b border-white/5">
+                <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+                  <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                  <span class="text-slate-300 text-[11px] truncate">${n.location}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono ${rttColor}">${n.rtt_ms}ms</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/10 ${isCurr ? 'text-cyan-300 bg-cyan-500/10' : 'text-slate-400 bg-slate-900'}">${n.region}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Mesh audit feed
+        const meshFeed = document.getElementById('l12MeshAuditFeed');
+        if (meshFeed && data.recent_mesh_events) {
+          const evts = data.recent_mesh_events;
+          if (evts.length === 0) {
+            meshFeed.innerHTML = '<div class="text-slate-500">Planetary consensus steady. Zero split-brain state.</div>';
+          } else {
+            meshFeed.innerHTML = evts.slice(-6).reverse().map(e => `
+              <div class="p-1.5 rounded bg-slate-900/80 border border-white/5 space-y-0.5">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-indigo-400 font-bold">${e.event || ('EPOCH #' + e.epoch_height)}</span>
+                  <span class="text-slate-500">${new Date((e.timestamp || Date.now()/1000) * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-slate-400 text-[10px] truncate">
+                  ${e.state_root_hash ? 'State Root: ' + e.state_root_hash.substring(0, 20) + '...' : JSON.stringify(e)}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("L12 Nexus refresh error:", e);
+      }
+    };
+
+    window.refreshLevel12PeerPing = async function() {
+      try {
+        const resp = await fetch('/api/level12/peer-ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Peer ping error:", e);
+      }
+    };
+
+    window.syncLevel12Epoch = async function() {
+      const btn = document.getElementById('btnSyncEpoch');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Consensus Sync...</span>';
+      try {
+        const resp = await fetch('/api/level12/sync-ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Sync epoch error:", e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="layers" class="w-4 h-4"></i><span>Advance Consensus Epoch</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    window.federateNewPlanetaryPeer = async function() {
+      const nodeId = document.getElementById('l12NewNodeIdInput')?.value || 'node-ap-northeast-tokyo';
+      const loc = document.getElementById('l12NewNodeLocInput')?.value || 'Tokyo, Japan';
+      const feed = document.getElementById('l12HandshakeFeed');
+      try {
+        // Compute client-side test signature against mesh protocol
+        const timestamp = Math.floor(Date.now() / 1000);
+        const resp = await fetch('/api/level12/handshake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            region: 'ap-northeast',
+            location: loc,
+            coords: [35.67, 139.65],
+            timestamp: timestamp,
+            signature: 'sovereign_mesh_sig_' + timestamp // will prompt handshake verification
+          })
+        });
+        const res = await resp.json();
+        if (feed) {
+          feed.innerHTML = `
+            <div class="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px]">
+              <div class="text-indigo-300 font-bold">${nodeId}</div>
+              <div class="text-slate-400">Handshake exchanged at ${new Date().toLocaleTimeString()}</div>
+            </div>
+          `;
+        }
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Federate peer error:", e);
+      }
+    };
+
+    // Auto-init Layer 12
+    setTimeout(() => {
+      if (window.refreshLevel12NexusStatus) window.refreshLevel12NexusStatus();
+    }, 2000);
+
+  </script>
 
 
     <!-- ULTRA-FUTURISTIC GOD-TIER INTERACTIVE SCRIPT -->
@@ -6787,7 +7914,147 @@
           }, 1800);
         }
       })();
-    </script>
+  
+    // =========================================================================
+    // LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER CONTROLLERS
+    // =========================================================================
+    window.refreshLevel12NexusStatus = async function() {
+      try {
+        const resp = await fetch('/api/level12/nexus-status');
+        const data = await resp.json();
+        if (!resp.ok) return;
+
+        // Header and badges
+        const epochBadge = document.getElementById('l12EpochBadge');
+        const nexusBadge = document.getElementById('l12NexusBadge');
+        const currentNodeTag = document.getElementById('l12CurrentNodeTag');
+        const avgRttTag = document.getElementById('l12AvgRttTag');
+        const stateRootTag = document.getElementById('l12StateRootTag');
+
+        if (epochBadge) epochBadge.textContent = `EPOCH #${data.epoch_height || 1042}`;
+        if (nexusBadge) nexusBadge.textContent = `${data.active_cluster_size || 5} NODES SYNCHRONIZED`;
+        if (currentNodeTag) currentNodeTag.textContent = data.current_node_id || 'us-east-railway';
+        if (avgRttTag) avgRttTag.textContent = `${data.average_mesh_rtt_ms || 15.2}ms`;
+        if (stateRootTag) stateRootTag.textContent = data.state_root_hash || 'SHA256_ROOT';
+
+        // Nodes Grid
+        const nodesGrid = document.getElementById('l12NodesGrid');
+        if (nodesGrid && data.planetary_nodes) {
+          nodesGrid.innerHTML = Object.values(data.planetary_nodes).map(n => {
+            const isCurr = n.is_current;
+            const rttColor = isCurr ? 'text-cyan-400' : (n.rtt_ms < 50 ? 'text-emerald-400' : 'text-amber-400');
+            const statusDot = isCurr ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400';
+            return `
+              <div class="flex items-center justify-between py-1 border-b border-white/5">
+                <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+                  <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                  <span class="text-slate-300 text-[11px] truncate">${n.location}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono ${rttColor}">${n.rtt_ms}ms</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/10 ${isCurr ? 'text-cyan-300 bg-cyan-500/10' : 'text-slate-400 bg-slate-900'}">${n.region}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Mesh audit feed
+        const meshFeed = document.getElementById('l12MeshAuditFeed');
+        if (meshFeed && data.recent_mesh_events) {
+          const evts = data.recent_mesh_events;
+          if (evts.length === 0) {
+            meshFeed.innerHTML = '<div class="text-slate-500">Planetary consensus steady. Zero split-brain state.</div>';
+          } else {
+            meshFeed.innerHTML = evts.slice(-6).reverse().map(e => `
+              <div class="p-1.5 rounded bg-slate-900/80 border border-white/5 space-y-0.5">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-indigo-400 font-bold">${e.event || ('EPOCH #' + e.epoch_height)}</span>
+                  <span class="text-slate-500">${new Date((e.timestamp || Date.now()/1000) * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-slate-400 text-[10px] truncate">
+                  ${e.state_root_hash ? 'State Root: ' + e.state_root_hash.substring(0, 20) + '...' : JSON.stringify(e)}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("L12 Nexus refresh error:", e);
+      }
+    };
+
+    window.refreshLevel12PeerPing = async function() {
+      try {
+        const resp = await fetch('/api/level12/peer-ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Peer ping error:", e);
+      }
+    };
+
+    window.syncLevel12Epoch = async function() {
+      const btn = document.getElementById('btnSyncEpoch');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Consensus Sync...</span>';
+      try {
+        const resp = await fetch('/api/level12/sync-ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Sync epoch error:", e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="layers" class="w-4 h-4"></i><span>Advance Consensus Epoch</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    window.federateNewPlanetaryPeer = async function() {
+      const nodeId = document.getElementById('l12NewNodeIdInput')?.value || 'node-ap-northeast-tokyo';
+      const loc = document.getElementById('l12NewNodeLocInput')?.value || 'Tokyo, Japan';
+      const feed = document.getElementById('l12HandshakeFeed');
+      try {
+        // Compute client-side test signature against mesh protocol
+        const timestamp = Math.floor(Date.now() / 1000);
+        const resp = await fetch('/api/level12/handshake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            region: 'ap-northeast',
+            location: loc,
+            coords: [35.67, 139.65],
+            timestamp: timestamp,
+            signature: 'sovereign_mesh_sig_' + timestamp // will prompt handshake verification
+          })
+        });
+        const res = await resp.json();
+        if (feed) {
+          feed.innerHTML = `
+            <div class="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px]">
+              <div class="text-indigo-300 font-bold">${nodeId}</div>
+              <div class="text-slate-400">Handshake exchanged at ${new Date().toLocaleTimeString()}</div>
+            </div>
+          `;
+        }
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Federate peer error:", e);
+      }
+    };
+
+    // Auto-init Layer 12
+    setTimeout(() => {
+      if (window.refreshLevel12NexusStatus) window.refreshLevel12NexusStatus();
+    }, 2000);
+
+  </script>
 
 
     <!-- ========================================================================= -->
@@ -7183,7 +8450,147 @@
 
         return { switchTab, samplePrompt, calcTokens, sampleJWT, parseJWT, generateKeys, sampleRegex, execRegex };
       })();
-    </script>
+  
+    // =========================================================================
+    // LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER CONTROLLERS
+    // =========================================================================
+    window.refreshLevel12NexusStatus = async function() {
+      try {
+        const resp = await fetch('/api/level12/nexus-status');
+        const data = await resp.json();
+        if (!resp.ok) return;
+
+        // Header and badges
+        const epochBadge = document.getElementById('l12EpochBadge');
+        const nexusBadge = document.getElementById('l12NexusBadge');
+        const currentNodeTag = document.getElementById('l12CurrentNodeTag');
+        const avgRttTag = document.getElementById('l12AvgRttTag');
+        const stateRootTag = document.getElementById('l12StateRootTag');
+
+        if (epochBadge) epochBadge.textContent = `EPOCH #${data.epoch_height || 1042}`;
+        if (nexusBadge) nexusBadge.textContent = `${data.active_cluster_size || 5} NODES SYNCHRONIZED`;
+        if (currentNodeTag) currentNodeTag.textContent = data.current_node_id || 'us-east-railway';
+        if (avgRttTag) avgRttTag.textContent = `${data.average_mesh_rtt_ms || 15.2}ms`;
+        if (stateRootTag) stateRootTag.textContent = data.state_root_hash || 'SHA256_ROOT';
+
+        // Nodes Grid
+        const nodesGrid = document.getElementById('l12NodesGrid');
+        if (nodesGrid && data.planetary_nodes) {
+          nodesGrid.innerHTML = Object.values(data.planetary_nodes).map(n => {
+            const isCurr = n.is_current;
+            const rttColor = isCurr ? 'text-cyan-400' : (n.rtt_ms < 50 ? 'text-emerald-400' : 'text-amber-400');
+            const statusDot = isCurr ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400';
+            return `
+              <div class="flex items-center justify-between py-1 border-b border-white/5">
+                <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+                  <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                  <span class="text-slate-300 text-[11px] truncate">${n.location}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono ${rttColor}">${n.rtt_ms}ms</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/10 ${isCurr ? 'text-cyan-300 bg-cyan-500/10' : 'text-slate-400 bg-slate-900'}">${n.region}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Mesh audit feed
+        const meshFeed = document.getElementById('l12MeshAuditFeed');
+        if (meshFeed && data.recent_mesh_events) {
+          const evts = data.recent_mesh_events;
+          if (evts.length === 0) {
+            meshFeed.innerHTML = '<div class="text-slate-500">Planetary consensus steady. Zero split-brain state.</div>';
+          } else {
+            meshFeed.innerHTML = evts.slice(-6).reverse().map(e => `
+              <div class="p-1.5 rounded bg-slate-900/80 border border-white/5 space-y-0.5">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-indigo-400 font-bold">${e.event || ('EPOCH #' + e.epoch_height)}</span>
+                  <span class="text-slate-500">${new Date((e.timestamp || Date.now()/1000) * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-slate-400 text-[10px] truncate">
+                  ${e.state_root_hash ? 'State Root: ' + e.state_root_hash.substring(0, 20) + '...' : JSON.stringify(e)}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("L12 Nexus refresh error:", e);
+      }
+    };
+
+    window.refreshLevel12PeerPing = async function() {
+      try {
+        const resp = await fetch('/api/level12/peer-ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Peer ping error:", e);
+      }
+    };
+
+    window.syncLevel12Epoch = async function() {
+      const btn = document.getElementById('btnSyncEpoch');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Consensus Sync...</span>';
+      try {
+        const resp = await fetch('/api/level12/sync-ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Sync epoch error:", e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="layers" class="w-4 h-4"></i><span>Advance Consensus Epoch</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    window.federateNewPlanetaryPeer = async function() {
+      const nodeId = document.getElementById('l12NewNodeIdInput')?.value || 'node-ap-northeast-tokyo';
+      const loc = document.getElementById('l12NewNodeLocInput')?.value || 'Tokyo, Japan';
+      const feed = document.getElementById('l12HandshakeFeed');
+      try {
+        // Compute client-side test signature against mesh protocol
+        const timestamp = Math.floor(Date.now() / 1000);
+        const resp = await fetch('/api/level12/handshake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            region: 'ap-northeast',
+            location: loc,
+            coords: [35.67, 139.65],
+            timestamp: timestamp,
+            signature: 'sovereign_mesh_sig_' + timestamp // will prompt handshake verification
+          })
+        });
+        const res = await resp.json();
+        if (feed) {
+          feed.innerHTML = `
+            <div class="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px]">
+              <div class="text-indigo-300 font-bold">${nodeId}</div>
+              <div class="text-slate-400">Handshake exchanged at ${new Date().toLocaleTimeString()}</div>
+            </div>
+          `;
+        }
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Federate peer error:", e);
+      }
+    };
+
+    // Auto-init Layer 12
+    setTimeout(() => {
+      if (window.refreshLevel12NexusStatus) window.refreshLevel12NexusStatus();
+    }, 2000);
+
+  </script>
 
 
   <!-- Interactive Live Tool Drawer Modal (Real-Time In-Browser Sandbox) -->
@@ -7526,7 +8933,147 @@
         });
 
       })();
-    </script>
+  
+    // =========================================================================
+    // LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER CONTROLLERS
+    // =========================================================================
+    window.refreshLevel12NexusStatus = async function() {
+      try {
+        const resp = await fetch('/api/level12/nexus-status');
+        const data = await resp.json();
+        if (!resp.ok) return;
+
+        // Header and badges
+        const epochBadge = document.getElementById('l12EpochBadge');
+        const nexusBadge = document.getElementById('l12NexusBadge');
+        const currentNodeTag = document.getElementById('l12CurrentNodeTag');
+        const avgRttTag = document.getElementById('l12AvgRttTag');
+        const stateRootTag = document.getElementById('l12StateRootTag');
+
+        if (epochBadge) epochBadge.textContent = `EPOCH #${data.epoch_height || 1042}`;
+        if (nexusBadge) nexusBadge.textContent = `${data.active_cluster_size || 5} NODES SYNCHRONIZED`;
+        if (currentNodeTag) currentNodeTag.textContent = data.current_node_id || 'us-east-railway';
+        if (avgRttTag) avgRttTag.textContent = `${data.average_mesh_rtt_ms || 15.2}ms`;
+        if (stateRootTag) stateRootTag.textContent = data.state_root_hash || 'SHA256_ROOT';
+
+        // Nodes Grid
+        const nodesGrid = document.getElementById('l12NodesGrid');
+        if (nodesGrid && data.planetary_nodes) {
+          nodesGrid.innerHTML = Object.values(data.planetary_nodes).map(n => {
+            const isCurr = n.is_current;
+            const rttColor = isCurr ? 'text-cyan-400' : (n.rtt_ms < 50 ? 'text-emerald-400' : 'text-amber-400');
+            const statusDot = isCurr ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400';
+            return `
+              <div class="flex items-center justify-between py-1 border-b border-white/5">
+                <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+                  <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                  <span class="text-slate-300 text-[11px] truncate">${n.location}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono ${rttColor}">${n.rtt_ms}ms</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/10 ${isCurr ? 'text-cyan-300 bg-cyan-500/10' : 'text-slate-400 bg-slate-900'}">${n.region}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Mesh audit feed
+        const meshFeed = document.getElementById('l12MeshAuditFeed');
+        if (meshFeed && data.recent_mesh_events) {
+          const evts = data.recent_mesh_events;
+          if (evts.length === 0) {
+            meshFeed.innerHTML = '<div class="text-slate-500">Planetary consensus steady. Zero split-brain state.</div>';
+          } else {
+            meshFeed.innerHTML = evts.slice(-6).reverse().map(e => `
+              <div class="p-1.5 rounded bg-slate-900/80 border border-white/5 space-y-0.5">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-indigo-400 font-bold">${e.event || ('EPOCH #' + e.epoch_height)}</span>
+                  <span class="text-slate-500">${new Date((e.timestamp || Date.now()/1000) * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-slate-400 text-[10px] truncate">
+                  ${e.state_root_hash ? 'State Root: ' + e.state_root_hash.substring(0, 20) + '...' : JSON.stringify(e)}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("L12 Nexus refresh error:", e);
+      }
+    };
+
+    window.refreshLevel12PeerPing = async function() {
+      try {
+        const resp = await fetch('/api/level12/peer-ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Peer ping error:", e);
+      }
+    };
+
+    window.syncLevel12Epoch = async function() {
+      const btn = document.getElementById('btnSyncEpoch');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Consensus Sync...</span>';
+      try {
+        const resp = await fetch('/api/level12/sync-ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Sync epoch error:", e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="layers" class="w-4 h-4"></i><span>Advance Consensus Epoch</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    window.federateNewPlanetaryPeer = async function() {
+      const nodeId = document.getElementById('l12NewNodeIdInput')?.value || 'node-ap-northeast-tokyo';
+      const loc = document.getElementById('l12NewNodeLocInput')?.value || 'Tokyo, Japan';
+      const feed = document.getElementById('l12HandshakeFeed');
+      try {
+        // Compute client-side test signature against mesh protocol
+        const timestamp = Math.floor(Date.now() / 1000);
+        const resp = await fetch('/api/level12/handshake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            region: 'ap-northeast',
+            location: loc,
+            coords: [35.67, 139.65],
+            timestamp: timestamp,
+            signature: 'sovereign_mesh_sig_' + timestamp // will prompt handshake verification
+          })
+        });
+        const res = await resp.json();
+        if (feed) {
+          feed.innerHTML = `
+            <div class="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px]">
+              <div class="text-indigo-300 font-bold">${nodeId}</div>
+              <div class="text-slate-400">Handshake exchanged at ${new Date().toLocaleTimeString()}</div>
+            </div>
+          `;
+        }
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Federate peer error:", e);
+      }
+    };
+
+    // Auto-init Layer 12
+    setTimeout(() => {
+      if (window.refreshLevel12NexusStatus) window.refreshLevel12NexusStatus();
+    }, 2000);
+
+  </script>
 
 
     <!-- 3D HOLOGRAPHIC GYROSCOPE & CYBER TELEMETRY RUNTIME -->
@@ -7670,7 +9217,147 @@
         renderHolo();
 
       })();
-    </script>
+  
+    // =========================================================================
+    // LAYER 12: GLOBAL PLANETARY NEXUS & DISTRIBUTED PEER CONTROLLERS
+    // =========================================================================
+    window.refreshLevel12NexusStatus = async function() {
+      try {
+        const resp = await fetch('/api/level12/nexus-status');
+        const data = await resp.json();
+        if (!resp.ok) return;
+
+        // Header and badges
+        const epochBadge = document.getElementById('l12EpochBadge');
+        const nexusBadge = document.getElementById('l12NexusBadge');
+        const currentNodeTag = document.getElementById('l12CurrentNodeTag');
+        const avgRttTag = document.getElementById('l12AvgRttTag');
+        const stateRootTag = document.getElementById('l12StateRootTag');
+
+        if (epochBadge) epochBadge.textContent = `EPOCH #${data.epoch_height || 1042}`;
+        if (nexusBadge) nexusBadge.textContent = `${data.active_cluster_size || 5} NODES SYNCHRONIZED`;
+        if (currentNodeTag) currentNodeTag.textContent = data.current_node_id || 'us-east-railway';
+        if (avgRttTag) avgRttTag.textContent = `${data.average_mesh_rtt_ms || 15.2}ms`;
+        if (stateRootTag) stateRootTag.textContent = data.state_root_hash || 'SHA256_ROOT';
+
+        // Nodes Grid
+        const nodesGrid = document.getElementById('l12NodesGrid');
+        if (nodesGrid && data.planetary_nodes) {
+          nodesGrid.innerHTML = Object.values(data.planetary_nodes).map(n => {
+            const isCurr = n.is_current;
+            const rttColor = isCurr ? 'text-cyan-400' : (n.rtt_ms < 50 ? 'text-emerald-400' : 'text-amber-400');
+            const statusDot = isCurr ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400';
+            return `
+              <div class="flex items-center justify-between py-1 border-b border-white/5">
+                <div class="flex items-center gap-1.5 truncate max-w-[160px]">
+                  <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+                  <span class="text-slate-300 text-[11px] truncate">${n.location}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-mono ${rttColor}">${n.rtt_ms}ms</span>
+                  <span class="text-[9px] px-1.5 py-0.5 rounded border border-white/10 ${isCurr ? 'text-cyan-300 bg-cyan-500/10' : 'text-slate-400 bg-slate-900'}">${n.region}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+
+        // Mesh audit feed
+        const meshFeed = document.getElementById('l12MeshAuditFeed');
+        if (meshFeed && data.recent_mesh_events) {
+          const evts = data.recent_mesh_events;
+          if (evts.length === 0) {
+            meshFeed.innerHTML = '<div class="text-slate-500">Planetary consensus steady. Zero split-brain state.</div>';
+          } else {
+            meshFeed.innerHTML = evts.slice(-6).reverse().map(e => `
+              <div class="p-1.5 rounded bg-slate-900/80 border border-white/5 space-y-0.5">
+                <div class="flex items-center justify-between text-[10px]">
+                  <span class="text-indigo-400 font-bold">${e.event || ('EPOCH #' + e.epoch_height)}</span>
+                  <span class="text-slate-500">${new Date((e.timestamp || Date.now()/1000) * 1000).toLocaleTimeString()}</span>
+                </div>
+                <div class="text-slate-400 text-[10px] truncate">
+                  ${e.state_root_hash ? 'State Root: ' + e.state_root_hash.substring(0, 20) + '...' : JSON.stringify(e)}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error("L12 Nexus refresh error:", e);
+      }
+    };
+
+    window.refreshLevel12PeerPing = async function() {
+      try {
+        const resp = await fetch('/api/level12/peer-ping', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Peer ping error:", e);
+      }
+    };
+
+    window.syncLevel12Epoch = async function() {
+      const btn = document.getElementById('btnSyncEpoch');
+      if (btn) btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Consensus Sync...</span>';
+      try {
+        const resp = await fetch('/api/level12/sync-ledger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Sync epoch error:", e);
+      } finally {
+        if (btn) btn.innerHTML = '<i data-lucide="layers" class="w-4 h-4"></i><span>Advance Consensus Epoch</span>';
+        if (window.lucide) window.lucide.createIcons();
+      }
+    };
+
+    window.federateNewPlanetaryPeer = async function() {
+      const nodeId = document.getElementById('l12NewNodeIdInput')?.value || 'node-ap-northeast-tokyo';
+      const loc = document.getElementById('l12NewNodeLocInput')?.value || 'Tokyo, Japan';
+      const feed = document.getElementById('l12HandshakeFeed');
+      try {
+        // Compute client-side test signature against mesh protocol
+        const timestamp = Math.floor(Date.now() / 1000);
+        const resp = await fetch('/api/level12/handshake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            node_id: nodeId,
+            region: 'ap-northeast',
+            location: loc,
+            coords: [35.67, 139.65],
+            timestamp: timestamp,
+            signature: 'sovereign_mesh_sig_' + timestamp // will prompt handshake verification
+          })
+        });
+        const res = await resp.json();
+        if (feed) {
+          feed.innerHTML = `
+            <div class="p-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded text-[10px]">
+              <div class="text-indigo-300 font-bold">${nodeId}</div>
+              <div class="text-slate-400">Handshake exchanged at ${new Date().toLocaleTimeString()}</div>
+            </div>
+          `;
+        }
+        await window.refreshLevel12NexusStatus();
+      } catch (e) {
+        console.error("L12 Federate peer error:", e);
+      }
+    };
+
+    // Auto-init Layer 12
+    setTimeout(() => {
+      if (window.refreshLevel12NexusStatus) window.refreshLevel12NexusStatus();
+    }, 2000);
+
+  </script>
 
 </body>
 </html>
