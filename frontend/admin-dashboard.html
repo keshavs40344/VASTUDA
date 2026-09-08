@@ -504,6 +504,46 @@
       if (window.ToolGovernance) window.ToolGovernance.load();
     }
 
+    async function startTelemetryStream() {
+      async function poll() {
+        try {
+          const token = window.ADMIN_ID_TOKEN || sessionStorage.getItem("SOVEREIGN_ID_TOKEN") || "";
+          const res = await fetch("/api/admin/live-metrics", {
+            headers: {
+              "Authorization": token ? `Bearer ${token}` : "",
+              "X-Admin-Clearance-Key": "VASTUDA_L5_SOVEREIGN_ROOT_CLEARANCE_SECURE_HASH_9948271"
+            }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const dEl = document.getElementById("liveMetricDaemon");
+            const dSub = document.getElementById("liveMetricDaemonSub");
+            const auditSub = document.getElementById("liveMetricAuditSub");
+            const entropySub = document.getElementById("liveMetricEntropySub");
+
+            if (dEl) dEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span>ONLINE (PID ${data.pid})</span>`;
+            if (dSub) dSub.textContent = `RSS: ${data.rss_memory_mb} MB | Uptime: ${Math.floor(data.uptime_seconds/60)}m | ${data.cpu_cores} Cores`;
+            if (auditSub) auditSub.textContent = `${data.total_tools} Tools Verified (${data.visible_tools} Live)`;
+            if (entropySub) entropySub.textContent = `${data.architecture} &middot; Hardware CSPRNG`;
+
+            const stream = document.getElementById("sreLiveStream");
+            if (stream && Math.random() < 0.3) {
+              const t = new Date().toLocaleTimeString();
+              const line = document.createElement("div");
+              line.textContent = `[${t}] [METRICS] CPU: ${data.cpu_utilization_percent}% | RSS: ${data.rss_memory_mb}MB (Peak: ${data.peak_rss_memory_mb}MB) | Threads: ${data.thread_count}`;
+              stream.appendChild(line);
+              stream.scrollTop = stream.scrollHeight;
+            }
+          }
+        } catch (e) {
+          console.warn("[TELEMETRY] Poll notice:", e);
+        }
+      }
+
+      poll();
+      setInterval(poll, 8000);
+    }
+
     // 1. FAST PATH: Check active session indicators
     const savedUnlocked = sessionStorage.getItem("SOVEREIGN_ADMIN_UNLOCKED") === "true";
     const savedEmail = sessionStorage.getItem("SOVEREIGN_ADMIN_EMAIL") || "";
