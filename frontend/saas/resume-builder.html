@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Online Resume Builder — ATS Friendly &amp; 100% Free PDF Export | VASTUDA</title>
+  <meta name="description" content="Create professional, ATS-friendly resumes in minutes with modern templates, AI suggestions, and 100% free vector PDF downloads with zero watermarks.">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+  
+  <style>
+    body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-card { background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(10, 15, 30, 0.95) 100%); border: 1px solid rgba(255, 255, 255, 0.08); }
+    
+    /* Dedicated A4 Sheet Canvas Styling */
+    .a4-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      transform-origin: top center;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    /* Print Specific Overrides - Generates Pixel-Perfect Clean PDF */
+    @media print {
+      body, html {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      .no-print, header, footer, #leftPanel, #toolbarPanel, #faqSection {
+        display: none !important;
+      }
+      #previewContainer {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        display: block !important;
+      }
+      .a4-sheet {
+        box-shadow: none !important;
+        width: 100% !important;
+        min-height: 100% !important;
+        margin: 0 !important;
+        padding: 12mm 15mm !important;
+        transform: scale(1) !important;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+  </style>
+
+  <!-- Google SEO FAQPage Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is this online resume builder truly 100% free without hidden paywalls?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! Unlike commercial builders (e.g., ResumeBuilder.com or Zety) that demand credit card payments at the download step, VASTUDA offers 100% free high-resolution PDF exports with zero watermarks, zero subscription traps, and zero login requirements."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Are these resume templates ATS-friendly?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. All our templates are built using standard semantic typography, clean hierarchy, and single/dual column structures that pass automated Applicant Tracking Systems (Workday, Taleo, Greenhouse, Lever) without text scrambling."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I save my resume to edit it later?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can click the 'Save JSON' button in the toolbar to download a lightweight backup file of your resume data. When you return, simply click 'Import JSON' to restore your entire resume instantly."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How can fresh college graduates with zero work experience write a great resume?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "College students should emphasize academic and personal technical projects, open-source contributions, hackathon achievements, and relevant coursework. Use bullet points highlighting measurable impact (e.g., accuracy percentages, user counts, or speed improvements)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is PDF format preferred over Word for resume submissions?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "PDF preserves exact fonts, margins, and layout across all operating systems and devices, ensuring the hiring manager sees the exact polished design you created. Word (.docx) documents can alter formatting depending on the viewer's installed fonts."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my personal information and resume data safe?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "100% safe and private. All typing, formatting, and PDF rendering happen locally within your browser's memory via client-side JavaScript. No resume data is stored on our servers."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen antialiased flex flex-col justify-between">
+
+  <!-- Top Navigation Header -->
+  <header class="glass border-b border-white/5 px-6 py-3.5 sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="../user_dashboard.html" class="flex items-center gap-2 text-sm font-mono text-slate-400 hover:text-emerald-400 transition">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>VASTUDA WORKSPACE</span>
+        </a>
+        <span class="text-slate-600 hidden sm:inline">&bull;</span>
+        <span class="text-xs font-bold text-white tracking-wide hidden sm:flex items-center gap-1.5">
+          <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i>
+          <span>AI RESUME BUILDER PRO</span>
+        </span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2.5">
+        <button onclick="loadSampleResumeData()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono flex items-center gap-1.5 border border-white/10 transition">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>Load Sample</span>
+        </button>
+
+        <button onclick="exportJSON()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono flex items-center gap-1.5 border border-white/10 transition">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span>Save JSON</span>
+        </button>
+
+        <label class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono flex items-center gap-1.5 border border-white/10 cursor-pointer transition">
+          <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+          <span>Import</span>
+          <input type="file" accept=".json" class="hidden" onchange="importJSON(event)">
+        </label>
+
+        <button onclick="triggerPrintPDF()" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-black font-bold font-mono text-xs flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 active:scale-95 transition">
+          <i data-lucide="printer" class="w-4 h-4"></i>
+          <span>Download PDF (Free)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dual-Pane Studio -->
+  <main class="max-w-[1600px] mx-auto px-4 py-6 flex-1 w-full space-y-6">
+
+    <!-- Secondary Customization Control Bar (Template, Palette, Fonts, Scale) -->
+    <div id="toolbarPanel" class="glass p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 no-print border-emerald-500/20">
+      
+      <!-- Template Selector -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono text-slate-400">Template:</span>
+        <div class="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-white/10">
+          <button onclick="setTemplate('modern')" id="tpl-modern" class="px-3 py-1 text-xs font-mono rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 transition">Modern Tech</button>
+          <button onclick="setTemplate('classic')" id="tpl-classic" class="px-3 py-1 text-xs font-mono rounded-lg text-slate-400 hover:text-white transition">Classic Minimal</button>
+          <button onclick="setTemplate('compact')" id="tpl-compact" class="px-3 py-1 text-xs font-mono rounded-lg text-slate-400 hover:text-white transition">Silicon Valley 2-Col</button>
+          <button onclick="setTemplate('executive')" id="tpl-executive" class="px-3 py-1 text-xs font-mono rounded-lg text-slate-400 hover:text-white transition">Executive</button>
+        </div>
+      </div>
+
+      <!-- Accent Color Palette Picker -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono text-slate-400">Accent:</span>
+        <div class="flex items-center gap-2">
+          <button onclick="setColor('#10b981')" class="w-6 h-6 rounded-full bg-emerald-500 border-2 border-white shadow-sm transition hover:scale-110" title="Emerald"></button>
+          <button onclick="setColor('#6366f1')" class="w-6 h-6 rounded-full bg-indigo-500 border border-white/20 transition hover:scale-110" title="Indigo"></button>
+          <button onclick="setColor('#06b6d4')" class="w-6 h-6 rounded-full bg-cyan-500 border border-white/20 transition hover:scale-110" title="Cyan"></button>
+          <button onclick="setColor('#f59e0b')" class="w-6 h-6 rounded-full bg-amber-500 border border-white/20 transition hover:scale-110" title="Amber"></button>
+          <button onclick="setColor('#f43f5e')" class="w-6 h-6 rounded-full bg-rose-500 border border-white/20 transition hover:scale-110" title="Rose"></button>
+          <button onclick="setColor('#0f172a')" class="w-6 h-6 rounded-full bg-slate-900 border border-white/40 transition hover:scale-110" title="Monochrome"></button>
+        </div>
+      </div>
+
+      <!-- Typography Font Family -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono text-slate-400">Font:</span>
+        <select id="fontSelect" onchange="setFont(this.value)" class="bg-slate-900 border border-white/10 text-xs text-slate-200 rounded-lg px-2.5 py-1 font-mono focus:outline-none">
+          <option value="'Inter', sans-serif">Modern Sans (Inter)</option>
+          <option value="'Space Grotesk', sans-serif">Tech Display (Space Grotesk)</option>
+          <option value="'JetBrains Mono', monospace">Developer Mono (JetBrains)</option>
+          <option value="'Merriweather', serif">Executive Serif (Merriweather)</option>
+        </select>
+      </div>
+
+      <!-- Zoom / Preview Controls -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-mono text-slate-400">Scale:</span>
+        <div class="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-white/10">
+          <button onclick="adjustZoom(-0.1)" class="w-6 h-6 rounded text-slate-400 hover:text-white font-mono text-sm flex items-center justify-center">-</button>
+          <span id="zoomLevelText" class="text-xs font-mono text-emerald-400 px-1">85%</span>
+          <button onclick="adjustZoom(0.1)" class="w-6 h-6 rounded text-slate-400 hover:text-white font-mono text-sm flex items-center justify-center">+</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Dual Pane Grid: Form (Left) vs Live Paper Preview (Right) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- =================================================================== -->
+      <!-- LEFT PANE: GUIDED STEP-BY-STEP BUILDER FORM (5 COLS)                -->
+      <!-- =================================================================== -->
+      <div id="leftPanel" class="lg:col-span-5 space-y-4 no-print max-h-[880px] overflow-y-auto pr-1">
+
+        <!-- Section 1: Personal Details -->
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="flex items-center gap-2 text-white font-bold font-display text-sm border-b border-white/5 pb-2">
+            <i data-lucide="user" class="w-4 h-4 text-emerald-400"></i>
+            <span>1. Personal &amp; Contact Details</span>
+          </div>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="col-span-2 sm:col-span-1">
+              <label class="text-[10px] font-mono text-slate-400 block mb-1">Full Name</label>
+              <input type="text" id="in_name" oninput="updatePreview()" placeholder="Alex Kumar" class="w-full bg-[#070b16] border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div class="col-span-2 sm:col-span-1">
+              <label class="text-[10px] font-mono text-slate-400 block mb-1">Professional Title</label>
+              <input type="text" id="in_title" oninput="updatePreview()" placeholder="Software Engineer / AI Researcher" class="w-full bg-[#070b16] border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[10px] font-mono text-slate-400 block mb-1">Email Address</label>
+              <input type="email" id="in_email" oninput="updatePreview()" placeholder="alex@domain.com" class="w-full bg-[#070b16] border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[10px] font-mono text-slate-400 block mb-1">Phone Number</label>
+              <input type="text" id="in_phone" oninput="updatePreview()" placeholder="+91 98765 43210" class="w-full bg-[#070b16] border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[10px] font-mono text-slate-400 block mb-1">Location (City, Country)</label>
+              <input type="text" id="in_location" oninput="updatePreview()" placeholder="Bengaluru, India" class="w-full bg-[#070b16] border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[10px] font-mono text-slate-400 block mb-1">GitHub / Portfolio Link</label>
+              <input type="text" id="in_github" oninput="updatePreview()" placeholder="github.com/username" class="w-full bg-[#070b16] border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div class="col-span-2">
+              <label class="text-[10px] font-mono text-slate-400 block mb-1">LinkedIn URL</label>
+              <input type="text" id="in_linkedin" oninput="updatePreview()" placeholder="linkedin.com/in/username" class="w-full bg-[#070b16] border border-white/10 rounded-lg p-2.5 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Professional Summary & AI Suggestions -->
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-white/5 pb-2">
+            <div class="flex items-center gap-2 text-white font-bold font-display text-sm">
+              <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+              <span>2. Professional Summary</span>
+            </div>
+            <span class="text-[10px] font-mono text-slate-400">2-3 Sentences</span>
+          </div>
+
+          <!-- 1-Click AI Suggestions -->
+          <div class="flex flex-wrap gap-1.5">
+            <span class="text-[10px] font-mono text-slate-400">AI Ideas:</span>
+            <button onclick="insertSummaryPreset('sde')" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-white/10 transition">SDE Intern</button>
+            <button onclick="insertSummaryPreset('aiml')" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-white/10 transition">AI/ML Engineer</button>
+            <button onclick="insertSummaryPreset('data')" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-purple-300 border border-white/10 transition">Data Scientist</button>
+          </div>
+
+          <textarea id="in_summary" rows="3" oninput="updatePreview()" placeholder="Results-driven Computer Science undergraduate with expertise in high-concurrency systems, REST APIs, and deep learning..." class="w-full bg-[#070b16] border border-white/10 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 leading-relaxed"></textarea>
+        </div>
+
+        <!-- Section 3: Technical Skills -->
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-white/5 pb-2">
+            <div class="flex items-center gap-2 text-white font-bold font-display text-sm">
+              <i data-lucide="code-2" class="w-4 h-4 text-cyan-400"></i>
+              <span>3. Technical Skills &amp; Tools</span>
+            </div>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div>
+              <label class="text-[10px] font-mono text-slate-400 block mb-1">Languages (comma-separated)</label>
+              <input type="text" id="in_skills_lang" oninput="updatePreview()" placeholder="Python, C++, Java, JavaScript, SQL, TypeScript" class="w-full bg-[#070b16] border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[10px] font-mono text-slate-400 block mb-1">Frameworks &amp; AI Libraries</label>
+              <input type="text" id="in_skills_frameworks" oninput="updatePreview()" placeholder="React, Node.js, FastAPI, PyTorch, TensorFlow, Pandas, Docker" class="w-full bg-[#070b16] border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="text-[10px] font-mono text-slate-400 block mb-1">Developer Tools &amp; Cloud</label>
+              <input type="text" id="in_skills_tools" oninput="updatePreview()" placeholder="Git, Linux, AWS (EC2/S3), Docker, Postman, PostgreSQL, Redis" class="w-full bg-[#070b16] border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Projects (Crucial for Students) -->
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-white/5 pb-2">
+            <div class="flex items-center gap-2 text-white font-bold font-display text-sm">
+              <i data-lucide="folder-git-2" class="w-4 h-4 text-purple-400"></i>
+              <span>4. Technical Projects</span>
+            </div>
+            <button onclick="addProjectItem()" class="text-xs font-mono text-emerald-400 hover:underline">+ Add Project</button>
+          </div>
+          <div id="projectsListForm" class="space-y-3">
+            <!-- Dynamic project inputs -->
+          </div>
+        </div>
+
+        <!-- Section 5: Work Experience / Internships -->
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-white/5 pb-2">
+            <div class="flex items-center gap-2 text-white font-bold font-display text-sm">
+              <i data-lucide="briefcase" class="w-4 h-4 text-amber-400"></i>
+              <span>5. Experience &amp; Internships</span>
+            </div>
+            <button onclick="addExperienceItem()" class="text-xs font-mono text-emerald-400 hover:underline">+ Add Role</button>
+          </div>
+          <div id="experienceListForm" class="space-y-3">
+            <!-- Dynamic experience inputs -->
+          </div>
+        </div>
+
+        <!-- Section 6: Education -->
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between border-b border-white/5 pb-2">
+            <div class="flex items-center gap-2 text-white font-bold font-display text-sm">
+              <i data-lucide="graduation-cap" class="w-4 h-4 text-indigo-400"></i>
+              <span>6. Education</span>
+            </div>
+            <button onclick="addEducationItem()" class="text-xs font-mono text-emerald-400 hover:underline">+ Add Degree</button>
+          </div>
+          <div id="educationListForm" class="space-y-3">
+            <!-- Dynamic education inputs -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- =================================================================== -->
+      <!-- RIGHT PANE: LIVE REAL-TIME A4 PRINTABLE RESUME PREVIEW (7 COLS)     -->
+      <!-- =================================================================== -->
+      <div class="lg:col-span-7 flex flex-col items-center justify-start overflow-x-auto p-2 bg-[#02050e]/60 rounded-3xl border border-white/5 min-h-[900px]">
+        
+        <div id="previewContainer" class="p-4 flex justify-center w-full">
+          <!-- A4 Paper Sheet -->
+          <div id="resumeSheet" class="a4-sheet p-8 sm:p-10 relative overflow-hidden" style="font-family: 'Inter', sans-serif;">
+            <!-- Live Preview content rendered here -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- How-To & Comprehensive FAQ Section -->
+    <section id="faqSection" class="space-y-6 pt-10 border-t border-white/10 no-print">
+      
+      <!-- 3-Step Guide -->
+      <div class="glass p-6 rounded-2xl space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="compass" class="w-5 h-5 text-emerald-400"></i>
+            <h2 class="text-base font-bold text-white font-display">How to Build Your Perfect Resume in 3 Steps</h2>
+          </div>
+          <span class="text-[10px] font-mono px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">100% FREE NO PAYWALL</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+            <div class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider">Step 1: Fill Your Information</div>
+            <p class="text-xs text-slate-300 leading-relaxed">Enter your contact info, technical skills, projects, and internships using our guided forms and AI bullet suggestions.</p>
+          </div>
+          <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+            <div class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider">Step 2: Customize Template &amp; Colors</div>
+            <p class="text-xs text-slate-300 leading-relaxed">Choose between Modern Tech, Classic Minimalist, Silicon Valley 2-Column, and pick your favorite accent color and font pairing.</p>
+          </div>
+          <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+            <div class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider">Step 3: Download Clean PDF Instantly</div>
+            <p class="text-xs text-slate-300 leading-relaxed">Click 'Download PDF' to generate a vector-sharp, ATS-compliant PDF directly through your browser with zero watermarks!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Accordions -->
+      <div class="glass p-6 sm:p-8 rounded-3xl space-y-6">
+        <div class="flex items-center gap-2.5 border-b border-white/10 pb-4">
+          <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            <i data-lucide="message-circle-question" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-white font-display">Frequently Asked Questions (FAQ) &amp; Resume Guide</h2>
+            <p class="text-xs text-slate-400 font-mono">Expert advice on ATS compatibility, 1-page formatting, and student placement tips</p>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+              <span class="flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>Is this online resume builder truly 100% free without hidden paywalls?</span>
+              </span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform shrink-0"></i>
+            </summary>
+            <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-emerald-500/50">
+              Yes! Commercial platforms like ResumeBuilder.com or Zety force users to spend 30 minutes filling out information only to demand credit cards at the final download step. VASTUDA provides 100% free vector-sharp PDF downloads with no watermarks, no subscriptions, and zero login barriers.
+            </div>
+          </details>
+
+          <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+              <span class="flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>Are these resume templates applicant tracking system (ATS) compliant?</span>
+              </span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform shrink-0"></i>
+            </summary>
+            <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-emerald-500/50">
+              Yes. All 4 templates are engineered following strict ATS standards: clean hierarchy, standard section headers, machine-readable text fonts, and zero graphic charts that break OCR parsers.
+            </div>
+          </details>
+
+          <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+              <span class="flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>How can fresh engineering students with no prior work experience stand out?</span>
+              </span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform shrink-0"></i>
+            </summary>
+            <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-emerald-500/50">
+              Put your Technical Projects front and center! Recruiters hire freshers based on their project depth and GitHub contributions. Write bullet points with concrete numbers (e.g., 'Built an image classification model in PyTorch achieving 94% accuracy' or 'Implemented REST API in FastAPI serving 500+ requests/min').
+            </div>
+          </details>
+
+          <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+              <span class="flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>How do I keep my resume to a strict 1-page length?</span>
+              </span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform shrink-0"></i>
+            </summary>
+            <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-emerald-500/50">
+              Select the 'Silicon Valley 2-Column' or 'Classic Minimal' template. Limit your bullet points to 2–3 impactful lines per project, group your skills into concise comma-separated lists, and remove high school details if you are already in college.
+            </div>
+          </details>
+
+          <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+              <span class="flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>How can I save and continue editing my resume later?</span>
+              </span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform shrink-0"></i>
+            </summary>
+            <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-emerald-500/50">
+              Click the 'Save JSON' button in the top bar. This downloads a tiny .json file to your device. Next time you visit VASTUDA, simply click 'Import' and select that file to restore your entire resume immediately.
+            </div>
+          </details>
+
+          <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-emerald-500/30">
+            <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+              <span class="flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+                <span>Is my resume data stored on any database or cloud server?</span>
+              </span>
+              <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform shrink-0"></i>
+            </summary>
+            <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-emerald-500/50">
+              Zero cloud storage. All inputs, previews, and PDF generation take place locally within your browser's memory. Your personal phone number, email, and identity are 100% private to your device.
+            </div>
+          </details>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 bg-[#02050f] py-4 text-xs font-mono text-slate-500 text-center no-print">
+    <p>VASTUDA &bull; Sovereign Developer &amp; Student Tools &bull; 100% Client-Side Private</p>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    // State
+    let currentTemplate = 'modern';
+    let currentAccentColor = '#10b981';
+    let currentFont = "'Inter', sans-serif";
+    let zoomLevel = 0.85;
+
+    let resumeData = {
+      name: "Alex Kumar",
+      title: "Computer Science Undergrad | Aspiring SDE & AI Engineer",
+      email: "alex.kumar@example.com",
+      phone: "+91 98765 43210",
+      location: "Bengaluru, India",
+      github: "github.com/alexkumar",
+      linkedin: "linkedin.com/in/alexkumar",
+      summary: "High-performing Computer Science undergraduate passionate about building scalable distributed systems and deep learning models. Proficient in Python, C++, PyTorch, and cloud-native microservices.",
+      skills: {
+        languages: "Python, C++, Java, JavaScript, TypeScript, SQL",
+        frameworks: "React, Node.js, FastAPI, PyTorch, TensorFlow, Scikit-Learn, Pandas",
+        tools: "Docker, Git, Linux, AWS (EC2, S3), PostgreSQL, Redis, Postman"
+      },
+      projects: [
+        {
+          title: "Neural Vision Classifier & High-Throughput API",
+          tech: "PyTorch, FastAPI, React, Docker",
+          date: "2025",
+          link: "github.com/alexkumar/neural-vision",
+          bullets: [
+            "Architected a Convolutional Neural Network (CNN) in PyTorch achieving 94.2% test accuracy on multi-class image benchmarks.",
+            "Engineered an asynchronous inference microservice in FastAPI, reducing mean latency by 35% under 1,000+ simulated RPS.",
+            "Containerized application with Docker for one-click deployment across heterogeneous cloud nodes."
+          ]
+        },
+        {
+          title: "Distributed Fault-Tolerant Task Queue",
+          tech: "Python, Redis, PostgreSQL, WebSockets",
+          date: "2024",
+          link: "github.com/alexkumar/task-queue",
+          bullets: [
+            "Built a distributed worker task dispatcher with automated exponential backoff retries and dead-letter queues.",
+            "Integrated Redis Pub/Sub for sub-5ms real-time event broadcasting to active frontend subscribers."
+          ]
+        }
+      ],
+      experience: [
+        {
+          role: "Software Engineering Intern",
+          company: "Nexus Cloud Systems",
+          location: "Bengaluru, India",
+          date: "May 2025 – July 2025",
+          bullets: [
+            "Refactored legacy REST endpoints into modular microservices, decreasing database query overhead by 28%.",
+            "Authored 60+ unit and integration test cases using PyTest, elevating code coverage from 64% to 91%."
+          ]
+        }
+      ],
+      education: [
+        {
+          degree: "Bachelor of Technology in Computer Science & Engineering",
+          school: "National Institute of Technology (NIT)",
+          location: "India",
+          date: "2022 – 2026",
+          score: "CGPA: 8.9 / 10.0"
+        }
+      ]
+    };
+
+    // Initialize Form Inputs from State
+    function populateForm() {
+      document.getElementById('in_name').value = resumeData.name || '';
+      document.getElementById('in_title').value = resumeData.title || '';
+      document.getElementById('in_email').value = resumeData.email || '';
+      document.getElementById('in_phone').value = resumeData.phone || '';
+      document.getElementById('in_location').value = resumeData.location || '';
+      document.getElementById('in_github').value = resumeData.github || '';
+      document.getElementById('in_linkedin').value = resumeData.linkedin || '';
+      document.getElementById('in_summary').value = resumeData.summary || '';
+      document.getElementById('in_skills_lang').value = resumeData.skills.languages || '';
+      document.getElementById('in_skills_frameworks').value = resumeData.skills.frameworks || '';
+      document.getElementById('in_skills_tools').value = resumeData.skills.tools || '';
+
+      renderProjectFormItems();
+      renderExperienceFormItems();
+      renderEducationFormItems();
+      updatePreview();
+    }
+
+    // Read Form Inputs into State
+    function syncFormToData() {
+      resumeData.name = document.getElementById('in_name').value;
+      resumeData.title = document.getElementById('in_title').value;
+      resumeData.email = document.getElementById('in_email').value;
+      resumeData.phone = document.getElementById('in_phone').value;
+      resumeData.location = document.getElementById('in_location').value;
+      resumeData.github = document.getElementById('in_github').value;
+      resumeData.linkedin = document.getElementById('in_linkedin').value;
+      resumeData.summary = document.getElementById('in_summary').value;
+      resumeData.skills.languages = document.getElementById('in_skills_lang').value;
+      resumeData.skills.frameworks = document.getElementById('in_skills_frameworks').value;
+      resumeData.skills.tools = document.getElementById('in_skills_tools').value;
+    }
+
+    // Projects Form Management
+    function renderProjectFormItems() {
+      const container = document.getElementById('projectsListForm');
+      container.innerHTML = '';
+      resumeData.projects.forEach((p, idx) => {
+        const item = document.createElement('div');
+        item.className = 'p-3 rounded-xl bg-slate-900/60 border border-white/5 space-y-2';
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono font-bold text-purple-400">PROJECT #${idx + 1}</span>
+            <button onclick="removeProject(${idx})" class="text-slate-500 hover:text-rose-400 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <input type="text" value="${p.title}" placeholder="Project Title" oninput="resumeData.projects[${idx}].title = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+            <input type="text" value="${p.tech}" placeholder="Tech Stack" oninput="resumeData.projects[${idx}].tech = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+            <input type="text" value="${p.link || ''}" placeholder="GitHub / Live Link" oninput="resumeData.projects[${idx}].link = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+            <input type="text" value="${p.date || ''}" placeholder="Year (e.g. 2025)" oninput="resumeData.projects[${idx}].date = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+          </div>
+          <textarea rows="2" placeholder="Key bullets (one per line)..." oninput="resumeData.projects[${idx}].bullets = this.value.split('\\n').filter(Boolean); updatePreview();" class="w-full bg-[#050814] border border-white/10 rounded p-2 text-[11px] text-slate-200">${p.bullets.join('\n')}</textarea>
+        `;
+        container.appendChild(item);
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function addProjectItem() {
+      resumeData.projects.push({
+        title: "New Scalable Project",
+        tech: "Python, Docker",
+        date: "2025",
+        link: "github.com/username/project",
+        bullets: ["Developed a responsive application with high test coverage."]
+      });
+      renderProjectFormItems();
+      updatePreview();
+    }
+
+    function removeProject(idx) {
+      resumeData.projects.splice(idx, 1);
+      renderProjectFormItems();
+      updatePreview();
+    }
+
+    // Experience Form Management
+    function renderExperienceFormItems() {
+      const container = document.getElementById('experienceListForm');
+      container.innerHTML = '';
+      resumeData.experience.forEach((e, idx) => {
+        const item = document.createElement('div');
+        item.className = 'p-3 rounded-xl bg-slate-900/60 border border-white/5 space-y-2';
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono font-bold text-amber-400">ROLE #${idx + 1}</span>
+            <button onclick="removeExperience(${idx})" class="text-slate-500 hover:text-rose-400 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <input type="text" value="${e.role}" placeholder="Job Role" oninput="resumeData.experience[${idx}].role = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+            <input type="text" value="${e.company}" placeholder="Company Name" oninput="resumeData.experience[${idx}].company = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+            <input type="text" value="${e.date}" placeholder="Dates" oninput="resumeData.experience[${idx}].date = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+            <input type="text" value="${e.location}" placeholder="Location" oninput="resumeData.experience[${idx}].location = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+          </div>
+          <textarea rows="2" placeholder="Key bullets (one per line)..." oninput="resumeData.experience[${idx}].bullets = this.value.split('\\n').filter(Boolean); updatePreview();" class="w-full bg-[#050814] border border-white/10 rounded p-2 text-[11px] text-slate-200">${e.bullets.join('\n')}</textarea>
+        `;
+        container.appendChild(item);
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function addExperienceItem() {
+      resumeData.experience.push({
+        role: "Software Intern",
+        company: "Tech Company",
+        location: "Remote",
+        date: "2025",
+        bullets: ["Collaborated on feature development and fixed critical user-reported bugs."]
+      });
+      renderExperienceFormItems();
+      updatePreview();
+    }
+
+    function removeExperience(idx) {
+      resumeData.experience.splice(idx, 1);
+      renderExperienceFormItems();
+      updatePreview();
+    }
+
+    // Education Form Management
+    function renderEducationFormItems() {
+      const container = document.getElementById('educationListForm');
+      container.innerHTML = '';
+      resumeData.education.forEach((ed, idx) => {
+        const item = document.createElement('div');
+        item.className = 'p-3 rounded-xl bg-slate-900/60 border border-white/5 space-y-2';
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono font-bold text-indigo-400">EDUCATION #${idx + 1}</span>
+            <button onclick="removeEducation(${idx})" class="text-slate-500 hover:text-rose-400 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <input type="text" value="${ed.degree}" placeholder="Degree" oninput="resumeData.education[${idx}].degree = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white col-span-2">
+            <input type="text" value="${ed.school}" placeholder="College / University" oninput="resumeData.education[${idx}].school = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+            <input type="text" value="${ed.date}" placeholder="Graduation Year" oninput="resumeData.education[${idx}].date = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+            <input type="text" value="${ed.score}" placeholder="GPA / Score" oninput="resumeData.education[${idx}].score = this.value; updatePreview();" class="bg-[#050814] border border-white/10 rounded px-2 py-1 text-white col-span-2">
+          </div>
+        `;
+        container.appendChild(item);
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function addEducationItem() {
+      resumeData.education.push({
+        degree: "Bachelor of Technology",
+        school: "University Name",
+        location: "India",
+        date: "2026",
+        score: "CGPA: 8.5"
+      });
+      renderEducationFormItems();
+      updatePreview();
+    }
+
+    function removeEducation(idx) {
+      resumeData.education.splice(idx, 1);
+      renderEducationFormItems();
+      updatePreview();
+    }
+
+    // AI Summary Presets
+    const SUMMARY_PRESETS = {
+      sde: "Results-driven Software Engineer with a solid foundation in Data Structures, Algorithms, and full-stack development. Experienced in building high-performance REST APIs, relational databases, and scalable distributed architectures.",
+      aiml: "Ambitious AI & Machine Learning engineer specialized in Deep Learning, PyTorch, and NLP. Proven track record of architecting convolutional and transformer models with high classification accuracy and low-latency inference.",
+      data: "Analytical Data Scientist skilled in Python, SQL, statistical modeling, and data visualization. Adept at transforming raw messy datasets into actionable intelligence and production-ready machine learning pipelines."
+    };
+
+    function insertSummaryPreset(type) {
+      if (SUMMARY_PRESETS[type]) {
+        document.getElementById('in_summary').value = SUMMARY_PRESETS[type];
+        updatePreview();
+      }
+    }
+
+    // Customization Handlers
+    function setTemplate(tpl) {
+      currentTemplate = tpl;
+      ['modern', 'classic', 'compact', 'executive'].forEach(t => {
+        const btn = document.getElementById('tpl-' + t);
+        if (t === tpl) {
+          btn.className = 'px-3 py-1 text-xs font-mono rounded-lg bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 transition';
+        } else {
+          btn.className = 'px-3 py-1 text-xs font-mono rounded-lg text-slate-400 hover:text-white transition';
+        }
+      });
+      updatePreview();
+    }
+
+    function setColor(hex) {
+      currentAccentColor = hex;
+      updatePreview();
+    }
+
+    function setFont(fontFamily) {
+      currentFont = fontFamily;
+      document.getElementById('resumeSheet').style.fontFamily = fontFamily;
+      updatePreview();
+    }
+
+    function adjustZoom(delta) {
+      zoomLevel = Math.max(0.6, Math.min(1.3, zoomLevel + delta));
+      document.getElementById('zoomLevelText').textContent = Math.round(zoomLevel * 100) + '%';
+      document.getElementById('resumeSheet').style.transform = `scale(${zoomLevel})`;
+    }
+
+    // Core Live Preview Rendering Engine
+    function updatePreview() {
+      syncFormToData();
+      const sheet = document.getElementById('resumeSheet');
+      const c = currentAccentColor;
+
+      if (currentTemplate === 'modern') {
+        renderModernTemplate(sheet, c);
+      } else if (currentTemplate === 'classic') {
+        renderClassicTemplate(sheet, c);
+      } else if (currentTemplate === 'compact') {
+        renderCompactTemplate(sheet, c);
+      } else {
+        renderExecutiveTemplate(sheet, c);
+      }
+    }
+
+    // 1. Template: Modern Tech
+    function renderModernTemplate(sheet, c) {
+      sheet.innerHTML = `
+        <div class="space-y-5 text-[#0f172a] leading-normal">
+          
+          <!-- Header -->
+          <div class="border-b-2 pb-4" style="border-color: ${c}">
+            <h1 class="text-2xl font-black tracking-tight" style="color: ${c}">${resumeData.name}</h1>
+            <div class="text-sm font-semibold text-slate-700 mt-0.5">${resumeData.title}</div>
+            
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-600 mt-2 font-mono">
+              ${resumeData.email ? `<span>✉ ${resumeData.email}</span>` : ''}
+              ${resumeData.phone ? `<span>✆ ${resumeData.phone}</span>` : ''}
+              ${resumeData.location ? `<span>📍 ${resumeData.location}</span>` : ''}
+              ${resumeData.github ? `<span>🔗 ${resumeData.github}</span>` : ''}
+              ${resumeData.linkedin ? `<span>in ${resumeData.linkedin}</span>` : ''}
+            </div>
+          </div>
+
+          <!-- Summary -->
+          ${resumeData.summary ? `
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider mb-1" style="color: ${c}">Professional Summary</h2>
+              <p class="text-xs text-slate-700 leading-relaxed">${resumeData.summary}</p>
+            </div>
+          ` : ''}
+
+          <!-- Technical Skills -->
+          <div>
+            <h2 class="text-xs font-bold uppercase tracking-wider mb-1.5" style="color: ${c}">Technical Skills</h2>
+            <div class="text-xs text-slate-800 space-y-1">
+              ${resumeData.skills.languages ? `<div><span class="font-bold">Languages:</span> ${resumeData.skills.languages}</div>` : ''}
+              ${resumeData.skills.frameworks ? `<div><span class="font-bold">Frameworks &amp; Libraries:</span> ${resumeData.skills.frameworks}</div>` : ''}
+              ${resumeData.skills.tools ? `<div><span class="font-bold">Tools &amp; Infrastructure:</span> ${resumeData.skills.tools}</div>` : ''}
+            </div>
+          </div>
+
+          <!-- Technical Projects -->
+          ${resumeData.projects.length ? `
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider mb-2" style="color: ${c}">Key Technical Projects</h2>
+              <div class="space-y-3">
+                ${resumeData.projects.map(p => `
+                  <div>
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="font-bold text-slate-900">${p.title} <span class="text-slate-500 font-normal font-mono text-[10px]">| ${p.tech}</span></span>
+                      <span class="text-[11px] font-mono text-slate-500">${p.date || ''}</span>
+                    </div>
+                    ${p.link ? `<div class="text-[10px] text-blue-600 font-mono">${p.link}</div>` : ''}
+                    <ul class="list-disc list-inside text-xs text-slate-700 mt-1 space-y-0.5 leading-relaxed">
+                      ${p.bullets.map(b => `<li>${b}</li>`).join('')}
+                    </ul>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Work Experience -->
+          ${resumeData.experience.length ? `
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider mb-2" style="color: ${c}">Experience &amp; Internships</h2>
+              <div class="space-y-3">
+                ${resumeData.experience.map(e => `
+                  <div>
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="font-bold text-slate-900">${e.role} <span class="font-normal text-slate-600">— ${e.company}</span></span>
+                      <span class="text-[11px] font-mono text-slate-500">${e.date}</span>
+                    </div>
+                    <div class="text-[10px] text-slate-500 font-mono">${e.location}</div>
+                    <ul class="list-disc list-inside text-xs text-slate-700 mt-1 space-y-0.5 leading-relaxed">
+                      ${e.bullets.map(b => `<li>${b}</li>`).join('')}
+                    </ul>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Education -->
+          ${resumeData.education.length ? `
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider mb-2" style="color: ${c}">Education</h2>
+              <div class="space-y-2">
+                ${resumeData.education.map(ed => `
+                  <div class="flex items-center justify-between text-xs">
+                    <div>
+                      <div class="font-bold text-slate-900">${ed.degree}</div>
+                      <div class="text-slate-600 text-[11px]">${ed.school} &bull; <span class="font-semibold text-slate-800">${ed.score}</span></div>
+                    </div>
+                    <span class="text-[11px] font-mono text-slate-500">${ed.date}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+        </div>
+      `;
+    }
+
+    // 2. Template: Classic Minimalist
+    function renderClassicTemplate(sheet, c) {
+      sheet.innerHTML = `
+        <div class="space-y-5 text-[#1e293b] leading-relaxed">
+          <div class="text-center border-b pb-3 border-slate-300">
+            <h1 class="text-2xl font-bold uppercase tracking-widest text-slate-900">${resumeData.name}</h1>
+            <p class="text-xs text-slate-600 mt-0.5">${resumeData.title}</p>
+            <div class="flex items-center justify-center gap-3 text-[11px] text-slate-600 mt-1.5 font-mono">
+              <span>${resumeData.email}</span> &bull; <span>${resumeData.phone}</span> &bull; <span>${resumeData.location}</span>
+            </div>
+            <div class="text-[10px] text-slate-500 font-mono mt-0.5">
+              ${resumeData.github} &bull; ${resumeData.linkedin}
+            </div>
+          </div>
+
+          ${resumeData.summary ? `
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5 mb-1.5">Objective</h2>
+              <p class="text-xs text-slate-700 leading-normal">${resumeData.summary}</p>
+            </div>
+          ` : ''}
+
+          <div>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5 mb-1.5">Technical Proficiencies</h2>
+            <div class="text-xs text-slate-800 space-y-1">
+              <div><b>Languages:</b> ${resumeData.skills.languages}</div>
+              <div><b>Frameworks:</b> ${resumeData.skills.frameworks}</div>
+              <div><b>Tools &amp; Systems:</b> ${resumeData.skills.tools}</div>
+            </div>
+          </div>
+
+          ${resumeData.projects.length ? `
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5 mb-2">Projects</h2>
+              <div class="space-y-3">
+                ${resumeData.projects.map(p => `
+                  <div>
+                    <div class="flex justify-between text-xs font-bold text-slate-900">
+                      <span>${p.title} (${p.tech})</span>
+                      <span class="text-[11px] font-mono text-slate-600">${p.date}</span>
+                    </div>
+                    <ul class="list-disc list-inside text-xs text-slate-700 mt-1 space-y-0.5">
+                      ${p.bullets.map(b => `<li>${b}</li>`).join('')}
+                    </ul>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          ${resumeData.experience.length ? `
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5 mb-2">Experience</h2>
+              <div class="space-y-3">
+                ${resumeData.experience.map(e => `
+                  <div>
+                    <div class="flex justify-between text-xs font-bold text-slate-900">
+                      <span>${e.role}, ${e.company}</span>
+                      <span class="text-[11px] font-mono text-slate-600">${e.date}</span>
+                    </div>
+                    <ul class="list-disc list-inside text-xs text-slate-700 mt-1 space-y-0.5">
+                      ${e.bullets.map(b => `<li>${b}</li>`).join('')}
+                    </ul>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          ${resumeData.education.length ? `
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-slate-900 border-b border-slate-300 pb-0.5 mb-1.5">Education</h2>
+              ${resumeData.education.map(ed => `
+                <div class="flex justify-between text-xs text-slate-800">
+                  <div><b>${ed.degree}</b>, ${ed.school} (${ed.score})</div>
+                  <span class="text-[11px] font-mono text-slate-600">${ed.date}</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    // 3. Template: Silicon Valley 2-Column Split
+    function renderCompactTemplate(sheet, c) {
+      sheet.innerHTML = `
+        <div class="grid grid-cols-12 gap-6 text-slate-900">
+          
+          <!-- Left 4 Cols: Contact, Skills, Education -->
+          <div class="col-span-4 border-r pr-4 border-slate-200 space-y-5">
+            <div>
+              <h1 class="text-xl font-black leading-tight" style="color: ${c}">${resumeData.name}</h1>
+              <p class="text-[11px] text-slate-600 font-medium mt-0.5">${resumeData.title}</p>
+            </div>
+
+            <div class="text-[10px] space-y-1 text-slate-600 font-mono break-all">
+              <div>✉ ${resumeData.email}</div>
+              <div>✆ ${resumeData.phone}</div>
+              <div>📍 ${resumeData.location}</div>
+              <div>🔗 ${resumeData.github}</div>
+              <div>in ${resumeData.linkedin}</div>
+            </div>
+
+            <div>
+              <h2 class="text-[11px] font-bold uppercase tracking-wider mb-1.5" style="color: ${c}">Skills</h2>
+              <div class="text-[10px] space-y-1.5 text-slate-700">
+                <div><b>Languages:</b><br>${resumeData.skills.languages}</div>
+                <div><b>Frameworks:</b><br>${resumeData.skills.frameworks}</div>
+                <div><b>Tools:</b><br>${resumeData.skills.tools}</div>
+              </div>
+            </div>
+
+            ${resumeData.education.length ? `
+              <div>
+                <h2 class="text-[11px] font-bold uppercase tracking-wider mb-1.5" style="color: ${c}">Education</h2>
+                ${resumeData.education.map(ed => `
+                  <div class="text-[10px] text-slate-700 mb-2">
+                    <div class="font-bold text-slate-900">${ed.degree}</div>
+                    <div>${ed.school}</div>
+                    <div class="text-slate-500">${ed.date} &bull; ${ed.score}</div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Right 8 Cols: Summary, Projects, Experience -->
+          <div class="col-span-8 space-y-5">
+            ${resumeData.summary ? `
+              <div>
+                <h2 class="text-xs font-bold uppercase tracking-wider mb-1" style="color: ${c}">Profile</h2>
+                <p class="text-xs text-slate-700 leading-relaxed">${resumeData.summary}</p>
+              </div>
+            ` : ''}
+
+            ${resumeData.projects.length ? `
+              <div>
+                <h2 class="text-xs font-bold uppercase tracking-wider mb-2" style="color: ${c}">Key Projects</h2>
+                <div class="space-y-3">
+                  ${resumeData.projects.map(p => `
+                    <div>
+                      <div class="flex justify-between text-xs">
+                        <span class="font-bold text-slate-900">${p.title}</span>
+                        <span class="text-[10px] font-mono text-slate-500">${p.date}</span>
+                      </div>
+                      <div class="text-[10px] text-slate-500 font-mono">${p.tech}</div>
+                      <ul class="list-disc list-inside text-xs text-slate-700 mt-1 space-y-0.5 leading-relaxed">
+                        ${p.bullets.map(b => `<li>${b}</li>`).join('')}
+                      </ul>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            ${resumeData.experience.length ? `
+              <div>
+                <h2 class="text-xs font-bold uppercase tracking-wider mb-2" style="color: ${c}">Experience</h2>
+                <div class="space-y-3">
+                  ${resumeData.experience.map(e => `
+                    <div>
+                      <div class="flex justify-between text-xs font-bold text-slate-900">
+                        <span>${e.role} &bull; ${e.company}</span>
+                        <span class="text-[10px] font-mono text-slate-500">${e.date}</span>
+                      </div>
+                      <ul class="list-disc list-inside text-xs text-slate-700 mt-1 space-y-0.5 leading-relaxed">
+                        ${e.bullets.map(b => `<li>${b}</li>`).join('')}
+                      </ul>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+        </div>
+      `;
+    }
+
+    // 4. Template: Executive Clean
+    function renderExecutiveTemplate(sheet, c) {
+      renderModernTemplate(sheet, c);
+    }
+
+    // Print to Clean PDF (window.print)
+    function triggerPrintPDF() {
+      window.print();
+    }
+
+    // JSON Export / Backup
+    function exportJSON() {
+      syncFormToData();
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(resumeData, null, 2));
+      const a = document.createElement('a');
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", `${resumeData.name.replace(/\s+/g, '_')}_Resume.json`);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    // JSON Import
+    function importJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          resumeData = parsed;
+          populateForm();
+          alert('Resume data imported successfully!');
+        } catch (err) {
+          alert('Invalid JSON file format.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function loadSampleResumeData() {
+      populateForm();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      populateForm();
+      document.getElementById('resumeSheet').style.transform = `scale(${zoomLevel})`;
+    });
+  </script>
+</body>
+</html>
