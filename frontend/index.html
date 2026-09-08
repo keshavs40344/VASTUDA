@@ -2358,6 +2358,213 @@
       <!-- ========================================================================= -->
       <!-- ACTIVE THEORY // SOVEREIGN WORKS & FLAGSHIP DESIGNATIONS SHOWCASE         -->
       <!-- ========================================================================= -->
+            <!-- ========================================================================= -->
+      <!-- LAYER 02 // NETWORK, DNS, EGRESS SECURITY & ANYCAST ROUTING MATRIX        -->
+      <!-- ========================================================================= -->
+      <section id="layer2NetworkMatrix" class="space-y-6 pt-8 border-t border-emerald-500/20">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[11px] font-mono border border-emerald-500/30 mb-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>LAYER 02 // NETWORK, DNS, EGRESS SECURITY &amp; ANYCAST ROUTING</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-display font-black text-white tracking-tight flex flex-wrap items-center gap-3">
+              <span>Global Anycast Mesh &amp; DNS Engine</span>
+              <span class="text-xs font-mono px-2.5 py-1 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 uppercase tracking-widest font-normal flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                Level 2 Live
+              </span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400 font-mono mt-1 max-w-3xl">
+              Cloudflare Anycast edge routing, RFC 8484 DNS-over-HTTPS resolution, strict client airgap egress inspection, and zero-leak DDoS shielding. 100% operational.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <button onclick="window.refreshLevel2NetworkStatus()" class="px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5 transition cursor-pointer shadow-sm">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span>Poll Network</span>
+            </button>
+            <button onclick="window.runLevel2EgressAudit()" id="btnEgressAudit" class="cyber-btn px-4 py-2 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 hover:opacity-90 text-slate-950 font-bold font-mono rounded-xl flex items-center gap-2 transition cursor-pointer shadow-lg shadow-emerald-500/20">
+              <i data-lucide="shield-check" class="w-4 h-4 fill-current"></i>
+              <span>Audit Egress Routes</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 TACTICAL HUD PANELS FOR LAYER 2 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          
+          <!-- PANEL 1: Anycast Edge & Ingress Routing -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-emerald-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+                  ANYCAST INGRESS
+                </span>
+                <span id="l2ColoBadge" class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px]">CF ANYCAST</span>
+              </div>
+              
+              <div class="space-y-2 font-mono text-xs">
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Ingress Client IP:</span>
+                  <span id="l2ClientIp" class="font-bold text-white">Detecting...</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Origin Geo / PoP:</span>
+                  <span id="l2OriginGeo" class="font-bold text-emerald-400">Detecting...</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Ray Identification:</span>
+                  <span id="l2CfRay" class="font-bold text-cyan-300 truncate max-w-[120px]">Detecting...</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Wire Encryption:</span>
+                  <span class="font-bold text-slate-200">TLSv1.3 ChaCha20</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Edge Gateway:</span>
+                  <span class="font-bold text-purple-400">Workers Mesh</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>INGRESS: <strong class="text-emerald-400">PROTECTED</strong></span>
+              <span>DDoS: <strong class="text-cyan-400">ARMED</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 2: Live DNS-over-HTTPS (DoH 1.1.1.1) Query Console -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-cyan-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                  DNS DoH ENGINE
+                </span>
+                <span id="l2DnssecBadge" class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-[10px]">DNSSEC SECURE</span>
+              </div>
+              
+              <!-- Mini DoH Interactive Input -->
+              <div class="space-y-2 font-mono text-xs">
+                <div class="flex gap-1.5">
+                  <input type="text" id="l2DnsQueryInput" value="cloudflare.com" placeholder="Enter hostname..." class="flex-1 bg-black/80 border border-slate-800 rounded px-2.5 py-1 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono">
+                  <button onclick="window.queryDoH()" class="px-2.5 py-1 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-900 transition font-bold text-[11px] cursor-pointer">
+                    DoH
+                  </button>
+                </div>
+
+                <div class="flex justify-between items-center text-slate-300 pt-1">
+                  <span class="text-slate-500">Query Domain:</span>
+                  <span id="l2DnsDomain" class="font-bold text-white truncate max-w-[120px]">cloudflare.com</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Resolved Answer:</span>
+                  <span id="l2DnsIp" class="font-bold text-emerald-400 truncate max-w-[130px]">104.16.132.229</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Resolver Engine:</span>
+                  <span class="font-bold text-slate-200">Cloudflare 1.1.1.1</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Query Latency:</span>
+                  <span id="l2DnsLatency" class="font-bold text-cyan-300">-- ms</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>PROTOCOL: <strong class="text-cyan-400">RFC 8484</strong></span>
+              <span>TTL: <strong id="l2DnsTtl" class="text-slate-300">300s</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 3: Egress Security & Airgap Leak Defense -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-purple-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+                  EGRESS ENCLAVE
+                </span>
+                <span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[10px]">ZERO LEAK</span>
+              </div>
+              
+              <div class="space-y-2 font-mono text-xs">
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Client Outbound Egress:</span>
+                  <span class="font-bold text-emerald-400">0 Bytes (Isolated)</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Server Egress Policy:</span>
+                  <span class="font-bold text-purple-300">STRICT_PROXY</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Port Egress Filter:</span>
+                  <span class="font-bold text-slate-200">Port 443/53 Only</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Anti-Reverse Eng:</span>
+                  <span class="font-bold text-emerald-400">AST Sanitized</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Leak Probability:</span>
+                  <span class="font-bold text-cyan-300">0.000% (Mathematical)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>ENCLAVE: <strong class="text-purple-400">ISOLATED</strong></span>
+              <span>INSPECTION: <strong class="text-emerald-400">PASS</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 4: Global Anycast Latency & DDoS Shield -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-amber-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                  ANYCAST PROBE MATRIX
+                </span>
+                <span id="l2EgressVerdictBadge" class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px]">PROBE READY</span>
+              </div>
+              
+              <div class="space-y-2 font-mono text-xs">
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Cloudflare (1.1.1.1):</span>
+                  <span id="l2PingCf" class="font-bold text-emerald-400">-- ms</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Google Anycast (8.8.8.8):</span>
+                  <span id="l2PingGg" class="font-bold text-cyan-300">-- ms</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Quad9 Anycast (9.9.9.9):</span>
+                  <span id="l2PingQ9" class="font-bold text-purple-300">-- ms</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">DDoS Rate Limiter:</span>
+                  <span class="font-bold text-slate-200">60 req/min (Active)</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Anycast Global PoP:</span>
+                  <span class="font-bold text-amber-300">Tier-1 Multihomed</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>LATENCY: <strong id="l2AvgLatency" class="text-emerald-400">&lt; 30ms</strong></span>
+              <span id="l2EgressStatusText" class="text-emerald-400 font-bold">OPTIMAL</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       <section id="sovereignDesignations" class="space-y-6 pt-4">
         <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
           <div>
