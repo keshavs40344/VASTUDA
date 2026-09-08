@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>AI World Sovereign — Secure Access</title>
+  <title>VASTUDA — Secure Workspace Login</title>
   <meta name="robots" content="noindex"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -295,21 +295,8 @@
 
   <!-- AUTH FORM CARD -->
   <div id="auth-card" class="card">
-    <div class="brand">
-      <div class="brand-logo">&#937;</div>
-      <div class="brand-info">
-        <span class="brand-name">AI World Sovereign</span>
-        <span class="brand-sub">Cloud-Verified Identity Platform</span>
-      </div>
-    </div>
-
-    <div class="tabs" role="tablist">
-      <button class="tab-btn active" id="tab-signin" role="tab" aria-selected="true">Sign In</button>
-      <button class="tab-btn" id="tab-register" role="tab" aria-selected="false">Register Free</button>
-    </div>
-
     <div class="form-title" id="form-title">Welcome back</div>
-    <div class="form-sub" id="form-sub">Sign in to your cloud-verified workspace.</div>
+    <div class="form-sub" id="form-sub">Sign in to your account.</div>
 
     <!-- OAuth Providers -->
     <div class="oauth-row">
@@ -391,16 +378,16 @@
       </div>
 
       <button type="submit" class="submit-btn" id="submit-btn">
-        <span id="submit-label">Sign In to Workspace</span>
+        <span id="submit-label">Sign In</span>
       </button>
     </form>
 
-    <div class="form-footer" style="margin-top:14px">
+    <div class="form-footer" style="margin-top:18px; display:flex; align-items:center; justify-content:center; gap:6px; font-size:13px; color:var(--text-muted);">
       <span id="fp-prompt">Don't have an account?</span>
-      <button id="fp-switch" style="margin-left:4px">Create one free</button>
+      <button type="button" id="fp-switch" style="background:none; border:none; color:var(--accent2); font-weight:600; cursor:pointer; font-size:13px; text-decoration:underline;">Create account</button>
     </div>
 
-    <a href="index.html" class="back-link">&#8592; Back to AI World</a>
+    <a href="/" class="back-link" style="margin-top:20px; display:inline-flex; align-items:center; justify-content:center; width:100%; text-align:center; font-size:12px; color:var(--text-muted); text-decoration:none;">&#8592; Back to VASTUDA Home</a>
   </div><!-- /auth-card -->
 
   <!-- ═══ CLOUD VERIFIED DASHBOARD ════════════════════════════════ -->
@@ -408,8 +395,8 @@
     <div class="brand" style="margin-bottom:22px">
       <div class="brand-logo">&#937;</div>
       <div class="brand-info">
-        <span class="brand-name">Cloud Verified Dashboard</span>
-        <span class="brand-sub">AI World Sovereign — Live Session</span>
+        <span class="brand-name">VASTUDA Workspace</span>
+        <span class="brand-sub">Verified Developer & Research Session</span>
       </div>
     </div>
 
@@ -461,7 +448,7 @@
     <!-- Actions -->
     <div class="dash-actions">
       <a href="user_dashboard.html" class="btn-dash-main">Enter Personal Workspace &#8594;</a>
-      <a href="admin-dashboard.html" id="btn-admin-portal" class="btn-dash-main" style="display:none;background:linear-gradient(135deg,#dc2626,#ef4444);box-shadow:0 4px 14px rgba(220,38,38,.3);">Enter Admin Mission Control &#128274;</a>
+      
       <button class="btn-resend hidden" id="btn-resend">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         Resend Verification Email
@@ -787,38 +774,56 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-/* ── TAB SWITCHER ─────────────────────────────────────────────────── */
+/* ── AUTH MODE SWITCHER (SAFE NULL-CHECKED) ─────────────────────── */
 let MODE = "signin";
 
 function switchMode(mode) {
   MODE = mode;
   const reg = mode === "register";
 
-  document.getElementById("tab-signin").classList.toggle("active",   !reg);
-  document.getElementById("tab-register").classList.toggle("active",  reg);
-  document.getElementById("tab-signin").setAttribute("aria-selected",   String(!reg));
-  document.getElementById("tab-register").setAttribute("aria-selected", String(reg));
+  const tabSignin = document.getElementById("tab-signin");
+  const tabRegister = document.getElementById("tab-register");
+  if (tabSignin) {
+    tabSignin.classList.toggle("active", !reg);
+    tabSignin.setAttribute("aria-selected", String(!reg));
+  }
+  if (tabRegister) {
+    tabRegister.classList.toggle("active", reg);
+    tabRegister.setAttribute("aria-selected", String(reg));
+  }
 
-  document.getElementById("f-name").classList.toggle("hidden",    !reg);
-  document.getElementById("f-confirm").classList.toggle("hidden", !reg);
-  document.getElementById("pw-strength-wrap").classList.toggle("hidden", !reg);
-  document.getElementById("forgot-row").classList.toggle("hidden",  reg);
+  const fName = document.getElementById("f-name");
+  const fConfirm = document.getElementById("f-confirm");
+  const pwStrength = document.getElementById("pw-strength-wrap");
+  const forgotRow = document.getElementById("forgot-row");
+  const formTitle = document.getElementById("form-title");
+  const formSub = document.getElementById("form-sub");
+  const submitLabel = document.getElementById("submit-label");
+  const fpPrompt = document.getElementById("fp-prompt");
+  const fpSwitch = document.getElementById("fp-switch");
 
-  document.getElementById("form-title").textContent = reg ? "Create your account" : "Welcome back";
-  document.getElementById("form-sub").textContent   = reg
-    ? "Join AI World Sovereign — free forever."
-    : "Sign in to your cloud-verified workspace.";
-  document.getElementById("submit-label").textContent = reg ? "Create Account" : "Sign In to Workspace";
-  document.getElementById("fp-prompt").textContent    = reg ? "Already have an account?" : "Don't have an account?";
-  document.getElementById("fp-switch").textContent    = reg ? "Sign In" : "Create one free";
+  if (fName) fName.classList.toggle("hidden", !reg);
+  if (fConfirm) fConfirm.classList.toggle("hidden", !reg);
+  if (pwStrength) pwStrength.classList.toggle("hidden", !reg);
+  if (forgotRow) forgotRow.classList.toggle("hidden", reg);
 
-  document.getElementById("in-pw").autocomplete = reg ? "new-password" : "current-password";
+  if (formTitle) formTitle.textContent = reg ? "Create Account" : "Welcome back";
+  if (formSub) formSub.textContent   = reg
+    ? "Enter your details to create your workspace account."
+    : "Sign in to your account.";
+  if (submitLabel) submitLabel.textContent = reg ? "Create Account" : "Sign In";
+  if (fpPrompt) fpPrompt.textContent    = reg ? "Already have an account?" : "Don't have an account?";
+  if (fpSwitch) fpSwitch.textContent    = reg ? "Sign In" : "Create account";
+
+  const inPw = document.getElementById("in-pw");
+  if (inPw) inPw.autocomplete = reg ? "new-password" : "current-password";
   clearErrors();
 }
 
-document.getElementById("tab-signin").addEventListener("click", () => switchMode("signin"));
-document.getElementById("tab-register").addEventListener("click", () => switchMode("register"));
-document.getElementById("fp-switch").addEventListener("click", () => switchMode(MODE === "signin" ? "register" : "signin"));
+const fpSwitchEl = document.getElementById("fp-switch");
+if (fpSwitchEl) {
+  fpSwitchEl.addEventListener("click", () => switchMode(MODE === "signin" ? "register" : "signin"));
+}
 
 // Auto-switch mode based on URL hash (#register) or parameter (?mode=register)
 try {
@@ -880,6 +885,26 @@ document.getElementById("in-confirm").addEventListener("input", function () {
     this.classList.add("is-err"); this.classList.remove("is-ok");
   }
 });
+
+
+function persistUserSession(user, customName) {
+  try {
+    const sessionData = {
+      uid: user.uid,
+      email: user.email,
+      displayName: customName || user.displayName || (user.email ? user.email.split("@")[0] : "Researcher"),
+      provider: user.providerData && user.providerData[0] ? user.providerData[0].providerId : "password",
+      photoURL: user.photoURL || null,
+      loginAt: Date.now()
+    };
+    localStorage.setItem("genesis_current_user", JSON.stringify(sessionData));
+    user.getIdToken().then(t => {
+      try { localStorage.setItem("genesis_id_token", t); } catch {}
+    }).catch(() => {});
+  } catch (e) {
+    console.warn("Session storage error:", e);
+  }
+}
 
 /* ── VALIDATION ───────────────────────────────────────────────────── */
 function isEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim()); }
@@ -951,6 +976,7 @@ document.getElementById("auth-form").addEventListener("submit", async (e) => {
       cred = await createUserWithEmailAndPassword(auth, email, pw);
       // Set display name
       if (name) await updateProfile(cred.user, { displayName: name }).catch(() => {});
+      persistUserSession(cred.user, name);
 
       // Send email verification — critical requirement
       await sendEmailVerification(cred.user);
@@ -960,6 +986,7 @@ document.getElementById("auth-form").addEventListener("submit", async (e) => {
     } else {
       // ── SIGN IN ──
       cred = await signInWithEmailAndPassword(auth, email, pw);
+      persistUserSession(cred.user);
       toast("s", "Signed in!",
         "Welcome back, " + (cred.user.displayName || email.split("@")[0]) + ". Your session is live.");
     }
@@ -995,6 +1022,7 @@ document.getElementById("btn-google").addEventListener("click", async () => {
     provider.addScope("profile");
     provider.addScope("email");
     const result = await signInWithPopup(auth, provider);
+    persistUserSession(result.user);
     syncFirestore(result.user).catch(() => {});
     toast("s", "Signed in with Google",
       "Welcome, " + (result.user.displayName || "User") + "! Your profile is cloud-synced.");
