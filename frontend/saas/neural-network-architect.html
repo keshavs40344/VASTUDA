@@ -19,6 +19,62 @@
     ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
     .neon-border-indigo:focus-within { border-color: rgba(99, 102, 241, 0.5); box-shadow: 0 0 15px rgba(99, 102, 241, 0.15); }
   </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the purpose of this Neural Network Architect tool?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "This tool helps students and AI developers design Deep Neural Networks visually, avoid common dimension mismatch errors (like out_features not matching the next in_features), calculate exact trainable parameter counts, and export bug-free PyTorch and TensorFlow boilerplate."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How are trainable parameters calculated for a Linear (Dense) layer?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For a fully-connected Linear layer, the formula is: Parameters = (in_features * out_features) + out_features. The first term represents the weights matrix connecting every input neuron to every output neuron, and the second term accounts for the bias vector."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I choose the correct output layer activation and loss function?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For Binary Classification (2 classes), use 1 output unit with BCEWithLogitsLoss (or Sigmoid + BCELoss). For Multi-Class Classification (K classes), use K output units with CrossEntropyLoss (or Softmax). For Continuous Regression, use 1 output unit with Linear activation and MSELoss."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the benefit of using Dropout and Batch Normalization?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Dropout randomly sets a fraction (e.g. p=0.2) of neuron activations to zero during training, preventing the network from co-adapting and overfitting. Batch Normalization standardizes intermediate activations, which stabilizes gradients and dramatically accelerates training convergence."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I train the exported PyTorch code on a GPU?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! The exported PyTorch code automatically includes: device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') and moves the model and tensors to the GPU whenever CUDA is detected."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens if my layer dimensions do not match?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The live Telemetry Bar will immediately flag 'Mismatch \u26a0' in red and indicate which layer dimensions need adjustment, saving you from frustrating runtime tensor shape errors in Python."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="min-h-screen antialiased flex flex-col justify-between">
 
@@ -147,6 +203,141 @@
 
     </div>
 
+  
+    <!-- ===================================================================== -->
+    <!-- COMPREHENSIVE HOW-TO-USE & STUDENT FAQ SECTION (SEO & EDUCATIONAL)     -->
+    <!-- ===================================================================== -->
+    <section class="space-y-6 pt-6 border-t border-white/10">
+      
+      <!-- How to Use in 3 Steps -->
+      <div class="glass p-6 rounded-2xl space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="compass" class="w-5 h-5 text-indigo-400"></i>
+            <h2 class="text-base font-bold text-white font-display">How to Use This Utility in 3 Quick Steps</h2>
+          </div>
+          <span class="text-[10px] font-mono px-2.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">DEEP LEARNING & PYTORCH FAQ</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-indigo-400 uppercase tracking-wider">Step 1: Choose Architecture Preset</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Pick an MLP, Vision CNN, or Binary Classifier preset, or design your own custom stack from scratch.</p>
+        </div>
+        
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-indigo-400 uppercase tracking-wider">Step 2: Add & Adjust Layers</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Add Linear, ReLU, Dropout, or BatchNorm layers. Adjust input and output feature dimensions dynamically.</p>
+        </div>
+        
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-indigo-400 uppercase tracking-wider">Step 3: Export Framework Code</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Toggle between PyTorch (nn.Module) and TensorFlow/Keras, then click 'Copy Code' to get a complete training loop.</p>
+        </div>
+        
+        </div>
+      </div>
+
+      <!-- FAQ Accordion Container -->
+      <div class="glass p-6 sm:p-8 rounded-3xl space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+              <i data-lucide="message-circle-question" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white font-display">Frequently Asked Questions (FAQ) — Neural Network Architect</h2>
+              <p class="text-xs text-slate-400 font-mono">Detailed guides, evaluation criteria, and best practices</p>
+            </div>
+          </div>
+          <span class="text-[11px] font-mono text-slate-400">6 Answers</span>
+        </div>
+
+        <div class="space-y-3">
+          
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-indigo-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+              <span>What is the purpose of this Neural Network Architect tool?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-indigo-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-indigo-500/50">
+            This tool helps students and AI developers design Deep Neural Networks visually, avoid common dimension mismatch errors (like out_features not matching the next in_features), calculate exact trainable parameter counts, and export bug-free PyTorch and TensorFlow boilerplate.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-indigo-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+              <span>How are trainable parameters calculated for a Linear (Dense) layer?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-indigo-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-indigo-500/50">
+            For a fully-connected Linear layer, the formula is: Parameters = (in_features * out_features) + out_features. The first term represents the weights matrix connecting every input neuron to every output neuron, and the second term accounts for the bias vector.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-indigo-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+              <span>How do I choose the correct output layer activation and loss function?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-indigo-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-indigo-500/50">
+            For Binary Classification (2 classes), use 1 output unit with BCEWithLogitsLoss (or Sigmoid + BCELoss). For Multi-Class Classification (K classes), use K output units with CrossEntropyLoss (or Softmax). For Continuous Regression, use 1 output unit with Linear activation and MSELoss.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-indigo-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+              <span>What is the benefit of using Dropout and Batch Normalization?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-indigo-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-indigo-500/50">
+            Dropout randomly sets a fraction (e.g. p=0.2) of neuron activations to zero during training, preventing the network from co-adapting and overfitting. Batch Normalization standardizes intermediate activations, which stabilizes gradients and dramatically accelerates training convergence.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-indigo-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+              <span>Can I train the exported PyTorch code on a GPU?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-indigo-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-indigo-500/50">
+            Yes! The exported PyTorch code automatically includes: device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') and moves the model and tensors to the GPU whenever CUDA is detected.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-indigo-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+              <span>What happens if my layer dimensions do not match?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-indigo-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-indigo-500/50">
+            The live Telemetry Bar will immediately flag 'Mismatch ⚠' in red and indicate which layer dimensions need adjustment, saving you from frustrating runtime tensor shape errors in Python.
+          </div>
+        </details>
+        
+        </div>
+      </div>
+
+    </section>
+    
   </main>
 
   <!-- Footer -->

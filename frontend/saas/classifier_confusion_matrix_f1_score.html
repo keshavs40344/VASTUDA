@@ -56,15 +56,63 @@
     </script>
     <!-- /SEO BLOCK -->
     
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a Confusion Matrix in Machine Learning?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A Confusion Matrix is a 2x2 table used to evaluate the performance of a binary classification model by comparing actual ground-truth labels against predicted labels. It categorizes outcomes into True Positives (TP), True Negatives (TN), False Positives (FP), and False Negatives (FN)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is Accuracy a misleading metric for imbalanced datasets?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Consider a credit card fraud dataset where 99.9% of transactions are legitimate and 0.1% are fraudulent. A naive model that predicts 'Not Fraud' for every single transaction will achieve 99.9% accuracy, yet it catches zero fraud cases! In such scenarios, Precision, Recall, and F1-Score are far more informative."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the formula for F1-Score and why is the harmonic mean used?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "F1-Score = 2 * (Precision * Recall) / (Precision + Recall). The harmonic mean penalizes extreme values heavily: if either Precision or Recall is close to zero, the F1-Score will drop near zero, unlike an arithmetic average which could conceal a severely imbalanced model."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I prioritize Precision over Recall (and vice versa)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Prioritize Precision when the cost of a False Positive is high (e.g., spam filters where classifying an important email as spam causes lost business). Prioritize Recall when the cost of a False Negative is critical (e.g., cancer detection or airport weapons screening where missing a positive case is life-threatening)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is Specificity (True Negative Rate)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Specificity measures the proportion of actual negatives that are correctly identified as negative: Specificity = TN / (TN + FP). It is crucial in clinical diagnostic trials to ensure healthy individuals are not mistakenly diagnosed with a condition."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="min-h-screen antialiased flex flex-col selection:bg-indigo-500/30 selection:text-indigo-300">
 
   <!-- Sovereign Nav -->
   <header class="glass border-b border-indigo-500/10 sticky top-0 z-50 px-6 py-3.5">
     <div class="max-w-6xl mx-auto flex items-center justify-between">
-      <a href="../../index.html" class="flex items-center gap-2.5 text-sm font-mono hover:text-indigo-400 transition">
+      <a href="../user_dashboard.html" class="flex items-center gap-2.5 text-sm font-mono hover:text-indigo-400 transition">
         <i data-lucide="brain-circuit" class="w-4 h-4 text-indigo-400"></i>
-        <span>AI WORLD HUB</span>
+        <span>VASTUDA WORKSPACE</span>
       </a>
       <div class="flex items-center gap-3">
         <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center gap-1.5">
@@ -130,13 +178,126 @@
     </div>
         
 
+  
+    <!-- FAQ SECTION -->
+    <section class="space-y-6 pt-6 border-t border-white/10">
+      <div class="glass p-6 rounded-2xl space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="compass" class="w-5 h-5 text-emerald-400"></i>
+            <h2 class="text-base font-bold text-white font-display">How to Use This Utility in 3 Steps</h2>
+          </div>
+          <span class="text-[10px] font-mono px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">MACHINE LEARNING EVALUATION FAQ</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider">Step 1: Input Confusion Matrix Counts</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Enter the counts for True Positives (TP), False Positives (FP), False Negatives (FN), and True Negatives (TN).</p>
+        </div>
+        
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider">Step 2: Inspect Evaluation Metrics</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Instantly view Accuracy, Precision, Recall, Specificity, and balanced F1-Score with color-coded confidence.</p>
+        </div>
+        
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider">Step 3: Review Trade-off Guidance</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Read tailored advice on whether your use case (medical diagnosis vs fraud detection) requires maximizing Precision or Recall.</p>
+        </div>
+        
+        </div>
+      </div>
+
+      <div class="glass p-6 sm:p-8 rounded-3xl space-y-6">
+        <div class="flex items-center gap-2.5 border-b border-white/10 pb-4">
+          <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            <i data-lucide="message-circle-question" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-white font-display">Frequently Asked Questions (FAQ) — Confusion Matrix & F1-Score Studio</h2>
+            <p class="text-xs text-slate-400 font-mono">Formulas, trade-offs, and cost-optimization guide</p>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-emerald-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span>What is a Confusion Matrix in Machine Learning?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-emerald-500/50">
+            A Confusion Matrix is a 2x2 table used to evaluate the performance of a binary classification model by comparing actual ground-truth labels against predicted labels. It categorizes outcomes into True Positives (TP), True Negatives (TN), False Positives (FP), and False Negatives (FN).
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-emerald-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span>Why is Accuracy a misleading metric for imbalanced datasets?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-emerald-500/50">
+            Consider a credit card fraud dataset where 99.9% of transactions are legitimate and 0.1% are fraudulent. A naive model that predicts 'Not Fraud' for every single transaction will achieve 99.9% accuracy, yet it catches zero fraud cases! In such scenarios, Precision, Recall, and F1-Score are far more informative.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-emerald-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span>What is the formula for F1-Score and why is the harmonic mean used?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-emerald-500/50">
+            F1-Score = 2 * (Precision * Recall) / (Precision + Recall). The harmonic mean penalizes extreme values heavily: if either Precision or Recall is close to zero, the F1-Score will drop near zero, unlike an arithmetic average which could conceal a severely imbalanced model.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-emerald-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span>When should I prioritize Precision over Recall (and vice versa)?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-emerald-500/50">
+            Prioritize Precision when the cost of a False Positive is high (e.g., spam filters where classifying an important email as spam causes lost business). Prioritize Recall when the cost of a False Negative is critical (e.g., cancer detection or airport weapons screening where missing a positive case is life-threatening).
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-emerald-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <span>What is Specificity (True Negative Rate)?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-emerald-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-emerald-500/50">
+            Specificity measures the proportion of actual negatives that are correctly identified as negative: Specificity = TN / (TN + FP). It is crucial in clinical diagnostic trials to ensure healthy individuals are not mistakenly diagnosed with a condition.
+          </div>
+        </details>
+        
+        </div>
+      </div>
+    </section>
+    
   </main>
 
   <footer class="border-t border-white/5 py-8 mt-12 text-center text-xs font-mono text-slate-500">
     <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div>AI WORLD CORE &bull; Sovereign AI & LLM Systems &bull; 100% Private</div>
+      <div>VASTUDA &bull; Sovereign AI & LLM Systems &bull; 100% Private</div>
       <div class="flex items-center gap-5 text-slate-400">
-        <a href="../../index.html" class="hover:text-indigo-400 transition">Hub</a>
+        <a href="../user_dashboard.html" class="hover:text-indigo-400 transition">Hub</a>
         <a href="../../tools.html" class="hover:text-cyan-400 transition">Catalogue</a>
         <a href="../../world.html" class="hover:text-pink-400 transition">World Live</a>
       </div>

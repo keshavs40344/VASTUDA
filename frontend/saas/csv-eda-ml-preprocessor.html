@@ -21,6 +21,62 @@
     .drop-zone { border: 2px dashed rgba(255, 255, 255, 0.15); transition: all 0.2s ease; }
     .drop-zone:hover, .drop-zone.dragover { border-color: #a855f7; background: rgba(168, 85, 247, 0.05); }
   </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Exploratory Data Analysis (EDA) in Machine Learning?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Exploratory Data Analysis (EDA) is the crucial first step in any Data Science or Machine Learning project. It involves analyzing datasets to summarize their main statistical characteristics, uncover underlying distributions, detect missing values, and spot outliers before feeding data into models."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the Auto-ML Python code generator create the pipeline?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The tool inspects each column's data type. It groups numeric features into a Scikit-Learn pipeline with SimpleImputer(strategy='median') and StandardScaler(), and groups categorical features with SimpleImputer(strategy='most_frequent') and OneHotEncoder(). It then packages them into a clean ColumnTransformer with train_test_split()."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How are outliers detected in the feature diagnostics table?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Outliers are calculated using the standard Interquartile Range (IQR) method. Values below Q1 - 1.5 * IQR or above Q3 + 1.5 * IQR are flagged as statistical anomalies, which is essential for determining whether feature clipping or robust scaling is required."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my confidential dataset uploaded to any cloud server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No, absolutely not. The file is read directly by your browser's HTML5 FileReader API into volatile JavaScript memory. No data is transmitted to VASTUDA, Railway, or any third party."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I run the generated Python script in Google Colab or Jupyter Notebook?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Simply click the 'Copy Python Code' button, open a new cell in your Jupyter Notebook or Google Colab notebook, paste the code, and ensure your CSV filename matches the path in pd.read_csv(). All required imports and pipeline steps are already included."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is Median imputation preferred over Mean imputation for numeric features?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Mean is heavily distorted by extreme outliers or skewed distributions (e.g., income or housing prices). The Median represents the true 50th percentile and is robust against extreme values, making it the preferred default in production ML pipelines."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="min-h-screen antialiased flex flex-col justify-between">
 
@@ -163,6 +219,141 @@
 
     </div>
 
+  
+    <!-- ===================================================================== -->
+    <!-- COMPREHENSIVE HOW-TO-USE & STUDENT FAQ SECTION (SEO & EDUCATIONAL)     -->
+    <!-- ===================================================================== -->
+    <section class="space-y-6 pt-6 border-t border-white/10">
+      
+      <!-- How to Use in 3 Steps -->
+      <div class="glass p-6 rounded-2xl space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="compass" class="w-5 h-5 text-purple-400"></i>
+            <h2 class="text-base font-bold text-white font-display">How to Use This Utility in 3 Quick Steps</h2>
+          </div>
+          <span class="text-[10px] font-mono px-2.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/30">AI/ML LAB & DATA SCIENCE FAQ</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-purple-400 uppercase tracking-wider">Step 1: Upload Your CSV</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Drag and drop any CSV dataset from your computer or click a quick demo dataset (Titanic, Iris, Housing).</p>
+        </div>
+        
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-purple-400 uppercase tracking-wider">Step 2: Review Data Diagnostics</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Instantly audit missing value percentages, column data types, statistical ranges, and IQR outliers.</p>
+        </div>
+        
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-purple-400 uppercase tracking-wider">Step 3: Copy Tailored Python Code</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Click 'Copy Python Code' to get a ready-to-run Pandas and Scikit-Learn preprocessing pipeline tailored to your dataset.</p>
+        </div>
+        
+        </div>
+      </div>
+
+      <!-- FAQ Accordion Container -->
+      <div class="glass p-6 sm:p-8 rounded-3xl space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/30">
+              <i data-lucide="message-circle-question" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white font-display">Frequently Asked Questions (FAQ) — CSV EDA & Preprocessor</h2>
+              <p class="text-xs text-slate-400 font-mono">Detailed guides, evaluation criteria, and best practices</p>
+            </div>
+          </div>
+          <span class="text-[11px] font-mono text-slate-400">6 Answers</span>
+        </div>
+
+        <div class="space-y-3">
+          
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-purple-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-purple-400 shrink-0"></i>
+              <span>What is Exploratory Data Analysis (EDA) in Machine Learning?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-purple-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-purple-500/50">
+            Exploratory Data Analysis (EDA) is the crucial first step in any Data Science or Machine Learning project. It involves analyzing datasets to summarize their main statistical characteristics, uncover underlying distributions, detect missing values, and spot outliers before feeding data into models.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-purple-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-purple-400 shrink-0"></i>
+              <span>How does the Auto-ML Python code generator create the pipeline?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-purple-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-purple-500/50">
+            The tool inspects each column's data type. It groups numeric features into a Scikit-Learn pipeline with SimpleImputer(strategy='median') and StandardScaler(), and groups categorical features with SimpleImputer(strategy='most_frequent') and OneHotEncoder(). It then packages them into a clean ColumnTransformer with train_test_split().
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-purple-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-purple-400 shrink-0"></i>
+              <span>How are outliers detected in the feature diagnostics table?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-purple-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-purple-500/50">
+            Outliers are calculated using the standard Interquartile Range (IQR) method. Values below Q1 - 1.5 * IQR or above Q3 + 1.5 * IQR are flagged as statistical anomalies, which is essential for determining whether feature clipping or robust scaling is required.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-purple-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-purple-400 shrink-0"></i>
+              <span>Is my confidential dataset uploaded to any cloud server?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-purple-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-purple-500/50">
+            No, absolutely not. The file is read directly by your browser's HTML5 FileReader API into volatile JavaScript memory. No data is transmitted to VASTUDA, Railway, or any third party.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-purple-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-purple-400 shrink-0"></i>
+              <span>How do I run the generated Python script in Google Colab or Jupyter Notebook?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-purple-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-purple-500/50">
+            Simply click the 'Copy Python Code' button, open a new cell in your Jupyter Notebook or Google Colab notebook, paste the code, and ensure your CSV filename matches the path in pd.read_csv(). All required imports and pipeline steps are already included.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-purple-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-purple-400 shrink-0"></i>
+              <span>Why is Median imputation preferred over Mean imputation for numeric features?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-purple-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-purple-500/50">
+            The Mean is heavily distorted by extreme outliers or skewed distributions (e.g., income or housing prices). The Median represents the true 50th percentile and is robust against extreme values, making it the preferred default in production ML pipelines.
+          </div>
+        </details>
+        
+        </div>
+      </div>
+
+    </section>
+    
   </main>
 
   <!-- Footer -->

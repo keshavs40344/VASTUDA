@@ -19,6 +19,62 @@
     ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
     .neon-border-cyan:focus-within { border-color: rgba(6, 182, 212, 0.5); box-shadow: 0 0 15px rgba(6, 182, 212, 0.15); }
   </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Big-O notation and why is it asked in every placement interview?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Big-O notation describes the upper bound (worst-case scenario) of an algorithm's runtime or memory consumption as the input size (n) grows towards infinity. Top tech companies ask this to ensure your code can scale efficiently to millions of users without crashing servers or causing timeouts."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between Time Complexity and Auxiliary Space Complexity?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Time Complexity measures the total number of fundamental operations executed by the CPU. Auxiliary Space Complexity measures the extra temporary RAM allocated by your code (such as hash tables, dynamic arrays, or recursion call stack frames) excluding the space taken by the input itself."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does this tool detect loops and logarithmic time complexity?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The in-browser analyzer performs static syntactic inspection on your code. It measures loop nesting depth, identifies step increments (e.g., n += 1 vs n /= 2 for logarithmic halving in Binary Search), detects recursion trees, and tracks auxiliary dynamic allocations."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How can I optimize an O(n\u00b2) nested loop algorithm down to O(n)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The most common optimization technique is replacing the inner search loop with a Hash Map or Hash Set. For example, in the classic 'Two Sum' problem, checking for (target - num) using a Hash Map takes O(1) time per element, turning an O(n\u00b2) nested loop into a single-pass O(n) algorithm."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why does naive recursive Fibonacci have an exponential O(2\u207f) complexity?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Because each call to fib(n) branches into two sub-calls: fib(n-1) and fib(n-2). This forms a binary tree of height n with approximately 2\u207f total nodes. You can optimize this to O(n) time and O(1) space using Dynamic Programming (memoization or iterative tabulation)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does this tool work offline without an active internet connection?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! The entire AST inspection engine and HTML5 Canvas growth chart run 100% client-side in your browser. No server calls are needed."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="min-h-screen antialiased flex flex-col justify-between">
 
@@ -185,6 +241,141 @@
 
     </div>
 
+  
+    <!-- ===================================================================== -->
+    <!-- COMPREHENSIVE HOW-TO-USE & STUDENT FAQ SECTION (SEO & EDUCATIONAL)     -->
+    <!-- ===================================================================== -->
+    <section class="space-y-6 pt-6 border-t border-white/10">
+      
+      <!-- How to Use in 3 Steps -->
+      <div class="glass p-6 rounded-2xl space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="compass" class="w-5 h-5 text-cyan-400"></i>
+            <h2 class="text-base font-bold text-white font-display">How to Use This Utility in 3 Quick Steps</h2>
+          </div>
+          <span class="text-[10px] font-mono px-2.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">DSA & CODING INTERVIEWS FAQ</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider">Step 1: Choose Language</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Select your programming language (C++, Python, Java, or JavaScript) or click an algorithm preset.</p>
+        </div>
+        
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider">Step 2: Input Your Algorithm</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Paste your function or algorithm implementation with your loops or recursive calls.</p>
+        </div>
+        
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider">Step 3: Inspect Complexity</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Click 'Analyze Complexity' to view Worst-case Time, Best-case Time, Auxiliary Space, and the interactive growth curve.</p>
+        </div>
+        
+        </div>
+      </div>
+
+      <!-- FAQ Accordion Container -->
+      <div class="glass p-6 sm:p-8 rounded-3xl space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+              <i data-lucide="message-circle-question" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-white font-display">Frequently Asked Questions (FAQ) — Big-O Complexity Analyzer</h2>
+              <p class="text-xs text-slate-400 font-mono">Detailed guides, evaluation criteria, and best practices</p>
+            </div>
+          </div>
+          <span class="text-[11px] font-mono text-slate-400">6 Answers</span>
+        </div>
+
+        <div class="space-y-3">
+          
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-cyan-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+              <span>What is Big-O notation and why is it asked in every placement interview?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-cyan-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-cyan-500/50">
+            Big-O notation describes the upper bound (worst-case scenario) of an algorithm's runtime or memory consumption as the input size (n) grows towards infinity. Top tech companies ask this to ensure your code can scale efficiently to millions of users without crashing servers or causing timeouts.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-cyan-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+              <span>What is the difference between Time Complexity and Auxiliary Space Complexity?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-cyan-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-cyan-500/50">
+            Time Complexity measures the total number of fundamental operations executed by the CPU. Auxiliary Space Complexity measures the extra temporary RAM allocated by your code (such as hash tables, dynamic arrays, or recursion call stack frames) excluding the space taken by the input itself.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-cyan-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+              <span>How does this tool detect loops and logarithmic time complexity?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-cyan-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-cyan-500/50">
+            The in-browser analyzer performs static syntactic inspection on your code. It measures loop nesting depth, identifies step increments (e.g., n += 1 vs n /= 2 for logarithmic halving in Binary Search), detects recursion trees, and tracks auxiliary dynamic allocations.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-cyan-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+              <span>How can I optimize an O(n²) nested loop algorithm down to O(n)?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-cyan-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-cyan-500/50">
+            The most common optimization technique is replacing the inner search loop with a Hash Map or Hash Set. For example, in the classic 'Two Sum' problem, checking for (target - num) using a Hash Map takes O(1) time per element, turning an O(n²) nested loop into a single-pass O(n) algorithm.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-cyan-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+              <span>Why does naive recursive Fibonacci have an exponential O(2ⁿ) complexity?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-cyan-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-cyan-500/50">
+            Because each call to fib(n) branches into two sub-calls: fib(n-1) and fib(n-2). This forms a binary tree of height n with approximately 2ⁿ total nodes. You can optimize this to O(n) time and O(1) space using Dynamic Programming (memoization or iterative tabulation).
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-cyan-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+              <span>Does this tool work offline without an active internet connection?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-cyan-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-cyan-500/50">
+            Yes! The entire AST inspection engine and HTML5 Canvas growth chart run 100% client-side in your browser. No server calls are needed.
+          </div>
+        </details>
+        
+        </div>
+      </div>
+
+    </section>
+    
   </main>
 
   <!-- Footer -->

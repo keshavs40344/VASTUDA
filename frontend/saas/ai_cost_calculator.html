@@ -55,14 +55,62 @@
     </script>
     <!-- /SEO BLOCK -->
     
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a token in Large Language Models (LLMs)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A token is the basic atomic unit of text that an LLM processes. As a general rule of thumb, 1 token is roughly 4 characters or 0.75 English words. 1,000 words is approximately 1,333 tokens."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why do completion (output) tokens cost 3 to 4 times more than prompt (input) tokens?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Input tokens can be processed in parallel using efficient matrix multiplications on GPUs (like KV cache lookups). Output tokens, however, must be generated auto-regressively one token at a time in sequential forward passes, consuming significantly more GPU compute and memory bandwidth."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How can developers reduce their monthly LLM API bill by 70% or more?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "1. Use Prompt Caching (Anthropic and OpenAI offer up to 90% discounts on cached system prompts). 2. Use Model Cascading: route easy queries to lightweight models (Gemini 1.5 Flash or GPT-4o-mini) and only invoke flagship models (Claude 3.5 Sonnet) for complex reasoning. 3. Compress system prompts and prune unnecessary conversation history."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between GPT-4o and GPT-4o-mini?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "GPT-4o is OpenAI's flagship multimodal model designed for high-intelligence reasoning and coding. GPT-4o-mini is a lightweight model that is over 80% cheaper and significantly faster, making it the ideal choice for high-volume tasks like summarization, categorization, and simple extractions."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is any API key or confidential data required to use this calculator?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No API keys are required. You simply specify your token volume, and the calculator applies public pricing tiers locally in your browser."
+      }
+    }
+  ]
+}
+</script>
 </head>
 <body class="min-h-screen antialiased">
 
   <!-- Header -->
   <header class="glass border-b border-white/5 px-6 py-3 sticky top-0 z-40">
     <div class="max-w-5xl mx-auto flex items-center justify-between">
-      <a href="../../index.html" class="flex items-center gap-2 text-sm font-mono hover:text-emerald-400 transition">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> AI WORLD HUB
+      <a href="../user_dashboard.html" class="flex items-center gap-2 text-sm font-mono hover:text-emerald-400 transition">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> VASTUDA WORKSPACE
       </a>
       <div class="flex items-center gap-3">
         <span class="text-[10px] font-mono px-2 py-0.5 rounded border bg-violet-500/10 text-violet-400 border-violet-500/30">AI & LLM Systems</span>
@@ -163,13 +211,126 @@
       </div>
     </div>
 
+  
+    <!-- FAQ SECTION -->
+    <section class="space-y-6 pt-6 border-t border-white/10">
+      <div class="glass p-6 rounded-2xl space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="compass" class="w-5 h-5 text-violet-400"></i>
+            <h2 class="text-base font-bold text-white font-display">How to Use This Utility in 3 Steps</h2>
+          </div>
+          <span class="text-[10px] font-mono px-2.5 py-0.5 rounded bg-violet-500/10 text-violet-400 border border-violet-500/30">AI & LLM API COST FAQ</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-violet-400 uppercase tracking-wider">Step 1: Input Tokens / Month</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Enter your expected monthly Prompt (Input) Tokens and Completion (Output) Tokens.</p>
+        </div>
+        
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-violet-400 uppercase tracking-wider">Step 2: Select AI Models</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Compare costs across OpenAI (GPT-4o, GPT-4o-mini), Anthropic (Claude 3.5 Sonnet), and Google (Gemini 1.5 Flash).</p>
+        </div>
+        
+        <div class="glass p-4 rounded-xl space-y-1.5 border border-white/5">
+          <div class="text-[10px] font-mono font-bold text-violet-400 uppercase tracking-wider">Step 3: Analyze Spend</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Review total projected monthly and annual spend, and see where caching or smaller models can save 70%+ budget.</p>
+        </div>
+        
+        </div>
+      </div>
+
+      <div class="glass p-6 sm:p-8 rounded-3xl space-y-6">
+        <div class="flex items-center gap-2.5 border-b border-white/10 pb-4">
+          <div class="p-2 rounded-xl bg-violet-500/10 text-violet-400 border border-violet-500/30">
+            <i data-lucide="message-circle-question" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-white font-display">Frequently Asked Questions (FAQ) — LLM Token Cost & Inference Estimator</h2>
+            <p class="text-xs text-slate-400 font-mono">Formulas, trade-offs, and cost-optimization guide</p>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-violet-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-violet-400 shrink-0"></i>
+              <span>What is a token in Large Language Models (LLMs)?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-violet-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-violet-500/50">
+            A token is the basic atomic unit of text that an LLM processes. As a general rule of thumb, 1 token is roughly 4 characters or 0.75 English words. 1,000 words is approximately 1,333 tokens.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-violet-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-violet-400 shrink-0"></i>
+              <span>Why do completion (output) tokens cost 3 to 4 times more than prompt (input) tokens?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-violet-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-violet-500/50">
+            Input tokens can be processed in parallel using efficient matrix multiplications on GPUs (like KV cache lookups). Output tokens, however, must be generated auto-regressively one token at a time in sequential forward passes, consuming significantly more GPU compute and memory bandwidth.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-violet-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-violet-400 shrink-0"></i>
+              <span>How can developers reduce their monthly LLM API bill by 70% or more?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-violet-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-violet-500/50">
+            1. Use Prompt Caching (Anthropic and OpenAI offer up to 90% discounts on cached system prompts). 2. Use Model Cascading: route easy queries to lightweight models (Gemini 1.5 Flash or GPT-4o-mini) and only invoke flagship models (Claude 3.5 Sonnet) for complex reasoning. 3. Compress system prompts and prune unnecessary conversation history.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-violet-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-violet-400 shrink-0"></i>
+              <span>What is the difference between GPT-4o and GPT-4o-mini?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-violet-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-violet-500/50">
+            GPT-4o is OpenAI's flagship multimodal model designed for high-intelligence reasoning and coding. GPT-4o-mini is a lightweight model that is over 80% cheaper and significantly faster, making it the ideal choice for high-volume tasks like summarization, categorization, and simple extractions.
+          </div>
+        </details>
+        
+        <details class="group glass p-4 rounded-2xl border border-white/5 cursor-pointer transition hover:border-violet-500/30">
+          <summary class="font-bold text-sm text-white flex items-center justify-between list-none">
+            <span class="flex items-center gap-2">
+              <i data-lucide="help-circle" class="w-4 h-4 text-violet-400 shrink-0"></i>
+              <span>Is any API key or confidential data required to use this calculator?</span>
+            </span>
+            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400 group-open:rotate-180 group-open:text-violet-400 transition-transform shrink-0"></i>
+          </summary>
+          <div class="text-xs text-slate-300 mt-3 pt-3 border-t border-white/5 leading-relaxed pl-2 border-l-2 border-violet-500/50">
+            No API keys are required. You simply specify your token volume, and the calculator applies public pricing tiers locally in your browser.
+          </div>
+        </details>
+        
+        </div>
+      </div>
+    </section>
+    
   </main>
 
   <footer class="border-t border-white/5 mt-12 py-6 text-center">
     <div class="text-[10px] font-mono text-slate-600 space-y-1">
-      <div>AI WORLD CORE &middot; AI & LLM Systems &middot; 100% Client-Side &middot; Free Forever</div>
+      <div>VASTUDA &middot; AI & LLM Systems &middot; 100% Client-Side &middot; Free Forever</div>
       <div class="flex items-center justify-center gap-4 mt-2 text-slate-700">
-        <a href="../../index.html" class="hover:text-emerald-400 transition">Hub</a>
+        <a href="../user_dashboard.html" class="hover:text-emerald-400 transition">Hub</a>
         <a href="../../tools.html" class="hover:text-cyan-400 transition">All Tools</a>
         <a href="../../agents.html" class="hover:text-violet-400 transition">Agents</a>
         <a href="../../world.html" class="hover:text-pink-400 transition">World</a>
