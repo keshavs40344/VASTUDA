@@ -11,6 +11,9 @@ import logging
 import threading
 import platform
 import hashlib
+import hmac
+import secrets
+from collections import defaultdict
 import math
 import socket
 import requests
@@ -26,16 +29,71 @@ FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 
 app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
 
-# Configure CORS specifically allowing Cloudflare Worker, PythonAnywhere, and local dev
-CORS(app, origins=[
+# ==============================================================================
+# DEFENSE-IN-DEPTH: SLIDING-WINDOW THREAD-SAFE RATE LIMITER & BRUTE-FORCE SHIELD
+# ==============================================================================
+class SlidingWindowRateLimiter:
+    """
+    Thread-safe in-memory sliding window rate limiter.
+    Provides DDoS suppression and automated lockout for brute-force attempts.
+    """
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._requests = defaultdict(list)
+        self._failed_logins = defaultdict(list)
+        self._blocked_ips = {}  # ip -> lockout_expiry_timestamp
+
+    def is_ip_blocked(self, ip, block_duration_sec=900):
+        now = time.time()
+        with self._lock:
+            if ip in self._blocked_ips:
+                if now < self._blocked_ips[ip]:
+                    return True, int(self._blocked_ips[ip] - now)
+                else:
+                    del self._blocked_ips[ip]
+                    self._failed_logins[ip] = []
+        return False, 0
+
+    def record_failed_login(self, ip, max_failures=5, block_duration_sec=900):
+        now = time.time()
+        with self._lock:
+            self._failed_logins[ip] = [t for t in self._failed_logins[ip] if now - t < block_duration_sec]
+            self._failed_logins[ip].append(now)
+            if len(self._failed_logins[ip]) >= max_failures:
+                self._blocked_ips[ip] = now + block_duration_sec
+                logger.warning(f"[SECURITY SHIELD] IP {ip} locked out for {block_duration_sec}s due to 5 failed login attempts.")
+                return True, block_duration_sec
+        return False, 0
+
+    def reset_failed_login(self, ip):
+        with self._lock:
+            self._failed_logins.pop(ip, None)
+            self._blocked_ips.pop(ip, None)
+
+    def check_api_rate_limit(self, ip, max_requests=120, window_sec=60):
+        now = time.time()
+        with self._lock:
+            self._requests[ip] = [t for t in self._requests[ip] if now - t < window_sec]
+            if len(self._requests[ip]) >= max_requests:
+                return False
+            self._requests[ip].append(now)
+            return True
+
+rate_limiter = SlidingWindowRateLimiter()
+
+
+# Configure Strict CORS (Zero insecure wildcards allowed with credentials)
+ALLOWED_ORIGINS = [
     "https://vastuda.keshavkumarthakur00007.workers.dev",
     "https://keshavs40344.pythonanywhere.com",
     "https://web-production-2ac2a.up.railway.app",
     "http://localhost:3000",
     "http://127.0.0.1:5500",
     "http://localhost:8088",
-    "*"
-], supports_credentials=True)
+    "http://localhost:5000",
+    "http://127.0.0.1:5000"
+]
+CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True)
 
 # Firebase Admin SDK (Safe lazy initialization)
 try:
@@ -62,26 +120,29 @@ except Exception as e:
 # SOVEREIGN ENCLAVE SECURITY CONSTANTS & ACCESS CONTROL GATEWAY
 # ==============================================================================
 ADMIN_ROOT_EMAILS = [
-    "keshavkumarthakur00007@gmail.com"
+    e.strip().lower() for e in os.environ.get("ADMIN_ROOT_EMAILS", "keshavkumarthakur00007@gmail.com").split(",") if e.strip()
 ]
-ADMIN_MASTER_CLEARANCE_KEY = os.environ.get(
-    "ADMIN_MASTER_CLEARANCE_KEY",
-    "VASTUDA_L5_SOVEREIGN_ROOT_CLEARANCE_SECURE_HASH_9948271"
-)
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8864791666:AAEI0R4XrbbyXVBGj85dg9L7S5cl-PhpjwU")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "1335170519")
+# Ephemeral cryptographically random clearance key if not set in environment
+ADMIN_MASTER_CLEARANCE_KEY = os.environ.get("ADMIN_MASTER_CLEARANCE_KEY")
+if not ADMIN_MASTER_CLEARANCE_KEY:
+    ADMIN_MASTER_CLEARANCE_KEY = secrets.token_urlsafe(32)
+    logger.info("[SECURITY INIT] Dynamic ephemeral Admin Clearance Key generated.")
+
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 
 def require_admin(f):
     """
     Cryptographic Level-5 Access Gate:
     Strictly verifies Firebase ID tokens using Firebase Admin SDK.
-    Zero fake passwords, mock tokens, or bypasses permitted.
+    Uses constant-time timing-safe comparisons and enforces strict RBAC.
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # 1. Master Clearance Key (internal server communications)
+        # 1. Master Clearance Key (constant-time comparison against environment secret)
         master_key = request.headers.get("X-Admin-Clearance-Key") or request.headers.get("X-Admin-Master-Key")
-        if master_key and master_key.strip() == ADMIN_MASTER_CLEARANCE_KEY:
+        if master_key and hmac.compare_digest(master_key.strip(), ADMIN_MASTER_CLEARANCE_KEY):
             g.admin_user = {"email": "system@internal", "role": "admin"}
             return f(*args, **kwargs)
 
@@ -96,7 +157,7 @@ def require_admin(f):
                     email = (decoded.get("email") or "").lower().strip()
                     uid = decoded.get("uid")
 
-                    if email and email == ADMIN_ROOT_EMAIL:
+                    if email and email in ADMIN_ROOT_EMAILS:
                         g.admin_user = decoded
                         return f(*args, **kwargs)
 
@@ -111,12 +172,12 @@ def require_admin(f):
                 except Exception as tok_err:
                     logger.warning(f"[AUTH GUARD] Token verification failed: {tok_err}")
 
-        client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+        client_ip = (request.headers.get("X-Forwarded-For", request.remote_addr) or "unknown").split(",")[0].strip()
         logger.warning(f"[SECURITY REJECTION] Unauthorized admin access attempt from IP: {client_ip}")
         return jsonify({
             "status": "error",
             "code": "ACCESS_DENIED",
-            "message": "Access Denied: Level-5 Firebase Clearance Required. No bypass permitted."
+            "message": "Access Denied: Level-5 Cryptographic Clearance Required."
         }), 403
 
     return decorated_function
@@ -130,6 +191,43 @@ def index():
     if os.path.exists(index_file):
         return send_from_directory(FRONTEND_DIR, "index.html")
     return jsonify({"status": "live", "service": "VASTUDA Backend", "cloud": "PythonAnywhere"}), 200
+
+
+BLOCKED_EXTENSIONS = ('.json', '.py', '.env', '.yml', '.yaml', '.md', '.sh', '.git', '.toml', '.lock')
+BLOCKED_FILES = ('tools_catalog.json', 'dockerfile', 'requirements.txt', 'procfile')
+
+@app.before_request
+def enforce_global_security_firewall():
+    """
+    Active Defense-in-Depth Ingress Security Shield:
+    1. System Resource Shield: Blocks direct downloads of .env, .py, .json, .git, etc.
+    2. Path Traversal Guard: Blocks directory traversal attempts (../, %2e%2e).
+    3. DDoS & Scraper Mitigation: Enforces per-IP sliding window rate limits (120 req/min).
+    """
+    clean_path = request.path.lower().replace('\\', '/')
+    base_name = os.path.basename(clean_path)
+
+    # 1. System File & Extension Shield
+    if any(base_name.endswith(ext) for ext in BLOCKED_EXTENSIONS) or base_name in BLOCKED_FILES:
+        logger.warning(f"[SECURITY FIREWALL] Blocked access to protected resource: {request.path}")
+        return jsonify({"error": "Access Denied: Protected System Resource"}), 403
+
+    # 2. Directory Traversal Defense
+    if ".." in clean_path:
+        logger.warning(f"[PATH TRAVERSAL BLOCKED] Traversal attempt: {request.path}")
+        return jsonify({"error": "Access Denied: Path Traversal Detected"}), 403
+
+    # 3. Rate limiting for API requests
+    if request.path.startswith("/api/"):
+        client_ip = (request.headers.get("X-Forwarded-For", request.remote_addr) or "127.0.0.1").split(",")[0].strip()
+        if not rate_limiter.check_api_rate_limit(client_ip, max_requests=120, window_sec=60):
+            logger.warning(f"[RATE LIMIT EXCEEDED] API flooding blocked for IP: {client_ip}")
+            return jsonify({
+                "status": "error",
+                "code": "TOO_MANY_REQUESTS",
+                "message": "Rate limit exceeded. Maximum 120 API requests per minute allowed."
+            }), 429
+    return None
 
 @app.route("/api/status", methods=["GET"])
 def health():
@@ -1386,25 +1484,38 @@ def bulk_admin_tools():
 @app.route("/api/admin/login", methods=["POST"])
 def admin_direct_login():
     """
-    Sovereign Direct Admin Authentication Gateway:
-    Validates root administrator credentials and master clearance keys.
-    Provides a 100% reliable fallback even during third-party OAuth outages.
+    Hardened Sovereign Admin Direct Authentication:
+    - Zero hardcoded passwords (Admin@123 purged).
+    - Enforces IP lockout after 5 failed attempts (15-min lockout).
+    - Uses constant-time hmac.compare_digest for all credential checks.
     """
+    client_ip = (request.headers.get("X-Forwarded-For", request.remote_addr) or "127.0.0.1").split(",")[0].strip()
+    is_blocked, remaining = rate_limiter.is_ip_blocked(client_ip)
+    if is_blocked:
+        logger.warning(f"[BRUTE FORCE BLOCKED] Locked-out IP {client_ip} attempted login. Remaining: {remaining}s")
+        return jsonify({
+            "status": "error",
+            "code": "TOO_MANY_REQUESTS",
+            "message": f"Security Lockout: Account temporarily locked due to failed attempts. Try again in {remaining} seconds."
+        }), 429
+
     payload = request.get_json(silent=True) or {}
     email = (payload.get("email") or "").lower().strip()
     password = (payload.get("password") or "").strip()
-    clearance_key = (payload.get("clearance_key") or password).strip()
+    clearance_key = (payload.get("clearance_key") or "").strip()
 
-    is_root_email = email in [e.lower() for e in ADMIN_ROOT_EMAILS]
-    is_valid_key = (
-        clearance_key == ADMIN_MASTER_CLEARANCE_KEY or
-        password == "Admin@123" or
-        password == "VastudaAdmin2026!" or
-        clearance_key == "VASTUDA_L5_SOVEREIGN_ROOT_CLEARANCE_SECURE_HASH_9948271"
-    )
+    is_root_email = email in ADMIN_ROOT_EMAILS
+    
+    # Strictly check against environment secrets with constant-time equality
+    is_valid_key = False
+    if clearance_key and hmac.compare_digest(clearance_key, ADMIN_MASTER_CLEARANCE_KEY):
+        is_valid_key = True
+    if ADMIN_PASSWORD and password and hmac.compare_digest(password, ADMIN_PASSWORD):
+        is_valid_key = True
 
     if is_root_email and is_valid_key:
-        logger.info(f"[SOVEREIGN LOGIN SUCCESS] Root Admin authenticated: {email}")
+        rate_limiter.reset_failed_login(client_ip)
+        logger.info(f"[SECURE LOGIN SUCCESS] Root Admin authenticated: {email} from IP: {client_ip}")
         return jsonify({
             "status": "success",
             "email": email,
@@ -1414,9 +1525,18 @@ def admin_direct_login():
             "message": "Root Administrator authenticated with Level-5 Clearance."
         }), 200
 
+    # Failed login - record and penalize
+    is_now_blocked, lockout_sec = rate_limiter.record_failed_login(client_ip)
+    if is_now_blocked:
+        return jsonify({
+            "status": "error",
+            "code": "TOO_MANY_REQUESTS",
+            "message": f"Security Lockout: Maximum attempts reached. IP locked for {lockout_sec} seconds."
+        }), 429
+
     return jsonify({
         "status": "error",
-        "message": "Invalid credentials. Please enter authorized Root Email and Password or Master Clearance Key."
+        "message": "Invalid root credentials or unauthorized clearance."
     }), 401
 
 ADMIN_ROOT_EMAIL = os.environ.get("ADMIN_ROOT_EMAIL", "keshavkumarthakur00007@gmail.com").lower().strip()
@@ -1618,21 +1738,33 @@ def serve_auth():
 def serve_user_dashboard():
     return send_from_directory(FRONTEND_DIR, "user_dashboard.html")
 
-BLOCKED_EXTENSIONS = ('.json', '.py', '.env', '.yml', '.yaml', '.md', '.sh', '.git', '.toml', '.lock')
-BLOCKED_FILES = ('tools_catalog.json', 'Dockerfile', 'requirements.txt', 'Procfile')
-
 @app.route("/<path:path>")
 def serve_static(path):
-    # Shield internal metadata, catalogs, and server files from direct scraping
-    clean_path = path.lower().replace('\\', '/')
-    base_name = os.path.basename(clean_path)
-    if any(clean_path.endswith(ext) for ext in BLOCKED_EXTENSIONS) or base_name in BLOCKED_FILES:
-        logger.warning(f"[SECURITY] Direct file download blocked: {path}")
+    """
+    Airtight Static File Gateway:
+    - Path Traversal Block: Enforces canonical realpath boundary within FRONTEND_DIR.
+    - File Extension Filter: Blocks all .py, .env, .json, .sh, .git, etc.
+    """
+    clean_path = path.replace('\\', '/')
+    base_name = os.path.basename(clean_path).lower()
+    if any(base_name.endswith(ext) for ext in BLOCKED_EXTENSIONS) or base_name in BLOCKED_FILES:
+        logger.warning(f"[SECURITY] Protected system file blocked: {path}")
         return jsonify({"error": "Access Denied: Protected System Resource"}), 403
 
-    file_path = os.path.join(FRONTEND_DIR, path)
-    if os.path.exists(file_path):
-        return send_from_directory(FRONTEND_DIR, path)
+    # Canonical realpath boundary check (prevents ../ and URL-encoded traversals)
+    try:
+        resolved_abs = os.path.abspath(os.path.join(FRONTEND_DIR, clean_path))
+        canonical_frontend = os.path.abspath(FRONTEND_DIR)
+        if not resolved_abs.startswith(canonical_frontend):
+            logger.warning(f"[PATH TRAVERSAL BLOCKED] Attempted escape: {path}")
+            return jsonify({"error": "Access Denied: Path Traversal Detected"}), 403
+
+        if os.path.isfile(resolved_abs):
+            rel_file = os.path.relpath(resolved_abs, canonical_frontend)
+            return send_from_directory(canonical_frontend, rel_file)
+    except Exception as e:
+        logger.error(f"[STATIC SERVE ERROR] {e}")
+
     return jsonify({"error": "Not Found", "path": path}), 404
 
 if __name__ == "__main__":
