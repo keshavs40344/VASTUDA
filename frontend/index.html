@@ -3743,6 +3743,144 @@
         </div>
       </section>
 
+      <!-- ========================================================================= -->
+      <!-- LEVEL 11: SELF-HEALING AUTONOMOUS WATCHDOG & HOT-PATCHING ENGINE -->
+      <!-- ========================================================================= -->
+      <section id="layer11HealingMatrix" class="space-y-6 pt-4">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono mb-2">
+              <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+              <span>LEVEL 11 // AUTONOMOUS WATCHDOG &amp; HOT-PATCHING ENGINE</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-3">
+              <span>Self-Healing Watchdog &amp; Hot-Patching</span>
+              <span id="l11VitalityBadge" class="text-xs px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">SYSTEM OPTIMAL</span>
+            </h2>
+            <p class="text-slate-400 text-sm max-w-3xl mt-1">
+              Autonomous continuous vitality monitor across Layers 1–10, tri-state circuit breaker protection, dynamic zero-downtime hot-patching registry, and automated SQLite WAL truncation / cache remediation.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <button onclick="window.refreshLevel11HealthMatrix()" class="px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-rose-300 border border-rose-500/40 flex items-center gap-1.5 transition cursor-pointer shadow-sm">
+              <i data-lucide="activity" class="w-3.5 h-3.5 text-rose-400"></i>
+              <span>Pulse Check</span>
+            </button>
+            <button onclick="window.triggerLevel11Healing('run_full_remediation')" id="btnTriggerHeal" class="cyber-btn px-4 py-2 bg-gradient-to-r from-rose-500 via-red-500 to-amber-500 hover:opacity-90 text-white font-bold font-mono rounded-xl flex items-center gap-2 transition cursor-pointer shadow-lg shadow-rose-500/20">
+              <i data-lucide="heart-pulse" class="w-4 h-4"></i>
+              <span>Autonomous Self-Heal</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 TACTICAL HUD PANELS FOR LAYER 11 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          
+          <!-- PANEL 1: Comprehensive Subsystem Health Grid (Layers 1-10) -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-rose-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                  SUB-LAYER PULSE (1-10)
+                </span>
+                <span id="l11HealthScoreTag" class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px]">100% HEALTHY</span>
+              </div>
+              
+              <div id="l11LayersGrid" class="space-y-1.5 font-mono text-xs max-h-[220px] overflow-y-auto pr-1">
+                <div class="text-slate-500 text-[11px]">Executing multi-layer pulse check...</div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>SCAN INTERVAL: <strong class="text-rose-400">REALTIME</strong></span>
+              <span>ANOMALY DETECTOR: <strong class="text-emerald-400">ACTIVE</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 2: Tri-State Circuit Breakers Monitor -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-rose-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="zap-off" class="w-3.5 h-3.5"></i>
+                  CIRCUIT BREAKERS
+                </span>
+                <span class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20 text-[10px]">TRI-STATE</span>
+              </div>
+
+              <div id="l11CircuitsList" class="space-y-2 font-mono text-xs max-h-[160px] overflow-y-auto pr-1">
+                <div class="text-slate-500 text-[11px]">Loading circuit states...</div>
+              </div>
+
+              <div class="flex items-center gap-2 pt-2 border-t border-white/5">
+                <button onclick="window.triggerLevel11Healing('reset_circuits')" class="w-1/2 py-1.5 rounded bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono transition">Reset All</button>
+                <button onclick="window.triggerLevel11Healing('trip_circuit', 'sandbox_circuit')" class="w-1/2 py-1.5 rounded bg-slate-900 hover:bg-slate-800 text-amber-400 border border-amber-500/30 text-[10px] font-mono transition">Chaos Trip</button>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>TRIP THRESHOLD: <strong class="text-rose-400">3 FAILS</strong></span>
+              <span>COOLDOWN: <strong class="text-cyan-400">20.0s</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 3: Dynamic Runtime Hot-Patching Console -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-rose-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="wrench" class="w-3.5 h-3.5"></i>
+                  DYNAMIC HOT-PATCHING
+                </span>
+                <span id="l11ActivePatchesBadge" class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-[10px]">0 ACTIVE</span>
+              </div>
+
+              <div class="space-y-2 font-mono text-xs">
+                <input id="l11PatchIdInput" type="text" value="patch_throttle_v1" placeholder="Patch identifier..." class="w-full px-3 py-1.5 bg-slate-950/80 border border-white/10 rounded-lg text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-rose-500/50">
+                <input id="l11PatchDescInput" type="text" value="Dynamic rate-limiting throttle adjustment" placeholder="Patch description..." class="w-full px-3 py-1.5 bg-slate-950/80 border border-white/10 rounded-lg text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-rose-500/50">
+                <div class="flex items-center gap-2 pt-1">
+                  <button onclick="window.applyLevel11HotPatch()" class="w-1/2 py-1.5 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-[10px] font-mono font-bold transition">Apply Patch</button>
+                  <button onclick="window.rollbackLevel11HotPatch()" class="w-1/2 py-1.5 rounded bg-slate-900 hover:bg-slate-800 text-slate-400 border border-white/10 text-[10px] font-mono transition">Rollback</button>
+                </div>
+              </div>
+
+              <div id="l11PatchesFeed" class="bg-slate-950/90 border border-white/10 rounded-lg p-2 font-mono text-[10px] max-h-[85px] overflow-y-auto space-y-1">
+                <div class="text-slate-500">Standby. No active runtime overrides.</div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>ZERO DOWNTIME: <strong class="text-emerald-400">TRUE</strong></span>
+              <span>ROLLBACK: <strong class="text-cyan-400">INSTANT</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 4: Real-Time Anomaly Audit & Remediation Feed -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-rose-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i>
+                  REMEDIATION AUDIT STREAM
+                </span>
+                <span class="px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20 text-[10px]">L4 EVENT LOG</span>
+              </div>
+
+              <div id="l11RemediationFeed" class="space-y-2 max-h-[175px] overflow-y-auto font-mono text-[10px] pr-1">
+                <div class="text-slate-500">Querying anomaly logs...</div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>WAL CHECKPOINT: <strong class="text-emerald-400">READY</strong></span>
+              <span>CACHE FLUSH: <strong class="text-cyan-400">SYNCED</strong></span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       <section id="sovereignDesignations" class="space-y-6 pt-4">
         <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
           <div>

@@ -1050,6 +1050,126 @@ def stream_level10_sse():
     from flask import Response
     return Response(event_stream(), mimetype="text/event-stream")
 
+# ==============================================================================
+# LAYER 11: SELF-HEALING WATCHDOG & HOT-PATCHING ENGINE APIS
+# ==============================================================================
+try:
+    from core.self_healing_engine import self_healing_watchdog, autonomous_healer, CircuitState
+except Exception as e:
+    logger.error(f"[SELF-HEALING CORE] Init notice: {e}")
+    self_healing_watchdog = None
+    autonomous_healer = None
+
+@app.route("/api/level11/health-matrix", methods=["GET"])
+def get_level11_health_matrix():
+    """
+    Level 11: Comprehensive Subsystem Health Matrix.
+    Executes live multi-layer diagnostic pulse across Layers 1 through 10,
+    circuit breaker status checks, and overall system vitality score.
+    """
+    if not self_healing_watchdog:
+        return jsonify({"status": "error", "message": "Self-healing watchdog uninitialized"}), 503
+    try:
+        report = self_healing_watchdog.run_full_pulse_check()
+        return jsonify(report), 200
+    except Exception as exc:
+        logger.error(f"[SELF-HEALING] Pulse check failed: {exc}")
+        return jsonify({"status": "error", "message": str(exc)}), 500
+
+@app.route("/api/level11/trigger-heal", methods=["POST"])
+def trigger_level11_healing_action():
+    """
+    Triggers autonomous remediation routines:
+    - run_full_remediation: WAL checkpoint + Cache purge + Circuit reset
+    - wal_checkpoint: SQLite PRAGMA wal_checkpoint(TRUNCATE)
+    - purge_cache: In-memory RAM cache expiration and eviction
+    - reset_circuits: Manual/automated circuit breaker reset
+    - trip_circuit: Simulated failure trip for chaos testing
+    """
+    if not autonomous_healer or not self_healing_watchdog:
+        return jsonify({"status": "error", "message": "Autonomous healer uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    action = payload.get("action", "run_full_remediation").strip()
+    
+    if action == "run_full_remediation":
+        result = autonomous_healer.run_full_remediation()
+        return jsonify(result), 200
+    elif action == "wal_checkpoint":
+        result = autonomous_healer.wal_checkpoint()
+        return jsonify(result), 200
+    elif action == "purge_cache":
+        result = autonomous_healer.purge_cache()
+        return jsonify(result), 200
+    elif action == "reset_circuits":
+        result = autonomous_healer.reset_all_circuits()
+        return jsonify(result), 200
+    elif action == "trip_circuit":
+        circuit_name = payload.get("circuit_name", "sandbox_circuit")
+        if circuit_name in self_healing_watchdog.circuits:
+            self_healing_watchdog.circuits[circuit_name].manual_trip("Manual test trip initiated via Level 11 API")
+            return jsonify({"success": True, "action": "trip_circuit", "circuit": circuit_name, "state": "OPEN"}), 200
+        return jsonify({"success": False, "error": f"Circuit '{circuit_name}' not found"}), 404
+    else:
+        return jsonify({"success": False, "error": f"Unknown action '{action}'"}), 400
+
+@app.route("/api/level11/anomalies", methods=["GET"])
+def get_level11_anomalies_log():
+    """
+    Retrieves the live Anomaly Audit & Self-Healing Event Stream.
+    """
+    if not self_healing_watchdog:
+        return jsonify({"status": "error", "message": "Self-healing watchdog uninitialized"}), 503
+    
+    from core.storage_engine import storage_engine
+    recent_events = []
+    if storage_engine:
+        evts = storage_engine.get_recent_events(limit=40)
+        recent_events = [e for e in evts if e.get("topic", "").startswith("system.")]
+        
+    return jsonify({
+        "status": "operational",
+        "anomaly_records": self_healing_watchdog.anomaly_log[-20:],
+        "remediation_events": recent_events,
+        "timestamp": time.time()
+    }), 200
+
+@app.route("/api/level11/apply-patch", methods=["POST"])
+def apply_level11_hot_patch():
+    """
+    Dynamic Runtime Hot-Patching Registry.
+    Applies live micro-patches with automated rollback capability.
+    """
+    if not self_healing_watchdog:
+        return jsonify({"status": "error", "message": "Self-healing watchdog uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    patch_id = payload.get("patch_id", f"patch_{int(time.time())}").strip()
+    description = payload.get("description", "Dynamic configuration hot-patch").strip()
+    patch_type = payload.get("patch_type", "DYNAMIC_CONFIG").strip()
+    patch_payload = payload.get("payload", {})
+
+    record = self_healing_watchdog.hot_patch_engine.register_and_apply_patch(
+        patch_id=patch_id,
+        description=description,
+        patch_type=patch_type,
+        payload=patch_payload
+    )
+    return jsonify({"success": True, "patch": record}), 200
+
+@app.route("/api/level11/rollback-patch", methods=["POST"])
+def rollback_level11_hot_patch():
+    """
+    Rolls back an applied hot-patch to restore pre-patch state.
+    """
+    if not self_healing_watchdog:
+        return jsonify({"status": "error", "message": "Self-healing watchdog uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    patch_id = payload.get("patch_id", "").strip()
+    if not patch_id:
+        return jsonify({"success": False, "error": "patch_id required"}), 400
+
+    result = self_healing_watchdog.hot_patch_engine.rollback_patch(patch_id)
+    return jsonify(result), 200
+
 
 
 
