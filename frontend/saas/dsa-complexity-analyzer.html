@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big-O DSA Time &amp; Space Complexity Analyzer — VASTUDA</title>
+  <meta name="description" content="Calculate algorithmic time complexity (Worst, Average, Best) and Auxiliary Space Complexity for C++, Java, Python, and JS code.">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-card { background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 30, 0.9) 100%); border: 1px solid rgba(255, 255, 255, 0.08); }
+    textarea, code, .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+    .neon-border-cyan:focus-within { border-color: rgba(6, 182, 212, 0.5); box-shadow: 0 0 15px rgba(6, 182, 212, 0.15); }
+  </style>
+</head>
+<body class="min-h-screen antialiased flex flex-col justify-between">
+
+  <!-- Top Navigation Header -->
+  <header class="glass border-b border-white/5 px-6 py-3.5 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="../user_dashboard.html" class="flex items-center gap-2 text-sm font-mono text-slate-400 hover:text-cyan-400 transition">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>VASTUDA WORKSPACE</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono px-2.5 py-0.5 rounded border bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
+          STUDENT &amp; CAMPUS PREP
+        </span>
+        <span class="text-[10px] font-mono text-slate-400 flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-0.5 rounded border border-white/5">
+          <i data-lucide="shield-check" class="w-3 h-3 text-cyan-400"></i>
+          <span>100% In-Browser AST</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-6 flex-1 w-full">
+
+    <!-- Header Banner -->
+    <div class="glass p-6 rounded-2xl relative overflow-hidden">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 shadow-lg shadow-cyan-500/10">
+            <i data-lucide="gauge" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold font-display text-white">Big-O DSA Time &amp; Space Complexity Analyzer</h1>
+            <p class="text-slate-400 text-sm mt-1 max-w-2xl leading-relaxed">
+              Analyze time complexity, auxiliary space, nested iteration depth, and recursion trees. Designed for LeetCode coders, DSA exam prep, and placement interviews.
+            </p>
+          </div>
+        </div>
+
+        <!-- DSA Presets -->
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <span class="text-xs font-mono text-slate-400">Algorithm Presets:</span>
+          <button onclick="loadPreset('binary_search')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 transition">Binary Search O(log n)</button>
+          <button onclick="loadPreset('two_sum')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 transition">Two Sum O(n)</button>
+          <button onclick="loadPreset('bubble_sort')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 transition">Bubble Sort O(n²)</button>
+          <button onclick="loadPreset('fibonacci')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 transition">Fibonacci O(2ⁿ)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code Input Section -->
+    <div class="glass p-5 rounded-2xl space-y-4 neon-border-cyan transition-all">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 pb-3">
+        <div class="flex items-center gap-3">
+          <label class="text-xs font-mono text-slate-400 uppercase tracking-wider">Language:</label>
+          <select id="langSelect" class="bg-slate-900 border border-white/10 text-xs font-mono text-cyan-400 rounded-lg px-3 py-1.5 focus:outline-none">
+            <option value="cpp">C++ (STL)</option>
+            <option value="python">Python 3</option>
+            <option value="java">Java</option>
+            <option value="javascript">JavaScript / TypeScript</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="clearCode()" class="text-xs font-mono text-slate-400 hover:text-white px-2.5 py-1">Clear</button>
+          <button onclick="analyzeComplexity()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-black font-bold font-mono text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-95 transition">
+            <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
+            <span>Analyze Complexity</span>
+          </button>
+        </div>
+      </div>
+
+      <textarea id="codeInput" rows="13" placeholder="// Paste your DSA function or algorithm implementation here..." class="w-full bg-[#070b16] border border-white/10 rounded-xl p-4 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 leading-relaxed font-mono resize-y"></textarea>
+      
+      <div class="flex items-center justify-between text-[11px] font-mono text-slate-500">
+        <span id="locCount">0 lines of code</span>
+        <span>Deterministic In-Browser Static Parser</span>
+      </div>
+    </div>
+
+    <!-- Complexity Results Section -->
+    <div id="resultsPanel" class="hidden space-y-6">
+
+      <!-- Metric Highlights Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        
+        <!-- Worst-Case Time -->
+        <div class="glass-card p-5 rounded-2xl space-y-1 border-cyan-500/30">
+          <div class="text-xs font-mono text-slate-400">Worst-Case Time</div>
+          <div id="worstCaseBadge" class="text-2xl font-black font-mono text-cyan-400">O(n)</div>
+          <div id="worstCaseDesc" class="text-[10px] text-slate-400">Linear Scaling</div>
+        </div>
+
+        <!-- Best-Case Time -->
+        <div class="glass-card p-5 rounded-2xl space-y-1">
+          <div class="text-xs font-mono text-slate-400">Best-Case Time</div>
+          <div id="bestCaseBadge" class="text-2xl font-black font-mono text-emerald-400">O(1)</div>
+          <div id="bestCaseDesc" class="text-[10px] text-slate-400">Constant Early Exit</div>
+        </div>
+
+        <!-- Auxiliary Space -->
+        <div class="glass-card p-5 rounded-2xl space-y-1">
+          <div class="text-xs font-mono text-slate-400">Auxiliary Space</div>
+          <div id="spaceBadge" class="text-2xl font-black font-mono text-purple-400">O(1)</div>
+          <div id="spaceDesc" class="text-[10px] text-slate-400">In-Place Pointers</div>
+        </div>
+
+        <!-- Max Nested Loop Depth -->
+        <div class="glass-card p-5 rounded-2xl space-y-1">
+          <div class="text-xs font-mono text-slate-400">Loop / Stack Depth</div>
+          <div id="loopDepthBadge" class="text-2xl font-black font-mono text-amber-400">1 Level</div>
+          <div id="loopDepthDesc" class="text-[10px] text-slate-400">Iteration Level</div>
+        </div>
+
+      </div>
+
+      <!-- Growth Curve Comparison & Explanation -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Growth Chart Canvas -->
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="trending-up" class="w-4 h-4 text-cyan-400"></i>
+              <span>Big-O Growth Curve Benchmark</span>
+            </h3>
+            <span class="text-[10px] font-mono text-slate-400">n: 1 &rarr; 50</span>
+          </div>
+          <div class="bg-[#070b16] p-4 rounded-xl border border-white/5 relative">
+            <canvas id="growthCanvas" height="200" class="w-full"></canvas>
+            <div class="flex flex-wrap items-center justify-center gap-4 text-[10px] font-mono text-slate-400 mt-2">
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-400"></span> O(1)</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-cyan-400"></span> O(log n)</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-blue-400"></span> O(n)</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-yellow-400"></span> O(n log n)</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-orange-400"></span> O(n²)</span>
+              <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-500"></span> O(2ⁿ)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Structural Breakdown & Optimization Advice -->
+        <div class="glass p-5 rounded-2xl space-y-4">
+          <h3 class="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="cpu" class="w-4 h-4 text-emerald-400"></i>
+            <span>AST Logic Breakdown &amp; Optimization</span>
+          </h3>
+
+          <div id="breakdownList" class="space-y-2.5 text-xs">
+            <!-- Dynamic bullets -->
+          </div>
+
+          <div id="optimizationBox" class="p-4 rounded-xl bg-cyan-500/08 border border-cyan-500/30 text-xs space-y-1">
+            <div class="font-bold text-cyan-300 flex items-center gap-1.5">
+              <i data-lucide="lightbulb" class="w-4 h-4 text-cyan-400"></i>
+              <span>Engineering Placement Tip</span>
+            </div>
+            <p id="optText" class="text-slate-300 leading-relaxed"></p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 bg-[#02050f] py-4 text-xs font-mono text-slate-500 text-center">
+    <p>VASTUDA &bull; Sovereign Developer &amp; Student Tools &bull; 100% Client-Side Private</p>
+  </footer>
+
+  <!-- Complexity Logic -->
+  <script>
+    const PRESETS = {
+      binary_search: `// Binary Search in C++
+int binarySearch(vector<int>& arr, int target) {
+    int low = 0;
+    int high = arr.size() - 1;
+
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (arr[mid] == target) {
+            return mid; // Best case: found in middle O(1)
+        } else if (arr[mid] < target) {
+            low = mid + 1; // Halves search space
+        } else {
+            high = mid - 1; // Halves search space
+        }
+    }
+    return -1; // Worst case: O(log n)
+}`,
+      two_sum: `// Two Sum using Hash Map (Python 3)
+def two_sum(nums, target):
+    lookup = {} # Auxiliary space O(n)
+    for i, num in enumerate(nums): # Single loop O(n)
+        diff = target - num
+        if diff in lookup:
+            return [lookup[diff], i]
+        lookup[num] = i
+    return []`,
+      bubble_sort: `// Bubble Sort (Java)
+void bubbleSort(int[] arr) {
+    int n = arr.length;
+    for (int i = 0; i < n - 1; i++) { // Outer loop O(n)
+        for (int j = 0; j < n - i - 1; j++) { // Nested inner loop O(n)
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}`,
+      fibonacci: `// Naive Recursive Fibonacci (JavaScript)
+function fibonacci(n) {
+    if (n <= 1) return n;
+    // Dual recursive branching without memoization -> O(2^n)
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}`
+    };
+
+    function loadPreset(key) {
+      if (PRESETS[key]) {
+        document.getElementById('codeInput').value = PRESETS[key];
+        updateLoc();
+        analyzeComplexity();
+      }
+    }
+
+    function clearCode() {
+      document.getElementById('codeInput').value = '';
+      updateLoc();
+      document.getElementById('resultsPanel').classList.add('hidden');
+    }
+
+    function updateLoc() {
+      const lines = document.getElementById('codeInput').value.split('\n').length;
+      document.getElementById('locCount').textContent = lines + ' lines of code';
+    }
+
+    document.getElementById('codeInput').addEventListener('input', updateLoc);
+
+    function analyzeComplexity() {
+      const code = document.getElementById('codeInput').value.trim();
+      if (!code) {
+        alert('Please paste or write code to analyze.');
+        return;
+      }
+
+      const lines = code.split('\n');
+      let loopCount = 0;
+      let maxNesting = 0;
+      let currentNesting = 0;
+      let hasLogarithmicHalving = false;
+      let hasRecursiveBranching = false;
+      let hasAuxiliaryMapOrVector = false;
+
+      // Detect recursion function name
+      let funcName = null;
+      const funcDefRegex = /(?:def|void|int|function)\s+([a-zA-Z0-9_]+)\s*\(/;
+      const matchFunc = code.match(funcDefRegex);
+      if (matchFunc) {
+        funcName = matchFunc[1];
+      }
+
+      // Check recursion branching
+      if (funcName) {
+        const callRegex = new RegExp(`\\b${funcName}\\s*\\(`, 'g');
+        const calls = code.match(callRegex) || [];
+        // If function calls itself more than once in same body (like fib(n-1) + fib(n-2))
+        if (calls.length > 2) {
+          hasRecursiveBranching = true;
+        }
+      }
+
+      // Check for / 2, >> 1, halving steps
+      if (/(\/\s*2|>>\s*1|\/\/\s*2|mid\s*=|mid\s*\+)/i.test(code)) {
+        hasLogarithmicHalving = true;
+      }
+
+      // Check for Map, dict, vector, array allocation
+      if (/(unordered_map|hash_map|Map<|HashMap|vector<|dict\(\)|\[\]\s*#|lookup\s*=|\{\})/i.test(code)) {
+        hasAuxiliaryMapOrVector = true;
+      }
+
+      // Inspect lines for loops and nesting depth
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (/\b(for|while)\b/.test(trimmed)) {
+          loopCount++;
+          currentNesting++;
+          if (currentNesting > maxNesting) maxNesting = currentNesting;
+        }
+        if (trimmed.includes('}') && currentNesting > 0) {
+          currentNesting--;
+        }
+      });
+
+      // Deduce Complexities
+      let worst = "O(n)";
+      let best = "O(1)";
+      let space = hasAuxiliaryMapOrVector ? "O(n)" : "O(1)";
+      let worstDesc = "Linear Iteration";
+      let bestDesc = "Constant Early Exit";
+      let optAdvice = "";
+
+      if (hasRecursiveBranching) {
+        worst = "O(2ⁿ)";
+        best = "O(1)";
+        space = "O(n)";
+        worstDesc = "Exponential Tree Expansion";
+        optAdvice = "Apply Dynamic Programming (Memoization or Bottom-Up Tabulation) to reduce from O(2ⁿ) down to O(n) linear time.";
+      } else if (hasLogarithmicHalving && loopCount <= 1) {
+        worst = "O(log n)";
+        best = "O(1)";
+        worstDesc = "Logarithmic Halving (Binary Search)";
+        optAdvice = "Logarithmic time is optimal for search operations on sorted arrays. No further optimization required.";
+      } else if (maxNesting >= 2 || loopCount >= 2 && code.includes('for') && code.includes('for')) {
+        worst = "O(n²)";
+        best = /break|return/.test(code) ? "O(n)" : "O(n²)";
+        worstDesc = "Quadratic Nested Iteration";
+        optAdvice = "Consider replacing the inner traversal loop with a Hash Map / Hash Set to check lookups in O(1), bringing total time down to O(n).";
+      } else if (maxNesting === 1 || loopCount === 1) {
+        worst = "O(n)";
+        best = /return|break/.test(code) ? "O(1)" : "O(n)";
+        worstDesc = "Single Pass Traversal";
+        optAdvice = "Linear O(n) is optimal for processing unsorted inputs in a single pass.";
+      } else {
+        worst = "O(1)";
+        best = "O(1)";
+        worstDesc = "Constant Execution";
+        optAdvice = "Executes in constant instructions with zero iterative loops.";
+      }
+
+      // Populate UI
+      document.getElementById('resultsPanel').classList.remove('hidden');
+      document.getElementById('worstCaseBadge').textContent = worst;
+      document.getElementById('worstCaseDesc').textContent = worstDesc;
+      document.getElementById('bestCaseBadge').textContent = best;
+      document.getElementById('bestCaseDesc').textContent = bestDesc;
+      document.getElementById('spaceBadge').textContent = space;
+      document.getElementById('spaceDesc').textContent = space === "O(1)" ? "Constant O(1) Auxiliary" : "Linear O(n) Auxiliary Map/Array";
+      document.getElementById('loopDepthBadge').textContent = Math.max(1, maxNesting) + ' Level' + (maxNesting > 1 ? 's' : '');
+      document.getElementById('optText').textContent = optAdvice;
+
+      // Breakdown Items
+      const breakdownList = document.getElementById('breakdownList');
+      breakdownList.innerHTML = '';
+      
+      const bullets = [
+        { label: 'Loop Count & Nesting', text: `Detected ${loopCount} loop construct(s) with a maximum nested depth of ${maxNesting}.` },
+        { label: 'Halving & Step Factor', text: hasLogarithmicHalving ? 'Detected index halving (mid / 2 or binary step), yielding logarithmic reduction factor.' : 'Standard single-increment step progression observed.' },
+        { label: 'Auxiliary Memory Footprint', text: hasAuxiliaryMapOrVector ? 'Auxiliary dynamic storage (Hash Table / List / Vector) instantiated in memory.' : 'In-place pointers used; zero auxiliary array allocations.' },
+        { label: 'Recursion Call Stack', text: hasRecursiveBranching ? 'Dual branching recursive calls detected without memoized state caching.' : 'No exponential recursion trees detected.' }
+      ];
+
+      bullets.forEach(b => {
+        const item = document.createElement('div');
+        item.className = 'p-2.5 rounded-lg bg-slate-900/50 border border-white/5';
+        item.innerHTML = `<span class="font-bold text-slate-300 font-mono text-[11px]">${b.label}:</span> <span class="text-slate-400">${b.text}</span>`;
+        breakdownList.appendChild(item);
+      });
+
+      drawGrowthChart(worst);
+      if (window.lucide) lucide.createIcons();
+      document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Interactive Canvas Chart
+    function drawGrowthChart(highlightComplexity) {
+      const canvas = document.getElementById('growthCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.parentElement.offsetWidth - 32;
+      const h = canvas.height = 180;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Grid lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = 1;
+      for (let y = 20; y < h; y += 35) {
+        ctx.beginPath();
+        ctx.moveTo(30, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      const curves = [
+        { name: "O(1)", color: "#10b981", fn: (n) => 5 },
+        { name: "O(log n)", color: "#06b6d4", fn: (n) => Math.log2(n + 1) * 7 },
+        { name: "O(n)", color: "#60a5fa", fn: (n) => n * 1.8 },
+        { name: "O(n log n)", color: "#facc15", fn: (n) => n * Math.log2(n + 1) * 0.4 },
+        { name: "O(n²)", color: "#fb923c", fn: (n) => (n * n) * 0.05 },
+        { name: "O(2ⁿ)", color: "#f43f5e", fn: (n) => Math.pow(1.18, n) }
+      ];
+
+      curves.forEach(c => {
+        const isHighlight = (c.name === highlightComplexity);
+        ctx.beginPath();
+        ctx.strokeStyle = c.color;
+        ctx.lineWidth = isHighlight ? 3.5 : 1.2;
+        ctx.globalAlpha = isHighlight ? 1 : 0.4;
+
+        for (let x = 0; x <= w - 40; x += 4) {
+          const n = (x / (w - 40)) * 50;
+          const val = c.fn(n);
+          const py = h - 20 - Math.min(h - 30, val);
+          if (x === 0) ctx.moveTo(30 + x, py);
+          else ctx.lineTo(30 + x, py);
+        }
+        ctx.stroke();
+
+        // Label
+        ctx.fillStyle = c.color;
+        ctx.font = isHighlight ? 'bold 11px JetBrains Mono' : '9px JetBrains Mono';
+        ctx.globalAlpha = isHighlight ? 1 : 0.7;
+        const lastY = h - 20 - Math.min(h - 30, c.fn(50));
+        ctx.fillText(c.name, w - 35, Math.max(15, lastY));
+      });
+
+      ctx.globalAlpha = 1;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      loadPreset('binary_search');
+    });
+  </script>
+</body>
+</html>

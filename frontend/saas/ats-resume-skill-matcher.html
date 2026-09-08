@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATS Resume Scanner & Tech Job Skill Gap Matcher — VASTUDA</title>
+  <meta name="description" content="Free, 100% private in-browser ATS Resume Scanner. Match your resume against SDE, AI/ML, and Tech Job Descriptions, calculate match score, and uncover missing keywords.">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-card { background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 30, 0.9) 100%); border: 1px solid rgba(255, 255, 255, 0.08); }
+    textarea, code, .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+    .neon-border-emerald:focus-within { border-color: rgba(16, 185, 129, 0.5); box-shadow: 0 0 15px rgba(16, 185, 129, 0.15); }
+    .gauge-circle { transform: rotate(-90deg); transform-origin: 50% 50%; }
+  </style>
+</head>
+<body class="min-h-screen antialiased flex flex-col justify-between">
+
+  <!-- Top Navigation Header -->
+  <header class="glass border-b border-white/5 px-6 py-3.5 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="../user_dashboard.html" class="flex items-center gap-2 text-sm font-mono text-slate-400 hover:text-emerald-400 transition">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>VASTUDA WORKSPACE</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono px-2.5 py-0.5 rounded border bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
+          STUDENT &amp; CAMPUS PREP
+        </span>
+        <span class="text-[10px] font-mono text-slate-400 flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-0.5 rounded border border-white/5">
+          <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i>
+          <span>100% In-Browser Privacy</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Interactive Studio -->
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-6 flex-1 w-full">
+
+    <!-- Hero Header -->
+    <div class="glass p-6 rounded-2xl relative overflow-hidden">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-lg shadow-emerald-500/10">
+            <i data-lucide="file-check-2" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold font-display text-white">ATS Resume Scanner &amp; Skill Gap Matcher</h1>
+            <p class="text-slate-400 text-sm mt-1 max-w-2xl leading-relaxed">
+              Scan your resume against technical Job Descriptions (SDE, AI/ML, Data Analyst). Calculate your real ATS score, uncover missing keywords, and get action-verb optimization tips.
+            </p>
+          </div>
+        </div>
+
+        <!-- Role Quick Presets -->
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <span class="text-xs font-mono text-slate-400">Presets:</span>
+          <button onclick="loadJobPreset('sde')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-white/10 transition">SDE Intern</button>
+          <button onclick="loadJobPreset('aiml')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-white/10 transition">AI/ML Engineer</button>
+          <button onclick="loadJobPreset('data')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-white/10 transition">Data Analyst</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-Column Input Workspace -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- Left: Resume Input -->
+      <div class="glass p-5 rounded-2xl space-y-3 neon-border-emerald transition-all">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i>
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider font-mono">1. Your Resume Text</h2>
+          </div>
+          <button onclick="loadSampleResume()" class="text-[11px] font-mono text-emerald-400 hover:underline">Load Sample Resume</button>
+        </div>
+        <textarea id="resumeInput" rows="11" placeholder="Paste your plain-text resume here (Summary, Skills, Projects, Experience, Education)..." class="w-full bg-[#070b16] border border-white/10 rounded-xl p-3.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 leading-relaxed resize-y"></textarea>
+        <div class="flex items-center justify-between text-[11px] font-mono text-slate-500">
+          <span id="resumeWordCount">0 words</span>
+          <span>Never saved or uploaded</span>
+        </div>
+      </div>
+
+      <!-- Right: Job Description Input -->
+      <div class="glass p-5 rounded-2xl space-y-3 neon-border-emerald transition-all">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="briefcase" class="w-4 h-4 text-cyan-400"></i>
+            <h2 class="text-sm font-bold text-white uppercase tracking-wider font-mono">2. Target Job Description (JD)</h2>
+          </div>
+          <button onclick="clearJD()" class="text-[11px] font-mono text-slate-400 hover:text-white">Clear</button>
+        </div>
+        <textarea id="jdInput" rows="11" placeholder="Paste the target job description or requirements here..." class="w-full bg-[#070b16] border border-white/10 rounded-xl p-3.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 leading-relaxed resize-y"></textarea>
+        <div class="flex items-center justify-between text-[11px] font-mono text-slate-500">
+          <span id="jdWordCount">0 words</span>
+          <span>Requirements analyzer</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Action Bar -->
+    <div class="flex items-center justify-center pt-2">
+      <button onclick="analyzeResumeATS()" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-black font-bold font-mono text-sm flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-transform active:scale-95">
+        <i data-lucide="scan-line" class="w-4 h-4"></i>
+        <span>Run Deep ATS Audit</span>
+      </button>
+    </div>
+
+    <!-- Results Section (Hidden until analyzed) -->
+    <div id="resultsSection" class="hidden space-y-6">
+
+      <!-- Top Score Dashboard -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        <!-- Score Card -->
+        <div class="glass-card p-5 rounded-2xl flex items-center gap-4 border-emerald-500/30">
+          <div class="relative w-20 h-20 shrink-0 flex items-center justify-center">
+            <svg class="w-20 h-20 gauge-circle">
+              <circle cx="40" cy="40" r="32" stroke="#1f2937" stroke-width="6" fill="transparent"/>
+              <circle id="scoreGauge" cx="40" cy="40" r="32" stroke="#10b981" stroke-width="6" fill="transparent" stroke-dasharray="201.06" stroke-dashoffset="201.06" stroke-linecap="round" class="transition-all duration-1000"/>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="scorePercent" class="text-xl font-black font-mono text-white">0%</span>
+            </div>
+          </div>
+          <div>
+            <div class="text-xs font-mono text-slate-400">ATS Match Score</div>
+            <div id="scoreVerdict" class="text-sm font-bold text-emerald-400 mt-0.5">Calculating...</div>
+            <div class="text-[10px] text-slate-500 mt-1">Based on keyword frequency &amp; weights</div>
+          </div>
+        </div>
+
+        <!-- Matched Skills Count -->
+        <div class="glass-card p-5 rounded-2xl space-y-1">
+          <div class="text-xs font-mono text-slate-400">Matched Skills</div>
+          <div id="matchedCount" class="text-2xl font-black font-mono text-emerald-400">0</div>
+          <div class="text-[11px] text-slate-400">Present in both resume &amp; JD</div>
+        </div>
+
+        <!-- Missing Skills Count -->
+        <div class="glass-card p-5 rounded-2xl space-y-1">
+          <div class="text-xs font-mono text-slate-400">Missing Critical Skills</div>
+          <div id="missingCount" class="text-2xl font-black font-mono text-rose-400">0</div>
+          <div class="text-[11px] text-slate-400">Required by JD but missing</div>
+        </div>
+
+        <!-- Action Verbs & Metrics Score -->
+        <div class="glass-card p-5 rounded-2xl space-y-1">
+          <div class="text-xs font-mono text-slate-400">Quantifiable Metrics</div>
+          <div id="metricsCount" class="text-2xl font-black font-mono text-cyan-400">0</div>
+          <div class="text-[11px] text-slate-400">Impact numbers (%, $, metrics) found</div>
+        </div>
+
+      </div>
+
+      <!-- Skills Matrix: Matched vs Missing -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Matched Skills Chips -->
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>Matched Keywords Found</span>
+            </h3>
+            <span id="matchedBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">0 Found</span>
+          </div>
+          <div id="matchedSkillsList" class="flex flex-wrap gap-2 min-h-[60px] p-2 bg-slate-900/40 rounded-xl border border-white/5">
+            <!-- Chips injected here -->
+          </div>
+        </div>
+
+        <!-- Missing Skills Chips -->
+        <div class="glass p-5 rounded-2xl space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-mono font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+              <span>Missing Keywords to Add</span>
+            </h3>
+            <span id="missingBadge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/30">0 Missing</span>
+          </div>
+          <div id="missingSkillsList" class="flex flex-wrap gap-2 min-h-[60px] p-2 bg-slate-900/40 rounded-xl border border-white/5">
+            <!-- Chips injected here -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ATS Formatting & Action Verbs Recommendation Panel -->
+      <div class="glass p-6 rounded-2xl space-y-4">
+        <h3 class="text-sm font-bold font-mono text-white flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i>
+          <span>ATS Optimization &amp; Bullet Improvement Suggestions</span>
+        </h3>
+        <div id="suggestionsList" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <!-- Dynamic actionable tips injected here -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 bg-[#02050f] py-4 text-xs font-mono text-slate-500 text-center">
+    <p>VASTUDA &bull; Sovereign Developer &amp; Student Tools &bull; 100% Client-Side Private</p>
+  </footer>
+
+  <!-- Script Logic -->
+  <script>
+    // Known Tech Dictionary
+    const TECH_KEYWORDS = [
+      "python", "javascript", "typescript", "c++", "java", "golang", "rust", "c#", "sql", "nosql",
+      "react", "next.js", "vue", "angular", "node.js", "express", "django", "fastapi", "flask", "spring boot",
+      "pytorch", "tensorflow", "keras", "scikit-learn", "pandas", "numpy", "opencv", "hugging face", "llm",
+      "docker", "kubernetes", "aws", "gcp", "azure", "git", "ci/cd", "github actions", "linux", "rest api",
+      "graphql", "redis", "postgresql", "mongodb", "mysql", "kafka", "microservices", "html", "css", "tailwind",
+      "dsa", "data structures", "algorithms", "oop", "system design", "unit testing", "agile", "scrum"
+    ];
+
+    const ACTION_VERBS = [
+      "architected", "developed", "built", "implemented", "optimized", "engineered", "spearheaded",
+      "deployed", "designed", "reduced", "increased", "accelerated", "automated", "refactored", "integrated"
+    ];
+
+    const PRESETS = {
+      sde: {
+        jd: `Software Engineer Intern (SDE)
+Requirements:
+- Strong proficiency in Python, Java, or C++.
+- Solid foundation in Data Structures & Algorithms (DSA), Object-Oriented Programming (OOP).
+- Experience building REST APIs with Node.js, Express, or FastAPI.
+- Familiarity with PostgreSQL, MySQL, or MongoDB.
+- Experience with Git, Docker, and CI/CD pipelines is a plus.
+- Good understanding of clean code, unit testing, and agile practices.`
+      },
+      aiml: {
+        jd: `AI / Machine Learning Engineer
+Requirements:
+- Proficiency in Python, PyTorch, and TensorFlow.
+- Experience with Pandas, NumPy, Scikit-Learn, and data preprocessing.
+- Knowledge of Deep Learning, CNNs, Transformers, and LLM fine-tuning.
+- Experience deploying ML models using FastAPI, Docker, and AWS/GCP.
+- Strong mathematical background in Linear Algebra and Probability.`
+      },
+      data: {
+        jd: `Data Analyst / Junior Data Scientist
+Requirements:
+- Advanced SQL querying, joins, aggregations, and performance tuning.
+- Strong proficiency in Python or R for data analysis (Pandas, NumPy).
+- Experience with data visualization libraries (Seaborn, Matplotlib, Tableau).
+- Knowledge of statistical hypothesis testing, A/B testing, and regression analysis.
+- Experience handling missing data, outliers, and ETL pipelines.`
+      }
+    };
+
+    const SAMPLE_RESUME = `Alex Kumar
+Aspiring Software & AI Engineer | Computer Science Undergrad
+Email: alex.kumar@example.com | GitHub: github.com/alexkumar
+
+EDUCATION
+Bachelor of Technology in Computer Science (2022 - 2026) | GPA: 8.8/10
+
+TECHNICAL SKILLS
+Languages: Python, C++, JavaScript, SQL
+Frameworks & Libraries: React, FastAPI, Node.js, Pandas, NumPy, PyTorch
+Developer Tools: Git, GitHub, Linux, VS Code
+Databases: PostgreSQL, MongoDB
+
+PROJECTS
+1. Neural Vision Classifier (PyTorch, FastAPI, React)
+- Architected a Convolutional Neural Network (CNN) in PyTorch achieving 94.2% test accuracy on image datasets.
+- Built a high-throughput REST API using FastAPI, reducing response latency by 35%.
+- Deployed frontend in React and served over 1,500 test requests.
+
+2. Real-Time Distributed Task Queue (Python, Redis)
+- Implemented an asynchronous task dispatcher handling 500+ jobs/minute.
+- Integrated PostgreSQL for persistent job telemetry and audit trails.`;
+
+    function loadJobPreset(type) {
+      if (PRESETS[type]) {
+        document.getElementById('jdInput').value = PRESETS[type].jd;
+        updateWordCounts();
+      }
+    }
+
+    function loadSampleResume() {
+      document.getElementById('resumeInput').value = SAMPLE_RESUME;
+      updateWordCounts();
+    }
+
+    function clearJD() {
+      document.getElementById('jdInput').value = '';
+      updateWordCounts();
+    }
+
+    function updateWordCounts() {
+      const rw = document.getElementById('resumeInput').value.trim().split(/\s+/).filter(Boolean).length;
+      const jw = document.getElementById('jdInput').value.trim().split(/\s+/).filter(Boolean).length;
+      document.getElementById('resumeWordCount').textContent = rw + ' words';
+      document.getElementById('jdWordCount').textContent = jw + ' words';
+    }
+
+    document.getElementById('resumeInput').addEventListener('input', updateWordCounts);
+    document.getElementById('jdInput').addEventListener('input', updateWordCounts);
+
+    function extractSkills(text) {
+      const lower = text.toLowerCase();
+      const found = new Set();
+      TECH_KEYWORDS.forEach(kw => {
+        const regex = new RegExp(`\\b${kw.replace(/[\.\+\#]/g, '\\$&')}\\b`, 'i');
+        if (regex.test(lower)) {
+          found.add(kw);
+        }
+      });
+      return Array.from(found);
+    }
+
+    function analyzeResumeATS() {
+      const resumeText = document.getElementById('resumeInput').value.trim();
+      const jdText = document.getElementById('jdInput').value.trim();
+
+      if (!resumeText || !jdText) {
+        alert('Please provide both your Resume text and the Target Job Description.');
+        return;
+      }
+
+      const resumeSkills = extractSkills(resumeText);
+      const jdSkills = extractSkills(jdText);
+
+      // Match Calculation
+      const matched = jdSkills.filter(s => resumeSkills.includes(s));
+      const missing = jdSkills.filter(s => !resumeSkills.includes(s));
+
+      let skillScore = jdSkills.length > 0 ? (matched.length / jdSkills.length) * 70 : 50;
+
+      // Metrics / Quantifiable Impact check
+      const numberMatches = resumeText.match(/\b\d+(\.\d+)?%|\b\d+k\b|\b\d+\+\b|\b\d{2,}\b/gi) || [];
+      const metricsScore = Math.min(15, numberMatches.length * 3);
+
+      // Action verbs check
+      const lowerResume = resumeText.toLowerCase();
+      let verbCount = 0;
+      ACTION_VERBS.forEach(v => {
+        if (lowerResume.includes(v)) verbCount++;
+      });
+      const verbScore = Math.min(15, verbCount * 2.5);
+
+      const totalScore = Math.min(100, Math.round(skillScore + metricsScore + verbScore));
+
+      // Display Results
+      document.getElementById('resultsSection').classList.remove('hidden');
+
+      // Animate Circular Gauge
+      const circumference = 2 * Math.PI * 32; // ~201.06
+      const offset = circumference - (totalScore / 100) * circumference;
+      const gauge = document.getElementById('scoreGauge');
+      gauge.style.strokeDasharray = circumference;
+      gauge.style.strokeDashoffset = offset;
+
+      if (totalScore >= 75) gauge.style.stroke = '#10b981';
+      else if (totalScore >= 50) gauge.style.stroke = '#f59e0b';
+      else gauge.style.stroke = '#ef4444';
+
+      document.getElementById('scorePercent').textContent = totalScore + '%';
+      document.getElementById('matchedCount').textContent = matched.length;
+      document.getElementById('missingCount').textContent = missing.length;
+      document.getElementById('metricsCount').textContent = numberMatches.length;
+
+      const verdictEl = document.getElementById('scoreVerdict');
+      if (totalScore >= 80) {
+        verdictEl.textContent = 'Excellent ATS Pass Potential';
+        verdictEl.className = 'text-sm font-bold text-emerald-400 mt-0.5';
+      } else if (totalScore >= 60) {
+        verdictEl.textContent = 'Competitive (Minor Gaps)';
+        verdictEl.className = 'text-sm font-bold text-amber-400 mt-0.5';
+      } else {
+        verdictEl.textContent = 'High Rejection Risk';
+        verdictEl.className = 'text-sm font-bold text-rose-400 mt-0.5';
+      }
+
+      // Render Matched Skills
+      const matchedContainer = document.getElementById('matchedSkillsList');
+      matchedContainer.innerHTML = '';
+      if (matched.length === 0) {
+        matchedContainer.innerHTML = '<span class="text-xs text-slate-500">No overlapping technical skills detected.</span>';
+      } else {
+        matched.forEach(s => {
+          const chip = document.createElement('span');
+          chip.className = 'px-2.5 py-1 rounded-md text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 flex items-center gap-1';
+          chip.innerHTML = `<i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> ${s.toUpperCase()}`;
+          matchedContainer.appendChild(chip);
+        });
+      }
+      document.getElementById('matchedBadge').textContent = matched.length + ' Found';
+
+      // Render Missing Skills
+      const missingContainer = document.getElementById('missingSkillsList');
+      missingContainer.innerHTML = '';
+      if (missing.length === 0) {
+        missingContainer.innerHTML = '<span class="text-xs text-emerald-400">Awesome! Zero critical skill gaps found.</span>';
+      } else {
+        missing.forEach(s => {
+          const chip = document.createElement('span');
+          chip.className = 'px-2.5 py-1 rounded-md text-xs font-mono bg-rose-500/10 text-rose-300 border border-rose-500/30 flex items-center gap-1';
+          chip.innerHTML = `<i data-lucide="plus" class="w-3 h-3 text-rose-400"></i> ${s.toUpperCase()}`;
+          missingContainer.appendChild(chip);
+        });
+      }
+      document.getElementById('missingBadge').textContent = missing.length + ' Missing';
+
+      // Render Suggestions
+      const suggestionsContainer = document.getElementById('suggestionsList');
+      suggestionsContainer.innerHTML = '';
+      
+      const suggestions = [];
+
+      if (missing.length > 0) {
+        suggestions.push({
+          type: 'warning',
+          title: 'Add Missing Priority Keywords',
+          desc: `Integrate missing skills like <b>${missing.slice(0, 4).join(', ')}</b> organically in your Project descriptions or Skills section.`
+        });
+      }
+
+      if (numberMatches.length < 3) {
+        suggestions.push({
+          type: 'danger',
+          title: 'Lack of Quantifiable Impact',
+          desc: 'ATS algorithms favor bullet points with concrete metrics (e.g., <i>"reduced latency by 40%", "served 10k users"</i>).'
+        });
+      } else {
+        suggestions.push({
+          type: 'success',
+          title: 'Strong Quantifiable Results',
+          desc: `Great job! Detected ${numberMatches.length} quantitative impact metrics across your project bullets.`
+        });
+      }
+
+      if (verbCount < 3) {
+        suggestions.push({
+          type: 'warning',
+          title: 'Strengthen Action Verbs',
+          desc: 'Start project bullet points with authoritative verbs like <i>"Architected", "Engineered", "Optimized"</i> instead of passive phrases like "Helped in".'
+        });
+      }
+
+      suggestions.push({
+        type: 'info',
+        title: 'ATS Clean Formatting Check',
+        desc: 'Keep resume in single-column format without nested tables or graphic skill bars that confuse ATS OCR parsers.'
+      });
+
+      suggestions.forEach(item => {
+        const box = document.createElement('div');
+        const borderColor = item.type === 'danger' ? 'border-rose-500/30 bg-rose-500/05' :
+                            item.type === 'warning' ? 'border-amber-500/30 bg-amber-500/05' :
+                            item.type === 'success' ? 'border-emerald-500/30 bg-emerald-500/05' : 'border-cyan-500/30 bg-cyan-500/05';
+        box.className = `p-3.5 rounded-xl border ${borderColor} space-y-1`;
+        box.innerHTML = `<div class="font-bold text-slate-200">${item.title}</div><p class="text-slate-400 leading-relaxed">${item.desc}</p>`;
+        suggestionsContainer.appendChild(box);
+      });
+
+      if (window.lucide) lucide.createIcons();
+      document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      updateWordCounts();
+    });
+  </script>
+</body>
+</html>

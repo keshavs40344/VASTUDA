@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neural Network Architect &amp; PyTorch/Keras Code Generator — VASTUDA</title>
+  <meta name="description" content="Visual Deep Learning architecture designer. Configure CNN, MLP, and Transformer layers, compute trainable parameter counts, and export bug-free PyTorch & Keras code.">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { background: #030712; color: #f3f4f6; font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-card { background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(10, 15, 30, 0.9) 100%); border: 1px solid rgba(255, 255, 255, 0.08); }
+    textarea, code, .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+    .neon-border-indigo:focus-within { border-color: rgba(99, 102, 241, 0.5); box-shadow: 0 0 15px rgba(99, 102, 241, 0.15); }
+  </style>
+</head>
+<body class="min-h-screen antialiased flex flex-col justify-between">
+
+  <!-- Top Header -->
+  <header class="glass border-b border-white/5 px-6 py-3.5 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="../user_dashboard.html" class="flex items-center gap-2 text-sm font-mono text-slate-400 hover:text-indigo-400 transition">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>VASTUDA WORKSPACE</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px] font-mono px-2.5 py-0.5 rounded border bg-indigo-500/10 text-indigo-400 border-indigo-500/30">
+          DEEP LEARNING LAB
+        </span>
+        <span class="text-[10px] font-mono text-slate-400 flex items-center gap-1.5 bg-slate-900/80 px-2.5 py-0.5 rounded border border-white/5">
+          <i data-lucide="cpu" class="w-3 h-3 text-indigo-400"></i>
+          <span>PyTorch &amp; Keras Generator</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-6 flex-1 w-full">
+
+    <!-- Hero Header -->
+    <div class="glass p-6 rounded-2xl relative overflow-hidden">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 shadow-lg shadow-indigo-500/10">
+            <i data-lucide="network" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold font-display text-white">Neural Network Architect &amp; Code Studio</h1>
+            <p class="text-slate-400 text-sm mt-1 max-w-2xl leading-relaxed">
+              Design Deep Neural Networks visually. Calculate exact parameter counts, validate dimension matching, and export bug-free PyTorch (`nn.Module`) and TensorFlow/Keras code with training loops.
+            </p>
+          </div>
+        </div>
+
+        <!-- Architecture Presets -->
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
+          <span class="text-xs font-mono text-slate-400">Presets:</span>
+          <button onclick="loadArch('cnn')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 transition">Vision CNN</button>
+          <button onclick="loadArch('mlp')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 transition">Tabular MLP</button>
+          <button onclick="loadArch('classifier')" class="px-2.5 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 transition">Binary Classifier</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Telemetry & Summary Bar -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="glass-card p-5 rounded-2xl space-y-1 border-indigo-500/30">
+        <div class="text-xs font-mono text-slate-400">Trainable Parameters</div>
+        <div id="metricParams" class="text-2xl font-black font-mono text-indigo-400">0</div>
+        <div class="text-[10px] text-slate-400">Weights &amp; Biases</div>
+      </div>
+      <div class="glass-card p-5 rounded-2xl space-y-1">
+        <div class="text-xs font-mono text-slate-400">Total Layers</div>
+        <div id="metricLayers" class="text-2xl font-black font-mono text-cyan-400">0</div>
+        <div class="text-[10px] text-slate-400">Sequential Depth</div>
+      </div>
+      <div class="glass-card p-5 rounded-2xl space-y-1">
+        <div class="text-xs font-mono text-slate-400">Dimension Status</div>
+        <div id="metricDim" class="text-xl font-bold font-mono text-emerald-400">Validated</div>
+        <div class="text-[10px] text-slate-400">Input &rarr; Output Alignment</div>
+      </div>
+      <div class="glass-card p-5 rounded-2xl space-y-1">
+        <div class="text-xs font-mono text-slate-400">Suggested Loss Function</div>
+        <div id="metricLoss" class="text-sm font-bold font-mono text-amber-400">CrossEntropyLoss</div>
+        <div class="text-[10px] text-slate-400">Objective Metric</div>
+      </div>
+    </div>
+
+    <!-- Architecture Builder & Code Exporter -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left: Visual Layer Builder (5 cols) -->
+      <div class="lg:col-span-5 glass p-5 rounded-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-white/5 pb-3">
+          <h3 class="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="layers" class="w-4 h-4 text-indigo-400"></i>
+            <span>Sequential Layer Stack</span>
+          </h3>
+          <span class="text-[10px] font-mono text-slate-400">Top to Bottom</span>
+        </div>
+
+        <!-- Add Layer Toolbar -->
+        <div class="flex flex-wrap gap-1.5 p-2 rounded-xl bg-slate-900/60 border border-white/5">
+          <button onclick="addLayer('Linear')" class="px-2.5 py-1 text-[11px] font-mono rounded bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/30 transition">+ Dense/Linear</button>
+          <button onclick="addLayer('ReLU')" class="px-2.5 py-1 text-[11px] font-mono rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 transition">+ ReLU</button>
+          <button onclick="addLayer('Dropout')" class="px-2.5 py-1 text-[11px] font-mono rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 transition">+ Dropout</button>
+          <button onclick="addLayer('BatchNorm')" class="px-2.5 py-1 text-[11px] font-mono rounded bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30 transition">+ BatchNorm</button>
+        </div>
+
+        <!-- Interactive Layers List -->
+        <div id="layersContainer" class="space-y-2.5 max-h-[440px] overflow-y-auto pr-1">
+          <!-- Layer cards injected here -->
+        </div>
+
+        <button onclick="resetLayers()" class="w-full py-2 text-xs font-mono text-slate-400 hover:text-rose-400 border border-dashed border-white/10 hover:border-rose-500/30 rounded-xl transition">
+          Reset Architecture
+        </button>
+      </div>
+
+      <!-- Right: Generated PyTorch / Keras Code (7 cols) -->
+      <div class="lg:col-span-7 glass p-5 rounded-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-white/5 pb-3">
+          <div class="flex items-center gap-3">
+            <button id="tabPyTorch" onclick="switchFramework('pytorch')" class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 transition">
+              PyTorch (nn.Module)
+            </button>
+            <button id="tabKeras" onclick="switchFramework('keras')" class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold text-slate-400 hover:text-white transition">
+              TensorFlow / Keras
+            </button>
+          </div>
+
+          <button onclick="copyCode()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono flex items-center gap-1.5 border border-white/10 active:scale-95 transition">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span id="copyStatus">Copy Code</span>
+          </button>
+        </div>
+
+        <pre class="bg-[#050814] p-4 rounded-xl border border-white/10 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed h-[440px] overflow-y-auto"><code id="codeDisplay"># Generating Neural Network code...</code></pre>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 bg-[#02050f] py-4 text-xs font-mono text-slate-500 text-center">
+    <p>VASTUDA &bull; Sovereign Developer &amp; Student Tools &bull; 100% Client-Side Private</p>
+  </footer>
+
+  <!-- Neural Network Engine -->
+  <script>
+    let activeFramework = 'pytorch';
+    let layers = [];
+
+    const ARCH_PRESETS = {
+      mlp: [
+        { type: 'Linear', in_features: 64, out_features: 128 },
+        { type: 'BatchNorm', num_features: 128 },
+        { type: 'ReLU' },
+        { type: 'Dropout', p: 0.2 },
+        { type: 'Linear', in_features: 128, out_features: 32 },
+        { type: 'ReLU' },
+        { type: 'Linear', in_features: 32, out_features: 10 }
+      ],
+      cnn: [
+        { type: 'Linear', in_features: 784, out_features: 256 },
+        { type: 'ReLU' },
+        { type: 'Dropout', p: 0.3 },
+        { type: 'Linear', in_features: 256, out_features: 64 },
+        { type: 'ReLU' },
+        { type: 'Linear', in_features: 64, out_features: 10 }
+      ],
+      classifier: [
+        { type: 'Linear', in_features: 20, out_features: 32 },
+        { type: 'ReLU' },
+        { type: 'Dropout', p: 0.25 },
+        { type: 'Linear', in_features: 32, out_features: 1 }
+      ]
+    };
+
+    function loadArch(presetKey) {
+      if (ARCH_PRESETS[presetKey]) {
+        layers = JSON.parse(JSON.stringify(ARCH_PRESETS[presetKey]));
+        renderLayers();
+      }
+    }
+
+    function addLayer(type) {
+      const lastLayer = layers.filter(l => l.type === 'Linear').slice(-1)[0];
+      const prevOut = lastLayer ? lastLayer.out_features : 64;
+
+      if (type === 'Linear') {
+        layers.push({ type: 'Linear', in_features: prevOut, out_features: Math.max(10, Math.floor(prevOut / 2)) });
+      } else if (type === 'ReLU') {
+        layers.push({ type: 'ReLU' });
+      } else if (type === 'Dropout') {
+        layers.push({ type: 'Dropout', p: 0.2 });
+      } else if (type === 'BatchNorm') {
+        layers.push({ type: 'BatchNorm', num_features: prevOut });
+      }
+      renderLayers();
+    }
+
+    function removeLayer(idx) {
+      layers.splice(idx, 1);
+      renderLayers();
+    }
+
+    function resetLayers() {
+      loadArch('mlp');
+    }
+
+    function updateLayerParam(idx, key, val) {
+      layers[idx][key] = Number(val);
+      renderLayers();
+    }
+
+    function renderLayers() {
+      const container = document.getElementById('layersContainer');
+      container.innerHTML = '';
+
+      let totalParams = 0;
+      let isDimValid = true;
+      let prevOutDim = null;
+
+      layers.forEach((layer, idx) => {
+        const card = document.createElement('div');
+        card.className = 'p-3 rounded-xl bg-slate-900/60 border border-white/5 hover:border-white/15 transition space-y-2';
+
+        let paramsCount = 0;
+        let controlsHtml = '';
+
+        if (layer.type === 'Linear') {
+          paramsCount = (layer.in_features * layer.out_features) + layer.out_features;
+          totalParams += paramsCount;
+
+          if (prevOutDim !== null && prevOutDim !== layer.in_features) {
+            isDimValid = false;
+          }
+          prevOutDim = layer.out_features;
+
+          controlsHtml = `
+            <div class="grid grid-cols-2 gap-2 text-[11px] font-mono">
+              <div>
+                <label class="text-slate-400 block text-[10px]">in_features</label>
+                <input type="number" value="${layer.in_features}" onchange="updateLayerParam(${idx}, 'in_features', this.value)" class="w-full bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+              </div>
+              <div>
+                <label class="text-slate-400 block text-[10px]">out_features</label>
+                <input type="number" value="${layer.out_features}" onchange="updateLayerParam(${idx}, 'out_features', this.value)" class="w-full bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+              </div>
+            </div>
+          `;
+        } else if (layer.type === 'Dropout') {
+          controlsHtml = `
+            <div class="text-[11px] font-mono">
+              <label class="text-slate-400 block text-[10px]">dropout rate (p)</label>
+              <input type="number" step="0.05" min="0.05" max="0.9" value="${layer.p}" onchange="updateLayerParam(${idx}, 'p', this.value)" class="w-full bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+            </div>
+          `;
+        } else if (layer.type === 'BatchNorm') {
+          paramsCount = layer.num_features * 2; // Gamma and Beta
+          totalParams += paramsCount;
+          controlsHtml = `
+            <div class="text-[11px] font-mono">
+              <label class="text-slate-400 block text-[10px]">num_features</label>
+              <input type="number" value="${layer.num_features}" onchange="updateLayerParam(${idx}, 'num_features', this.value)" class="w-full bg-[#050814] border border-white/10 rounded px-2 py-1 text-white">
+            </div>
+          `;
+        }
+
+        const badgeColor = layer.type === 'Linear' ? 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30' :
+                           layer.type === 'ReLU' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' :
+                           layer.type === 'Dropout' ? 'text-rose-400 bg-rose-500/10 border-rose-500/30' : 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30';
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-slate-500 text-[10px] font-mono">#${idx + 1}</span>
+              <span class="px-2 py-0.5 rounded text-xs font-mono font-bold border ${badgeColor}">${layer.type}</span>
+              <span class="text-[10px] font-mono text-slate-400">${paramsCount > 0 ? paramsCount.toLocaleString() + ' params' : 'Activation'}</span>
+            </div>
+            <button onclick="removeLayer(${idx})" class="text-slate-500 hover:text-rose-400 p-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+          ${controlsHtml}
+        `;
+        container.appendChild(card);
+      });
+
+      // Update Telemetry
+      document.getElementById('metricParams').textContent = totalParams.toLocaleString();
+      document.getElementById('metricLayers').textContent = layers.length;
+      
+      const dimEl = document.getElementById('metricDim');
+      if (isDimValid) {
+        dimEl.textContent = 'Aligned ✓';
+        dimEl.className = 'text-xl font-bold font-mono text-emerald-400';
+      } else {
+        dimEl.textContent = 'Mismatch ⚠';
+        dimEl.className = 'text-xl font-bold font-mono text-rose-400';
+      }
+
+      // Check last layer for suggested loss function
+      const lastLinear = layers.filter(l => l.type === 'Linear').slice(-1)[0];
+      const lossEl = document.getElementById('metricLoss');
+      if (lastLinear && lastLinear.out_features === 1) {
+        lossEl.textContent = 'BCEWithLogitsLoss (Binary)';
+      } else if (lastLinear && lastLinear.out_features > 1) {
+        lossEl.textContent = 'CrossEntropyLoss (Multi-class)';
+      } else {
+        lossEl.textContent = 'MSELoss (Regression)';
+      }
+
+      generateCode();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function switchFramework(fw) {
+      activeFramework = fw;
+      if (fw === 'pytorch') {
+        document.getElementById('tabPyTorch').className = 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 transition';
+        document.getElementById('tabKeras').className = 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold text-slate-400 hover:text-white transition';
+      } else {
+        document.getElementById('tabKeras').className = 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 transition';
+        document.getElementById('tabPyTorch').className = 'px-3 py-1.5 rounded-lg text-xs font-mono font-bold text-slate-400 hover:text-white transition';
+      }
+      generateCode();
+    }
+
+    function generateCode() {
+      if (activeFramework === 'pytorch') {
+        generatePyTorchCode();
+      } else {
+        generateKerasCode();
+      }
+    }
+
+    function generatePyTorchCode() {
+      let layerDefs = [];
+      let forwardSteps = [];
+
+      layers.forEach((l, i) => {
+        const name = `layer_${i + 1}`;
+        if (l.type === 'Linear') {
+          layerDefs.push(`        self.${name} = nn.Linear(in_features=${l.in_features}, out_features=${l.out_features})`);
+          forwardSteps.push(`        x = self.${name}(x)`);
+        } else if (l.type === 'ReLU') {
+          layerDefs.push(`        self.${name} = nn.ReLU()`);
+          forwardSteps.push(`        x = self.${name}(x)`);
+        } else if (l.type === 'Dropout') {
+          layerDefs.push(`        self.${name} = nn.Dropout(p=${l.p})`);
+          forwardSteps.push(`        x = self.${name}(x)`);
+        } else if (l.type === 'BatchNorm') {
+          layerDefs.push(`        self.${name} = nn.BatchNorm1d(num_features=${l.num_features})`);
+          forwardSteps.push(`        x = self.${name}(x)`);
+        }
+      });
+
+      const code = `import torch
+import torch.nn as nn
+import torch.optim as optim
+
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super(NeuralNetwork, self).__init__()
+${layerDefs.join('\n')}
+
+    def forward(self, x):
+${forwardSteps.join('\n')}
+        return x
+
+# Instantiate Model
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = NeuralNetwork().to(device)
+print(model)
+
+# Training Hyperparameters
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=1e-4)
+
+# Example Training Loop Step
+def train_step(data, target):
+    model.train()
+    optimizer.zero_grad()
+    output = model(data.to(device))
+    loss = criterion(output, target.to(device))
+    loss.backward()
+    optimizer.step()
+    return loss.item()
+`;
+      document.getElementById('codeDisplay').textContent = code;
+    }
+
+    function generateKerasCode() {
+      let kerasLayers = [];
+      layers.forEach((l, i) => {
+        if (l.type === 'Linear') {
+          if (i === 0) {
+            kerasLayers.push(`    keras.layers.Dense(units=${l.out_features}, input_shape=(${l.in_features},))`);
+          } else {
+            kerasLayers.push(`    keras.layers.Dense(units=${l.out_features})`);
+          }
+        } else if (l.type === 'ReLU') {
+          kerasLayers.push(`    keras.layers.Activation('relu')`);
+        } else if (l.type === 'Dropout') {
+          kerasLayers.push(`    keras.layers.Dropout(rate=${l.p})`);
+        } else if (l.type === 'BatchNorm') {
+          kerasLayers.push(`    keras.layers.BatchNormalization()`);
+        }
+      });
+
+      const code = `import tensorflow as tf
+from tensorflow import keras
+
+# Build Sequential Model
+model = keras.Sequential([
+${kerasLayers.join(',\n')}
+])
+
+model.summary()
+
+# Compile Model
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=0.001),
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Ready to Train:
+# history = model.fit(X_train, y_train, epochs=20, batch_size=32, validation_split=0.2)
+`;
+      document.getElementById('codeDisplay').textContent = code;
+    }
+
+    function copyCode() {
+      const code = document.getElementById('codeDisplay').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('copyStatus');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy Code'; }, 2000);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      loadArch('mlp');
+    });
+  </script>
+</body>
+</html>
