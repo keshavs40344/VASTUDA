@@ -916,6 +916,59 @@ def verify_level8_rbac():
     result = security_enclave.verify_rbac_access(role=role, requested_action=action)
     return jsonify(result), 200
 
+# ==============================================================================
+# LAYER 9: MULTI-AGENT SWARM ORCHESTRATOR & CONSENSUS ENGINE APIS
+# ==============================================================================
+try:
+    from core.swarm_orchestrator import swarm_orchestrator
+except Exception as e:
+    logger.error(f"[SWARM CORE] Init notice: {e}")
+    swarm_orchestrator = None
+
+@app.route("/api/level9/swarm-status", methods=["GET"])
+def get_level9_swarm_status():
+    """
+    Level 9: Multi-Agent Swarm Orchestrator & Consensus Engine Telemetry.
+    Reports active agent archetypes, total swarm missions, consensus metrics,
+    and supermajority quorum thresholds.
+    """
+    if not swarm_orchestrator:
+        return jsonify({"status": "error", "message": "Swarm orchestrator uninitialized"}), 503
+    return jsonify(swarm_orchestrator.get_status()), 200
+
+@app.route("/api/level9/dispatch-mission", methods=["POST"])
+def dispatch_level9_swarm_mission():
+    """
+    Coordinates a decentralized parallel mission across specialized sub-agents
+    (Architect, Security, Synthesizer, Benchmarker), tallies consensus votes,
+    and reaches algorithmic agreement.
+    """
+    if not swarm_orchestrator:
+        return jsonify({"status": "error", "message": "Swarm orchestrator uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    mission_goal = payload.get("goal", "").strip()
+    quorum = float(payload.get("quorum", 0.75))
+    if not mission_goal:
+        return jsonify({"status": "error", "message": "Mission goal required"}), 400
+
+    report = swarm_orchestrator.dispatch_swarm_mission(mission_goal=mission_goal, required_quorum=quorum)
+    return jsonify(report), 200
+
+@app.route("/api/level9/history", methods=["GET"])
+def get_level9_swarm_history():
+    """
+    Returns recent swarm missions and consensus voting tallies.
+    """
+    if not swarm_orchestrator:
+        return jsonify({"status": "error", "message": "Swarm orchestrator uninitialized"}), 503
+    limit = int(request.args.get("limit", 10))
+    return jsonify({
+        "status": "success",
+        "missions": swarm_orchestrator.mission_history[:limit],
+        "timestamp": time.time()
+    }), 200
+
+
 
 
 
