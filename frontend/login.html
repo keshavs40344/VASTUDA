@@ -737,30 +737,7 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     renderDash(user);
-    // Admin clearance probe
-    try {
-      const isMaster = (user.email === "keshavkumarthakur00007@gmail.com");
-      const adminBtn = document.getElementById("btn-admin-portal");
-      if (isMaster) {
-        if (adminBtn) adminBtn.style.display = "flex";
-        sessionStorage.setItem("SOVEREIGN_ADMIN_UNLOCKED", "true");
-        sessionStorage.setItem("SOVEREIGN_ADMIN_EMAIL", user.email);
-      } else {
-        // Probe server clearance
-        user.getIdToken().then(tok => {
-          fetch("/api/admin/verify-clearance", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + tok }
-          }).then(r => r.json()).then(d => {
-            if (d.status === "authorized" && adminBtn) {
-              adminBtn.style.display = "flex";
-              sessionStorage.setItem("SOVEREIGN_ADMIN_UNLOCKED", "true");
-              sessionStorage.setItem("SOVEREIGN_ADMIN_EMAIL", user.email);
-            }
-          }).catch(() => {});
-        }).catch(() => {});
-      }
-    } catch(e) {}
+// User session ready
 
     // Background Firestore sync
     syncFirestore(user).catch(() => {});
