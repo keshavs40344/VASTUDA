@@ -5,8 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI WORLD CORE | Personal Developer & Researcher Workspace</title>
   
+  <!-- High-Performance Resource Hints -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <link rel="dns-prefetch" href="https://www.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -22,38 +26,110 @@
 
   <style>
     body {
-      background-color: #0b0f19;
+      background-color: #070a13;
       color: #f1f5f9;
       font-family: 'Inter', sans-serif;
       overflow-x: hidden;
+      background-image: 
+        radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+        radial-gradient(at 90% 80%, rgba(168, 85, 247, 0.06) 0px, transparent 50%);
+      background-attachment: fixed;
     }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
     
-    /* Modern SaaS Glass Card */
+    /* Ambient Floating Glow Orbs */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 9999px;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.45;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+    @keyframes floatOrb {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(60px, -40px, 0) scale(1.15); }
+      100% { transform: translate3d(-40px, 50px, 0) scale(0.95); }
+    }
+
+    /* Advanced Interactive SaaS Glass Card with Spotlight Hover */
     .saas-card {
-      background: rgba(17, 24, 39, 0.7);
-      backdrop-filter: blur(12px);
+      position: relative;
+      background: rgba(13, 19, 34, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.07);
       border-radius: 1rem;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+                  box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+                  border-color 0.25s ease;
+      overflow: hidden;
+      will-change: transform;
+    }
+    .saas-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99, 102, 241, 0.18), transparent 45%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .saas-card:hover::before {
+      opacity: 1;
     }
     .saas-card:hover {
-      border-color: rgba(99, 102, 241, 0.35);
-      transform: translateY(-2px);
-      box-shadow: 0 12px 28px -8px rgba(99, 102, 241, 0.15);
+      border-color: rgba(129, 140, 248, 0.45);
+      transform: translateY(-4px) scale(1.008);
+      box-shadow: 0 20px 35px -10px rgba(99, 102, 241, 0.2), 0 0 20px rgba(99, 102, 241, 0.08);
     }
     
-    /* Active Nav Item */
+    /* Staggered Entrance Cascade Animation */
+    @keyframes cardCascade {
+      0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.97);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .animate-card-cascade {
+      animation: cardCascade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* Active Nav Item with Glowing Neon Indicator */
     .nav-active {
-      background: linear-gradient(90deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.05) 100%);
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.18) 0%, rgba(99, 102, 241, 0.04) 100%);
       color: #818cf8 !important;
       border-left: 3px solid #6366f1;
       font-weight: 600;
+      box-shadow: inset 0 0 12px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Tactile Micro-Interactions */
+    button:active, .btn-tactile:active {
+      transform: scale(0.96) !important;
+      transition: transform 0.08s ease;
+    }
+
+    /* Pulsing Cyber Radar Indicator */
+    @keyframes cyberPulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .cyber-radar {
+      animation: cyberPulse 2.4s infinite;
     }
 
     /* Scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0b0f19; }
+    ::-webkit-scrollbar-track { background: #070a13; }
     ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
   </style>
@@ -231,21 +307,14 @@
           <kbd class="text-[10px] font-mono bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-slate-400">/</kbd>
         </button>
 
-        <!-- Status Tag -->
-        <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <!-- Live Status Tag with Cyber Radar -->
+        <span class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 cyber-radar"></span>
           Zero-Cloud Leakage
         </span>
 
-        <!-- Distinct Admin Console Link -->
-        <a href="admin_dashboard.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-semibold transition">
-          <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-amber-400"></i>
-          <span class="hidden sm:inline">Admin Mission Control</span>
-          <span class="sm:hidden">Admin</span> 🔒
-        </a>
-
         <!-- Home link -->
-        <a href="index.html" class="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition" title="Back to Homepage">
+        <a href="index.html" class="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition btn-tactile" title="Back to Homepage">
           <i data-lucide="home" class="w-4 h-4"></i>
         </a>
 
@@ -253,44 +322,45 @@
     </header>
 
     <!-- Content Workspace Views -->
-    <main class="p-4 sm:p-8 max-w-7xl mx-auto w-full space-y-8 flex-1">
+    <main class="p-4 sm:p-8 max-w-7xl mx-auto w-full space-y-8 flex-1 relative z-10">
 
       <!-- ===================================================================== -->
       <!-- VIEW 1: WORKSPACE OVERVIEW                                            -->
       <!-- ===================================================================== -->
-      <section id="view-overview" class="space-y-8">
+      <section id="view-overview" class="space-y-8 animate-card-cascade">
         
-        <!-- Welcome Banner -->
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-900/40 via-purple-900/20 to-slate-900/40 border border-indigo-500/20 p-6 sm:p-8">
+        <!-- Welcome Banner with Interactive Neural Constellation Canvas -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-950/60 via-purple-950/30 to-slate-900/60 border border-indigo-500/20 p-6 sm:p-8 shadow-2xl shadow-indigo-950/20">
+          <canvas id="heroConstellationCanvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-40 z-0"></canvas>
           <div class="relative z-10 max-w-2xl space-y-2">
             <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-[11px] font-mono text-indigo-300">
-              <i data-lucide="sparkles" class="w-3 h-3"></i> Sovereign Developer Portal
+              <i data-lucide="sparkles" class="w-3 h-3 animate-pulse"></i> Sovereign Developer Portal
             </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Welcome to your Workspace, <span id="heroUserName" class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Developer</span>
+              Welcome to your Workspace, <span id="heroUserName" class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400">Developer</span>
             </h1>
             <p class="text-sm text-slate-300">
               Your personal, zero-latency in-browser studio. All tools run purely inside your browser memory with zero tracking, zero cloud file uploads, and complete cryptographic privacy.
             </p>
             <div class="pt-2 flex flex-wrap gap-3">
-              <button onclick="switchView('launchpad')" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5">
+              <button onclick="switchView('launchpad')" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-lg shadow-indigo-600/30 transition flex items-center gap-1.5 btn-tactile">
                 <i data-lucide="grid" class="w-3.5 h-3.5"></i> Open App Launchpad
               </button>
-              <button onclick="switchView('tokens')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs transition flex items-center gap-1.5">
+              <button onclick="switchView('tokens')" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs transition flex items-center gap-1.5 btn-tactile">
                 <i data-lucide="key" class="w-3.5 h-3.5"></i> Manage API Tokens
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Personal Workspace Metrics -->
+        <!-- Personal Workspace Metrics with Animated Counters -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="saas-card p-5">
             <div class="flex items-center justify-between text-slate-400 text-xs">
               <span class="font-medium">Total Sovereign Tools</span>
               <span class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400"><i data-lucide="box" class="w-4 h-4"></i></span>
             </div>
-            <div class="text-2xl font-black text-white mt-2">47</div>
+            <div class="text-2xl font-black text-white mt-2" id="kpiTotalTools">47</div>
             <div class="text-[11px] text-emerald-400 font-mono mt-1">100% In-Browser Active</div>
           </div>
 
@@ -317,7 +387,7 @@
               <span class="font-medium">Data Privacy Index</span>
               <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400"><i data-lucide="shield-check" class="w-4 h-4"></i></span>
             </div>
-            <div class="text-2xl font-black text-white mt-2">100%</div>
+            <div class="text-2xl font-black text-white mt-2" id="kpiPrivacy">100%</div>
             <div class="text-[11px] text-emerald-400 font-mono mt-1">Airgapped Local RAM</div>
           </div>
         </div>
@@ -668,6 +738,12 @@
       renderTokens();
       updateBadges();
 
+      // Launch Advanced Animation Engines
+      initConstellationCanvas();
+      initCardSpotlights();
+      animateCounter(document.getElementById("kpiTotalTools"), 0, 47, 800);
+      animateCounter(document.getElementById("kpiPrivacy"), 0, 100, 1000, '%');
+
       // Keyboard shortcuts
       window.addEventListener("keydown", (e) => {
         if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
@@ -677,7 +753,7 @@
       });
     });
 
-    // Sidebar View Navigation
+    // Sidebar View Navigation with Smooth Cascade Transition
     function switchView(viewName) {
       const views = ["overview", "launchpad", "favorites", "activity", "tokens", "sandbox", "account"];
       views.forEach(v => {
@@ -689,7 +765,12 @@
 
       const targetEl = document.getElementById("view-" + viewName);
       const targetNav = document.getElementById("nav-" + viewName);
-      if (targetEl) targetEl.classList.remove("hidden");
+      if (targetEl) {
+        targetEl.classList.remove("hidden");
+        targetEl.classList.remove("animate-card-cascade");
+        void targetEl.offsetWidth; // Reflow
+        targetEl.classList.add("animate-card-cascade");
+      }
       if (targetNav) targetNav.classList.add("nav-active");
 
       // Update breadcrumb
@@ -1004,23 +1085,24 @@
         return;
       }
 
-      grid.innerHTML = filtered.map(t => {
+      grid.innerHTML = filtered.map((t, idx) => {
         const fav = isFavorite(t.id);
         const starClass = fav ? "text-amber-400 fill-amber-400" : "text-slate-500 hover:text-amber-400";
+        const delay = Math.min(idx * 20, 360);
         return `
-          <div class="saas-card p-5 flex flex-col justify-between group">
+          <div class="saas-card p-5 flex flex-col justify-between group animate-card-cascade" style="animation-delay: ${delay}ms;">
             <div>
               <div class="flex items-center justify-between mb-3">
                 <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 uppercase tracking-wider font-semibold">
                   ${t.badge || t.cat}
                 </span>
-                <button onclick="toggleFavorite('${t.id}', event)" class="p-1.5 rounded-lg hover:bg-slate-800 transition" title="${fav ? 'Remove from bookmarks' : 'Add to bookmarks'}">
+                <button onclick="toggleFavorite('${t.id}', event)" class="p-1.5 rounded-lg hover:bg-slate-800 transition btn-tactile" title="${fav ? 'Remove from bookmarks' : 'Add to bookmarks'}">
                   <i data-lucide="star" class="w-4 h-4 ${starClass}"></i>
                 </button>
               </div>
 
               <div class="flex items-start gap-3">
-                <div class="p-2.5 rounded-xl bg-slate-800/80 text-indigo-400 border border-slate-700/60 group-hover:scale-105 transition-transform shrink-0">
+                <div class="p-2.5 rounded-xl bg-slate-800/80 text-indigo-400 border border-slate-700/60 group-hover:scale-110 group-hover:text-indigo-300 group-hover:border-indigo-500/40 transition-all duration-300 shrink-0 shadow-sm">
                   <i data-lucide="${t.icon || 'box'}" class="w-5 h-5"></i>
                 </div>
                 <div>
@@ -1032,8 +1114,8 @@
 
             <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
               <span class="text-[10px] font-mono text-slate-500">100% Client RAM</span>
-              <button onclick="launchTool('${t.id}', '${t.url}')" class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 rounded-lg text-xs font-semibold font-mono flex items-center gap-1.5 transition">
-                <span>Launch</span> <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              <button onclick="launchTool('${t.id}', '${t.url}')" class="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 rounded-lg text-xs font-semibold font-mono flex items-center gap-1.5 transition btn-tactile group-hover:border-indigo-400/60 group-hover:bg-indigo-600/40">
+                <span>Launch</span> <i data-lucide="arrow-right" class="w-3 h-3 group-hover:translate-x-0.5 transition-transform"></i>
               </button>
             </div>
           </div>
@@ -1064,25 +1146,26 @@
         return;
       }
 
-      grid.innerHTML = favTools.map(t => {
+      grid.innerHTML = favTools.map((t, idx) => {
+        const delay = Math.min(idx * 25, 300);
         return `
-          <div class="saas-card p-5 flex flex-col justify-between border-amber-500/20">
+          <div class="saas-card p-5 flex flex-col justify-between border-amber-500/20 group animate-card-cascade" style="animation-delay: ${delay}ms;">
             <div>
               <div class="flex items-center justify-between mb-3">
                 <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30 uppercase tracking-wider font-semibold">
                   BOOKMARKED
                 </span>
-                <button onclick="toggleFavorite('${t.id}', event)" class="p-1.5 rounded-lg hover:bg-slate-800 transition" title="Remove bookmark">
+                <button onclick="toggleFavorite('${t.id}', event)" class="p-1.5 rounded-lg hover:bg-slate-800 transition btn-tactile" title="Remove bookmark">
                   <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
                 </button>
               </div>
 
               <div class="flex items-start gap-3">
-                <div class="p-2.5 rounded-xl bg-slate-800/80 text-amber-400 border border-slate-700/60 shrink-0">
+                <div class="p-2.5 rounded-xl bg-slate-800/80 text-amber-400 border border-slate-700/60 shrink-0 group-hover:scale-110 group-hover:border-amber-500/40 transition-all duration-300 shadow-sm">
                   <i data-lucide="${t.icon || 'star'}" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="font-bold text-sm text-white">${t.name}</h3>
+                  <h3 class="font-bold text-sm text-white group-hover:text-amber-300 transition-colors">${t.name}</h3>
                   <p class="text-xs text-slate-400 mt-1 line-clamp-2">${t.desc}</p>
                 </div>
               </div>
@@ -1090,8 +1173,8 @@
 
             <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
               <span class="text-[10px] font-mono text-slate-500">${t.catName}</span>
-              <button onclick="launchTool('${t.id}', '${t.url}')" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-xs font-semibold font-mono flex items-center gap-1.5 transition">
-                <span>Launch</span> <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              <button onclick="launchTool('${t.id}', '${t.url}')" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-xs font-semibold font-mono flex items-center gap-1.5 transition btn-tactile group-hover:bg-amber-500/35">
+                <span>Launch</span> <i data-lucide="arrow-right" class="w-3 h-3 group-hover:translate-x-0.5 transition-transform"></i>
               </button>
             </div>
           </div>
@@ -1119,9 +1202,9 @@
       }
       picks = picks.slice(0, 4);
 
-      container.innerHTML = picks.map(t => `
-        <div onclick="launchTool('${t.id}', '${t.url}')" class="saas-card p-4 flex items-center gap-3 cursor-pointer group">
-          <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 group-hover:bg-indigo-500/20 transition shrink-0">
+      container.innerHTML = picks.map((t, idx) => `
+        <div onclick="launchTool('${t.id}', '${t.url}')" class="saas-card p-4 flex items-center gap-3 cursor-pointer group animate-card-cascade" style="animation-delay: ${idx * 60}ms;">
+          <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 group-hover:bg-indigo-500/20 group-hover:scale-110 transition-all shrink-0">
             <i data-lucide="${t.icon || 'zap'}" class="w-4 h-4"></i>
           </div>
           <div class="truncate">
@@ -1347,6 +1430,143 @@
       if (actBadge) actBadge.textContent = history.length;
       if (kpiStar) kpiStar.textContent = favs.length;
       if (kpiExec) kpiExec.textContent = history.length;
+    }
+
+    // =========================================================================
+    // ADVANCED HIGH-PERFORMANCE ANIMATION ENGINES
+    // =========================================================================
+
+    // 1. Dynamic Interactive Card Spotlight Engine
+    function initCardSpotlights() {
+      document.addEventListener('mousemove', (e) => {
+        const cards = document.querySelectorAll('.saas-card');
+        for (let i = 0; i < cards.length; i++) {
+          const rect = cards[i].getBoundingClientRect();
+          if (
+            e.clientX >= rect.left - 100 &&
+            e.clientX <= rect.right + 100 &&
+            e.clientY >= rect.top - 100 &&
+            e.clientY <= rect.bottom + 100
+          ) {
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            cards[i].style.setProperty('--mouse-x', `${x}px`);
+            cards[i].style.setProperty('--mouse-y', `${y}px`);
+          }
+        }
+      }, { passive: true });
+    }
+
+    // 2. Smooth Interpolated Counter Engine
+    function animateCounter(el, start, end, duration = 1000, suffix = '') {
+      if (!el) return;
+      const startTime = performance.now();
+      function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 3); // Smooth cubic ease out
+        const current = Math.floor(start + (end - start) * ease);
+        el.textContent = `${current}${suffix}`;
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          el.textContent = `${end}${suffix}`;
+        }
+      }
+      requestAnimationFrame(update);
+    }
+
+    // 3. Interactive Neural Constellation Particle Canvas
+    function initConstellationCanvas() {
+      const canvas = document.getElementById("heroConstellationCanvas");
+      if (!canvas || !canvas.parentElement) return;
+      const ctx = canvas.getContext("2d");
+      let width, height;
+      let particles = [];
+      const particleCount = 42;
+      const maxDistance = 105;
+      let mouse = { x: null, y: null, radius: 110 };
+
+      function resize() {
+        if (!canvas.parentElement) return;
+        width = canvas.width = canvas.parentElement.offsetWidth;
+        height = canvas.height = canvas.parentElement.offsetHeight;
+      }
+      resize();
+      window.addEventListener("resize", resize, { passive: true });
+
+      canvas.parentElement.addEventListener("mousemove", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      }, { passive: true });
+
+      canvas.parentElement.addEventListener("mouseleave", () => {
+        mouse.x = null;
+        mouse.y = null;
+      }, { passive: true });
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * (width || 800);
+          this.y = Math.random() * (height || 260);
+          this.vx = (Math.random() - 0.5) * 0.65;
+          this.vy = (Math.random() - 0.5) * 0.65;
+          this.radius = Math.random() * 1.5 + 1.2;
+          this.color = Math.random() > 0.45 ? "#818cf8" : "#c084fc";
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          if (this.x < 0 || this.x > width) this.vx *= -1;
+          if (this.y < 0 || this.y > height) this.vy *= -1;
+
+          if (mouse.x !== null && mouse.y !== null) {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < mouse.radius && dist > 0) {
+              const force = (mouse.radius - dist) / mouse.radius;
+              this.x -= (dx / dist) * force * 1.2;
+              this.y -= (dy / dist) * force * 1.2;
+            }
+          }
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+
+      function renderFrame() {
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update();
+          particles[i].draw();
+
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < maxDistance) {
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(129, 140, 248, ${(1 - dist / maxDistance) * 0.22})`;
+              ctx.lineWidth = 0.75;
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(renderFrame);
+      }
+      requestAnimationFrame(renderFrame);
     }
   </script>
 </body>

@@ -235,6 +235,15 @@ def add_security_headers(response):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+    # High-Performance Intelligent Caching
+    clean_p = request.path.lower()
+    if clean_p.startswith(("/assets/", "/static/")) or any(clean_p.endswith(ext) for ext in ('.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2', '.ico')):
+        response.headers["Cache-Control"] = "public, max-age=86400, stale-while-revalidate=3600"
+    elif clean_p.endswith(".html") or clean_p == "/":
+        response.headers["Cache-Control"] = "public, max-age=300, stale-while-revalidate=600"
+    elif clean_p.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     return response
 
 @app.route("/api/status", methods=["GET"])
