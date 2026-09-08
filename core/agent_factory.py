@@ -176,11 +176,40 @@ class SovereignAgentFactory:
             "started_at": time.time()
         }
 
+        # Layer 8 Security Enclave Screening
+        try:
+            from core.security_guardrails import security_enclave
+            sec_eval = security_enclave.inspect_prompt_safety(prompt)
+            if not sec_eval.get("is_safe"):
+                return {
+                    "status": "security_blocked",
+                    "agent_id": agent_id,
+                    "role": agent_role,
+                    "engine": "Layer 8 Security Enclave",
+                    "verdict": "BLOCKED",
+                    "threats_detected": sec_eval.get("threats_detected"),
+                    "risk_score": sec_eval.get("risk_score"),
+                    "final_answer": "Execution terminated: Adversarial prompt injection or system override pattern detected.",
+                    "steps": [],
+                    "duration_ms": round((time.perf_counter() - t_start) * 1000, 2),
+                    "timestamp": time.time()
+                }
+        except Exception:
+            pass
+
         # Route to Gemini ReAct if key is available
         if has_gemini:
             result = self._dispatch_gemini_react(agent_id, prompt, agent_role, max_turns, steps)
         else:
             result = self._dispatch_sovereign_fallback(agent_id, prompt, agent_role, steps)
+
+        # Layer 8 PII Sanitization on Egress Output
+        try:
+            from core.security_guardrails import security_enclave
+            sanitized_ans, _ = security_enclave.sanitize_pii(result.get("final_answer", ""))
+            result["final_answer"] = sanitized_ans
+        except Exception:
+            pass
 
         duration_ms = round((time.perf_counter() - t_start) * 1000, 2)
         result["duration_ms"] = duration_ms
@@ -188,6 +217,7 @@ class SovereignAgentFactory:
         result["role"] = agent_role
         result["steps"] = steps
         result["timestamp"] = time.time()
+
 
         # Update active state
         self.active_agents[agent_id]["state"] = "COMPLETED" if result.get("status") == "success" else "ERROR"

@@ -845,6 +845,78 @@ def query_level7_knowledge_graph():
     result = memory_engine.query_knowledge_graph(entity=entity)
     return jsonify(result), 200
 
+# ==============================================================================
+# LAYER 8: SECURITY GUARDRAILS, TAINT ANALYSIS & RBAC ENCLAVES APIS
+# ==============================================================================
+try:
+    from core.security_guardrails import security_enclave
+except Exception as e:
+    logger.error(f"[SECURITY CORE] Init notice: {e}")
+    security_enclave = None
+
+@app.route("/api/level8/security-status", methods=["GET"])
+def get_level8_security_status():
+    """
+    Level 8: Security Guardrails & Enclave Telemetry.
+    Reports blocked injection attempts, PII redactions, and RBAC matrix status.
+    """
+    if not security_enclave:
+        return jsonify({"status": "error", "message": "Security enclave uninitialized"}), 503
+    return jsonify(security_enclave.get_status()), 200
+
+@app.route("/api/level8/inspect-prompt", methods=["POST"])
+def inspect_level8_prompt():
+    """
+    Scans a prompt for adversarial prompt injection, jailbreaks, and system overrides.
+    """
+    if not security_enclave:
+        return jsonify({"status": "error", "message": "Security enclave uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    prompt = payload.get("prompt", "").strip()
+    if not prompt:
+        return jsonify({"status": "error", "message": "Prompt required"}), 400
+
+    result = security_enclave.inspect_prompt_safety(prompt)
+    status_code = 200 if result.get("is_safe") else 403
+    return jsonify(result), status_code
+
+@app.route("/api/level8/sanitize-pii", methods=["POST"])
+def sanitize_level8_pii():
+    """
+    Redacts sensitive emails, credit cards, and API credentials from egress text.
+    """
+    if not security_enclave:
+        return jsonify({"status": "error", "message": "Security enclave uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    text = payload.get("text", "")
+    if not text:
+        return jsonify({"status": "error", "message": "Text required"}), 400
+
+    sanitized, count = security_enclave.sanitize_pii(text)
+    return jsonify({
+        "status": "success",
+        "sanitized_text": sanitized,
+        "redactions_count": count,
+        "timestamp": time.time()
+    }), 200
+
+@app.route("/api/level8/verify-rbac", methods=["POST"])
+def verify_level8_rbac():
+    """
+    Verifies Zero-Trust RBAC authorization for a given role and action.
+    """
+    if not security_enclave:
+        return jsonify({"status": "error", "message": "Security enclave uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    role = payload.get("role", "ephemeral_guest")
+    action = payload.get("action", "")
+    if not action:
+        return jsonify({"status": "error", "message": "Action required"}), 400
+
+    result = security_enclave.verify_rbac_access(role=role, requested_action=action)
+    return jsonify(result), 200
+
+
 
 
 
