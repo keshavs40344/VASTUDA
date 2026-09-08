@@ -1732,6 +1732,11 @@ def inject_sovereign_security_headers(response):
         response.headers["Expires"] = "0"
     return response
 
+@app.route("/")
+@app.route("/index.html")
+def serve_index():
+    return send_from_directory(FRONTEND_DIR, "index.html")
+
 @app.route("/admin")
 @app.route("/admin-dashboard.html")
 def serve_admin():

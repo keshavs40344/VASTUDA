@@ -47,6 +47,7 @@
   <style>
     :root {
       --neon-cyan: #00f0ff;
+      --neon-cyan: #00f0ff;
       --neon-emerald: #00ff9d;
     }
     body {
@@ -57,26 +58,69 @@
     }
     .cyber-grid {
       background-image: 
-        radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.10) 0%, transparent 45%),
-        radial-gradient(circle at 15% 70%, rgba(139, 92, 246, 0.10) 0%, transparent 45%),
+        radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.15) 0%, transparent 55%),
+        radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 15% 70%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
         linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
       background-size: 100% 100%, 100% 100%, 100% 100%, 36px 36px, 36px 36px;
     }
+
+    /* Ambient Floating Aurora Mesh */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 9999px;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+      animation: floatOrb 20s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+    @keyframes floatOrb {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(70px, -45px, 0) scale(1.15); }
+      100% { transform: translate3d(-50px, 55px, 0) scale(0.92); }
+    }
+
+    /* Ultra-Luxury Linear Spotlight Card (Interactive Mouse Track) */
     .linear-spotlight {
       position: relative;
-      background: rgba(8, 12, 22, 0.75);
+      background: linear-gradient(135deg, rgba(10, 15, 28, 0.8) 0%, rgba(6, 10, 20, 0.9) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 
+                  0 12px 32px -10px rgba(0, 0, 0, 0.8);
       border-radius: 1.25rem;
       overflow: hidden;
-      transition: all 0.3s ease;
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+                  box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), 
+                  border-color 0.25s ease;
+      will-change: transform;
+    }
+    .linear-spotlight::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(350px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(16, 185, 129, 0.2), transparent 45%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .linear-spotlight:hover::before {
+      opacity: 1;
     }
     .linear-spotlight:hover {
-      border-color: rgba(16, 185, 129, 0.35);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8), 0 0 30px -5px rgba(16, 185, 129, 0.15);
-      transform: translateY(-3px);
+      border-color: rgba(52, 211, 153, 0.45);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.2), 
+                  0 24px 48px -12px rgba(16, 185, 129, 0.25), 
+                  0 0 25px rgba(16, 185, 129, 0.12);
+      transform: translateY(-4px) scale(1.01);
     }
+
     .neon-gradient-text {
       background: linear-gradient(135deg, #34d399 0%, #22d3ee 50%, #818cf8 100%);
       -webkit-background-clip: text;
@@ -84,27 +128,47 @@
     }
     .cyber-btn {
       position: relative;
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(0, 255, 157, 0.15));
-      border: 1px solid rgba(0, 240, 255, 0.4);
-      transition: all 0.25s ease;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.18), rgba(0, 255, 157, 0.18));
+      border: 1px solid rgba(0, 240, 255, 0.5);
+      box-shadow: 0 0 20px rgba(0, 255, 157, 0.2), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .cyber-btn:hover {
-      background: linear-gradient(135deg, rgba(0, 240, 255, 0.3), rgba(0, 255, 157, 0.3));
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), rgba(0, 255, 157, 0.35));
       border-color: #00ff9d;
-      box-shadow: 0 0 25px rgba(0, 255, 157, 0.4);
-      transform: translateY(-2px);
+      box-shadow: 0 0 35px rgba(0, 255, 157, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+      transform: translateY(-3px) scale(1.02);
+    }
+    .btn-tactile:active, .cyber-btn:active {
+      transform: scale(0.96) !important;
+      transition: transform 0.08s ease;
+    }
+
+    /* Pulsing Cyber Radar Indicator */
+    @keyframes cyberPulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .cyber-radar {
+      animation: cyberPulse 2.4s infinite;
     }
   </style>
 </head>
 
-<body class="min-h-screen cyber-grid font-sans antialiased selection:bg-emerald-500 selection:text-black flex flex-col justify-between">
+<body class="min-h-screen cyber-grid font-sans antialiased selection:bg-emerald-500 selection:text-black flex flex-col justify-between relative overflow-x-hidden">
+
+  <!-- Ambient Floating Aurora Mesh (Deep Luxury Glow) -->
+  <div class="ambient-orb w-[700px] h-[700px] -top-40 -left-40 bg-emerald-500/10"></div>
+  <div class="ambient-orb w-[600px] h-[600px] top-1/2 -right-40 bg-cyan-500/10" style="animation-delay: -8s;"></div>
+  <div class="ambient-orb w-[800px] h-[800px] -bottom-40 left-1/4 bg-purple-500/10" style="animation-delay: -14s;"></div>
 
   <!-- Main Navigation Bar -->
   <div class="sticky top-3 z-50 max-w-7xl mx-auto px-4 sm:px-6 w-full">
     <header class="rounded-2xl bg-[#060914]/90 backdrop-blur-2xl border border-white/10 shadow-2xl shadow-black/80 px-4 sm:px-6 py-3 flex items-center justify-between">
       <!-- Left: Logo -->
       <a href="/" class="flex items-center space-x-3 group">
-        <div class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-500 p-[1px] shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-all">
+        <div class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-500 p-[1px] shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-all ring-1 ring-white/10">
           <div class="w-full h-full bg-[#070b18] rounded-[10px] flex items-center justify-center">
             <span class="font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-300 text-lg">⟡</span>
           </div>
@@ -128,7 +192,7 @@
         <a href="#security" class="hidden md:inline text-xs font-mono text-slate-400 hover:text-white transition px-3 py-1.5">
           Security
         </a>
-        <a href="/login" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-mono font-semibold text-white bg-gradient-to-r from-slate-900 to-slate-950 hover:from-slate-800 hover:to-slate-900 border border-emerald-500/40 hover:border-emerald-400 shadow-lg shadow-emerald-500/10 transition flex items-center gap-2">
+        <a href="/login" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-mono font-semibold text-white bg-gradient-to-r from-slate-900 to-slate-950 hover:from-slate-800 hover:to-slate-900 border border-emerald-500/40 hover:border-emerald-400 shadow-lg shadow-emerald-500/15 transition flex items-center gap-2 btn-tactile">
           <i data-lucide="log-in" class="w-3.5 h-3.5 text-emerald-400"></i>
           <span>Login</span>
         </a>
@@ -137,55 +201,58 @@
   </div>
 
   <!-- Hero Section -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 space-y-24 flex-1 w-full">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 space-y-24 flex-1 w-full relative z-10">
     
-    <div class="text-center space-y-6 max-w-4xl mx-auto">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-        <span>PRIVATE ENTERPRISE AI COMPUTE FABRIC</span>
-      </div>
+    <div class="relative text-center space-y-6 max-w-4xl mx-auto">
+      <canvas id="indexHeroCanvas" class="absolute inset-x-0 -top-24 w-full h-[520px] pointer-events-none opacity-40 z-0"></canvas>
+      <div class="relative z-10 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono shadow-sm shadow-emerald-500/15">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 cyber-radar"></span>
+          <span>PRIVATE ENTERPRISE AI COMPUTE FABRIC</span>
+        </div>
 
-      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight font-display text-white leading-none">
-        Autonomous Sovereign Intelligence. <br>
-        <span class="neon-gradient-text">Zero Data Leakage.</span>
-      </h1>
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight font-display text-white leading-none">
+          Autonomous Sovereign Intelligence. <br>
+          <span class="neon-gradient-text">Zero Data Leakage.</span>
+        </h1>
 
-      <p class="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto font-sans leading-relaxed">
-        VASTUDA is an airgapped, high-throughput multi-agent compute platform built on Byzantine fault-tolerant quorum consensus, deterministic sandboxing, and planetary mesh state synchronization.
-      </p>
+        <p class="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto font-sans leading-relaxed">
+          VASTUDA is an airgapped, high-throughput multi-agent compute platform built on Byzantine fault-tolerant quorum consensus, deterministic sandboxing, and planetary mesh state synchronization.
+        </p>
 
-      <div class="flex flex-wrap items-center justify-center gap-4 pt-4 font-mono text-xs">
-        <a href="/login" class="cyber-btn px-6 py-3.5 rounded-xl font-bold text-white flex items-center gap-2 shadow-lg shadow-emerald-500/20">
-          <i data-lucide="log-in" class="w-4 h-4 text-emerald-400"></i>
-          <span>Login</span>
-        </a>
-        <a href="#features" class="px-6 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 border border-white/10 transition flex items-center gap-2">
-          <i data-lucide="cpu" class="w-4 h-4 text-cyan-400"></i>
-          <span>Platform Overview</span>
-        </a>
+        <div class="flex flex-wrap items-center justify-center gap-4 pt-4 font-mono text-xs">
+          <a href="/login" class="cyber-btn px-7 py-3.5 rounded-xl font-bold text-white flex items-center gap-2 shadow-xl shadow-emerald-500/25">
+            <i data-lucide="log-in" class="w-4 h-4 text-emerald-400"></i>
+            <span>Login to Workspace</span>
+          </a>
+          <a href="#features" class="px-7 py-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-white/10 hover:border-white/25 transition flex items-center gap-2 btn-tactile shadow-sm">
+            <i data-lucide="cpu" class="w-4 h-4 text-cyan-400"></i>
+            <span>Platform Overview</span>
+          </a>
+        </div>
       </div>
     </div>
 
     <!-- Live Cluster Telemetry Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto font-mono text-center">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto font-mono text-center relative z-10">
       <div class="linear-spotlight p-5 space-y-1">
-        <div class="text-2xl sm:text-3xl font-black text-white">100%</div>
-        <div class="text-xs text-slate-400">Airgap Isolation</div>
+        <div class="text-2xl sm:text-3xl font-black text-white" id="metricAirgap">100%</div>
+        <div class="text-xs text-slate-400 font-semibold">Airgap Isolation</div>
         <div class="text-[10px] text-emerald-400">Zero Cloud Egress</div>
       </div>
       <div class="linear-spotlight p-5 space-y-1">
-        <div class="text-2xl sm:text-3xl font-black text-cyan-400">12 / 12</div>
-        <div class="text-xs text-slate-400">Subsystem Layers</div>
+        <div class="text-2xl sm:text-3xl font-black text-cyan-400" id="metricLayers">12 / 12</div>
+        <div class="text-xs text-slate-400 font-semibold">Subsystem Layers</div>
         <div class="text-[10px] text-cyan-400">Nominal Health</div>
       </div>
       <div class="linear-spotlight p-5 space-y-1">
-        <div class="text-2xl sm:text-3xl font-black text-purple-400">3072-D</div>
-        <div class="text-xs text-slate-400">Vector Embeddings</div>
+        <div class="text-2xl sm:text-3xl font-black text-purple-400" id="metricEmbeddings">3072-D</div>
+        <div class="text-xs text-slate-400 font-semibold">Vector Embeddings</div>
         <div class="text-[10px] text-purple-400">Cosine Recall</div>
       </div>
       <div class="linear-spotlight p-5 space-y-1">
-        <div class="text-2xl sm:text-3xl font-black text-amber-400">75%</div>
-        <div class="text-xs text-slate-400">Quorum Consensus</div>
+        <div class="text-2xl sm:text-3xl font-black text-amber-400" id="metricQuorum">75%</div>
+        <div class="text-xs text-slate-400 font-semibold">Quorum Consensus</div>
         <div class="text-[10px] text-amber-400">BFT Supermajority</div>
       </div>
     </div>
@@ -309,9 +376,146 @@
   </footer>
 
   <script>
+    // 1. Initialize Lucide Icons
     if (window.lucide) {
       window.lucide.createIcons();
     }
+
+    // 2. Ultra-Smooth Cursor Spotlight Tracking for Cards
+    function initSpotlightCards() {
+      const cards = document.querySelectorAll('.linear-spotlight');
+      cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        });
+      });
+    }
+
+    // 3. Interactive Neural Constellation Particle Canvas
+    function initHeroCanvas() {
+      const canvas = document.getElementById('indexHeroCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let particles = [];
+      const PARTICLE_COUNT = 55;
+      const MAX_DIST = 120;
+      let mouse = { x: null, y: null, radius: 150 };
+
+      function resize() {
+        width = canvas.width = canvas.parentElement.offsetWidth || window.innerWidth;
+        height = canvas.height = canvas.parentElement.offsetHeight || 520;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      window.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      });
+      window.addEventListener('mouseleave', () => {
+        mouse.x = null;
+        mouse.y = null;
+      });
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.6;
+          this.vy = (Math.random() - 0.5) * 0.6;
+          this.radius = Math.random() * 1.8 + 1;
+          this.color = Math.random() > 0.4 ? 'rgba(16, 185, 129, ' : 'rgba(6, 182, 212, ';
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          if (this.x < 0 || this.x > width) this.vx *= -1;
+          if (this.y < 0 || this.y > height) this.vy *= -1;
+
+          if (mouse.x !== null && mouse.y !== null) {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < mouse.radius && dist > 0) {
+              const force = (mouse.radius - dist) / mouse.radius;
+              this.x -= (dx / dist) * force * 2.2;
+              this.y -= (dy / dist) * force * 2.2;
+            }
+          }
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = this.color + '0.75)';
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push(new Particle());
+      }
+
+      function render() {
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update();
+          particles[i].draw();
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < MAX_DIST) {
+              const alpha = (1 - dist / MAX_DIST) * 0.28;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(16, 185, 129, ${alpha})`;
+              ctx.lineWidth = 0.85;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(render);
+      }
+      requestAnimationFrame(render);
+    }
+
+    // 4. Staggered Animated Metric Counters
+    function animateCounters() {
+      function countUp(el, target, suffix, duration = 1200) {
+        if (!el) return;
+        const stepTime = 20;
+        const steps = Math.ceil(duration / stepTime);
+        const inc = target / steps;
+        let current = 0;
+        const timer = setInterval(() => {
+          current += inc;
+          if (current >= target) {
+            current = target;
+            clearInterval(timer);
+          }
+          el.textContent = Math.floor(current) + suffix;
+        }, stepTime);
+      }
+
+      setTimeout(() => countUp(document.getElementById('metricAirgap'), 100, '%', 1000), 200);
+      setTimeout(() => countUp(document.getElementById('metricLayers'), 12, ' / 12', 800), 400);
+      setTimeout(() => countUp(document.getElementById('metricEmbeddings'), 3072, '-D', 1300), 600);
+      setTimeout(() => countUp(document.getElementById('metricQuorum'), 75, '%', 1100), 800);
+    }
+
+    // Launch animations on load
+    document.addEventListener('DOMContentLoaded', () => {
+      initSpotlightCards();
+      initHeroCanvas();
+      animateCounters();
+    });
   </script>
 </body>
 </html>

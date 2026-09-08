@@ -10,12 +10,12 @@
   <style>
     /* ═══ DESIGN TOKENS ═══════════════════════════════════════════ */
     :root{
-      --bg:#08080f; --bg-card:#0f0f18; --bg-elevated:#14141e;
-      --bg-input:#0b0b13; --bg-glass:rgba(15,15,24,.85);
-      --border:rgba(255,255,255,.07); --border-focus:rgba(99,102,241,.6);
+      --bg:#040711; --bg-card:#0a0f1d; --bg-elevated:#10172a;
+      --bg-input:#070a14; --bg-glass:rgba(10,15,29,.85);
+      --border:rgba(255,255,255,.08); --border-focus:rgba(16,185,129,.6);
       --border-err:rgba(239,68,68,.6); --border-ok:rgba(16,185,129,.5);
       --text:#e2e8f0; --text-muted:#64748b; --text-dim:#374151;
-      --accent:#6366f1; --accent2:#818cf8; --glow:rgba(99,102,241,.18);
+      --accent:#10b981; --accent2:#06b6d4; --glow:rgba(16,185,129,.18);
       --green:#10b981; --red:#ef4444; --amber:#f59e0b; --blue:#3b82f6;
       --r:12px; --r-sm:8px; --r-xs:6px;
     }
@@ -295,6 +295,13 @@
 
   <!-- AUTH FORM CARD -->
   <div id="auth-card" class="card">
+    <div class="brand" style="margin-bottom:20px">
+      <div class="brand-logo" style="background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.2)); border: 1px solid rgba(16,185,129,0.4); color: #10b981; font-family: 'JetBrains Mono', monospace; font-size: 20px;">⟡</div>
+      <div class="brand-info">
+        <span class="brand-name" style="letter-spacing: 0.05em;">VASTUDA</span>
+        <span class="brand-sub">Sovereign Developer Workspace</span>
+      </div>
+    </div>
     <div class="form-title" id="form-title">Welcome back</div>
     <div class="form-sub" id="form-sub">Sign in to your account.</div>
 
@@ -394,9 +401,9 @@
   <!-- ═══ CLOUD VERIFIED DASHBOARD ════════════════════════════════ -->
   <div id="dash-card" class="card">
     <div class="brand" style="margin-bottom:22px">
-      <div class="brand-logo">&#937;</div>
+      <div class="brand-logo" style="background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.2)); border: 1px solid rgba(16,185,129,0.4); color: #10b981; font-family: 'JetBrains Mono', monospace; font-size: 20px;">⟡</div>
       <div class="brand-info">
-        <span class="brand-name">VASTUDA Workspace</span>
+        <span class="brand-name" style="letter-spacing: 0.05em;">VASTUDA Workspace</span>
         <span class="brand-sub">Verified Developer & Research Session</span>
       </div>
     </div>
@@ -460,7 +467,7 @@
       </button>
     </div>
 
-    <a href="index.html" class="back-link">&#8592; Back to AI World</a>
+    <a href="/" class="back-link">&#8592; Back to VASTUDA Home</a>
   </div><!-- /dash-card -->
 
 </div><!-- /page -->
