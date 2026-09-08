@@ -3167,6 +3167,147 @@
         </div>
       </section>
 
+      <!-- ========================================================================= -->
+      <!-- LAYER 07 // LONG-TERM MEMORY, VECTOR SEARCH & KNOWLEDGE GRAPHS MATRIX       -->
+      <!-- ========================================================================= -->
+      <section id="layer7MemoryMatrix" class="space-y-6 pt-8 border-t border-teal-500/20">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 text-teal-400 text-[11px] font-mono border border-teal-500/30 mb-2">
+              <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span>
+              <span>LAYER 07 // LONG-TERM MEMORY, VECTOR SEARCH &amp; KNOWLEDGE GRAPHS</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-display font-black text-white tracking-tight flex flex-wrap items-center gap-3">
+              <span>Vector Memory &amp; Knowledge Graph</span>
+              <span class="text-xs font-mono px-2.5 py-1 rounded bg-teal-500/20 text-teal-300 border border-teal-500/40 uppercase tracking-widest font-normal flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
+                Level 7 Live
+              </span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400 font-mono mt-1 max-w-3xl">
+              High-dimensional vector embeddings, normalized Cosine Similarity semantic recall, and entity relationship graph triples stored in SQLite WAL mode.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <button onclick="window.refreshLevel7MemoryStatus()" class="px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-teal-300 border border-teal-500/40 flex items-center gap-1.5 transition cursor-pointer shadow-sm">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-teal-400"></i>
+              <span>Poll Memory</span>
+            </button>
+            <button onclick="window.executeVectorSearch()" id="btnVectorSearch" class="cyber-btn px-4 py-2 bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-400 hover:opacity-90 text-slate-950 font-bold font-mono rounded-xl flex items-center gap-2 transition cursor-pointer shadow-lg shadow-teal-500/20">
+              <i data-lucide="search" class="w-4 h-4"></i>
+              <span>Semantic Recall</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 TACTICAL HUD PANELS FOR LAYER 7 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          
+          <!-- PANEL 1: Memory Engine Telemetry -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-teal-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                  VECTOR STORAGE
+                </span>
+                <span id="l7ModeTag" class="px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 text-[10px]">3072-DIM EMBEDDINGS</span>
+              </div>
+              
+              <div class="space-y-2 font-mono text-xs">
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Vector Memories:</span>
+                  <span id="l7TotalMemories" class="font-bold text-white">0</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Graph Triples:</span>
+                  <span id="l7TotalTriples" class="font-bold text-emerald-400">0</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Dimension Space:</span>
+                  <span id="l7VectorDim" class="font-bold text-cyan-400">3072 Dense</span>
+                </div>
+                <div class="flex justify-between items-center text-slate-300">
+                  <span class="text-slate-500">Distance Metric:</span>
+                  <span class="font-bold text-teal-300">Cosine Similarity</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>STORAGE: <strong class="text-teal-400">SQLite WAL</strong></span>
+              <span>INDEX: <strong class="text-emerald-400">NORMALIZED</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 2: Interactive Vector Recall Enclave -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4 md:col-span-2">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-teal-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="compass" class="w-3.5 h-3.5"></i>
+                  SEMANTIC VECTOR RECALL ENCLAVE
+                </span>
+                <span id="l7RecallStatusTag" class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px]">READY</span>
+              </div>
+
+              <!-- Quick Presets -->
+              <div class="flex flex-wrap items-center gap-1.5 font-mono text-[10px]">
+                <span class="text-slate-500">PROBES:</span>
+                <button onclick="window.setMemoryProbe('ram')" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-teal-300 border border-teal-500/30 transition">RAM Protection</button>
+                <button onclick="window.setMemoryProbe('hash')" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-rose-300 border border-rose-500/30 transition">Web Ingest Cryptography</button>
+                <button onclick="window.setMemoryProbe('layers')" class="px-2 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-cyan-500/30 transition">12-Layer Mesh</button>
+              </div>
+
+              <!-- Query Input Bar -->
+              <div class="flex items-center gap-2">
+                <input id="l7SearchQueryInput" type="text" value="How is memory exhaustion and RAM overload prevented?" placeholder="Enter semantic query for vector similarity recall..." class="flex-1 px-3 py-2 bg-slate-950/80 border border-white/10 rounded-lg text-xs font-mono text-white placeholder-slate-600 focus:outline-none focus:border-teal-500/50">
+                <button onclick="window.executeVectorSearch()" class="px-3.5 py-2 bg-teal-500/20 hover:bg-teal-500/30 text-teal-300 border border-teal-500/40 rounded-lg text-xs font-mono font-bold transition flex items-center gap-1 shrink-0">
+                  <i data-lucide="zap" class="w-3 h-3 fill-current"></i>
+                  <span>Recall</span>
+                </button>
+              </div>
+
+              <!-- Real-time Recall Results Terminal -->
+              <div class="bg-slate-950/90 border border-white/10 rounded-lg p-3 font-mono text-[11px] space-y-1.5 max-h-[125px] overflow-y-auto" id="l7RecallTerminal">
+                <div class="text-slate-500 flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>
+                  <span>Vector memory engine standby. Execute a semantic search query above.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>COSINE RANKING: <strong class="text-teal-400">NORMALIZED</strong></span>
+              <span>AGENT CONNECTED: <strong class="text-purple-400">Level 6 Synced</strong></span>
+            </div>
+          </div>
+
+          <!-- PANEL 3: Knowledge Graph Relationship Visualizer -->
+          <div class="linear-spotlight hud-corners p-5 flex flex-col justify-between space-y-4">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-500 border-b border-white/5 pb-2">
+                <span class="text-teal-400 font-bold flex items-center gap-1.5">
+                  <i data-lucide="git-merge" class="w-3.5 h-3.5"></i>
+                  KNOWLEDGE GRAPH PATHS
+                </span>
+                <span class="px-2 py-0.5 rounded bg-teal-500/10 text-teal-300 border border-teal-500/20 text-[10px]">SEMANTIC TRIPLES</span>
+              </div>
+
+              <div id="l7GraphFeed" class="space-y-2 max-h-[145px] overflow-y-auto font-mono text-[10px] pr-1">
+                <div class="text-slate-500">Querying semantic triples...</div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center justify-between">
+              <span>PERSISTENCE: <strong class="text-emerald-400">WAL DB</strong></span>
+              <span>CONFIDENCE: <strong class="text-cyan-400">100%</strong></span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
       <section id="sovereignDesignations" class="space-y-6 pt-4">
         <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-white/10 pb-5">
           <div>

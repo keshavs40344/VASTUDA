@@ -135,7 +135,23 @@ class SovereignAgentFactory:
             except Exception as exc:
                 return {"tool": "event_emit", "status": "error", "error": str(exc)}
 
+        # Tool 5: Level 7 Vector Memory & Knowledge Recall
+        elif tool_name == "memory_recall":
+            query = args.get("query", "")
+            try:
+                from core.memory_engine import memory_engine
+                res = memory_engine.search_vector_memory(query, top_k=3)
+                return {
+                    "tool": "memory_recall",
+                    "status": "success",
+                    "query": query,
+                    "matches": res.get("matches", [])
+                }
+            except Exception as exc:
+                return {"tool": "memory_recall", "status": "error", "error": str(exc)}
+
         return {"tool": tool_name, "status": "unknown_tool", "error": f"Tool '{tool_name}' not registered"}
+
 
     # =========================================================================
     # MULTI-TURN REACT REASONING DISPATCHER
@@ -239,10 +255,22 @@ class SovereignAgentFactory:
                             },
                             "required": ["key"]
                         }
+                    },
+                    {
+                        "name": "memory_recall",
+                        "description": "Performs semantic vector recall on Level 7 Long-Term Memory to retrieve past experiences, facts, and architectural knowledge.",
+                        "parameters": {
+                            "type": "OBJECT",
+                            "properties": {
+                                "query": {"type": "STRING", "description": "Semantic search query to recall relevant knowledge"}
+                            },
+                            "required": ["query"]
+                        }
                     }
                 ]
             }
         ]
+
 
         system_instruction = {
             "parts": [

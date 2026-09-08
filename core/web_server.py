@@ -779,6 +779,73 @@ def get_level6_agent_history():
         "timestamp": time.time()
     }), 200
 
+# ==============================================================================
+# LAYER 7: LONG-TERM MEMORY, VECTOR SEARCH & KNOWLEDGE GRAPH APIS
+# ==============================================================================
+try:
+    from core.memory_engine import memory_engine
+except Exception as e:
+    logger.error(f"[MEMORY CORE] Init notice: {e}")
+    memory_engine = None
+
+@app.route("/api/level7/memory-status", methods=["GET"])
+def get_level7_memory_status():
+    """
+    Level 7: Long-Term Memory, Vector Search & Knowledge Graphs Telemetry.
+    Reports vector dimensions, total memories, knowledge graph triples,
+    and cosine similarity engine status.
+    """
+    if not memory_engine:
+        return jsonify({"status": "error", "message": "Memory engine uninitialized"}), 503
+    return jsonify(memory_engine.get_status()), 200
+
+@app.route("/api/level7/search", methods=["POST"])
+def search_level7_vector_memory():
+    """
+    Performs high-precision semantic vector search using Cosine Similarity.
+    """
+    if not memory_engine:
+        return jsonify({"status": "error", "message": "Memory engine uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    query = payload.get("query", "").strip()
+    top_k = int(payload.get("top_k", 4))
+    if not query:
+        return jsonify({"status": "error", "message": "Search query required"}), 400
+    
+    result = memory_engine.search_vector_memory(query=query, top_k=top_k)
+    return jsonify(result), 200
+
+@app.route("/api/level7/store", methods=["POST"])
+def store_level7_memory():
+    """
+    Embeds and stores a new experience or document into Level 7 vector memory.
+    """
+    if not memory_engine:
+        return jsonify({"status": "error", "message": "Memory engine uninitialized"}), 503
+    payload = request.get_json(silent=True) or {}
+    content = payload.get("content", "").strip()
+    category = payload.get("category", "general").strip()
+    if not content:
+        return jsonify({"status": "error", "message": "Memory content required"}), 400
+    
+    result = memory_engine.store_memory(content=content, category=category)
+    return jsonify(result), 201
+
+@app.route("/api/level7/graph", methods=["GET"])
+def query_level7_knowledge_graph():
+    """
+    Queries knowledge graph semantic triples and entity relationships.
+    """
+    if not memory_engine:
+        return jsonify({"status": "error", "message": "Memory engine uninitialized"}), 503
+    entity = request.args.get("entity", "").strip()
+    if not entity:
+        return jsonify({"status": "error", "message": "Entity parameter required"}), 400
+    
+    result = memory_engine.query_knowledge_graph(entity=entity)
+    return jsonify(result), 200
+
+
 
 
 @app.route("/api/scrape", methods=["POST"])
