@@ -231,7 +231,10 @@ def enforce_global_security_firewall():
 
 @app.after_request
 def add_security_headers(response):
-    response.headers["X-Frame-Options"] = "DENY"
+    if request.path.startswith("/api/browser/proxy"):
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    else:
+        response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
@@ -1720,7 +1723,10 @@ def inject_sovereign_security_headers(response):
     - XSS Protection: Active
     - No-Cache for Admin Surface: Ensures zero identity persistence in public browser caches
     """
-    response.headers["X-Frame-Options"] = "DENY"
+    if request.path.startswith("/api/browser/proxy"):
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    else:
+        response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
@@ -1739,6 +1745,14 @@ try:
     logger.info("[MEDIA STUDIO] Successfully mounted media_downloader Blueprint.")
 except Exception as e:
     logger.warning(f"[MEDIA STUDIO INIT] Blueprint registration notice: {e}")
+
+# Register Staunt Browser Sovereign Engine Blueprint
+try:
+    from core.staunt_browser_proxy import browser_bp
+    app.register_blueprint(browser_bp)
+    logger.info("[STAUNT BROWSER] Successfully mounted Staunt Browser Engine Blueprint.")
+except Exception as e:
+    logger.warning(f"[STAUNT BROWSER INIT] Blueprint registration notice: {e}")
 
 @app.route("/")
 @app.route("/index.html")
