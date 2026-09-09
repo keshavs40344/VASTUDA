@@ -20,10 +20,13 @@ import zipfile
 import re
 import subprocess
 import urllib.parse
+import logging
 from pathlib import Path
 from flask import Blueprint, request, jsonify, Response, stream_with_context
 
 import yt_dlp
+
+logger = logging.getLogger("media_downloader")
 
 # Detect FFmpeg executable
 def get_ffmpeg_binary():
@@ -108,12 +111,13 @@ def analyze_url():
                 info = ydl.extract_info(url, download=False)
         except Exception as e:
             err_msg = str(e)
+            print(f"[MEDIA ANALYZE ERROR] {url}: {err_msg}", flush=True)
             logger.error(f"[MEDIA ANALYZE ERROR] {url}: {err_msg}")
             if "Sign in to confirm you’re not a bot" in err_msg or "429" in err_msg:
-                return jsonify({"error": "Platform bot protection or rate-limit triggered. Please try again shortly or use another video link."}), 429
+                return jsonify({"error": "Platform bot protection or rate-limit triggered. Please try again shortly or use another video link.", "detail": err_msg[:120]}), 429
             elif "Private video" in err_msg or "Video unavailable" in err_msg:
                 return jsonify({"error": "The requested video or playlist is private, deleted, or unavailable."}), 404
-            return jsonify({"error": f"Failed to analyze URL: {err_msg[:160]}"}), 400
+            return jsonify({"error": f"Failed to analyze URL: {err_msg[:160]}", "detail": err_msg[:120]}), 400
 
         if not info:
             return jsonify({"error": "No media metadata found."}), 404
@@ -275,6 +279,7 @@ def analyze_url():
     except Exception as fatal_e:
         import traceback
         tb = traceback.format_exc()
+        print(f"[MEDIA ANALYZE FATAL ERROR] {url}: {tb}", flush=True)
         logger.error(f"[MEDIA ANALYZE FATAL ERROR] {url}: {tb}")
         return jsonify({"error": f"Media processing failed: {str(fatal_e)}", "detail": tb[-250:]}), 500
 
