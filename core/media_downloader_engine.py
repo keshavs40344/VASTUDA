@@ -70,6 +70,11 @@ def get_base_ydl_opts(quiet=True):
         'geo_bypass': True,
         'ignoreerrors': False,
         'source_address': '0.0.0.0',
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android_vr', 'web_safari', 'android', 'web']
+            }
+        },
         'http_headers': {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -101,8 +106,9 @@ def analyze_url():
             info = ydl.extract_info(url, download=False)
     except Exception as e:
         err_msg = str(e)
-        if "Sign in to confirm you’re not a bot" in err_msg:
-            return jsonify({"error": "Platform rate-limit or bot detection triggered. Please try again shortly."}), 429
+        logger.error(f"[MEDIA ANALYZE ERROR] {url}: {err_msg}")
+        if "Sign in to confirm you’re not a bot" in err_msg or "429" in err_msg:
+            return jsonify({"error": "Platform bot protection or rate-limit triggered. Please try again shortly or use another video link."}), 429
         elif "Private video" in err_msg or "Video unavailable" in err_msg:
             return jsonify({"error": "The requested video or playlist is private, deleted, or unavailable."}), 404
         return jsonify({"error": f"Failed to analyze URL: {err_msg[:160]}"}), 400
