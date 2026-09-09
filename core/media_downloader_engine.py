@@ -72,7 +72,7 @@ def get_base_ydl_opts(quiet=True):
         'source_address': '0.0.0.0',
         'extractor_args': {
             'youtube': {
-                'player_client': ['android_vr', 'web_safari', 'android', 'web']
+                'player_client': ['android_vr']
             }
         },
         'http_headers': {
