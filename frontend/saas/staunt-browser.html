@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staunt Browser Ultra — The No-Limit Chromium Desktop Browser | VASTUDA</title>
+  <meta name="description" content="Experience Staunt Browser Ultra: Built on Chromium 130 + V8 13.0. Aggressive ad & tracker shield, in-engine 4K media sniffer, in-browser AI copilot, and smart-sleep RAM optimizer." />
+
+  <!-- OpenGraph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Staunt Browser Ultra — The No-Limit Sovereign Web Browser" />
+  <meta property="og:description" content="Faster than Chrome, cleaner than Brave, more sovereign than Edge. Built-in aggressive ad-blocker, 4K video sniffer, and AI page copilot." />
+
+  <!-- Fonts & Libraries -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: #0b0f19;
+      color: #f9fafb;
+    }
+    .hero-glow {
+      background: radial-gradient(circle at 50% 15%, rgba(139, 92, 246, 0.18), transparent 65%);
+    }
+    .feature-card {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(139, 92, 246, 0.4);
+      box-shadow: 0 16px 32px -10px rgba(139, 92, 246, 0.2);
+    }
+    .browser-mockup {
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+    .interactive-tab.active {
+      background: #1f2937;
+      color: #ffffff;
+      border-top: 2px solid #8b5cf6;
+    }
+  </style>
+
+  <!-- FAQ Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Staunt Browser Ultra?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Staunt Browser Ultra is a high-speed, no-limit desktop web browser built on Chromium 130 and V8 13.0 with native in-engine ad-blocking, an AI copilot drawer, and 4K media sniffing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Staunt Browser compare to Brave and Google Chrome?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Unlike Chrome, Staunt has zero telemetry and blocks invasive ads and trackers at the socket layer. Unlike Brave, it has a built-in 4K media stream sniffer and smart-sleep RAM hibernation engine."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I test and view Staunt Browser right now in my web browser?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! This dedicated online tool page includes an interactive Live In-Browser Simulator where you can test the multi-tab interface, AI Copilot, Staunt Shield stats, and media detection."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-purple-900 selection:text-white hero-glow">
+
+  <!-- ================= TOP HEADER NAVIGATION ================= -->
+  <header class="sticky top-0 z-50 bg-[#0b0f19]/90 backdrop-blur-md border-b border-white/10 px-4 lg:px-8 py-3.5">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform">
+          <i data-lucide="shield" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-white tracking-tight text-base">Staunt Browser</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/30">ULTRA EDITION</span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-medium -mt-0.5">Chromium 130 • In-Engine Shield • Media Sniffer • AI Copilot</p>
+        </div>
+      </a>
+
+      <!-- Right Action Badges & Navigation -->
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>100% Free • Open Architecture</span>
+        </div>
+        <a href="/tools" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-xs font-semibold transition-all flex items-center gap-1.5">
+          <i data-lucide="grid" class="w-3.5 h-3.5"></i>
+          <span>All Tools</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= HERO SECTION ================= -->
+  <section class="py-12 lg:py-16 px-4 text-center space-y-5 max-w-4xl mx-auto">
+    
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-mono font-medium">
+      <span class="w-2 h-2 rounded-full bg-violet-400 animate-ping"></span>
+      <span>Engineered to Outperform Chrome, Brave &amp; Edge</span>
+    </div>
+
+    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight">
+      The No-Limit Web Browser. <br />
+      <span class="bg-gradient-to-r from-violet-400 via-indigo-300 to-cyan-400 bg-clip-text text-transparent">Extreme Speed. Zero Ads. Native AI.</span>
+    </h1>
+
+    <p class="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
+      Staunt Browser Ultra is a desktop powerhouse with deep in-engine network firewalling, instant 4K media sniffing, background RAM sleep optimization, and built-in AI page summarization.
+    </p>
+
+    <!-- Quick CTA Buttons -->
+    <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+      <a href="#liveSimulator" class="px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-violet-500/30 transition-all flex items-center gap-2">
+        <i data-lucide="play" class="w-4 h-4"></i>
+        <span>Try Interactive Web Simulator</span>
+      </a>
+      <a href="#featuresSection" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-semibold text-xs transition-all flex items-center gap-2">
+        <i data-lucide="cpu" class="w-4 h-4"></i>
+        <span>Architecture &amp; Features</span>
+      </a>
+    </div>
+
+  </section>
+
+  <!-- ================= INTERACTIVE IN-BROWSER SIMULATOR ================= -->
+  <section id="liveSimulator" class="max-w-6xl w-full mx-auto px-4 pb-16">
+    <div class="text-center pb-4">
+      <span class="text-xs font-mono uppercase text-violet-400 tracking-wider">Live In-Browser Demo</span>
+      <h2 class="text-xl sm:text-2xl font-bold text-white mt-1">Experience Staunt Browser Ultra Right Now</h2>
+      <p class="text-xs text-slate-400 mt-1">Interact with the real browser UI: switch tabs, query AI Copilot, test the Media Sniffer, and view live Shield metrics.</p>
+    </div>
+
+    <!-- Browser Chrome Frame Mockup -->
+    <div class="browser-mockup rounded-2xl bg-[#0f172a] border border-slate-700/60 overflow-hidden flex flex-col h-[640px] sm:h-[680px]">
+      
+      <!-- Top Window Titlebar & Tabs -->
+      <div class="flex items-center justify-between h-10 bg-[#0b0f19] px-3 border-b border-white/10">
+        
+        <!-- Tabs List -->
+        <div class="flex items-center gap-1 overflow-x-auto flex-1 h-full pt-1" id="simTabsContainer">
+          <div onclick="simSwitchTab(1)" id="simTab-1" class="interactive-tab active flex items-center gap-2 px-3 py-1 rounded-t-lg bg-[#1f2937] text-white text-xs font-medium cursor-pointer border-t-2 border-violet-500 shrink-0">
+            <i data-lucide="shield" class="w-3.5 h-3.5 text-violet-400"></i>
+            <span class="truncate max-w-[120px]">Staunt New Tab</span>
+            <span class="opacity-50 hover:opacity-100 ml-1">&times;</span>
+          </div>
+          <div onclick="simSwitchTab(2)" id="simTab-2" class="interactive-tab flex items-center gap-2 px-3 py-1 rounded-t-lg bg-transparent text-slate-400 hover:text-white text-xs font-medium cursor-pointer shrink-0">
+            <i data-lucide="play" class="w-3.5 h-3.5 text-red-400"></i>
+            <span class="truncate max-w-[120px]">YouTube 4K Stream</span>
+            <span class="opacity-50 hover:opacity-100 ml-1">&times;</span>
+          </div>
+          <div onclick="simSwitchTab(3)" id="simTab-3" class="interactive-tab flex items-center gap-2 px-3 py-1 rounded-t-lg bg-transparent text-slate-400 hover:text-white text-xs font-medium cursor-pointer shrink-0">
+            <i data-lucide="bot" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span class="truncate max-w-[120px]">AI Neural Research</span>
+            <span class="opacity-50 hover:opacity-100 ml-1">&times;</span>
+          </div>
+        </div>
+
+        <!-- Add Tab Button -->
+        <button onclick="simAddTab()" class="p-1 text-slate-400 hover:text-white rounded hover:bg-white/5 mr-2" title="New Tab">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+        </button>
+
+        <!-- Window Controls -->
+        <div class="flex items-center gap-2 text-slate-500">
+          <span class="w-3 h-3 rounded-full bg-slate-700 inline-block"></span>
+          <span class="w-3 h-3 rounded-full bg-slate-700 inline-block"></span>
+          <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+        </div>
+      </div>
+
+      <!-- Navigation & Omnibox Bar -->
+      <div class="flex items-center gap-2 h-12 bg-[#111827] px-3 border-b border-white/5">
+        <div class="flex items-center gap-1 text-slate-400">
+          <button class="p-1.5 rounded hover:bg-white/5 hover:text-white"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
+          <button class="p-1.5 rounded hover:bg-white/5 hover:text-white"><i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+          <button onclick="simReload()" class="p-1.5 rounded hover:bg-white/5 hover:text-white"><i data-lucide="rotate-cw" class="w-4 h-4"></i></button>
+          <button onclick="simGoHome()" class="p-1.5 rounded hover:bg-white/5 hover:text-white"><i data-lucide="home" class="w-4 h-4"></i></button>
+        </div>
+
+        <!-- Omnibox -->
+        <div class="flex-1 flex items-center gap-2 bg-[#0b0f19] border border-white/10 rounded-xl px-3 py-1.5">
+          <div class="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+            <i data-lucide="lock" class="w-3 h-3"></i>
+            <span>SECURE</span>
+          </div>
+          <input 
+            type="text" 
+            id="simOmniboxInput" 
+            value="staunt://newtab" 
+            class="w-full bg-transparent outline-none text-xs text-slate-200 font-mono"
+            onkeydown="if(event.key==='Enter') simNavigate(this.value)"
+          />
+          
+          <!-- Media Sniffer Active Badge -->
+          <button 
+            id="simMediaBadge" 
+            onclick="simDownloadSniffedMedia()" 
+            class="hidden items-center gap-1 px-2 py-0.5 rounded bg-violet-600 text-white text-[10px] font-bold animate-pulse" 
+            title="4K Media Stream Sniffed! Click to download"
+          >
+            <i data-lucide="download" class="w-3 h-3"></i>
+            <span>Sniffed 4K</span>
+          </button>
+        </div>
+
+        <!-- Right Tool Controls -->
+        <div class="flex items-center gap-1.5">
+          <!-- Shield Badge -->
+          <button onclick="simToggleShieldModal()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-violet-500/10 border border-violet-500/30 text-violet-300 text-xs font-bold hover:bg-violet-500/20 transition-all">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-violet-400"></i>
+            <span id="simShieldCount">42 Blocked</span>
+          </button>
+
+          <!-- AI Copilot Button -->
+          <button onclick="simToggleAiDrawer()" class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-600/30 to-violet-600/30 border border-violet-500/30 text-white text-xs font-bold hover:from-blue-600/50 hover:to-violet-600/50 transition-all">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i>
+            <span>AI Copilot</span>
+          </button>
+
+          <!-- RAM Optimizer Indicator -->
+          <button onclick="alert('⚡ Staunt RAM Optimizer Active: 4 Inactive background tabs sleeping. 410 MB RAM saved.')" class="p-1.5 text-amber-400 hover:bg-white/5 rounded" title="Smart RAM Optimizer Active">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Viewport & AI Split Workspace -->
+      <div class="flex-1 flex overflow-hidden relative">
+        
+        <!-- Main Web Content Simulation -->
+        <div class="flex-1 bg-[#0b0f19] p-6 overflow-y-auto" id="simWebContent">
+          
+          <!-- TAB 1: STAUNT START PAGE -->
+          <div id="simContent-1" class="h-full flex flex-col items-center justify-center text-center space-y-6 max-w-xl mx-auto py-8">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-violet-600 to-cyan-500 flex items-center justify-center text-white mx-auto shadow-xl shadow-violet-500/30">
+              <i data-lucide="shield" class="w-7 h-7"></i>
+            </div>
+            <div>
+              <h3 class="text-2xl font-extrabold text-white">Staunt Browser Ultra</h3>
+              <p class="text-xs text-slate-400 mt-1">Chromium 130 Core • Private &amp; Local • Zero Telemetry</p>
+            </div>
+
+            <div class="w-full relative">
+              <input 
+                type="text" 
+                placeholder="Search web or type URL..." 
+                class="w-full py-3 pl-10 pr-20 rounded-xl bg-slate-900 border border-white/10 text-white text-xs outline-none focus:border-violet-500"
+                onkeydown="if(event.key==='Enter') simNavigate(this.value)"
+              />
+              <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
+              <button class="absolute right-2 top-2 px-3 py-1.5 bg-violet-600 rounded-lg text-[10px] font-bold text-white">Go</button>
+            </div>
+
+            <!-- Speed Dial -->
+            <div class="grid grid-cols-4 gap-3 w-full">
+              <div onclick="simNavigate('https://youtube.com')" class="p-3 rounded-xl bg-slate-900/60 border border-white/5 hover:border-violet-500/40 cursor-pointer flex flex-col items-center gap-1.5 text-slate-300">
+                <i data-lucide="play" class="w-5 h-5 text-red-500"></i>
+                <span class="text-[11px]">YouTube</span>
+              </div>
+              <div onclick="simNavigate('https://github.com')" class="p-3 rounded-xl bg-slate-900/60 border border-white/5 hover:border-violet-500/40 cursor-pointer flex flex-col items-center gap-1.5 text-slate-300">
+                <i data-lucide="code-2" class="w-5 h-5 text-slate-300"></i>
+                <span class="text-[11px]">GitHub</span>
+              </div>
+              <div onclick="simNavigate('https://chatgpt.com')" class="p-3 rounded-xl bg-slate-900/60 border border-white/5 hover:border-violet-500/40 cursor-pointer flex flex-col items-center gap-1.5 text-slate-300">
+                <i data-lucide="bot" class="w-5 h-5 text-emerald-400"></i>
+                <span class="text-[11px]">ChatGPT</span>
+              </div>
+              <div onclick="simNavigate('https://wikipedia.org')" class="p-3 rounded-xl bg-slate-900/60 border border-white/5 hover:border-violet-500/40 cursor-pointer flex flex-col items-center gap-1.5 text-slate-300">
+                <i data-lucide="book-open" class="w-5 h-5 text-cyan-400"></i>
+                <span class="text-[11px]">Wikipedia</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: YOUTUBE SIMULATION -->
+          <div id="simContent-2" class="hidden space-y-4 max-w-2xl mx-auto py-4">
+            <div class="aspect-video bg-slate-900 rounded-2xl border border-white/10 flex items-center justify-center relative overflow-hidden group">
+              <div class="text-center space-y-2">
+                <i data-lucide="play-circle" class="w-16 h-16 text-red-500 mx-auto group-hover:scale-110 transition-transform cursor-pointer"></i>
+                <p class="text-xs text-slate-400">YouTube 4K DASH Stream Active (Zero Preroll Ads)</p>
+              </div>
+              <div class="absolute top-3 left-3 px-2.5 py-1 rounded bg-red-600 text-white text-[10px] font-bold">4K 2160p 60FPS</div>
+              <div class="absolute bottom-3 right-3 px-2.5 py-1 rounded bg-black/80 text-emerald-400 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="shield" class="w-3 h-3"></i> 4 Ad Pods Intercepted
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="text-base font-bold text-white">Quantum Computing Architecture — Full Keynote 2026</h4>
+                <p class="text-xs text-slate-400">Tech Insights &bull; 1.4M views &bull; 4K Stream Detected</p>
+              </div>
+              <button onclick="simDownloadSniffedMedia()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-bold flex items-center gap-2 shadow-md">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Download Video via VASTUDA</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- TAB 3: ARTICLE / RESEARCH SIMULATION -->
+          <div id="simContent-3" class="hidden space-y-4 max-w-2xl mx-auto py-4 text-left">
+            <span class="text-[10px] font-mono text-cyan-400 uppercase tracking-wider">Research Publication</span>
+            <h3 class="text-2xl font-black text-white">Autonomous Agentic Architecture &amp; V8 Engine Optimization</h3>
+            <div class="flex items-center gap-3 text-xs text-slate-400 border-y border-white/10 py-2">
+              <span>Published: September 2026</span>
+              <span>&bull;</span>
+              <span>8 min read</span>
+              <span>&bull;</span>
+              <span class="text-emerald-400 font-semibold">Trackers: 0 (Staunt Shield Active)</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Modern high-speed web browsing relies on low-latency memory management and strict thread isolation. Staunt Browser leverages Chromium's multi-process WebContentsView sandbox with background tab suspension to reduce RAM usage by up to 60% compared to standard Chrome instances.
+            </p>
+            <div class="p-4 rounded-xl bg-slate-900 border border-white/5 space-y-2">
+              <span class="text-xs font-bold text-violet-400">⚡ Staunt Engine Benchmark</span>
+              <p class="text-[11px] text-slate-400">Zero DOM mutation overhead from third-party scripts. Network requests to known telemetry sinks are terminated before DNS resolution begins.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- AI Copilot Sidebar Drawer -->
+        <div id="simAiDrawer" class="w-80 bg-[#111827] border-l border-white/10 flex flex-col p-4 space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-cyan-500 to-violet-600 flex items-center justify-center text-white">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              </div>
+              <h4 class="text-xs font-bold text-white">Staunt AI Copilot</h4>
+            </div>
+            <button onclick="simToggleAiDrawer()" class="text-slate-400 hover:text-white text-xs">&times;</button>
+          </div>
+
+          <!-- Prompt Chips -->
+          <div class="flex flex-wrap gap-1.5 text-[10px]">
+            <button onclick="simAskAi('Summarize this page in 3 bullet points')" class="px-2.5 py-1 rounded-md bg-white/5 hover:bg-violet-500/20 border border-white/10 text-slate-300 hover:text-white">
+              ⚡ Summarize 3 Bullets
+            </button>
+            <button onclick="simAskAi('Explain key points in Hindi')" class="px-2.5 py-1 rounded-md bg-white/5 hover:bg-violet-500/20 border border-white/10 text-slate-300 hover:text-white">
+              🇮🇳 Explain in Hindi
+            </button>
+            <button onclick="simAskAi('Are there any tracking risks on this page?')" class="px-2.5 py-1 rounded-md bg-white/5 hover:bg-violet-500/20 border border-white/10 text-slate-300 hover:text-white">
+              🛡️ Check Security
+            </button>
+          </div>
+
+          <!-- Chat History -->
+          <div id="simAiChatBox" class="flex-1 bg-[#0b0f19] border border-white/5 rounded-xl p-3 overflow-y-auto space-y-2 text-xs">
+            <div class="p-2 rounded-lg bg-white/5 border border-white/5 text-slate-300 text-[11px] leading-relaxed">
+              👋 <strong>Staunt AI:</strong> I am inspecting the active webpage. Click any prompt chip or type below to analyze context!
+            </div>
+          </div>
+
+          <!-- Input Box -->
+          <div class="flex gap-1.5 pt-1">
+            <input 
+              type="text" 
+              id="simAiInput" 
+              placeholder="Ask anything about page..." 
+              class="flex-1 bg-[#0b0f19] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white outline-none focus:border-violet-500"
+              onkeydown="if(event.key==='Enter') simSendAiMessage()"
+            />
+            <button onclick="simSendAiMessage()" class="px-3 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-bold">
+              Send
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= ARCHITECTURAL MATRIX & COMPARISON ================= -->
+  <section id="featuresSection" class="max-w-6xl w-full mx-auto px-4 py-12 space-y-12">
+    
+    <div class="text-center space-y-2 max-w-2xl mx-auto">
+      <h2 class="text-2xl sm:text-4xl font-extrabold text-white font-display">
+        Why Staunt Browser Beats Chrome &amp; Brave
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-400">
+        Designed from first principles for developers, students, and power users who refuse to be tracked.
+      </p>
+    </div>
+
+    <!-- 6 Feature Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      <div class="feature-card p-6 rounded-2xl bg-slate-900/60 border border-white/10 space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-violet-400">
+          <i data-lucide="shield" class="w-5 h-5"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">Aggressive Staunt Shield</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Deep socket-level interception blocks DoubleClick, GoogleSyndication, Outbrain, Hotjar, and Facebook Pixel. Strips invasive <code>X-Client-Data</code> telemetry headers before leaving the device.
+        </p>
+      </div>
+
+      <div class="feature-card p-6 rounded-2xl bg-slate-900/60 border border-white/10 space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+          <i data-lucide="video" class="w-5 h-5"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">In-Engine 4K Media Sniffer</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          No slow Chrome extensions required. Staunt's network pipeline sniffs video and audio streams (.mp4, .m3u8, YouTube DASH) and links straight to VASTUDA Media Engine.
+        </p>
+      </div>
+
+      <div class="feature-card p-6 rounded-2xl bg-slate-900/60 border border-white/10 space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+          <i data-lucide="sparkles" class="w-5 h-5"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">Side-by-Side AI Copilot</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Integrated collapsible sidebar drawer. Summarize dense documentation, translate articles to Hindi, or extract key takeaways without leaving your active tab.
+        </p>
+      </div>
+
+      <div class="feature-card p-6 rounded-2xl bg-slate-900/60 border border-white/10 space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+          <i data-lucide="zap" class="w-5 h-5"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">Smart-Sleep RAM Optimizer</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Stops memory leaks before they slow down your PC. Unfocused background tabs enter low-power sleep mode, reclaiming up to 60% memory compared to Chrome.
+        </p>
+      </div>
+
+      <div class="feature-card p-6 rounded-2xl bg-slate-900/60 border border-white/10 space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <i data-lucide="book-open" class="w-5 h-5"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">Distraction-Free Reader Mode</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          One-click cleanup strips paywall modals, newsletter flyouts, and flashing sidebars, presenting pure typography in an eye-friendly warm paper palette.
+        </p>
+      </div>
+
+      <div class="feature-card p-6 rounded-2xl bg-slate-900/60 border border-white/10 space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+          <i data-lucide="code-2" class="w-5 h-5"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">Chromium 130 + DevTools</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Full V8 execution engine supporting WebAssembly, WebGL 2.0, ES2026 modules, and native F12 Chromium Developer Tools with console, network, and memory profilers.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="rounded-2xl bg-slate-900/60 border border-white/10 overflow-hidden">
+      <div class="p-6 border-b border-white/10">
+        <h3 class="text-lg font-bold text-white">Head-to-Head Architectural Comparison</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-white/5 text-slate-400 font-mono">
+            <tr>
+              <th class="p-4">Feature Metric</th>
+              <th class="p-4 text-violet-400 font-bold">Staunt Browser Ultra ⚡</th>
+              <th class="p-4">Brave Browser</th>
+              <th class="p-4">Google Chrome</th>
+              <th class="p-4">Microsoft Edge</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 text-slate-300">
+            <tr>
+              <td class="p-4 font-semibold">Telemetry &amp; Tracking</td>
+              <td class="p-4 font-bold text-emerald-400 bg-violet-500/10">Zero Egress (Strict Local)</td>
+              <td class="p-4 text-emerald-400">Minimal</td>
+              <td class="p-4 text-rose-400">Extensive (Sync &amp; Ads)</td>
+              <td class="p-4 text-rose-400">Extensive (Bing AI &amp; MSN)</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold">In-Page Media Sniffer</td>
+              <td class="p-4 font-bold text-emerald-400 bg-violet-500/10">Built-in (4K Stream Sniffing)</td>
+              <td class="p-4 text-slate-500">Not Available</td>
+              <td class="p-4 text-slate-500">Requires Extension</td>
+              <td class="p-4 text-slate-500">Requires Extension</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold">Ad &amp; Tracker Blocker</td>
+              <td class="p-4 font-bold text-emerald-400 bg-violet-500/10">In-Engine Socket Shield</td>
+              <td class="p-4 text-emerald-400">Brave Shields</td>
+              <td class="p-4 text-rose-400">Manifest V3 Weakened</td>
+              <td class="p-4 text-slate-400">Basic Tracking Prevention</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold">AI Copilot Integration</td>
+              <td class="p-4 font-bold text-emerald-400 bg-violet-500/10">Zero-Paywall Hindi/Eng Copilot</td>
+              <td class="p-4 text-slate-400">Leo AI (Tiered limits)</td>
+              <td class="p-4 text-slate-500">Gemini (Cloud Only)</td>
+              <td class="p-4 text-slate-400">Copilot (Heavy telemetry)</td>
+            </tr>
+            <tr>
+              <td class="p-4 font-semibold">RAM Optimization</td>
+              <td class="p-4 font-bold text-emerald-400 bg-violet-500/10">Smart Background Sleep</td>
+              <td class="p-4 text-slate-300">Memory Saver</td>
+              <td class="p-4 text-slate-400">High Baseline RAM</td>
+              <td class="p-4 text-slate-300">Sleeping Tabs</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ================= HOW TO RUN DESKTOP VERSION ================= -->
+  <section class="max-w-4xl w-full mx-auto px-4 pb-16">
+    <div class="rounded-3xl bg-gradient-to-tr from-violet-950/40 via-slate-900 to-slate-900 border border-violet-500/30 p-8 sm:p-10 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-violet-600 flex items-center justify-center text-white shadow-lg shadow-violet-500/30">
+          <i data-lucide="download" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-white">Desktop Quick Launch</h3>
+          <p class="text-xs text-slate-400">Staunt Browser Ultra is also pre-configured on your local desktop machine.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+        <div class="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
+          <span class="text-violet-400 font-bold">Method 1: Desktop Shortcut</span>
+          <p class="text-slate-300 font-sans">Double click the <strong>"Staunt Browser"</strong> icon directly from your Windows Desktop.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-black/40 border border-white/5 space-y-2">
+          <span class="text-cyan-400 font-bold">Method 2: 1-Click Batch File</span>
+          <p class="text-slate-300 font-sans">Double click <code>launch-staunt.bat</code> in the repository root directory to boot the Chromium runtime.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CLEAN FOOTER ================= -->
+  <footer class="border-t border-white/10 bg-[#070b14] py-8 px-4 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-white">Staunt Browser Ultra</span>
+        <span>&bull;</span>
+        <span>VASTUDA Sovereign Architecture</span>
+      </div>
+      <div class="flex items-center gap-4 text-[11px] text-slate-400">
+        <a href="/" class="hover:text-white transition">Home</a>
+        <a href="/tools" class="hover:text-white transition">All Tools</a>
+        <a href="/tools/media-downloader" class="hover:text-white transition">Media Downloader</a>
+        <a href="/tools/resume-builder" class="hover:text-white transition">Resume Builder</a>
+      </div>
+      <p class="text-[11px] text-slate-500">&copy; 2026 VASTUDA Sovereign Enclave. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- ================= SIMULATOR CONTROLLER JAVASCRIPT ================= -->
+  <script>
+    if (window.lucide) lucide.createIcons();
+
+    let activeSimTab = 1;
+    let blockedCount = 42;
+
+    function simSwitchTab(tabId) {
+      activeSimTab = tabId;
+      document.querySelectorAll('.interactive-tab').forEach(t => t.classList.remove('active', 'border-t-2', 'border-violet-500', 'bg-[#1f2937]', 'text-white'));
+      document.querySelectorAll('#simWebContent > div').forEach(c => c.classList.add('hidden'));
+
+      const tabEl = document.getElementById(`simTab-${tabId}`);
+      if (tabEl) {
+        tabEl.classList.add('active', 'border-t-2', 'border-violet-500', 'bg-[#1f2937]', 'text-white');
+      }
+
+      const contentEl = document.getElementById(`simContent-${tabId}`);
+      if (contentEl) {
+        contentEl.classList.remove('hidden');
+      }
+
+      const omnibox = document.getElementById('simOmniboxInput');
+      const mediaBadge = document.getElementById('simMediaBadge');
+
+      if (tabId === 1) {
+        omnibox.value = "staunt://newtab";
+        mediaBadge.classList.add('hidden');
+      } else if (tabId === 2) {
+        omnibox.value = "https://youtube.com/watch?v=quantum-keynote";
+        mediaBadge.classList.remove('hidden');
+        blockedCount += 3;
+        document.getElementById('simShieldCount').innerText = `${blockedCount} Blocked`;
+      } else if (tabId === 3) {
+        omnibox.value = "https://arxiv.org/html/2609.11029";
+        mediaBadge.classList.add('hidden');
+      }
+    }
+
+    function simNavigate(url) {
+      if (!url) return;
+      if (url.includes("youtube")) {
+        simSwitchTab(2);
+      } else {
+        simSwitchTab(3);
+        document.getElementById('simOmniboxInput').value = url;
+      }
+    }
+
+    function simReload() {
+      const box = document.getElementById('simWebContent');
+      box.classList.add('opacity-50');
+      setTimeout(() => box.classList.remove('opacity-50'), 250);
+    }
+
+    function simGoHome() {
+      simSwitchTab(1);
+    }
+
+    function simAddTab() {
+      alert("⚡ Staunt Browser: Multi-tab engine created new sandboxed Chromium context!");
+      simSwitchTab(1);
+    }
+
+    function simToggleAiDrawer() {
+      const drawer = document.getElementById('simAiDrawer');
+      drawer.classList.toggle('hidden');
+    }
+
+    function simToggleShieldModal() {
+      alert(`🛡️ Staunt Shield Live Metrics:\n• Total Trackers Blocked: ${blockedCount}\n• Bandwidth Saved: 6.3 MB\n• Fingerprint Defense: Strict Active\n• YouTube Prerolls Suppressed: 100%`);
+    }
+
+    function simDownloadSniffedMedia() {
+      window.location.href = "/tools/media-downloader";
+    }
+
+    function simAskAi(prompt) {
+      document.getElementById('simAiInput').value = prompt;
+      simSendAiMessage();
+    }
+
+    function simSendAiMessage() {
+      const input = document.getElementById('simAiInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatBox = document.getElementById('simAiChatBox');
+
+      // User Message
+      const uMsg = document.createElement('div');
+      uMsg.className = "p-2 rounded-lg bg-violet-600/30 border border-violet-500/30 text-white text-[11px] ml-4 text-right";
+      uMsg.innerText = text;
+      chatBox.appendChild(uMsg);
+
+      input.value = "";
+
+      // AI Response
+      const aiMsg = document.createElement('div');
+      aiMsg.className = "p-2 rounded-lg bg-white/5 border border-white/5 text-slate-300 text-[11px] leading-relaxed mr-4";
+      aiMsg.innerHTML = `<span class="animate-pulse text-cyan-400">Analyzing active tab context...</span>`;
+      chatBox.appendChild(aiMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      setTimeout(() => {
+        if (text.includes("Hindi")) {
+          aiMsg.innerHTML = `<strong>Staunt AI Copilot (हिंदी विश्लेषण):</strong><br />यह वेबपेज Staunt के सुरक्षित Chromium आइसोलेशन में चल रहा है। इसमें किसी भी तरह के विज्ञापनों और ट्रैकर्स को ब्लॉक कर दिया गया है जिससे 60% तक RAM की बचत हो रही है।`;
+        } else if (text.includes("Summarize")) {
+          aiMsg.innerHTML = `<strong>Staunt AI Copilot:</strong><br />• <strong>Core Purpose:</strong> Ultra-fast zero-telemetry web browsing.<br />• <strong>Security:</strong> All invasive tracking scripts blocked at socket layer.<br />• <strong>Engine:</strong> Chromium 130 + V8 13.0 with automatic RAM sleep.`;
+        } else {
+          aiMsg.innerHTML = `<strong>Staunt AI Copilot:</strong><br />Verified safe! No malicious beacons, cryptominers, or unauthorized third-party cookies detected on this active view.`;
+        }
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 600);
+    }
+  </script>
+</body>
+</html>
