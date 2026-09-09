@@ -11,7 +11,13 @@ import logging
 import urllib.parse
 from flask import Blueprint, request, Response, jsonify
 import requests
-from bs4 import BeautifulSoup
+
+try:
+    from bs4 import BeautifulSoup
+    HAS_BS4 = True
+except Exception:
+    HAS_BS4 = False
+    BeautifulSoup = None
 
 logger = logging.getLogger("STAUNT_BROWSER_ENGINE")
 
@@ -133,97 +139,32 @@ def staunt_web_proxy():
         # 2. HTML CONTENT: REWRITE LINKS, STRIP ADS, INJECT CLIENT BRIDGE
         # -------------------------------------------------------------
         html_content = resp.text
-        soup = BeautifulSoup(html_content, "html.parser")
-
         blocked_count = 0
+        page_title = final_url
 
-        # A. Strip Ad & Tracker Scripts
-        for s in soup.find_all("script"):
-            src = s.get("src", "")
-            if src and AD_REGEX.search(src):
-                s.decompose()
-                blocked_count += 1
-            elif not src and s.string and AD_REGEX.search(s.string):
-                s.decompose()
-                blocked_count += 1
-
-        # B. Strip Ad & Tracking Iframes
-        for iframe in soup.find_all("iframe"):
-            src = iframe.get("src", "")
-            if src and AD_REGEX.search(src):
-                iframe.decompose()
-                blocked_count += 1
-
-        # C. Inject or Update <base> tag for relative asset loading
-        head = soup.find("head")
-        if not head:
-            head = soup.new_tag("head")
-            if soup.html:
-                soup.html.insert(0, head)
-
-        existing_base = head.find("base")
-        if existing_base:
-            existing_base["href"] = final_url
-        else:
-            base_tag = soup.new_tag("base", href=final_url)
-            head.insert(0, base_tag)
-
-        # D. Rewrite All Anchor Links (<a>) to route through Staunt Proxy
-        for a in soup.find_all("a", href=True):
-            href = a["href"].strip()
-            if not href.startswith(("javascript:", "mailto:", "tel:", "#", "data:")):
-                abs_href = urllib.parse.urljoin(final_url, href)
-                # Ensure we only proxy http/https
-                if abs_href.startswith(("http://", "https://")):
-                    a["href"] = f"/api/browser/proxy?url={urllib.parse.quote(abs_href)}"
-            # Never break out of the tab frame
-            a["target"] = "_self"
-
-        # E. Rewrite Form Actions to stay inside Staunt Proxy
-        for form in soup.find_all("form"):
-            action = form.get("action", "").strip()
-            method = form.get("method", "GET").upper()
-            abs_action = urllib.parse.urljoin(final_url, action) if action else final_url
-            if method == "GET":
-                # For GET forms, rewrite action to proxy endpoint with a hidden url field
-                form["action"] = "/api/browser/proxy"
-                hidden = soup.new_tag("input", type="hidden", attrs={"name": "url", "value": abs_action})
-                form.append(hidden)
-            else:
-                form["action"] = f"/api/browser/proxy?url={urllib.parse.quote(abs_action)}"
-
-        # F. Inject Staunt Sovereign Client Bridge
-        bridge_script = soup.new_tag("script", id="staunt-bridge-runtime")
-        page_title = soup.title.string.strip() if soup.title and soup.title.string else final_url
         bridge_code = f"""
         (function() {{
             window.__STAUNT_ACTIVE_URL__ = {json.dumps(final_url)};
             window.__STAUNT_BLOCKED_ADS__ = {blocked_count};
-            window.__STAUNT_PAGE_TITLE__ = {json.dumps(page_title)};
 
-            // Broadcast active page context to Staunt Browser Omnibox
             try {{
                 if (window.parent && window.parent !== window) {{
                     window.parent.postMessage({{
                         type: 'STAUNT_NAVIGATED',
                         url: window.__STAUNT_ACTIVE_URL__,
-                        title: window.__STAUNT_PAGE_TITLE__,
+                        title: document.title || window.__STAUNT_ACTIVE_URL__,
                         blocked: window.__STAUNT_BLOCKED_ADS__
                     }}, '*');
                 }}
             }} catch(e) {{}}
 
-            // Intercept dynamic link clicks & enforce frame containment
             document.addEventListener('click', function(e) {{
                 var link = e.target.closest('a');
-                if (link && link.href) {{
-                    if (link.target === '_blank') {{
-                        link.target = '_self';
-                    }}
+                if (link && link.href && link.target === '_blank') {{
+                    link.target = '_self';
                 }}
             }}, true);
 
-            // Respond to parent Staunt AI and Media Sniffer requests
             window.addEventListener('message', function(evt) {{
                 if (!evt.data || !evt.data.type) return;
                 if (evt.data.type === 'STAUNT_REQUEST_TEXT') {{
@@ -254,14 +195,94 @@ def staunt_web_proxy():
             }});
         }})();
         """
-        bridge_script.string = bridge_code
-        if soup.body:
-            soup.body.append(bridge_script)
+
+        if HAS_BS4 and BeautifulSoup:
+            soup = BeautifulSoup(html_content, "html.parser")
+
+            # A. Strip Ad & Tracker Scripts
+            for s in soup.find_all("script"):
+                src = s.get("src", "")
+                if src and AD_REGEX.search(src):
+                    s.decompose()
+                    blocked_count += 1
+                elif not src and s.string and AD_REGEX.search(s.string):
+                    s.decompose()
+                    blocked_count += 1
+
+            # B. Strip Ad & Tracking Iframes
+            for iframe in soup.find_all("iframe"):
+                src = iframe.get("src", "")
+                if src and AD_REGEX.search(src):
+                    iframe.decompose()
+                    blocked_count += 1
+
+            # C. Inject or Update <base> tag for relative asset loading
+            head = soup.find("head")
+            if not head:
+                head = soup.new_tag("head")
+                if soup.html:
+                    soup.html.insert(0, head)
+
+            existing_base = head.find("base")
+            if existing_base:
+                existing_base["href"] = final_url
+            else:
+                base_tag = soup.new_tag("base", href=final_url)
+                head.insert(0, base_tag)
+
+            # D. Rewrite All Anchor Links (<a>) to route through Staunt Proxy
+            for a in soup.find_all("a", href=True):
+                href = a["href"].strip()
+                if not href.startswith(("javascript:", "mailto:", "tel:", "#", "data:")):
+                    abs_href = urllib.parse.urljoin(final_url, href)
+                    if abs_href.startswith(("http://", "https://")):
+                        a["href"] = f"/api/browser/proxy?url={urllib.parse.quote(abs_href)}"
+                a["target"] = "_self"
+
+            # E. Rewrite Form Actions to stay inside Staunt Proxy
+            for form in soup.find_all("form"):
+                action = form.get("action", "").strip()
+                method = form.get("method", "GET").upper()
+                abs_action = urllib.parse.urljoin(final_url, action) if action else final_url
+                if method == "GET":
+                    form["action"] = "/api/browser/proxy"
+                    hidden = soup.new_tag("input", type="hidden", attrs={"name": "url", "value": abs_action})
+                    form.append(hidden)
+                else:
+                    form["action"] = f"/api/browser/proxy?url={urllib.parse.quote(abs_action)}"
+
+            # F. Inject Staunt Sovereign Client Bridge
+            bridge_script = soup.new_tag("script", id="staunt-bridge-runtime")
+            bridge_script.string = bridge_code
+            if soup.body:
+                soup.body.append(bridge_script)
+            else:
+                soup.append(bridge_script)
+
+            rendered_html = str(soup)
         else:
-            soup.append(bridge_script)
+            # Fallback pure regex rewriter
+            rendered_html = html_content
+            base_injection = f'<base href="{final_url}">'
+            if "<head" in rendered_html.lower():
+                rendered_html = re.sub(r'(<head[^>]*>)', r'\1' + base_injection, rendered_html, flags=re.I, count=1)
+            else:
+                rendered_html = base_injection + rendered_html
+
+            def rewrite_link(match):
+                prefix = match.group(1)
+                href = match.group(2)
+                suffix = match.group(3)
+                if href.startswith(('javascript:', 'mailto:', '#', 'tel:', 'data:')):
+                    return match.group(0)
+                abs_href = urllib.parse.urljoin(final_url, href)
+                proxied = f'/api/browser/proxy?url={urllib.parse.quote(abs_href)}'
+                return f'{prefix}{proxied}{suffix}'
+
+            rendered_html = re.sub(r'(<a\s+[^>]*href=["\'])([^"\']+)(["\'])', rewrite_link, rendered_html, flags=re.I)
+            rendered_html += f'\n<script id="staunt-bridge-runtime">{bridge_code}</script>'
 
         # Prepare Clean Response
-        rendered_html = str(soup)
         response = Response(rendered_html, status=resp.status_code, mimetype="text/html; charset=utf-8")
         
         # Override headers to permit seamless iframe embedding inside Staunt Browser
