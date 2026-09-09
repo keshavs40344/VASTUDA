@@ -76,7 +76,7 @@ def get_base_ydl_opts(quiet=True):
         'retries': 2,
         'extractor_args': {
             'youtube': {
-                'player_client': ['android_vr', 'android', 'web']
+                'player_client': ['android_vr']
             }
         },
         'http_headers': {
