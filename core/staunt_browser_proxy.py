@@ -199,13 +199,10 @@ def staunt_web_proxy():
         if HAS_BS4 and BeautifulSoup:
             soup = BeautifulSoup(html_content, "html.parser")
 
-            # A. Strip Ad & Tracker Scripts
+            # A. Strip Ad & Tracker Scripts (External ad network scripts only)
             for s in soup.find_all("script"):
                 src = s.get("src", "")
                 if src and AD_REGEX.search(src):
-                    s.decompose()
-                    blocked_count += 1
-                elif not src and s.string and AD_REGEX.search(s.string):
                     s.decompose()
                     blocked_count += 1
 
@@ -229,6 +226,15 @@ def staunt_web_proxy():
             else:
                 base_tag = soup.new_tag("base", href=final_url)
                 head.insert(0, base_tag)
+
+            # Ensure proper responsive viewport & natural scrolling
+            if not head.find("meta", attrs={"name": "viewport"}):
+                vp = soup.new_tag("meta", attrs={"name": "viewport", "content": "width=device-width, initial-scale=1.0"})
+                head.append(vp)
+            
+            style_patch = soup.new_tag("style", id="staunt-viewport-patch")
+            style_patch.string = "html, body { min-height: 100% !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; }"
+            head.append(style_patch)
 
             # D. Rewrite All Anchor Links (<a>) to route through Staunt Proxy
             for a in soup.find_all("a", href=True):
