@@ -1732,6 +1732,14 @@ def inject_sovereign_security_headers(response):
         response.headers["Expires"] = "0"
     return response
 
+# Register Media Downloader Engine Blueprint
+try:
+    from core.media_downloader_engine import media_bp
+    app.register_blueprint(media_bp)
+    logger.info("[MEDIA STUDIO] Successfully mounted media_downloader Blueprint.")
+except Exception as e:
+    logger.warning(f"[MEDIA STUDIO INIT] Blueprint registration notice: {e}")
+
 @app.route("/")
 @app.route("/index.html")
 def serve_index():

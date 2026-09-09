@@ -5,4 +5,5 @@ firebase-admin>=6.5.0
 requests>=2.32.0
 python-dotenv>=1.0.1
 psutil>=5.9.0
-
+yt-dlp>=2024.08.06
+imageio-ffmpeg>=0.4.9
