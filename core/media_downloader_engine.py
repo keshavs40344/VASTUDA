@@ -69,10 +69,11 @@ def get_base_ydl_opts(quiet=True):
         'no_warnings': True,
         'geo_bypass': True,
         'ignoreerrors': False,
-        'source_address': '0.0.0.0',
+        'socket_timeout': 15,
+        'retries': 2,
         'extractor_args': {
             'youtube': {
-                'player_client': ['android_vr']
+                'player_client': ['android_vr', 'android', 'web']
             }
         },
         'http_headers': {
