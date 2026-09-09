@@ -98,162 +98,184 @@ def analyze_url():
     if not url:
         return jsonify({"error": "Please enter a valid video or playlist URL."}), 400
 
-    opts = get_base_ydl_opts()
-    opts['extract_flat'] = 'in_playlist'
-
     try:
-        with yt_dlp.YoutubeDL(opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-    except Exception as e:
-        err_msg = str(e)
-        logger.error(f"[MEDIA ANALYZE ERROR] {url}: {err_msg}")
-        if "Sign in to confirm you’re not a bot" in err_msg or "429" in err_msg:
-            return jsonify({"error": "Platform bot protection or rate-limit triggered. Please try again shortly or use another video link."}), 429
-        elif "Private video" in err_msg or "Video unavailable" in err_msg:
-            return jsonify({"error": "The requested video or playlist is private, deleted, or unavailable."}), 404
-        return jsonify({"error": f"Failed to analyze URL: {err_msg[:160]}"}), 400
+        opts = get_base_ydl_opts()
+        opts['extract_flat'] = 'in_playlist'
 
-    if not info:
-        return jsonify({"error": "No media metadata found."}), 404
+        try:
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                info = ydl.extract_info(url, download=False)
+        except Exception as e:
+            err_msg = str(e)
+            logger.error(f"[MEDIA ANALYZE ERROR] {url}: {err_msg}")
+            if "Sign in to confirm you’re not a bot" in err_msg or "429" in err_msg:
+                return jsonify({"error": "Platform bot protection or rate-limit triggered. Please try again shortly or use another video link."}), 429
+            elif "Private video" in err_msg or "Video unavailable" in err_msg:
+                return jsonify({"error": "The requested video or playlist is private, deleted, or unavailable."}), 404
+            return jsonify({"error": f"Failed to analyze URL: {err_msg[:160]}"}), 400
 
-    is_playlist = info.get('_type') == 'playlist' or 'entries' in info
+        if not info:
+            return jsonify({"error": "No media metadata found."}), 404
 
-    if is_playlist:
-        entries = info.get('entries', []) or []
-        playlist_items = []
-        for idx, entry in enumerate(entries[:100], start=1):
-            if not entry:
-                continue
-            playlist_items.append({
-                "index": idx,
-                "id": entry.get("id"),
-                "title": entry.get("title", f"Video {idx}"),
-                "duration": entry.get("duration", 0),
-                "duration_string": str(round(entry.get("duration", 0) / 60, 1)) + " min" if entry.get("duration") else "N/A",
-                "url": entry.get("url") or f"https://www.youtube.com/watch?v={entry.get('id')}",
-                "thumbnail": entry.get("thumbnails")[-1]["url"] if entry.get("thumbnails") else None
+        is_playlist = info.get('_type') == 'playlist' or 'entries' in info
+
+        if is_playlist:
+            entries = info.get('entries', []) or []
+            playlist_items = []
+            for idx, entry in enumerate(entries[:100], start=1):
+                if not entry:
+                    continue
+                th = None
+                if entry.get("thumbnails") and isinstance(entry.get("thumbnails"), list):
+                    last_th = entry.get("thumbnails")[-1]
+                    if isinstance(last_th, dict):
+                        th = last_th.get("url")
+                dur = float(entry.get("duration") or 0.0)
+                playlist_items.append({
+                    "index": idx,
+                    "id": entry.get("id"),
+                    "title": entry.get("title", f"Video {idx}"),
+                    "duration": dur,
+                    "duration_string": f"{round(dur / 60, 1)} min" if dur else "N/A",
+                    "url": entry.get("url") or f"https://www.youtube.com/watch?v={entry.get('id')}",
+                    "thumbnail": th
+                })
+
+            return jsonify({
+                "type": "playlist",
+                "id": info.get("id"),
+                "title": info.get("title", "YouTube Playlist"),
+                "uploader": info.get("uploader", "Various Artists / Creator"),
+                "video_count": len(entries),
+                "thumbnail": playlist_items[0]["thumbnail"] if playlist_items else None,
+                "items": playlist_items,
+                "batch_options": [5, 10, 20, 50]
+            }), 200
+
+        # Single Video Format Matrix Extraction
+        raw_formats = info.get("formats") if isinstance(info.get("formats"), list) else []
+        duration_sec = float(info.get("duration") or 0.0)
+        video_id = str(info.get("id") or "")
+
+        # High-Definition Video Resolutions
+        desired_resolutions = [
+            ("2160p (4K Ultra HD)", 2160),
+            ("1440p (2K QHD)", 1440),
+            ("1080p (Full HD 60fps)", 1080),
+            ("720p (HD High Speed)", 720),
+            ("480p (Standard)", 480),
+            ("360p (Mobile Friendly)", 360),
+            ("240p (Low Bandwidth)", 240),
+            ("144p (Saver)", 144)
+        ]
+
+        def _get_br(x):
+            try:
+                return float(x.get('tbr') or x.get('vbr') or 0.0)
+            except Exception:
+                return 0.0
+
+        video_formats = []
+        for label, target_h in desired_resolutions:
+            matching = [f for f in raw_formats if isinstance(f, dict) and f.get('vcodec') != 'none' and f.get('height') == target_h]
+            if matching:
+                best_stream = max(matching, key=_get_br)
+                fmt_id = str(best_stream.get('format_id') or "")
+                needs_merge = best_stream.get('acodec') == 'none'
+                fps = best_stream.get('fps')
+                
+                filesize = best_stream.get('filesize') or best_stream.get('filesize_approx')
+                if not filesize and duration_sec > 0 and _get_br(best_stream) > 0:
+                    filesize = int((_get_br(best_stream) * 1024 * duration_sec) / 8)
+                
+                size_str = f"{round(float(filesize) / (1024 * 1024), 1)} MB" if filesize else "Adaptive Size"
+
+                video_formats.append({
+                    "resolution": label,
+                    "height": target_h,
+                    "fps": fps,
+                    "format_id": fmt_id,
+                    "ext": "mp4",
+                    "needs_merge": needs_merge,
+                    "filesize_approx": size_str
+                })
+
+        if not video_formats:
+            video_formats.append({
+                "resolution": "Best Available MP4",
+                "height": 720,
+                "format_id": "best",
+                "ext": "mp4",
+                "needs_merge": True,
+                "filesize_approx": "Dynamic"
             })
+
+        # Audiophile & Lossless Audio Formats
+        audio_formats = [
+            {"quality": "320 kbps (Studio MP3)", "ext": "mp3", "bitrate": "320k", "approx_size": f"{round(duration_sec * 320 / 8 / 1024, 1)} MB" if duration_sec else "Studio 320k"},
+            {"quality": "256 kbps (HQ MP3)", "ext": "mp3", "bitrate": "256k", "approx_size": f"{round(duration_sec * 256 / 8 / 1024, 1)} MB" if duration_sec else "HQ 256k"},
+            {"quality": "192 kbps (High MP3)", "ext": "mp3", "bitrate": "192k", "approx_size": f"{round(duration_sec * 192 / 8 / 1024, 1)} MB" if duration_sec else "High 192k"},
+            {"quality": "128 kbps (Standard MP3)", "ext": "mp3", "bitrate": "128k", "approx_size": f"{round(duration_sec * 128 / 8 / 1024, 1)} MB" if duration_sec else "Standard 128k"},
+            {"quality": "64 kbps (Speech / Audiobook)", "ext": "mp3", "bitrate": "64k", "approx_size": f"{round(duration_sec * 64 / 8 / 1024, 1)} MB" if duration_sec else "Compact 64k"},
+            {"quality": "Lossless WAV (Uncompressed)", "ext": "wav", "bitrate": "wav", "approx_size": f"{round(duration_sec * 1411 / 8 / 1024, 1)} MB" if duration_sec else "Lossless PCM"},
+            {"quality": "Lossless FLAC (Hi-Res Audio)", "ext": "flac", "bitrate": "flac", "approx_size": f"{round(duration_sec * 800 / 8 / 1024, 1)} MB" if duration_sec else "Hi-Res FLAC"},
+            {"quality": "Original AAC / M4A", "ext": "m4a", "bitrate": "best", "approx_size": f"{round(duration_sec * 128 / 8 / 1024, 1)} MB" if duration_sec else "Original Stream"},
+            {"quality": "OGG Vorbis", "ext": "ogg", "bitrate": "ogg", "approx_size": f"{round(duration_sec * 160 / 8 / 1024, 1)} MB" if duration_sec else "OGG Audio"}
+        ]
+
+        # Subtitles Metadata Extraction
+        subtitles_raw = info.get("subtitles") if isinstance(info.get("subtitles"), dict) else {}
+        auto_subs_raw = info.get("automatic_captions") if isinstance(info.get("automatic_captions"), dict) else {}
+        subtitle_tracks = []
+
+        for lang in subtitles_raw.keys():
+            subtitle_tracks.append({"lang": str(lang), "type": "official", "label": str(lang).upper()})
+        for lang in list(auto_subs_raw.keys())[:15]:
+            if not any(s['lang'] == str(lang) for s in subtitle_tracks):
+                subtitle_tracks.append({"lang": str(lang), "type": "auto", "label": f"{str(lang).upper()} (Auto)"})
+
+        # High-Res Thumbnail Image Links
+        thumbnails = []
+        if video_id and ("youtube.com" in url or "youtu.be" in url):
+            thumbnails = [
+                {"label": "Ultra HD (4K / 1080p)", "resolution": "1920x1080", "url": f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"},
+                {"label": "High Quality (HD)", "resolution": "640x480", "url": f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"},
+                {"label": "Medium Quality", "resolution": "320x180", "url": f"https://img.youtube.com/vi/{video_id}/mqdefault.jpg"}
+            ]
+        elif info.get("thumbnail"):
+            thumbnails = [{"label": "Original Cover", "resolution": "High Res", "url": info.get("thumbnail")}]
+
+        # Direct In-Browser Progressive Preview Stream URL
+        preview_url = None
+        direct_progressive = [f for f in raw_formats if isinstance(f, dict) and f.get('vcodec') != 'none' and f.get('acodec') != 'none' and f.get('ext') == 'mp4' and f.get('url')]
+        if direct_progressive:
+            preview_url = direct_progressive[0].get('url')
+
+        dur_m = int(duration_sec // 60) if duration_sec else 0
+        dur_s = int(duration_sec % 60) if duration_sec else 0
 
         return jsonify({
-            "type": "playlist",
-            "id": info.get("id"),
-            "title": info.get("title", "YouTube Playlist"),
-            "uploader": info.get("uploader", "Various Artists / Creator"),
-            "video_count": len(entries),
-            "thumbnail": playlist_items[0]["thumbnail"] if playlist_items else None,
-            "items": playlist_items,
-            "batch_options": [5, 10, 20, 50]
+            "type": "video",
+            "id": video_id,
+            "title": info.get("title", "YouTube Video"),
+            "uploader": info.get("uploader", "Creator"),
+            "views": info.get("view_count", 0),
+            "duration_seconds": duration_sec,
+            "duration_string": f"{dur_m}:{dur_s:02d}",
+            "thumbnail": info.get("thumbnail"),
+            "thumbnails_list": thumbnails,
+            "subtitles_available": subtitle_tracks,
+            "preview_url": preview_url,
+            "video_formats": video_formats,
+            "audio_formats": audio_formats,
+            "ffmpeg_available": bool(FFMPEG_PATH)
         }), 200
 
-    # Single Video Format Matrix Extraction
-    raw_formats = info.get("formats", [])
-    duration_sec = info.get("duration", 0)
-    video_id = info.get("id")
-
-    # High-Definition Video Resolutions
-    desired_resolutions = [
-        ("2160p (4K Ultra HD)", 2160),
-        ("1440p (2K QHD)", 1440),
-        ("1080p (Full HD 60fps)", 1080),
-        ("720p (HD High Speed)", 720),
-        ("480p (Standard)", 480),
-        ("360p (Mobile Friendly)", 360),
-        ("240p (Low Bandwidth)", 240),
-        ("144p (Saver)", 144)
-    ]
-
-    video_formats = []
-    for label, target_h in desired_resolutions:
-        matching = [f for f in raw_formats if f.get('vcodec') != 'none' and f.get('height') == target_h]
-        if matching:
-            best_stream = max(matching, key=lambda x: x.get('tbr') or x.get('vbr') or 0)
-            fmt_id = best_stream.get('format_id')
-            needs_merge = best_stream.get('acodec') == 'none'
-            fps = best_stream.get('fps')
-            
-            filesize = best_stream.get('filesize') or best_stream.get('filesize_approx')
-            if not filesize and duration_sec and best_stream.get('tbr'):
-                filesize = int((best_stream['tbr'] * 1024 * duration_sec) / 8)
-            
-            size_str = f"{round(filesize / (1024 * 1024), 1)} MB" if filesize else "Adaptive Size"
-
-            video_formats.append({
-                "resolution": label,
-                "height": target_h,
-                "fps": fps,
-                "format_id": fmt_id,
-                "ext": "mp4",
-                "needs_merge": needs_merge,
-                "filesize_approx": size_str
-            })
-
-    if not video_formats:
-        video_formats.append({
-            "resolution": "Best Available MP4",
-            "height": 720,
-            "format_id": "best",
-            "ext": "mp4",
-            "needs_merge": True,
-            "filesize_approx": "Dynamic"
-        })
-
-    # Audiophile & Lossless Audio Formats
-    audio_formats = [
-        {"quality": "320 kbps (Studio MP3)", "ext": "mp3", "bitrate": "320k", "approx_size": f"{round(duration_sec * 320 / 8 / 1024, 1)} MB" if duration_sec else "Studio 320k"},
-        {"quality": "256 kbps (HQ MP3)", "ext": "mp3", "bitrate": "256k", "approx_size": f"{round(duration_sec * 256 / 8 / 1024, 1)} MB" if duration_sec else "HQ 256k"},
-        {"quality": "192 kbps (High MP3)", "ext": "mp3", "bitrate": "192k", "approx_size": f"{round(duration_sec * 192 / 8 / 1024, 1)} MB" if duration_sec else "High 192k"},
-        {"quality": "128 kbps (Standard MP3)", "ext": "mp3", "bitrate": "128k", "approx_size": f"{round(duration_sec * 128 / 8 / 1024, 1)} MB" if duration_sec else "Standard 128k"},
-        {"quality": "64 kbps (Speech / Audiobook)", "ext": "mp3", "bitrate": "64k", "approx_size": f"{round(duration_sec * 64 / 8 / 1024, 1)} MB" if duration_sec else "Compact 64k"},
-        {"quality": "Lossless WAV (Uncompressed)", "ext": "wav", "bitrate": "wav", "approx_size": f"{round(duration_sec * 1411 / 8 / 1024, 1)} MB" if duration_sec else "Lossless PCM"},
-        {"quality": "Lossless FLAC (Hi-Res Audio)", "ext": "flac", "bitrate": "flac", "approx_size": f"{round(duration_sec * 800 / 8 / 1024, 1)} MB" if duration_sec else "Hi-Res FLAC"},
-        {"quality": "Original AAC / M4A", "ext": "m4a", "bitrate": "best", "approx_size": f"{round(duration_sec * 128 / 8 / 1024, 1)} MB" if duration_sec else "Original Stream"},
-        {"quality": "OGG Vorbis", "ext": "ogg", "bitrate": "ogg", "approx_size": f"{round(duration_sec * 160 / 8 / 1024, 1)} MB" if duration_sec else "OGG Audio"}
-    ]
-
-    # Subtitles Metadata Extraction
-    subtitles_raw = info.get("subtitles") or {}
-    auto_subs_raw = info.get("automatic_captions") or {}
-    subtitle_tracks = []
-
-    for lang in subtitles_raw.keys():
-        subtitle_tracks.append({"lang": lang, "type": "official", "label": lang.upper()})
-    for lang in list(auto_subs_raw.keys())[:15]:  # Top 15 auto caption languages
-        if not any(s['lang'] == lang for s in subtitle_tracks):
-            subtitle_tracks.append({"lang": lang, "type": "auto", "label": f"{lang.upper()} (Auto)"})
-
-    # High-Res Thumbnail Image Links
-    thumbnails = []
-    if video_id and ("youtube.com" in url or "youtu.be" in url):
-        thumbnails = [
-            {"label": "Ultra HD (4K / 1080p)", "resolution": "1920x1080", "url": f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"},
-            {"label": "High Quality (HD)", "resolution": "640x480", "url": f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"},
-            {"label": "Medium Quality", "resolution": "320x180", "url": f"https://img.youtube.com/vi/{video_id}/mqdefault.jpg"}
-        ]
-    elif info.get("thumbnail"):
-        thumbnails = [{"label": "Original Cover", "resolution": "High Res", "url": info.get("thumbnail")}]
-
-    # Direct In-Browser Progressive Preview Stream URL
-    preview_url = None
-    direct_progressive = [f for f in raw_formats if f.get('vcodec') != 'none' and f.get('acodec') != 'none' and f.get('ext') == 'mp4' and f.get('url')]
-    if direct_progressive:
-        preview_url = direct_progressive[0].get('url')
-
-    return jsonify({
-        "type": "video",
-        "id": video_id,
-        "title": info.get("title", "YouTube Video"),
-        "uploader": info.get("uploader", "Creator"),
-        "views": info.get("view_count", 0),
-        "duration_seconds": duration_sec,
-        "duration_string": f"{int(duration_sec // 60)}:{int(duration_sec % 60):02d}",
-        "thumbnail": info.get("thumbnail"),
-        "thumbnails_list": thumbnails,
-        "subtitles_available": subtitle_tracks,
-        "preview_url": preview_url,
-        "video_formats": video_formats,
-        "audio_formats": audio_formats,
-        "ffmpeg_available": bool(FFMPEG_PATH)
-    }), 200
+    except Exception as fatal_e:
+        import traceback
+        tb = traceback.format_exc()
+        logger.error(f"[MEDIA ANALYZE FATAL ERROR] {url}: {tb}")
+        return jsonify({"error": f"Media processing failed: {str(fatal_e)}", "detail": tb[-250:]}), 500
 
 
 # ==============================================================================
