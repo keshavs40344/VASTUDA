@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VASTUDA Media Studio — High-Speed YouTube & Playlist Downloader</title>
-  <meta name="description" content="Fast, clean, ad-free YouTube video, audio, and playlist downloader. True 4K/1080p DASH audio-video merging, 320kbps MP3 extraction, and batch ZIP downloads." />
+  <title>VASTUDA Media Studio Ultra — High-Performance Video, Audio & Playlist Downloader</title>
+  <meta name="description" content="The ultimate ad-free media downloader. Multi-platform extraction (YouTube, Shorts, Reels, TikTok), true 4K/1080p DASH merging, video/audio trimmer, subtitles, and 320kbps MP3/WAV/FLAC." />
 
   <!-- Fonts: Plus Jakarta Sans & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -22,7 +22,8 @@
         extend: {
           fontFamily: {
             sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
-            display: ['"Plus Jakarta Sans"', 'sans-serif']
+            display: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
           },
           colors: {
             brand: {
@@ -53,7 +54,6 @@
       background-size: 24px 24px;
     }
 
-    /* Clean input focus state */
     .search-input {
       outline: none;
       transition: all 0.2s ease;
@@ -62,7 +62,6 @@
       box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
     }
 
-    /* Pulse animation for loading skeletons */
     @keyframes pulse-slow {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.4; }
@@ -86,9 +85,9 @@
         <div>
           <div class="flex items-center gap-2">
             <span class="font-extrabold text-slate-900 tracking-tight text-base font-display">VASTUDA</span>
-            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200/60">Media Studio</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200/60">Media Studio Ultra</span>
           </div>
-          <p class="text-[11px] text-slate-500 font-medium -mt-0.5">Ad-Free • 4K DASH • Zero Disk Fill</p>
+          <p class="text-[11px] text-slate-500 font-medium -mt-0.5">Ad-Free • 4K DASH • Multi-Platform • Clip Trimmer</p>
         </div>
       </a>
 
@@ -96,10 +95,10 @@
       <div class="flex items-center gap-3">
         <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-700 text-xs font-semibold">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>FFmpeg High-Speed Muxing Active</span>
+          <span>100% Free Forever • Zero Ads</span>
         </div>
-        <a href="#faqSection" class="text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors hidden md:block">
-          How It Works
+        <a href="#comparisonSection" class="text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors hidden md:block">
+          Vs Snaptube & Y2Mate
         </a>
       </div>
 
@@ -110,19 +109,22 @@
   <section class="hero-grid-bg border-b border-slate-200/80 py-12 lg:py-16 px-4">
     <div class="max-w-4xl mx-auto text-center space-y-4">
       
-      <!-- Top Pill -->
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 border border-purple-200/70 text-purple-700 text-xs font-semibold shadow-xs">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-        Ultra-Fast YouTube Video, Audio & Playlist Extractor
+      <!-- Multi-Platform Pills -->
+      <div class="inline-flex flex-wrap items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold shadow-xs">
+        <span class="text-violet-700 font-bold flex items-center gap-1"><i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Universal Downloader:</span>
+        <span class="px-2 py-0.5 rounded bg-red-50 text-red-600 border border-red-200/60 text-[10px] font-bold">YouTube & Shorts</span>
+        <span class="px-2 py-0.5 rounded bg-pink-50 text-pink-600 border border-pink-200/60 text-[10px] font-bold">Instagram Reels</span>
+        <span class="px-2 py-0.5 rounded bg-slate-900 text-white text-[10px] font-bold">TikTok (No Watermark)</span>
+        <span class="px-2 py-0.5 rounded bg-sky-50 text-sky-600 border border-sky-200/60 text-[10px] font-bold">Twitter / X</span>
       </div>
 
       <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight font-display">
-        Download YouTube Media in <br class="hidden sm:inline" />
-        <span class="bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">True 4K & Pure 320kbps MP3</span>
+        The Pro Media Downloader <br class="hidden sm:inline" />
+        <span class="bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">True 4K, Studio MP3 & Clip Trimmer</span>
       </h1>
       
       <p class="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto font-normal">
-        Zero popups, zero server disk retention, and true DASH audio-video merging. Paste any YouTube video link or full playlist URL below.
+        Far better than Snaptube and Y2Mate. Zero ads, zero popups, in-browser video preview, custom timestamp trimming, and subtitle extraction.
       </p>
 
       <!-- Search Input Container -->
@@ -130,12 +132,12 @@
         <form onsubmit="handleAnalyze(event)" class="relative flex flex-col sm:flex-row items-center gap-2 bg-white p-2 rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200">
           
           <div class="flex items-center gap-2.5 flex-1 px-3 w-full">
-            <i data-lucide="link" class="w-5 h-5 text-slate-400 flex-shrink-0"></i>
+            <i data-lucide="link-2" class="w-5 h-5 text-slate-400 flex-shrink-0"></i>
             <input 
               type="url" 
               id="urlInput" 
               required
-              placeholder="Paste YouTube Video or Playlist link (e.g. https://www.youtube.com/watch?v=...)" 
+              placeholder="Paste YouTube, Shorts, Reels, or TikTok link..." 
               class="search-input w-full bg-transparent text-sm sm:text-base text-slate-800 placeholder:text-slate-400 py-2.5 font-medium"
             />
             <button 
@@ -165,6 +167,8 @@
           <button onclick="loadSample('https://www.youtube.com/watch?v=dQw4w9WgXcQ')" class="text-violet-600 hover:underline font-semibold">Rick Astley 4K</button>
           <span>•</span>
           <button onclick="loadSample('https://www.youtube.com/watch?v=L_LUpnjgPso')" class="text-violet-600 hover:underline font-semibold">Lofi Hip Hop Stream</button>
+          <span>•</span>
+          <button onclick="loadSample('https://www.youtube.com/shorts/aqz-KE-bpKQ')" class="text-violet-600 hover:underline font-semibold">YouTube Shorts</button>
         </div>
       </div>
 
@@ -205,30 +209,35 @@
         <div class="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
         <div>
           <p class="text-xs font-bold" id="processingText">Processing Media Stream...</p>
-          <p class="text-[11px] text-purple-700" id="processingSubtext">FFmpeg is dynamically muxing high-res DASH video and audio streams. Your browser download will trigger momentarily.</p>
+          <p class="text-[11px] text-purple-700" id="processingSubtext">FFmpeg is assembling streams or cutting your custom clip. Download will start automatically.</p>
         </div>
       </div>
     </div>
 
-    <!-- 4. SINGLE VIDEO RESULT CONTAINER -->
+    <!-- 4. SINGLE VIDEO / SHORTS RESULT CONTAINER -->
     <div id="videoResultContainer" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
       
       <!-- Video Header Card -->
       <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row gap-5 items-start">
-        <div class="relative w-full md:w-72 h-44 rounded-xl overflow-hidden bg-slate-900 flex-shrink-0 shadow-sm">
+        <div class="relative w-full md:w-72 h-44 rounded-xl overflow-hidden bg-slate-900 flex-shrink-0 shadow-sm group">
           <img id="videoThumbnail" src="" alt="Thumbnail" class="w-full h-full object-cover" />
           <div class="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 backdrop-blur-xs text-white text-[11px] font-bold rounded">
             <span id="videoDuration">--:--</span>
           </div>
+          <!-- Live Preview Trigger Overlay -->
+          <button onclick="toggleInBrowserPreview()" class="absolute inset-0 bg-black/40 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white font-bold text-xs">
+            <i data-lucide="play-circle" class="w-7 h-7"></i>
+            <span>Preview in Browser</span>
+          </button>
         </div>
 
         <div class="flex-1 space-y-2.5">
           <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200/60 text-[11px] font-bold">Single Video</span>
-            <span id="videoUploader" class="text-xs text-slate-500 font-medium">Channel Name</span>
+            <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200/60 text-[11px] font-bold" id="mediaTypeBadge">Video</span>
+            <span id="videoUploader" class="text-xs text-slate-500 font-medium">Channel / Creator</span>
           </div>
 
-          <h2 id="videoTitle" class="text-base sm:text-lg font-bold text-slate-900 leading-snug">Video Title</h2>
+          <h2 id="videoTitle" class="text-base sm:text-lg font-bold text-slate-900 leading-snug">Media Title</h2>
 
           <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 pt-1">
             <span class="flex items-center gap-1">
@@ -239,50 +248,144 @@
               <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
               <span id="videoDurationText">--</span>
             </span>
-            <span class="flex items-center gap-1 text-emerald-600 font-semibold">
-              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-              Direct Stream Ready
-            </span>
+            <button onclick="toggleInBrowserPreview()" class="inline-flex items-center gap-1 text-violet-600 hover:text-violet-800 font-semibold transition-colors">
+              <i data-lucide="play" class="w-3.5 h-3.5"></i>
+              Preview Stream
+            </button>
+          </div>
+
+          <!-- Embedded In-Browser Video Player Box (Hidden by default) -->
+          <div id="inlinePlayerBox" class="hidden pt-3 border-t border-slate-100">
+            <video id="inlineVideoPlayer" controls class="w-full max-h-64 rounded-xl bg-black shadow-inner"></video>
           </div>
         </div>
       </div>
 
-      <!-- Format Matrix Tabs -->
+      <!-- Format Matrix Navigation Tabs (5 Ultra Tabs) -->
       <div class="p-6 space-y-5">
         
-        <!-- Tab Switcher -->
-        <div class="flex items-center p-1 bg-slate-100 rounded-xl max-w-xs">
-          <button onclick="switchFormatTab('video')" id="tabBtnVideo" class="flex-1 py-1.5 rounded-lg text-xs font-bold text-violet-700 bg-white shadow-xs transition-all flex items-center justify-center gap-1.5">
+        <!-- Segmented Tab Switcher -->
+        <div class="flex items-center gap-1 p-1 bg-slate-100 rounded-xl overflow-x-auto text-xs font-semibold">
+          <button onclick="switchStudioTab('video')" id="tabBtn-video" class="matrix-tab-btn active px-3.5 py-1.5 rounded-lg text-violet-700 bg-white shadow-xs transition-all flex items-center gap-1.5 whitespace-nowrap">
             <i data-lucide="video" class="w-3.5 h-3.5"></i>
-            Video (MP4)
+            Video (MP4 4K-144p)
           </button>
-          <button onclick="switchFormatTab('audio')" id="tabBtnAudio" class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5">
+          <button onclick="switchStudioTab('audio')" id="tabBtn-audio" class="matrix-tab-btn px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5 whitespace-nowrap">
             <i data-lucide="music" class="w-3.5 h-3.5"></i>
-            Audio (MP3)
+            Audio (MP3 / Lossless)
+          </button>
+          <button onclick="switchStudioTab('trim')" id="tabBtn-trim" class="matrix-tab-btn px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5 whitespace-nowrap">
+            <i data-lucide="scissors" class="w-3.5 h-3.5 text-violet-600"></i>
+            Clip &amp; Trim
+          </button>
+          <button onclick="switchStudioTab('subtitles')" id="tabBtn-subtitles" class="matrix-tab-btn px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5 whitespace-nowrap">
+            <i data-lucide="subtitles" class="w-3.5 h-3.5"></i>
+            Subtitles (.SRT/.TXT)
+          </button>
+          <button onclick="switchStudioTab('thumbnails')" id="tabBtn-thumbnails" class="matrix-tab-btn px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5 whitespace-nowrap">
+            <i data-lucide="image" class="w-3.5 h-3.5"></i>
+            4K Thumbnails
           </button>
         </div>
 
-        <!-- Video Format Options Matrix -->
-        <div id="videoFormatsTab" class="space-y-2.5">
+        <!-- 1. VIDEO FORMATS TAB -->
+        <div id="tabContent-video" class="matrix-tab-content space-y-2.5">
           <div class="text-xs text-slate-500 flex items-center justify-between pb-1">
             <span>Choose your desired video resolution:</span>
-            <span class="text-[11px] font-medium text-purple-700">★ 1080p, 2K & 4K dynamically merged via FFmpeg</span>
+            <span class="text-[11px] font-semibold text-purple-700">★ 1080p, 2K &amp; 4K dynamically multiplexed via FFmpeg</span>
           </div>
+          <div id="videoFormatRows" class="space-y-2"></div>
+        </div>
 
-          <div id="videoFormatRows" class="space-y-2">
-            <!-- Rendered via JS -->
+        <!-- 2. AUDIO FORMATS TAB -->
+        <div id="tabContent-audio" class="matrix-tab-content hidden space-y-2.5">
+          <div class="text-xs text-slate-500 pb-1">
+            <span>Extract studio-grade audio tracks (Lossless WAV/FLAC &amp; High-Bitrate MP3):</span>
+          </div>
+          <div id="audioFormatRows" class="space-y-2"></div>
+        </div>
+
+        <!-- 3. CLIP & TRIM TAB (SNAPTUBE KILLER) -->
+        <div id="tabContent-trim" class="matrix-tab-content hidden space-y-4">
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center text-xs font-bold">
+                <i data-lucide="scissors" class="w-4 h-4"></i>
+              </span>
+              <div>
+                <h4 class="text-xs font-bold text-slate-800">Custom Timestamp Video/Audio Trimmer</h4>
+                <p class="text-[11px] text-slate-500">Download only your highlighted clip or ringtone instead of the full video.</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Start Time (mm:ss)</label>
+                <input type="text" id="trimStartTime" placeholder="00:15" value="00:00" class="search-input w-full bg-white border border-slate-200 rounded-lg p-2 font-mono text-xs" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">End Time (mm:ss)</label>
+                <input type="text" id="trimEndTime" placeholder="01:30" value="00:30" class="search-input w-full bg-white border border-slate-200 rounded-lg p-2 font-mono text-xs" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-1">Format</label>
+                <select id="trimFormatType" class="w-full bg-white border border-slate-200 rounded-lg p-2 font-semibold text-xs outline-none">
+                  <option value="video">MP4 Video Clip</option>
+                  <option value="audio">MP3 Audio Ringtone</option>
+                </select>
+              </div>
+            </div>
+
+            <button onclick="triggerTrimDownload()" class="w-full py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
+              <i data-lucide="scissors" class="w-3.5 h-3.5"></i>
+              <span>Cut &amp; Download Segment</span>
+            </button>
           </div>
         </div>
 
-        <!-- Audio Format Options Matrix -->
-        <div id="audioFormatsTab" class="hidden space-y-2.5">
-          <div class="text-xs text-slate-500 pb-1">
-            <span>Extract studio-grade audio tracks without video stream:</span>
-          </div>
+        <!-- 4. SUBTITLES & TRANSCRIPTS TAB -->
+        <div id="tabContent-subtitles" class="matrix-tab-content hidden space-y-4">
+          <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+              </span>
+              <div>
+                <h4 class="text-xs font-bold text-slate-800">Captions, Subtitles &amp; AI Transcripts</h4>
+                <p class="text-[11px] text-slate-500">Download official or auto-generated subtitles for VLC, video players, or study notes.</p>
+              </div>
+            </div>
 
-          <div id="audioFormatRows" class="space-y-2">
-            <!-- Rendered via JS -->
+            <div class="space-y-2 text-xs">
+              <label class="block text-[11px] font-semibold text-slate-600">Select Language Track:</label>
+              <select id="subtitleLangSelect" class="w-full bg-white border border-slate-200 rounded-lg p-2 font-semibold text-xs outline-none">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+
+            <div class="flex flex-wrap gap-2 pt-1">
+              <button onclick="downloadSubtitleFormat('srt')" class="flex-1 py-2 bg-white border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-xs">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                Download .SRT
+              </button>
+              <button onclick="downloadSubtitleFormat('vtt')" class="flex-1 py-2 bg-white border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-xs">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                Download .VTT
+              </button>
+              <button onclick="downloadSubtitleFormat('txt')" class="flex-1 py-2 bg-white border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600 text-slate-700 font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-xs">
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                Plain Text .TXT
+              </button>
+            </div>
           </div>
+        </div>
+
+        <!-- 5. 4K THUMBNAILS TAB -->
+        <div id="tabContent-thumbnails" class="matrix-tab-content hidden space-y-3">
+          <div class="text-xs text-slate-500 pb-1">
+            <span>Download Ultra-HD cover art and video thumbnails:</span>
+          </div>
+          <div id="thumbnailsGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
         </div>
 
       </div>
@@ -304,20 +407,22 @@
         </div>
 
         <!-- Batch Download ZIP Box -->
-        <div class="p-3.5 bg-white border border-slate-200 rounded-xl shadow-xs space-y-2.5 w-full md:w-80">
+        <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-xs space-y-3 w-full md:w-88">
           <div class="flex items-center justify-between text-xs">
             <span class="font-bold text-slate-800 flex items-center gap-1.5">
               <i data-lucide="archive" class="w-3.5 h-3.5 text-violet-600"></i>
-              Batch Download as .ZIP
+              Batch Package as .ZIP
             </span>
             <span class="text-[10px] text-slate-400">Streamable archive</span>
           </div>
 
           <div class="flex items-center gap-2">
             <select id="playlistBatchLimit" class="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-700 outline-none flex-1">
-              <option value="5">First 5 Videos (Fastest)</option>
-              <option value="10" selected>First 10 Videos (Recommended)</option>
+              <option value="selected">Selected Checkboxes Only</option>
+              <option value="5">First 5 Videos</option>
+              <option value="10" selected>First 10 Videos</option>
               <option value="20">First 20 Videos</option>
+              <option value="50">First 50 Videos</option>
             </select>
 
             <select id="playlistBatchType" class="text-xs font-semibold bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-700 outline-none">
@@ -333,52 +438,77 @@
         </div>
       </div>
 
-      <!-- Playlist Items List -->
+      <!-- Playlist Items List with Checkboxes -->
       <div class="p-6 space-y-3">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Individual Playlist Tracks</h3>
-        <div id="playlistItemsList" class="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-          <!-- Rendered via JS -->
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Select Tracks to Bundle</h3>
+          <div class="flex items-center gap-2 text-xs">
+            <button onclick="selectAllPlaylist(true)" class="text-violet-600 font-semibold hover:underline">Select All</button>
+            <span class="text-slate-300">•</span>
+            <button onclick="selectAllPlaylist(false)" class="text-slate-500 hover:underline">Deselect All</button>
+          </div>
         </div>
+        <div id="playlistItemsList" class="space-y-2 max-h-[500px] overflow-y-auto pr-1"></div>
       </div>
 
     </div>
 
-    <!-- ================= HOW IT WORKS & FAQ SECTION ================= -->
-    <section id="faqSection" class="pt-8 space-y-6">
+    <!-- ================= COMPARISON SECTION (VS SNAPTUBE & Y2MATE) ================= -->
+    <section id="comparisonSection" class="pt-8 space-y-6">
       <div class="text-center space-y-2">
-        <h3 class="text-xl font-bold text-slate-900">Why VASTUDA Media Studio is Better than Y2Mate</h3>
-        <p class="text-xs text-slate-500 max-w-xl mx-auto">Engineered for clean, safe, and true high-definition downloads without intrusive redirects.</p>
+        <h3 class="text-xl font-bold text-slate-900">Why VASTUDA Media Studio Beats Snaptube &amp; Y2Mate</h3>
+        <p class="text-xs text-slate-500 max-w-xl mx-auto">Engineered without malware, popups, or APK requirements. Pure browser-native power.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        
-        <!-- Card 1 -->
-        <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center">
-            <i data-lucide="shield-check" class="w-4 h-4"></i>
-          </div>
-          <h4 class="text-sm font-bold text-slate-900">Zero Ads & Zero Popups</h4>
-          <p class="text-xs text-slate-600 leading-relaxed">Unlike typical download sites infested with malicious ads, crypto miners, and deceptive clickbait, VASTUDA operates with pure HTTP streaming pipes.</p>
-        </div>
-
-        <!-- Card 2 -->
-        <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
-            <i data-lucide="hard-drive" class="w-4 h-4"></i>
-          </div>
-          <h4 class="text-sm font-bold text-slate-900">Zero Server Disk Fill</h4>
-          <p class="text-xs text-slate-600 leading-relaxed">Files are either piped straight through memory or created in ephemeral temp context managers that delete immediately once the stream completes.</p>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-xs space-y-2">
-          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <i data-lucide="film" class="w-4 h-4"></i>
-          </div>
-          <h4 class="text-sm font-bold text-slate-900">True 4K DASH Muxing</h4>
-          <p class="text-xs text-slate-600 leading-relaxed">YouTube separates video and audio tracks at 1080p, 2K, and 4K. VASTUDA leverages containerized FFmpeg to seamlessly multiplex them without quality loss.</p>
-        </div>
-
+      <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200 shadow-xs">
+        <table class="w-full text-left text-xs text-slate-700 border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
+              <th class="p-3.5">Feature</th>
+              <th class="p-3.5 text-violet-700 bg-violet-50/50">VASTUDA Media Studio</th>
+              <th class="p-3.5">Snaptube</th>
+              <th class="p-3.5">Y2Mate</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr>
+              <td class="p-3.5 font-bold">Intrusive Ads &amp; Popups</td>
+              <td class="p-3.5 font-bold text-emerald-600 bg-violet-50/20">Zero Ads / Clean UI</td>
+              <td class="p-3.5 text-rose-500">Heavy ads &amp; tracking</td>
+              <td class="p-3.5 text-rose-500">Deceptive popups &amp; redirects</td>
+            </tr>
+            <tr>
+              <td class="p-3.5 font-bold">1080p, 2K &amp; 4K Audio Muxing</td>
+              <td class="p-3.5 font-bold text-emerald-600 bg-violet-50/20">True FFmpeg Multiplexing</td>
+              <td class="p-3.5 text-slate-600">Limited to 1080p</td>
+              <td class="p-3.5 text-rose-500">Silent / Audio Broken</td>
+            </tr>
+            <tr>
+              <td class="p-3.5 font-bold">Clip &amp; Time Trimmer</td>
+              <td class="p-3.5 font-bold text-emerald-600 bg-violet-50/20">Built-in (mm:ss cutter)</td>
+              <td class="p-3.5 text-slate-400">Not available</td>
+              <td class="p-3.5 text-slate-400">Not available</td>
+            </tr>
+            <tr>
+              <td class="p-3.5 font-bold">Subtitles (.SRT / .TXT)</td>
+              <td class="p-3.5 font-bold text-emerald-600 bg-violet-50/20">1-Click in any language</td>
+              <td class="p-3.5 text-slate-400">Not available</td>
+              <td class="p-3.5 text-slate-400">Not available</td>
+            </tr>
+            <tr>
+              <td class="p-3.5 font-bold">Device Compatibility</td>
+              <td class="p-3.5 font-bold text-emerald-600 bg-violet-50/20">Any Browser (Desktop/iOS/Android)</td>
+              <td class="p-3.5 text-amber-600">Android APK Only</td>
+              <td class="p-3.5 text-slate-600">Web Browser</td>
+            </tr>
+            <tr>
+              <td class="p-3.5 font-bold">Server Disk Retention</td>
+              <td class="p-3.5 font-bold text-emerald-600 bg-violet-50/20">Zero (Auto-deleted on stream)</td>
+              <td class="p-3.5 text-slate-400">Local device only</td>
+              <td class="p-3.5 text-slate-600">Cached on server</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
@@ -388,11 +518,11 @@
   <footer class="border-t border-slate-200 bg-white py-6 px-4 text-center text-xs text-slate-500">
     <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
       <div class="flex items-center gap-2">
-        <span class="font-bold text-slate-800">VASTUDA Media Studio</span>
+        <span class="font-bold text-slate-800">VASTUDA Media Studio Ultra</span>
         <span>•</span>
         <span>FastAPI + yt-dlp + FFmpeg</span>
       </div>
-      <p class="text-[11px] text-slate-400">Educational & Personal Media Archiving Tool. Please respect copyright laws.</p>
+      <p class="text-[11px] text-slate-400">For personal &amp; educational archiving only. Respect copyright guidelines.</p>
     </div>
   </footer>
 
@@ -401,7 +531,6 @@
     let activeMediaData = null;
     let currentAnalyzeUrl = "";
 
-    // Paste clipboard utility
     async function pasteClipboard() {
       try {
         const text = await navigator.clipboard.readText();
@@ -429,31 +558,46 @@
       document.getElementById('loadingSkeleton').classList.add('hidden');
     }
 
-    // Tab Switcher for formats
-    function switchFormatTab(type) {
-      const btnVideo = document.getElementById('tabBtnVideo');
-      const btnAudio = document.getElementById('tabBtnAudio');
-      const tabVideo = document.getElementById('videoFormatsTab');
-      const tabAudio = document.getElementById('audioFormatsTab');
+    // Segmented Tab Switcher (5 Matrix Tabs)
+    function switchStudioTab(tabId) {
+      document.querySelectorAll('.matrix-tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.matrix-tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'text-violet-700', 'bg-white', 'shadow-xs');
+        btn.classList.add('text-slate-600');
+      });
 
-      if (type === 'video') {
-        tabVideo.classList.remove('hidden');
-        tabAudio.classList.add('hidden');
-        btnVideo.classList.add('text-violet-700', 'bg-white', 'shadow-xs');
-        btnVideo.classList.remove('text-slate-600');
-        btnAudio.classList.remove('text-violet-700', 'bg-white', 'shadow-xs');
-        btnAudio.classList.add('text-slate-600');
+      const targetContent = document.getElementById(`tabContent-${tabId}`);
+      if (targetContent) targetContent.classList.remove('hidden');
+
+      const targetBtn = document.getElementById(`tabBtn-${tabId}`);
+      if (targetBtn) {
+        targetBtn.classList.add('active', 'text-violet-700', 'bg-white', 'shadow-xs');
+        targetBtn.classList.remove('text-slate-600');
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Toggle In-Browser Preview Player
+    function toggleInBrowserPreview() {
+      const box = document.getElementById('inlinePlayerBox');
+      const player = document.getElementById('inlineVideoPlayer');
+
+      if (box.classList.contains('hidden')) {
+        if (activeMediaData && activeMediaData.preview_url) {
+          player.src = activeMediaData.preview_url;
+          box.classList.remove('hidden');
+          player.play().catch(() => {});
+        } else {
+          alert("Direct stream preview not available for this media format. Please download directly.");
+        }
       } else {
-        tabAudio.classList.remove('hidden');
-        tabVideo.classList.add('hidden');
-        btnAudio.classList.add('text-violet-700', 'bg-white', 'shadow-xs');
-        btnAudio.classList.remove('text-slate-600');
-        btnVideo.classList.remove('text-violet-700', 'bg-white', 'shadow-xs');
-        btnVideo.classList.add('text-slate-600');
+        box.classList.add('hidden');
+        player.pause();
       }
     }
 
-    // Main Analyze Form Handler
+    // Main Analyze Link Handler
     async function handleAnalyze(e) {
       if (e) e.preventDefault();
       const urlInput = document.getElementById('urlInput');
@@ -463,10 +607,10 @@
       currentAnalyzeUrl = url;
       dismissError();
 
-      // UI state: Show skeleton, hide results
       document.getElementById('loadingSkeleton').classList.remove('hidden');
       document.getElementById('videoResultContainer').classList.add('hidden');
       document.getElementById('playlistResultContainer').classList.add('hidden');
+      document.getElementById('inlinePlayerBox').classList.add('hidden');
       
       const analyzeBtn = document.getElementById('analyzeBtn');
       analyzeBtn.disabled = true;
@@ -482,7 +626,7 @@
         const data = await resp.json();
 
         if (!resp.ok) {
-          throw new Error(data.detail || "Unable to extract media information.");
+          throw new Error(data.error || "Unable to extract media information.");
         }
 
         activeMediaData = data;
@@ -495,7 +639,7 @@
         }
 
       } catch (err) {
-        showError("Analysis Failed", err.message || "Failed to analyze link. Make sure the video is public.");
+        showError("Analysis Failed", err.message || "Failed to analyze link. Please ensure video is public.");
       } finally {
         analyzeBtn.disabled = false;
         analyzeBtn.innerHTML = `<i data-lucide="search" class="w-4 h-4"></i><span>Fetch Formats</span>`;
@@ -503,23 +647,37 @@
       }
     }
 
-    // Render Single Video Result
+    // Render Single Video Formats & Tabs
     function renderVideoResult(data) {
       document.getElementById('videoThumbnail').src = data.thumbnail || '';
       document.getElementById('videoDuration').innerText = data.duration_string || '--:--';
       document.getElementById('videoDurationText').innerText = data.duration_string || '--:--';
-      document.getElementById('videoTitle').innerText = data.title || 'YouTube Video';
+      document.getElementById('videoTitle').innerText = data.title || 'Media';
       document.getElementById('videoUploader').innerText = data.uploader || 'Creator';
       document.getElementById('videoViews').innerText = Number(data.views || 0).toLocaleString();
 
-      // Render Video Formats
+      // Platform badge
+      const badge = document.getElementById('mediaTypeBadge');
+      if (currentAnalyzeUrl.includes('shorts')) {
+        badge.innerText = "YouTube Shorts";
+        badge.className = "px-2 py-0.5 rounded-md bg-red-50 text-red-700 border border-red-200/60 text-[11px] font-bold";
+      } else if (currentAnalyzeUrl.includes('instagram')) {
+        badge.innerText = "Instagram Reel";
+        badge.className = "px-2 py-0.5 rounded-md bg-pink-50 text-pink-700 border border-pink-200/60 text-[11px] font-bold";
+      } else if (currentAnalyzeUrl.includes('tiktok')) {
+        badge.innerText = "TikTok Video";
+        badge.className = "px-2 py-0.5 rounded-md bg-slate-900 text-white text-[11px] font-bold";
+      } else {
+        badge.innerText = "YouTube Video";
+        badge.className = "px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200/60 text-[11px] font-bold";
+      }
+
+      // 1. Render Video Formats
       const videoRowsContainer = document.getElementById('videoFormatRows');
       videoRowsContainer.innerHTML = '';
-
       (data.video_formats || []).forEach(fmt => {
         const row = document.createElement('div');
         row.className = "flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-violet-300 hover:bg-violet-50/20 transition-all text-xs";
-        
         const badgeColor = fmt.height >= 1080 ? "bg-purple-100 text-purple-700 border-purple-200" : "bg-slate-100 text-slate-700 border-slate-200";
 
         row.innerHTML = `
@@ -529,7 +687,7 @@
             </span>
             <div>
               <span class="font-semibold text-slate-800">${fmt.ext.toUpperCase()} Video</span>
-              <span class="text-slate-400 text-[11px] block">${fmt.needs_merge ? "Audio Merged (FFmpeg)" : "Direct Progressive"}</span>
+              <span class="text-slate-400 text-[11px] block">${fmt.needs_merge ? "Audio Multiplexed (FFmpeg)" : "Direct Stream"}</span>
             </div>
           </div>
 
@@ -547,10 +705,9 @@
         videoRowsContainer.appendChild(row);
       });
 
-      // Render Audio Formats
+      // 2. Render Audio Formats
       const audioRowsContainer = document.getElementById('audioFormatRows');
       audioRowsContainer.innerHTML = '';
-
       (data.audio_formats || []).forEach(af => {
         const row = document.createElement('div');
         row.className = "flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/20 transition-all text-xs";
@@ -561,14 +718,14 @@
             </span>
             <div>
               <span class="font-semibold text-slate-800">${escapeHtml(af.quality)}</span>
-              <span class="text-slate-400 text-[11px] block">Extracted Audio Track</span>
+              <span class="text-slate-400 text-[11px] block">High-Fidelity Audio</span>
             </div>
           </div>
 
           <div class="flex items-center gap-3">
             <span class="font-medium text-slate-500">${escapeHtml(af.approx_size)}</span>
             <button 
-              onclick="triggerAudioDownload('${escapeHtml(currentAnalyzeUrl)}', '${af.bitrate}')"
+              onclick="triggerAudioDownload('${escapeHtml(currentAnalyzeUrl)}', '${af.bitrate}', '${af.ext}')"
               class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all shadow-xs flex items-center gap-1.5"
             >
               <i data-lucide="download" class="w-3.5 h-3.5"></i>
@@ -579,14 +736,51 @@
         audioRowsContainer.appendChild(row);
       });
 
+      // 3. Render Subtitles Select
+      const subSelect = document.getElementById('subtitleLangSelect');
+      subSelect.innerHTML = '';
+      const subs = data.subtitles_available || [];
+      if (subs.length > 0) {
+        subs.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.lang;
+          opt.innerText = `${s.label} (${s.type === 'official' ? 'Official' : 'Auto-Generated'})`;
+          subSelect.appendChild(opt);
+        });
+      } else {
+        const opt = document.createElement('option');
+        opt.value = "en";
+        opt.innerText = "English (Auto)";
+        subSelect.appendChild(opt);
+      }
+
+      // 4. Render Thumbnails
+      const thumbGrid = document.getElementById('thumbnailsGrid');
+      thumbGrid.innerHTML = '';
+      (data.thumbnails_list || []).forEach(th => {
+        const card = document.createElement('div');
+        card.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-center";
+        card.innerHTML = `
+          <div class="h-28 rounded-lg overflow-hidden bg-slate-200">
+            <img src="${escapeHtml(th.url)}" alt="Cover" class="w-full h-full object-cover" />
+          </div>
+          <p class="text-xs font-bold text-slate-800">${escapeHtml(th.label)}</p>
+          <p class="text-[11px] text-slate-500 font-mono">${escapeHtml(th.resolution)}</p>
+          <a href="${escapeHtml(th.url)}" target="_blank" download="thumbnail.jpg" class="inline-flex items-center justify-center gap-1 w-full py-1.5 bg-white border border-slate-200 hover:bg-violet-50 hover:text-violet-700 text-slate-700 font-semibold text-xs rounded-lg transition-colors">
+            <i data-lucide="download" class="w-3 h-3"></i> Download Image
+          </a>
+        `;
+        thumbGrid.appendChild(card);
+      });
+
       document.getElementById('videoResultContainer').classList.remove('hidden');
       if (window.lucide) lucide.createIcons();
     }
 
-    // Render Playlist Result
+    // Render Playlist Result with Checkboxes
     function renderPlaylistResult(data) {
-      document.getElementById('playlistTitle').innerText = data.title || 'YouTube Playlist';
-      document.getElementById('playlistUploader').innerText = data.uploader || 'Playlist Creator';
+      document.getElementById('playlistTitle').innerText = data.title || 'Playlist';
+      document.getElementById('playlistUploader').innerText = data.uploader || 'Creator';
       document.getElementById('playlistCountBadge').innerText = `${data.video_count || 0} Videos Total`;
 
       const listContainer = document.getElementById('playlistItemsList');
@@ -597,6 +791,7 @@
         row.className = "flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors text-xs";
         row.innerHTML = `
           <div class="flex items-center gap-3 flex-1 min-w-0 pr-3">
+            <input type="checkbox" value="${item.index}" class="playlist-item-check w-4 h-4 rounded text-violet-600 focus:ring-violet-500 border-slate-300" checked />
             <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center text-[11px] flex-shrink-0">
               ${item.index}
             </span>
@@ -610,7 +805,7 @@
             <button onclick="triggerVideoDownload('${escapeHtml(item.url)}', '720p', 720, 'best')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-violet-50 text-slate-700 hover:text-violet-700 font-semibold border border-slate-200 transition-colors">
               MP4
             </button>
-            <button onclick="triggerAudioDownload('${escapeHtml(item.url)}', '192k')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 font-semibold border border-slate-200 transition-colors">
+            <button onclick="triggerAudioDownload('${escapeHtml(item.url)}', '192k', 'mp3')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 font-semibold border border-slate-200 transition-colors">
               MP3
             </button>
           </div>
@@ -622,28 +817,76 @@
       if (window.lucide) lucide.createIcons();
     }
 
+    function selectAllPlaylist(select) {
+      document.querySelectorAll('.playlist-item-check').forEach(chk => {
+        chk.checked = select;
+      });
+    }
+
     // Trigger Single Video Download
     function triggerVideoDownload(url, resolution, height, formatId) {
-      showProcessingBanner("Muxing & Preparing Video Download...", "FFmpeg is assembling audio and video streams. Your browser download will begin shortly.");
+      showProcessingBanner("Multiplexing & Preparing Video...", "FFmpeg is assembling audio & video streams. Your browser download will begin momentarily.");
       const downloadUrl = `/api/download/video?url=${encodeURIComponent(url)}&resolution=${encodeURIComponent(resolution)}&height=${height || ''}&format_id=${formatId || ''}`;
       window.location.href = downloadUrl;
       setTimeout(() => { hideProcessingBanner(); }, 6000);
     }
 
     // Trigger Single Audio Download
-    function triggerAudioDownload(url, bitrate) {
-      showProcessingBanner("Extracting Audio Track...", "Converting stream to high-quality audio. Download will begin shortly.");
-      const downloadUrl = `/api/download/video?url=${encodeURIComponent(url)}&is_audio=true&audio_bitrate=${encodeURIComponent(bitrate)}`;
+    function triggerAudioDownload(url, bitrate, format) {
+      showProcessingBanner("Extracting Audio Track...", `Converting stream to high-fidelity ${format.toUpperCase()} audio. Download will begin momentarily.`);
+      const downloadUrl = `/api/download/video?url=${encodeURIComponent(url)}&is_audio=true&audio_bitrate=${encodeURIComponent(bitrate)}&audio_format=${encodeURIComponent(format)}`;
       window.location.href = downloadUrl;
       setTimeout(() => { hideProcessingBanner(); }, 5000);
     }
 
+    // Trigger Clip / Trim Download
+    function triggerTrimDownload() {
+      const sTime = document.getElementById('trimStartTime').value.trim();
+      const eTime = document.getElementById('trimEndTime').value.trim();
+      const fType = document.getElementById('trimFormatType').value;
+
+      if (!sTime || !eTime) {
+        alert("Please enter both Start Time and End Time (e.g. 00:15 and 01:30).");
+        return;
+      }
+
+      showProcessingBanner("Cutting Media Clip...", `FFmpeg is seeking and cutting segment from ${sTime} to ${eTime}. Your download will begin shortly.`);
+      const isAudio = fType === 'audio';
+      const downloadUrl = `/api/download/video?url=${encodeURIComponent(currentAnalyzeUrl)}&start_time=${encodeURIComponent(sTime)}&end_time=${encodeURIComponent(eTime)}&is_audio=${isAudio}&height=720`;
+      window.location.href = downloadUrl;
+      setTimeout(() => { hideProcessingBanner(); }, 8000);
+    }
+
+    // Trigger Subtitles Download
+    function downloadSubtitleFormat(fmt) {
+      const lang = document.getElementById('subtitleLangSelect').value || 'en';
+      showProcessingBanner("Extracting Subtitle File...", `Fetching ${lang.toUpperCase()} transcript in .${fmt.toUpperCase()} format.`);
+      const downloadUrl = `/api/download/subtitles?url=${encodeURIComponent(currentAnalyzeUrl)}&lang=${encodeURIComponent(lang)}&format=${encodeURIComponent(fmt)}`;
+      window.location.href = downloadUrl;
+      setTimeout(() => { hideProcessingBanner(); }, 4000);
+    }
+
     // Trigger Playlist ZIP Download
     async function downloadPlaylistZip() {
-      const limit = parseInt(document.getElementById('playlistBatchLimit').value, 10);
+      const mode = document.getElementById('playlistBatchLimit').value;
       const formatType = document.getElementById('playlistBatchType').value;
 
-      showProcessingBanner("Building Playlist ZIP Package...", `Downloading first ${limit} items and archiving into a streamable .ZIP archive.`);
+      let limit = 10;
+      let selectedIndices = [];
+
+      if (mode === "selected") {
+        document.querySelectorAll('.playlist-item-check:checked').forEach(chk => {
+          selectedIndices.push(parseInt(chk.value, 10));
+        });
+        if (selectedIndices.length === 0) {
+          alert("Please select at least one track from the playlist checklist.");
+          return;
+        }
+      } else {
+        limit = parseInt(mode, 10) || 10;
+      }
+
+      showProcessingBanner("Assembling Playlist ZIP Package...", `Downloading items and packing into a streamable .ZIP archive. Please wait.`);
 
       try {
         const resp = await fetch('/api/download/playlist-zip', {
@@ -652,20 +895,21 @@
           body: JSON.stringify({
             url: currentAnalyzeUrl,
             format_type: formatType,
-            limit: limit
+            limit: limit,
+            items: selectedIndices.length > 0 ? selectedIndices : null
           })
         });
 
         if (!resp.ok) {
           const errData = await resp.json();
-          throw new Error(errData.detail || "Playlist ZIP creation failed.");
+          throw new Error(errData.error || "Playlist packaging failed.");
         }
 
         const blob = await resp.blob();
         const downloadUrl = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
-        a.download = `playlist_batch_${limit}_items.zip`;
+        a.download = `playlist_bundle.zip`;
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -698,7 +942,6 @@
         .replace(/'/g, "&#039;");
     }
 
-    // Initialize icons on load
     document.addEventListener('DOMContentLoaded', () => {
       if (window.lucide) lucide.createIcons();
     });
