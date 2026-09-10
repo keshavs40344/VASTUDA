@@ -17,6 +17,8 @@ from collections import defaultdict
 import math
 import socket
 import requests
+import re
+import urllib.parse
 from functools import wraps
 from flask import Flask, jsonify, request, send_from_directory, g
 from flask_cors import CORS
@@ -231,14 +233,19 @@ def enforce_global_security_firewall():
 
 @app.after_request
 def add_security_headers(response):
-    if request.path.startswith("/api/browser/proxy"):
-        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    # Dynamic Frame Unblocker: Do not restrict framing for gateway routes
+    if request.path.startswith(("/gateway", "/api/gateway", "/api/browser/proxy")):
+        response.headers.pop("Content-Security-Policy", None)
+        response.headers.pop("X-Content-Security-Policy", None)
+        response.headers["X-Frame-Options"] = "ALLOWALL"
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "*"
     else:
         response.headers["X-Frame-Options"] = "DENY"
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-XSS-Protection"] = "1; mode=block"
-    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin" 
     # High-Performance Intelligent Caching
     clean_p = request.path.lower()
     if clean_p.startswith(("/assets/", "/static/")) or any(clean_p.endswith(ext) for ext in ('.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2', '.ico')):
@@ -1834,6 +1841,155 @@ def serve_tool_site(tool_id):
             return send_from_directory(FRONTEND_DIR, cand)
 
     return jsonify({"error": "Tool Not Found", "address": f"/tools/{tool_id}"}), 404
+
+
+# ==============================================================================
+# DYNAMIC FRAME-UNBLOCKER REVERSE-PROXY GATEWAY (/gateway & /api/gateway)
+# ==============================================================================
+@app.route("/gateway", methods=["GET", "POST", "HEAD", "OPTIONS"])
+@app.route("/api/gateway", methods=["GET", "POST", "HEAD", "OPTIONS"])
+def handle_gateway_proxy():
+    """
+    High-Performance, Low-Latency Reverse-Proxy Gateway:
+    - Strips X-Frame-Options, Content-Security-Policy, Frame-Options on the fly.
+    - Injects Access-Control-Allow-Origin: * to allow cross-origin embed assets.
+    - Rewrites HTML documents with <base href="..."> to resolve relative paths.
+    - Injects child navigation postMessage interceptors for seamless in-frame browsing.
+    """
+    if request.method == "OPTIONS":
+        resp = app.response_class("", status=204)
+        resp.headers["Access-Control-Allow-Origin"] = "*"
+        resp.headers["Access-Control-Allow-Methods"] = "GET, POST, HEAD, OPTIONS"
+        resp.headers["Access-Control-Allow-Headers"] = "*"
+        return resp
+
+    target_param = request.args.get("url") or request.args.get("target")
+    if not target_param:
+        return jsonify({
+            "status": "error",
+            "code": "MISSING_URL",
+            "message": "Gateway requires target URL parameter (e.g. /gateway?url=https://news.ycombinator.com)"
+        }), 400
+
+    target_url = target_param.strip()
+    if not re.match(r"^https?://", target_url, re.IGNORECASE):
+        target_url = "https://" + target_url
+
+    parsed_target = urllib.parse.urlparse(target_url)
+    target_origin = f"{parsed_target.scheme}://{parsed_target.netloc}"
+
+    # Prepare outbound request headers
+    req_headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        "Accept": request.headers.get("Accept", "*/*"),
+        "Accept-Language": request.headers.get("Accept-Language", "en-US,en;q=0.9"),
+    }
+
+    try:
+        data_payload = request.get_data() if request.method in ("POST", "PUT", "PATCH") else None
+        upstream = requests.request(
+            method=request.method,
+            url=target_url,
+            headers=req_headers,
+            data=data_payload,
+            timeout=15,
+            allow_redirects=True,
+            verify=False
+        )
+
+        content_type = upstream.headers.get("Content-Type", "").lower()
+        response_data = upstream.content
+
+        # For HTML responses, rewrite relative paths and inject client message bridge
+        if "text/html" in content_type:
+            try:
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(upstream.content, "html.parser")
+
+                # Inject <base href="..."> if not present
+                if not soup.find("base") and soup.head:
+                    base_tag = soup.new_tag("base", href=target_url)
+                    soup.head.insert(0, base_tag)
+
+                # Inject in-page navigation interceptor
+                nav_script = soup.new_tag("script")
+                nav_script.string = """
+                (function() {
+                  document.addEventListener('click', function(e) {
+                    var a = e.target.closest('a');
+                    if (a && a.href && !a.href.startsWith('javascript:') && !a.href.startsWith('#')) {
+                      e.preventDefault();
+                      if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({ type: 'STAUNT_NAVIGATE', url: a.href }, '*');
+                      } else {
+                        window.location.href = '/gateway?url=' + encodeURIComponent(a.href);
+                      }
+                    }
+                  }, true);
+                })();
+                """
+                if soup.body:
+                    soup.body.append(nav_script)
+
+                response_data = str(soup).encode("utf-8")
+            except Exception as transform_err:
+                logger.warning(f"[GATEWAY HTML TRANSFORM WARNING] {transform_err}")
+                response_data = upstream.content
+
+        resp = app.response_class(
+            response=response_data,
+            status=upstream.status_code,
+            mimetype=content_type.split(";")[0] if content_type else "text/html"
+        )
+
+        # Forward safe response headers while stripping all frame-blocking policies
+        EXCLUDED_HEADERS = {
+            "x-frame-options", "content-security-policy", "content-security-policy-report-only",
+            "frame-options", "content-encoding", "transfer-encoding", "content-length",
+            "cross-origin-opener-policy", "cross-origin-embedder-policy", "cross-origin-resource-policy"
+        }
+
+        for k, v in upstream.headers.items():
+            if k.lower() not in EXCLUDED_HEADERS:
+                resp.headers[k] = v
+
+        # Unconditionally enforce frame allowance & CORS
+        resp.headers["Access-Control-Allow-Origin"] = "*"
+        resp.headers["Access-Control-Allow-Methods"] = "GET, POST, HEAD, OPTIONS"
+        resp.headers["Access-Control-Allow-Headers"] = "*"
+        resp.headers["X-Frame-Options"] = "ALLOWALL"
+
+        return resp
+
+    except requests.exceptions.RequestException as req_err:
+        logger.error(f"[GATEWAY REQUEST ERROR] {target_url} : {req_err}")
+        # In-canvas styled native error prompt
+        error_html = f"""<!DOCTYPE html>
+        <html><head><meta charset="UTF-8"><title>Staunt Core • Connection Dropped</title>
+        <style>
+          body {{ margin:0; height:100vh; display:flex; align-items:center; justify-content:center; background:#090a0f; color:#fff; font-family:-apple-system,BlinkMacSystemFont,sans-serif; }}
+          .error-card {{ background:rgba(18,20,29,0.85); border:0.5px solid rgba(255,255,255,0.1); border-radius:14px; padding:32px; text-align:center; max-width:420px; box-shadow:0 12px 30px rgba(0,0,0,0.5); }}
+          .error-icon {{ width:48px; height:48px; border-radius:50%; background:rgba(239,68,68,0.15); color:#ef4444; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }}
+          h2 {{ font-size:18px; font-weight:600; margin-bottom:8px; }}
+          p {{ font-size:13px; color:rgba(255,255,255,0.5); line-height:1.5; margin-bottom:20px; }}
+          .retry-btn {{ background:#8b5cf6; border:none; color:#fff; padding:9px 20px; font-size:13px; font-weight:500; border-radius:8px; cursor:pointer; }}
+          .retry-btn:hover {{ background:#7c3aed; }}
+        </style></head>
+        <body>
+          <div class="error-card">
+            <div class="error-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <h2>Unable to Connect</h2>
+            <p>The destination site dropped connection or timed out.<br><small style="color:rgba(255,255,255,0.35);">{target_url}</small></p>
+            <button class="retry-btn" onclick="window.location.reload()">Retry Navigation</button>
+          </div>
+        </body></html>"""
+        resp = app.response_class(error_html, status=502, mimetype="text/html")
+        resp.headers["Access-Control-Allow-Origin"] = "*"
+        resp.headers["X-Frame-Options"] = "ALLOWALL"
+        return resp
+
 
 @app.route("/<path:path>")
 def serve_static(path):

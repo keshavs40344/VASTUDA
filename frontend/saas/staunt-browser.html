@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="description" content="Staunt Core — Authentic Apple Sequoia-grade Tri-Tier Cross-Platform Browser Engine." />
+  <meta name="description" content="Staunt Web-Core — Authentic Apple Sequoia-grade Tri-Tier Browser Engine with Reverse-Proxy Gateway." />
   <title>Staunt Core</title>
 
   <style>
@@ -21,6 +21,7 @@
       --accent-purple: #8b5cf6;
       --accent-blue: #0a84ff;
       --accent-emerald: #30d158;
+      --accent-red: #ff453a;
       --system-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Inter, Arial, sans-serif;
       
       /* Tier 1 Defaults (Desktop >= 1025px) */
@@ -79,7 +80,7 @@
       transform: scale(0.92);
     }
 
-    /* Animated Loading Progress Line */
+    /* Hardware-Accelerated Top Loading Progress Line */
     .viewport-progress-bar {
       position: fixed;
       top: var(--header-height);
@@ -88,7 +89,7 @@
       height: 2px;
       background: linear-gradient(90deg, #8b5cf6, #0a84ff, #30d158);
       z-index: 10000;
-      transition: width 0.3s ease, opacity 0.4s ease;
+      transition: width 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.4s ease;
       pointer-events: none;
     }
 
@@ -108,14 +109,14 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 12px;
+      padding: 0 14px;
       z-index: 9999;
       -webkit-app-region: drag;
     }
 
     @media (max-width: 680px) {
       .top-navigation-bar {
-        display: none; /* Auto-hidden on mobile smartphone */
+        display: none !important;
       }
     }
 
@@ -126,21 +127,19 @@
       -webkit-app-region: no-drag;
     }
 
-    /* Native macOS Traffic Lights (Desktop Only) */
     .traffic-lights {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
     }
     @media (max-width: 1024px) {
-      .traffic-lights { display: none; } /* Hidden on tablet / touch */
+      .traffic-lights { display: none; }
     }
 
     .traffic-dot {
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      border: 0.5px solid rgba(0, 0, 0, 0.25);
       cursor: pointer;
     }
     .dot-close { background-color: #ff5f56; }
@@ -254,43 +253,40 @@
     .tab-counter-pill {
       min-width: 24px;
       height: 24px;
-      border-radius: 7px;
+      padding: 0 6px;
+      border-radius: 6px;
       background: rgba(255, 255, 255, 0.08);
       border: 0.5px solid var(--border-highlight);
       color: var(--text-main);
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 5px;
-    }
-    .tab-counter-pill:hover {
-      background: rgba(255, 255, 255, 0.16);
     }
 
     /* ==========================================================================
-       3. TIER 3 MOBILE BOTTOM-DOCKED BAR (<= 680px, Ergonomic Thumb Arc)
+       3. TIER 3: MOBILE SMARTPHONE BOTTOM DOCK (<= 680px)
        ========================================================================== */
     .mobile-bottom-dock {
       display: none;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom, 0px));
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      background: var(--bg-frosted);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
-      border-top: 0.5px solid var(--border-highlight);
-      z-index: 9999;
-      transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
     }
 
     @media (max-width: 680px) {
       .mobile-bottom-dock {
         display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom, 0px));
+        background: var(--bg-frosted);
+        backdrop-filter: blur(30px) saturate(190%);
+        -webkit-backdrop-filter: blur(30px) saturate(190%);
+        border-top: 0.5px solid var(--border-highlight);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        z-index: 9999;
+        transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
       }
     }
 
@@ -355,7 +351,7 @@
     }
 
     /* ==========================================================================
-       4. VIEWPORT HOST (Direct Webview / Fallback Container)
+       4. VIEWPORT HOST (Direct Webview / Standalone Container)
        ========================================================================== */
     .viewport-stage-container {
       position: absolute;
@@ -381,6 +377,88 @@
       border: none;
       display: block;
       background: #ffffff;
+    }
+
+    /* Native In-Canvas Error State Container */
+    .viewport-error-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-obsidian);
+      background-image: radial-gradient(ellipse at 50% 30%, #171926 0%, #090a0f 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 20;
+    }
+
+    .error-card {
+      background: rgba(18, 20, 29, 0.88);
+      border: 0.5px solid var(--border-highlight);
+      border-radius: 16px;
+      padding: 36px 28px;
+      text-align: center;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(28px);
+    }
+
+    .error-icon-wrapper {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--accent-red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .error-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .error-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 20px;
+      word-break: break-all;
+    }
+
+    .error-actions-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .btn-error-retry {
+      background: var(--accent-purple);
+      border: none;
+      color: #fff;
+      padding: 10px 22px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+    .btn-error-home {
+      background: rgba(255, 255, 255, 0.08);
+      border: 0.5px solid var(--border-highlight);
+      color: var(--text-main);
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 9px;
+      cursor: pointer;
     }
 
     /* ==========================================================================
@@ -416,12 +494,14 @@
     }
 
     .context-date-label {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 400;
       color: var(--text-muted);
-      letter-spacing: -0.01em;
-      margin-bottom: 36px;
-      text-align: center;
+      letter-spacing: 0.01em;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 680px) {
+      .context-date-label { margin-bottom: 24px; }
     }
 
     .favorites-section {
@@ -432,24 +512,23 @@
     .favorites-section-header {
       font-size: 11.5px;
       font-weight: 600;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      margin-bottom: 16px;
-      padding-left: 10px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      padding-left: 6px;
     }
 
-    /* Tri-Tier Favorites Grid: 4x2 Desktop, 4x2 Tablet, 2x4 / 3x2 Mobile */
     .favorites-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr); /* 4x2 on Desktop / Tablet */
-      gap: 20px 14px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px 16px;
       justify-items: center;
     }
     @media (max-width: 680px) {
       .favorites-grid {
-        grid-template-columns: repeat(3, 1fr); /* 3x2 / 2x4 on Smartphone */
-        gap: 22px 10px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px 10px;
       }
     }
 
@@ -457,12 +536,15 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-decoration: none;
-      color: inherit;
-      width: 78px;
+      gap: 9px;
+      cursor: pointer;
+      width: 80px;
+    }
+    .favorite-tile:hover .squircle {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
     }
 
-    /* 56x56 Squircle */
     .squircle {
       width: 56px;
       height: 56px;
@@ -470,24 +552,21 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.40);
-      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
-      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s ease;
     }
-    .favorite-tile:hover .squircle {
-      transform: scale(1.08);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
-    }
-    .favorite-tile:active .squircle {
-      transform: scale(0.94);
+    @media (max-width: 680px) {
+      .squircle {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+      }
     }
 
     .tile-name {
       font-size: 12px;
       font-weight: 400;
       color: var(--text-main);
-      opacity: 0.85;
-      margin-top: 8px;
       text-align: center;
       white-space: nowrap;
       overflow: hidden;
@@ -624,7 +703,7 @@
 </head>
 <body>
 
-  <!-- Viewport Loading Progress Line -->
+  <!-- Hardware-Accelerated Top Loading Progress Line -->
   <div class="viewport-progress-bar" id="progressBar"></div>
 
   <!-- ==========================================================================
@@ -649,6 +728,9 @@
         </button>
         <button class="nav-glyph-btn" id="btnDeskReload" title="Reload (⌘R)" aria-label="Reload">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+        </button>
+        <button class="nav-glyph-btn" id="btnDeskHome" title="Home (Start Canvas)" aria-label="Home">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </button>
       </div>
     </div>
@@ -681,7 +763,7 @@
        ========================================================================== -->
   <main class="viewport-stage-container" id="stageContainer">
     
-    <!-- Minimalist Start Canvas (Shown on newtab) -->
+    <!-- Minimalist Start Canvas (Shown on newtab / home) -->
     <div class="start-canvas" id="startCanvas">
       <div class="digital-clock-time" id="digitalClock">09:41</div>
       <div class="context-date-label" id="contextDate">Good Morning • Thursday, Sep 10</div>
@@ -703,7 +785,7 @@
           <!-- 2. Bing -->
           <div class="favorite-tile" onclick="execNavigate('https://www.bing.com')">
             <div class="squircle" style="background: #008373;">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="#ffffff"><path d="M5 3v18l5-3 6 3 3-5-6-3V7l-8-4z"/></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff"><path d="M5.4 0v24l6.6-3.8 6.6-4.6-4.8-1.8-4.4 2.8V6.2L5.4 0z"/></svg>
             </div>
             <span class="tile-name">Bing</span>
           </div>
@@ -711,15 +793,15 @@
           <!-- 3. ChatGPT -->
           <div class="favorite-tile" onclick="execNavigate('https://chatgpt.com')">
             <div class="squircle" style="background: #10a37f;">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 4a6 6 0 1 0 0 12A6 6 0 0 0 12 6z"/></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494z"/></svg>
             </div>
             <span class="tile-name">ChatGPT</span>
           </div>
 
           <!-- 4. GitHub -->
           <div class="favorite-tile" onclick="execNavigate('https://github.com')">
-            <div class="squircle" style="background: #24292e; border: 0.5px solid rgba(255,255,255,0.15);">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            <div class="squircle" style="background: #24292e;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
             </div>
             <span class="tile-name">GitHub</span>
           </div>
@@ -760,8 +842,23 @@
       </section>
     </div>
 
-    <!-- Fallback isolated frame for Web / Mobile / Tablet standalone -->
-    <iframe id="webStageFrame" class="viewport-iframe hidden" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    <!-- Active Viewport Frame for Web & Gateway Forwarding -->
+    <iframe id="webStageFrame" class="viewport-iframe hidden" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
+
+    <!-- Native-Styled Error Interceptor Container -->
+    <div id="errorOverlay" class="viewport-error-overlay hidden">
+      <div class="error-card">
+        <div class="error-icon-wrapper">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h2 class="error-title">Connection Dropped</h2>
+        <p class="error-desc" id="errorDescription">The destination server dropped connection or took too long to respond.</p>
+        <div class="error-actions-group">
+          <button class="btn-error-retry" onclick="triggerReload()">Retry</button>
+          <button class="btn-error-home" onclick="triggerHome()">Return Home</button>
+        </div>
+      </div>
+    </div>
 
   </main>
 
@@ -785,62 +882,51 @@
         <input type="text" id="mobInput" class="mobile-omnibox-input hidden" placeholder="Search or enter website name" autocomplete="off" spellcheck="false" />
       </div>
 
-      <button class="mobile-dock-btn" id="btnMobTabCount" aria-label="Tabs">
-        <div style="min-width:20px; height:20px; border-radius:6px; border:1px solid var(--border-highlight); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; padding:0 3px;">
-          <span id="mobBadge">1</span>
-        </div>
+      <button class="mobile-dock-btn" id="btnMobHome" aria-label="Home">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
       </button>
 
-      <button class="mobile-dock-btn" id="btnMobNewTab" aria-label="New Tab">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      <button class="tab-counter-pill" id="btnMobTabCount" title="Show Tabs">
+        <span id="mobBadge">1</span>
       </button>
     </div>
   </nav>
 
   <!-- ==========================================================================
-       TAB OVERVIEW & TABLET 2-COLUMN DRAWER OVERLAY
+       TAB OVERVIEW MODAL (Full Grid & Tablet 2-Column Drawer)
        ========================================================================== -->
   <div class="tab-overview-overlay hidden" id="overviewOverlay">
     <div class="overview-top-bar">
-      <span class="overview-heading">Open Tabs</span>
-      <div style="display:flex; align-items:center; gap:8px;">
+      <h2 class="overview-heading">Active Tabs</h2>
+      <div style="display:flex; gap:10px;">
         <button class="overview-action-btn" id="btnOverviewAddTab" title="New Tab">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
         </button>
         <button class="overview-action-btn" id="btnOverviewClose" title="Done">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
     </div>
     <div class="overview-grid" id="tabsGridContainer"></div>
   </div>
 
-  <!-- ==========================================================================
-       INTERACTION LOGIC (VANILLA JS, RESILIENT DUAL-MODE ENGINE)
-       ========================================================================== -->
   <script>
     (function() {
       'use strict';
 
-      // 1. DUAL-MODE RUNTIME DETECTION
-      const isElectron = Boolean(
-        window.stauntSecureBridge || 
-        window.stauntAPI || 
-        (window.process && window.process.type) || 
-        (typeof require === 'function' && window.require)
-      );
-
-      // Local Tab State Storage (Synced for Standalone Web & Electron)
-      let tabs = [
-        { id: 1, url: 'staunt://newtab', title: 'Favorites', active: true }
-      ];
-      let activeTabId = 1;
+      // 1. STATE & PLATFORM INITIALIZATION
+      const isElectron = !!(window.stauntAPI || window.stauntSecureBridge || (window.process && window.process.type));
       let currentUrl = '';
+      let activeTabId = Date.now();
+      let tabs = [{ id: activeTabId, url: 'staunt://newtab', title: 'Favorites', active: true }];
       let isOverviewOpen = false;
 
       // DOM Elements
+      const stageContainer = document.getElementById('stageContainer');
       const startCanvas = document.getElementById('startCanvas');
       const webStageFrame = document.getElementById('webStageFrame');
+      const errorOverlay = document.getElementById('errorOverlay');
+      const errorDescription = document.getElementById('errorDescription');
       const progressBar = document.getElementById('progressBar');
 
       // Desktop Elements
@@ -862,10 +948,10 @@
       const overviewOverlay = document.getElementById('overviewOverlay');
       const tabsGridContainer = document.getElementById('tabsGridContainer');
 
-      // 2. DYNAMIC DIGITAL CLOCK & CONTEXT DATE
+      // 2. REAL-TIME CLOCK & CONTEXTUAL GREETING
       function updateClock() {
         const now = new Date();
-        let hours = now.getHours();
+        const hours = now.getHours();
         const mins = String(now.getMinutes()).padStart(2, '0');
         const timeStr = `${hours % 12 || 12}:${mins}`;
         document.getElementById('digitalClock').textContent = timeStr;
@@ -901,15 +987,25 @@
         return `https://html.duckduckgo.com/html/?q=${encodeURIComponent(trimmed)}`;
       }
 
+      // Helper: Format Gateway Route for in-process unblocked framing
+      function getGatewayUrl(targetUrl) {
+        if (!targetUrl || targetUrl === 'staunt://newtab') return 'about:blank';
+        // In web mode, route through /gateway?url=
+        return `/gateway?url=${encodeURIComponent(targetUrl)}`;
+      }
+
       // 4. DUAL-MODE NAVIGATION DISPATCHER
       window.execNavigate = function(input) {
         const target = parseUserInput(input);
         currentUrl = target === 'staunt://newtab' ? '' : target;
 
+        // Hide error overlay upon navigation
+        errorOverlay.classList.add('hidden');
+
         // Progress bar visual loading trigger
-        progressBar.style.width = '35%';
         progressBar.style.opacity = '1';
-        setTimeout(() => { progressBar.style.width = '75%'; }, 200);
+        progressBar.style.width = '30%';
+        setTimeout(() => { progressBar.style.width = '70%'; }, 250);
 
         if (isElectron) {
           // Native IPC Forwarding for WebContentsView
@@ -927,7 +1023,10 @@
         } else {
           startCanvas.classList.add('hidden');
           webStageFrame.classList.remove('hidden');
-          webStageFrame.src = target;
+          
+          // In web mode, load through reverse proxy gateway
+          const gatewaySrc = isElectron ? target : getGatewayUrl(target);
+          webStageFrame.src = gatewaySrc;
         }
 
         setTimeout(() => {
@@ -936,11 +1035,48 @@
             progressBar.style.opacity = '0';
             progressBar.style.width = '0%';
           }, 300);
-        }, 600);
+        }, 650);
 
         updateTabState(activeTabId, target);
         updateOmniboxDisplays(target);
       };
+
+      // 5. NAVIGATION & FALLBACK CONTROLS
+      window.triggerHome = function() {
+        execNavigate('staunt://newtab');
+      };
+
+      window.triggerReload = function() {
+        if (isElectron && window.stauntAPI?.reload) return window.stauntAPI.reload();
+        if (currentUrl) {
+          execNavigate(currentUrl);
+        } else {
+          execNavigate('staunt://newtab');
+        }
+      };
+
+      window.triggerBack = function() {
+        if (isElectron && window.stauntAPI?.goBack) return window.stauntAPI.goBack();
+        try { webStageFrame.contentWindow.history.back(); } catch(e){}
+      };
+
+      window.triggerForward = function() {
+        if (isElectron && window.stauntAPI?.goForward) return window.stauntAPI.goForward();
+        try { webStageFrame.contentWindow.history.forward(); } catch(e){}
+      };
+
+      // In-Frame Error Interceptor
+      webStageFrame.addEventListener('error', () => {
+        errorDescription.textContent = currentUrl ? `Unable to establish connection to ${currentUrl}.` : 'Failed to load page.';
+        errorOverlay.classList.remove('hidden');
+      });
+
+      // Child Frame Navigation Message Listener
+      window.addEventListener('message', (e) => {
+        if (e.data && e.data.type === 'STAUNT_NAVIGATE' && e.data.url) {
+          execNavigate(e.data.url);
+        }
+      });
 
       function updateTabState(id, url) {
         const tab = tabs.find(t => t.id === id);
@@ -983,7 +1119,7 @@
         }
       }
 
-      // 5. OMNIBOX INTERACTION (FOCUS / SELECT BEHAVIOR)
+      // 6. OMNIBOX INTERACTION (FOCUS / SELECT BEHAVIOR)
       function setupCapsule(capsule, displayEl, inputEl) {
         capsule.addEventListener('click', () => {
           capsule.classList.add('focused');
@@ -1016,26 +1152,16 @@
       setupCapsule(deskCapsule, deskDisplay, deskInput);
       setupCapsule(mobCapsule, mobDisplay, mobInput);
 
-      // 6. NAVIGATION BUTTONS
-      function handleBack() {
-        if (isElectron && window.stauntAPI?.goBack) return window.stauntAPI.goBack();
-        try { webStageFrame.contentWindow.history.back(); } catch(e){}
-      }
-      function handleForward() {
-        if (isElectron && window.stauntAPI?.goForward) return window.stauntAPI.goForward();
-        try { webStageFrame.contentWindow.history.forward(); } catch(e){}
-      }
-      function handleReload() {
-        if (isElectron && window.stauntAPI?.reload) return window.stauntAPI.reload();
-        if (currentUrl) webStageFrame.src = currentUrl;
-      }
+      // Desktop Action Listeners
+      document.getElementById('btnDeskBack').addEventListener('click', triggerBack);
+      document.getElementById('btnDeskForward').addEventListener('click', triggerForward);
+      document.getElementById('btnDeskReload').addEventListener('click', triggerReload);
+      document.getElementById('btnDeskHome').addEventListener('click', triggerHome);
 
-      document.getElementById('btnDeskBack').addEventListener('click', handleBack);
-      document.getElementById('btnDeskForward').addEventListener('click', handleForward);
-      document.getElementById('btnDeskReload').addEventListener('click', handleReload);
-
-      document.getElementById('btnMobBack').addEventListener('click', handleBack);
-      document.getElementById('btnMobForward').addEventListener('click', handleForward);
+      // Mobile Action Listeners
+      document.getElementById('btnMobBack').addEventListener('click', triggerBack);
+      document.getElementById('btnMobForward').addEventListener('click', triggerForward);
+      document.getElementById('btnMobHome').addEventListener('click', triggerHome);
 
       // Desktop Window Controls
       if (isElectron && window.stauntAPI) {
@@ -1061,7 +1187,6 @@
       }
 
       document.getElementById('btnDeskNewTab').addEventListener('click', handleNewTab);
-      document.getElementById('btnMobNewTab').addEventListener('click', handleNewTab);
       document.getElementById('btnOverviewAddTab').addEventListener('click', handleNewTab);
 
       function toggleOverview() {
@@ -1172,9 +1297,9 @@
 
         if (deltaY < 50) {
           if (touchStartX <= 35 && deltaX > 70) {
-            handleBack(); // Swipe right from left edge -> Back
+            triggerBack(); // Swipe right from left edge -> Back
           } else if (touchStartX >= window.innerWidth - 35 && deltaX < -70) {
-            handleForward(); // Swipe left from right edge -> Forward
+            triggerForward(); // Swipe left from right edge -> Forward
           }
         }
         isEdgeSwipe = false;
@@ -1199,7 +1324,7 @@
           }
         } else if (isMeta && e.key.toLowerCase() === 'r') {
           e.preventDefault();
-          handleReload();
+          triggerReload();
         } else if (isMeta && e.key === '\\') {
           e.preventDefault();
           toggleOverview();
