@@ -168,9 +168,9 @@
       color: #ffffff;
     }
 
-    /* Sidebar collapse transitions */
+    /* Sidebar collapse transitions & Mobile Overlay */
     #sidebar {
-      transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     #sidebar.collapsed {
       width: 64px !important;
@@ -184,9 +184,39 @@
     .sidebar-collapsed-only {
       display: none;
     }
+
+    /* Mobile Responsive Dock Overrides (Android, iPhone, iPad) */
+    @media (max-width: 768px) {
+      #sidebar {
+        position: fixed !important;
+        left: -280px;
+        top: 0;
+        bottom: 0;
+        width: 280px !important;
+        z-index: 60 !important;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+      }
+      #sidebar.mobile-open {
+        left: 0 !important;
+      }
+      #sidebarBackdrop {
+        display: block !important;
+      }
+      .mobile-menu-btn {
+        display: flex !important;
+      }
+    }
+    .mobile-menu-btn {
+      display: none;
+    }
+    #sidebarBackdrop {
+      display: none;
+    }
   </style>
 </head>
 <body class="h-full w-full flex bg-[#05070d] text-slate-200 overflow-hidden">
+  <!-- Mobile Sidebar Backdrop Overlay -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar(false)" style="position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); z-index:55; display:none;"></div>
 
   <!-- ========================================================================= -->
   <!-- 1. ADAPTIVE VERTICAL SIDEBAR (ARC-STYLE WORKSPACES & DOCK) -->
@@ -308,8 +338,11 @@
     <!-- TOP SLIM CONTROL HEADER (38px) -->
     <header class="h-[38px] flex items-center justify-between px-2 gap-2 flex-shrink-0 z-20 mb-1.5">
       
-      <!-- Left: Navigation Controls -->
+      <!-- Left: Navigation Controls & Mobile Hamburger -->
       <div class="flex items-center gap-1 flex-shrink-0">
+        <button onclick="toggleMobileSidebar(true)" class="mobile-menu-btn w-7 h-7 rounded-lg bg-violet-600/20 border border-violet-500/30 text-violet-300 hover:text-white flex items-center justify-center transition-colors mr-1" title="Open Spaces and Tabs">
+          <i data-lucide="menu" class="w-4 h-4"></i>
+        </button>
         <button onclick="navigateBack()" id="btnBack" title="Back (Alt+Left)" class="w-7 h-7 rounded-lg hover:bg-white/[0.06] text-slate-400 hover:text-white flex items-center justify-center transition-colors">
           <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
         </button>
@@ -1604,6 +1637,22 @@
     // =========================================================================
     // SIDEBAR & WINDOW CONTROL ACTIONS
     // =========================================================================
+    
+    function toggleMobileSidebar(force) {
+      const sb = document.getElementById("sidebar");
+      const bd = document.getElementById("sidebarBackdrop");
+      if (force === true) {
+        sb.classList.add("mobile-open");
+        bd.style.display = "block";
+      } else if (force === false) {
+        sb.classList.remove("mobile-open");
+        bd.style.display = "none";
+      } else {
+        sb.classList.toggle("mobile-open");
+        bd.style.display = sb.classList.contains("mobile-open") ? "block" : "none";
+      }
+    }
+
     function toggleSidebarCollapse() {
       const sidebar = document.getElementById("sidebar");
       sidebar.classList.toggle("collapsed");
