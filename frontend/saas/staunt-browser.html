@@ -116,10 +116,10 @@
     <div class="relative flex-1 max-w-2xl mx-auto">
       <div class="flex items-center bg-[#070a13] border border-slate-700/80 rounded-xl px-2.5 py-1 focus-within:border-violet-500 focus-within:ring-1 focus-within:ring-violet-500/30 transition-all">
         
-        <!-- Shield Pill -->
-        <button onclick="toggleShieldModal()" title="Staunt In-Engine Shield" class="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold mr-1.5 transition-colors flex-shrink-0">
-          <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400"></i>
-          <span class="hidden md:inline">Shield Active</span>
+        <!-- Brave-Style Shield Pill -->
+        <button onclick="toggleShieldModal()" id="shieldPillBtn" title="Staunt Brave-Style Shield Matrix" class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold mr-1.5 transition-colors flex-shrink-0">
+          <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400" id="shieldPillIcon"></i>
+          <span id="shieldPillText" class="hidden md:inline">Brave Mode: Standard</span>
         </button>
 
         <!-- Input -->
@@ -339,7 +339,7 @@
   </main>
 
   <!-- ========================================================================= -->
-  <!-- 3. SHIELD DEFENSE MODAL -->
+  <!-- 3. SHIELD DEFENSE MODAL (BRAVE-STYLE CONTROL MATRIX) -->
   <!-- ========================================================================= -->
   <div id="shieldModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
@@ -350,7 +350,7 @@
           </div>
           <div>
             <h3 class="font-bold text-white text-sm">Staunt Shield Defense Matrix</h3>
-            <p class="text-[11px] text-emerald-400">All Protective Layers Active</p>
+            <p class="text-[11px] text-emerald-400" id="shieldStatusSubtitle">Brave Protection Active</p>
           </div>
         </div>
         <button onclick="toggleShieldModal()" class="text-slate-400 hover:text-white">
@@ -358,38 +358,66 @@
         </button>
       </div>
 
+      <!-- Shield Mode Switcher Options -->
+      <div class="space-y-2">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Shield Protection Level</div>
+        <div class="grid grid-cols-1 gap-2">
+          
+          <button onclick="setShieldMode('standard')" id="shieldOptStandard" class="flex items-start gap-2.5 p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-left transition-all">
+            <div class="w-4 h-4 rounded-full border-2 border-emerald-400 flex items-center justify-center mt-0.5 flex-shrink-0">
+              <div class="w-2 h-2 rounded-full bg-emerald-400" id="shieldRadioStandard"></div>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+                <span>Standard Protection (Brave Mode)</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Recommended</span>
+              </div>
+              <div class="text-[11px] text-slate-300 leading-relaxed mt-0.5">
+                100% normal site functionality. Injects surrogate scriptlets so React/Next.js/SPAs never crash, while stopping intrusive ads.
+              </div>
+            </div>
+          </button>
+
+          <button onclick="setShieldMode('aggressive')" id="shieldOptAggressive" class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-700 bg-slate-800/40 text-left transition-all hover:bg-slate-800/70">
+            <div class="w-4 h-4 rounded-full border-2 border-slate-500 flex items-center justify-center mt-0.5 flex-shrink-0">
+              <div class="w-2 h-2 rounded-full bg-transparent" id="shieldRadioAggressive"></div>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-200">Aggressive Protection</div>
+              <div class="text-[11px] text-slate-400 leading-relaxed mt-0.5">
+                Strips all detected ad scripts and tracking pixels directly at the network layer. May affect complex SPAs.
+              </div>
+            </div>
+          </button>
+
+          <button onclick="setShieldMode('off')" id="shieldOptOff" class="flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-700 bg-slate-800/40 text-left transition-all hover:bg-slate-800/70">
+            <div class="w-4 h-4 rounded-full border-2 border-slate-500 flex items-center justify-center mt-0.5 flex-shrink-0">
+              <div class="w-2 h-2 rounded-full bg-transparent" id="shieldRadioOff"></div>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-200">Shields Down (Allow All)</div>
+              <div class="text-[11px] text-slate-400 leading-relaxed mt-0.5">
+                Disables ad and tracker suppression entirely for the current domain.
+              </div>
+            </div>
+          </button>
+
+        </div>
+      </div>
+
       <div class="grid grid-cols-2 gap-2 text-xs">
         <div class="p-3 rounded-xl bg-slate-800/60 border border-slate-700">
-          <div class="text-slate-400">Trackers Blocked</div>
-          <div class="text-xl font-bold text-white mt-1" id="modalBlockedCount">42</div>
+          <div class="text-slate-400">Trackers Suppressed</div>
+          <div class="text-xl font-bold text-white mt-1" id="modalBlockedCount">38</div>
         </div>
         <div class="p-3 rounded-xl bg-slate-800/60 border border-slate-700">
-          <div class="text-slate-400">Security Rating</div>
-          <div class="text-xl font-bold text-emerald-400 mt-1">Grade A+</div>
+          <div class="text-slate-400">Site Compatibility</div>
+          <div class="text-xl font-bold text-emerald-400 mt-1" id="modalCompatScore">100% (Brave)</div>
         </div>
       </div>
 
-      <div class="space-y-1.5 text-xs text-slate-300">
-        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40">
-          <span>Ad Network Suppression</span>
-          <span class="text-emerald-400 font-semibold">100% Active</span>
-        </div>
-        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40">
-          <span>Google Tag Manager / Analytics</span>
-          <span class="text-emerald-400 font-semibold">Stripped Server-Side</span>
-        </div>
-        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40">
-          <span>WebRTC Real IP Leak Shield</span>
-          <span class="text-emerald-400 font-semibold">Protected</span>
-        </div>
-        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/40">
-          <span>Zero Server-Side Logging</span>
-          <span class="text-emerald-400 font-semibold">Enforced</span>
-        </div>
-      </div>
-
-      <button onclick="toggleShieldModal()" class="w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs transition-all">
-        Close Shield Panel
+      <button onclick="applyAndReloadShield()" class="w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs transition-all shadow-lg shadow-violet-600/20">
+        Apply & Reload Tab
       </button>
     </div>
   </div>
@@ -401,6 +429,7 @@
     let activeUrl = "staunt://newtab";
     let activeMode = "start"; // start | proxy | search | reader
     let readerFontSize = 18;
+    let currentShieldMode = "standard"; // standard (Brave mode) | aggressive | off
 
     // Initialize
     function initBrowser() {
@@ -672,7 +701,7 @@
       container.innerHTML = `
         <iframe 
           id="proxyIframe" 
-          src="/api/browser/proxy?url=${encodeURIComponent(targetUrl)}" 
+          src="/api/browser/proxy?url=${encodeURIComponent(targetUrl)}&shield=${encodeURIComponent(currentShieldMode)}" 
           class="w-full h-full border-none block bg-white"
           onload="endProgress()"
         ></iframe>
@@ -969,6 +998,68 @@
       document.getElementById("shieldModal").classList.toggle("hidden");
     }
 
+    function setShieldMode(mode) {
+      currentShieldMode = mode;
+      updateShieldUI();
+    }
+
+    function updateShieldUI() {
+      const standardOpt = document.getElementById("shieldOptStandard");
+      const aggressiveOpt = document.getElementById("shieldOptAggressive");
+      const offOpt = document.getElementById("shieldOptOff");
+
+      const rStd = document.getElementById("shieldRadioStandard");
+      const rAgg = document.getElementById("shieldRadioAggressive");
+      const rOff = document.getElementById("shieldRadioOff");
+
+      const pillBtn = document.getElementById("shieldPillBtn");
+      const pillText = document.getElementById("shieldPillText");
+      const subTitle = document.getElementById("shieldStatusSubtitle");
+      const compatScore = document.getElementById("modalCompatScore");
+
+      // Reset
+      [standardOpt, aggressiveOpt, offOpt].forEach(el => {
+        el.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-700 bg-slate-800/40 text-left transition-all hover:bg-slate-800/70";
+      });
+      [rStd, rAgg, rOff].forEach(el => { el.className = "w-2 h-2 rounded-full bg-transparent"; });
+
+      if (currentShieldMode === "standard") {
+        standardOpt.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-left transition-all";
+        rStd.className = "w-2 h-2 rounded-full bg-emerald-400";
+        pillBtn.className = "flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold mr-1.5 transition-colors flex-shrink-0";
+        pillText.textContent = "Brave Mode: Standard";
+        subTitle.textContent = "Brave Protection Active (100% Site Fidelity)";
+        subTitle.className = "text-[11px] text-emerald-400";
+        compatScore.textContent = "100% (Brave)";
+        compatScore.className = "text-xl font-bold text-emerald-400 mt-1";
+      } else if (currentShieldMode === "aggressive") {
+        aggressiveOpt.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 text-left transition-all";
+        rAgg.className = "w-2 h-2 rounded-full bg-amber-400";
+        pillBtn.className = "flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-[10px] font-semibold mr-1.5 transition-colors flex-shrink-0";
+        pillText.textContent = "Shield: Aggressive";
+        subTitle.textContent = "Aggressive Network Filtering Active";
+        subTitle.className = "text-[11px] text-amber-400";
+        compatScore.textContent = "80% (Strict)";
+        compatScore.className = "text-xl font-bold text-amber-400 mt-1";
+      } else {
+        offOpt.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-rose-500/40 bg-rose-500/10 text-left transition-all";
+        rOff.className = "w-2 h-2 rounded-full bg-rose-400";
+        pillBtn.className = "flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-semibold mr-1.5 transition-colors flex-shrink-0";
+        pillText.textContent = "Shields Down";
+        subTitle.textContent = "Protection Disabled for this site";
+        subTitle.className = "text-[11px] text-rose-400";
+        compatScore.textContent = "Raw / Unfiltered";
+        compatScore.className = "text-xl font-bold text-rose-400 mt-1";
+      }
+    }
+
+    function applyAndReloadShield() {
+      toggleShieldModal();
+      if (activeMode === "proxy" && activeUrl && activeUrl.startsWith("http")) {
+        browseTo(activeUrl);
+      }
+    }
+
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
@@ -994,6 +1085,19 @@
       bar.style.width = "100%";
       setTimeout(() => { bar.style.width = "0%"; }, 300);
     }
+
+    window.addEventListener("message", function(evt) {
+      if (!evt.data || !evt.data.type) return;
+      if (evt.data.type === "STAUNT_NAVIGATED") {
+        if (evt.data.url && activeMode === "proxy") {
+          activeUrl = evt.data.url;
+          const input = document.getElementById("omniboxInput");
+          if (input && document.activeElement !== input) {
+            input.value = activeUrl;
+          }
+        }
+      }
+    });
 
     window.addEventListener("DOMContentLoaded", initBrowser);
   </script>

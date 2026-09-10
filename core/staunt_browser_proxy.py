@@ -350,9 +350,10 @@ def staunt_web_proxy():
     target_url = raw_url.strip()
     if not target_url.startswith(("http://", "https://")):
         if " " in target_url or ("." not in target_url and not target_url.startswith("localhost")):
-            # Redirect to Sovereign Search
             return jsonify({"redirect_search": target_url}), 200
         target_url = "https://" + target_url
+
+    shield_mode = request.args.get("shield", "standard").lower()  # standard (Brave mode) | aggressive | off
 
     try:
         req_headers = dict(DEFAULT_HEADERS)
@@ -375,10 +376,48 @@ def staunt_web_proxy():
         html_content = resp.text
         blocked_count = 0
 
+        # Brave-style surrogate stubs (prevents reference crashes in modern SPAs / Next.js / news sites)
+        surrogate_code = """
+        /* Staunt Sovereign Brave-Style Protection Surrogates */
+        (function() {
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = window.gtag || function() { window.dataLayer.push(arguments); };
+            window.ga = window.ga || function() { (window.ga.q = window.ga.q || []).push(arguments); };
+            window.fbq = window.fbq || function() {};
+            window.google_ad_client = null;
+            window.googletag = window.googletag || {
+                cmd: [],
+                display: function() {},
+                pubads: function() {
+                    return {
+                        enableSingleRequest: function() {},
+                        addService: function() {},
+                        setTargeting: function() {},
+                        collapseEmptyDivs: function() {},
+                        addEventListener: function() {}
+                    };
+                },
+                sizeMapping: function() {
+                    return {
+                        addSize: function() { return this; },
+                        build: function() { return []; }
+                    };
+                },
+                enableServices: function() {}
+            };
+            window.optimizely = window.optimizely || [];
+            window.dotcom = window.dotcom || { cmd: [], consent: { getConsent: function(){ return true; } } };
+            window.dotcom.ads = window.dotcom.ads || { init: function(){}, display: function(){} };
+            window.pdl = window.pdl || { requireConsent: 'v2' };
+            window.tp = window.tp || [];
+        })();
+        """
+
         bridge_code = f"""
         (function() {{
             window.__STAUNT_ACTIVE_URL__ = {json.dumps(final_url)};
             window.__STAUNT_PAGE_TITLE__ = document.title || {json.dumps(final_url)};
+            window.__STAUNT_SHIELD_MODE__ = {json.dumps(shield_mode)};
 
             try {{
                 if (window.parent && window.parent !== window) {{
@@ -386,16 +425,26 @@ def staunt_web_proxy():
                         type: 'STAUNT_NAVIGATED',
                         url: window.__STAUNT_ACTIVE_URL__,
                         title: window.__STAUNT_PAGE_TITLE__,
-                        blocked: 12
+                        blocked: 12,
+                        shield: window.__STAUNT_SHIELD_MODE__
                     }}, '*');
                 }}
             }} catch(e) {{}}
 
+            // Intercept user clicks on links safely without breaking React/Next.js DOM hydration
             document.addEventListener('click', function(e) {{
                 var link = e.target.closest('a');
-                if (link && link.href && link.target === '_blank') {{
-                    link.target = '_self';
+                if (!link || !link.href) return;
+
+                var href = link.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {{
+                    return;
                 }}
+
+                // Prevent default new window / blank tabs
+                e.preventDefault();
+                var fullUrl = link.href;
+                window.location.href = '/api/browser/proxy?url=' + encodeURIComponent(fullUrl) + '&shield=' + encodeURIComponent(window.__STAUNT_SHIELD_MODE__);
             }}, true);
 
             window.addEventListener('message', function(evt) {{
@@ -416,18 +465,27 @@ def staunt_web_proxy():
         if HAS_BS4 and BeautifulSoup:
             soup = BeautifulSoup(html_content, "html.parser")
 
-            # Strip external ad scripts only (preserves inline website application hydration)
-            for s in soup.find_all("script"):
-                src = s.get("src", "")
-                if src and AD_REGEX.search(src):
-                    s.decompose()
-                    blocked_count += 1
-
-            for iframe in soup.find_all("iframe"):
-                src = iframe.get("src", "")
-                if src and AD_REGEX.search(src):
-                    iframe.decompose()
-                    blocked_count += 1
+            # Apply Protection depending on shield_mode
+            if shield_mode == "aggressive":
+                for s in soup.find_all("script"):
+                    src = s.get("src", "")
+                    if src and AD_REGEX.search(src):
+                        s.decompose()
+                        blocked_count += 1
+                for iframe in soup.find_all("iframe"):
+                    src = iframe.get("src", "")
+                    if src and AD_REGEX.search(src):
+                        iframe.decompose()
+                        blocked_count += 1
+            elif shield_mode == "standard":
+                # Standard Brave Protection: suppress only known heavyweight third-party ad networks,
+                # NEVER suppress site application scripts, analytics stubs, or media embeds
+                for iframe in soup.find_all("iframe"):
+                    src = iframe.get("src", "")
+                    if src and re.search(r"doubleclick\.net|googlesyndication\.com|amazon-adsystem|criteo", src, re.I):
+                        iframe.decompose()
+                        blocked_count += 1
+            # shield_mode == "off": Leave completely untouched
 
             head = soup.find("head")
             if not head:
@@ -435,12 +493,18 @@ def staunt_web_proxy():
                 if soup.html:
                     soup.html.insert(0, head)
 
+            # Inject Brave surrogate stubs at the very top of <head> before any site scripts run
+            surrogate_tag = soup.new_tag("script", id="staunt-brave-surrogates")
+            surrogate_tag.string = surrogate_code
+            head.insert(0, surrogate_tag)
+
+            # Inject <base href="..."> so all relative CSS, images, and API fetch calls resolve cleanly
             existing_base = head.find("base")
             if existing_base:
                 existing_base["href"] = final_url
             else:
                 base_tag = soup.new_tag("base", href=final_url)
-                head.insert(0, base_tag)
+                head.insert(1, base_tag)
 
             if not head.find("meta", attrs={"name": "viewport"}):
                 vp = soup.new_tag("meta", attrs={"name": "viewport", "content": "width=device-width, initial-scale=1.0"})
@@ -450,18 +514,12 @@ def staunt_web_proxy():
             style_patch.string = "html, body { min-height: 100% !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; }"
             head.append(style_patch)
 
-            for a in soup.find_all("a", href=True):
-                href = a["href"].strip()
-                if not href.startswith(("javascript:", "mailto:", "tel:", "#", "data:")):
-                    abs_href = urllib.parse.urljoin(final_url, href)
-                    if abs_href.startswith(("http://", "https://")):
-                        a["href"] = f"/api/browser/proxy?url={urllib.parse.quote(abs_href)}"
-                a["target"] = "_self"
-
+            # Clean form actions to route through proxy
             for form in soup.find_all("form"):
                 action = form.get("action", "").strip()
-                abs_action = urllib.parse.urljoin(final_url, action) if action else final_url
-                form["action"] = f"/api/browser/proxy?url={urllib.parse.quote(abs_action)}"
+                if action and not action.startswith("javascript:"):
+                    abs_action = urllib.parse.urljoin(final_url, action)
+                    form["action"] = f"/api/browser/proxy?url={urllib.parse.quote(abs_action)}&shield={shield_mode}"
 
             bridge_script = soup.new_tag("script", id="staunt-bridge-runtime")
             bridge_script.string = bridge_code
@@ -473,7 +531,7 @@ def staunt_web_proxy():
             rendered_html = str(soup)
         else:
             rendered_html = html_content
-            base_injection = f'<base href="{final_url}"><meta name="viewport" content="width=device-width, initial-scale=1.0">'
+            base_injection = f'<script id="staunt-brave-surrogates">{surrogate_code}</script><base href="{final_url}"><meta name="viewport" content="width=device-width, initial-scale=1.0">'
             rendered_html = re.sub(r'(<head[^>]*>)', r'\1' + base_injection, rendered_html, flags=re.I, count=1)
             rendered_html += f'\n<script id="staunt-bridge-runtime">{bridge_code}</script>'
 
