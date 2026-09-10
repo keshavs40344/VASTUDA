@@ -1897,17 +1897,39 @@ def handle_gateway_proxy():
     target_origin = f"{parsed_target.scheme}://{parsed_target.netloc}"
     ACTIVE_UPSTREAM_ORIGIN = target_origin
 
-    # Prepare outbound request headers with full Origin and Referer spoofing
+    # Authentic browser outbound request headers (Prevents Google/Cloudflare bot blocking)
+    is_doc_nav = request.method in ("GET", "HEAD") and not request.headers.get("X-Requested-With")
+
     req_headers = {
         "Host": parsed_target.netloc,
-        "Origin": target_origin,
-        "Referer": target_origin + "/",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
-        "Accept": request.headers.get("Accept", "*/*"),
         "Accept-Language": request.headers.get("Accept-Language", "en-US,en;q=0.9"),
-        "sec-fetch-site": "same-origin",
-        "sec-fetch-mode": "cors",
     }
+
+    if is_doc_nav:
+        req_headers.update({
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "sec-ch-ua": '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "none",
+            "sec-fetch-user": "?1",
+            "upgrade-insecure-requests": "1",
+        })
+    else:
+        req_headers.update({
+            "Origin": target_origin,
+            "Referer": target_origin + "/",
+            "Accept": request.headers.get("Accept", "*/*"),
+            "sec-fetch-dest": request.headers.get("sec-fetch-dest", "empty"),
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+        })
+
+    if request.headers.get("Cookie"):
+        req_headers["Cookie"] = request.headers["Cookie"]
 
     try:
         data_payload = request.get_data() if request.method in ("POST", "PUT", "PATCH") else None
@@ -2220,7 +2242,6 @@ def serve_static(path):
             # Forward incoming client headers (Content-Type, User-Agent, X-YouTube-*, etc.)
             fwd_headers = {
                 "Host": parsed_up.netloc,
-                "Origin": effective_origin,
                 "Referer": effective_origin + "/",
                 "User-Agent": (
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -2229,10 +2250,13 @@ def serve_static(path):
                 ),
                 "Accept": request.headers.get("Accept", "*/*"),
                 "Accept-Language": request.headers.get("Accept-Language", "en-US,en;q=0.9"),
-                "sec-fetch-site": "same-origin",
-                "sec-fetch-mode": "cors",
-                "sec-fetch-dest": request.headers.get("sec-fetch-dest", "empty"),
             }
+
+            if request.method not in ("GET", "HEAD") or request.headers.get("Origin"):
+                fwd_headers["Origin"] = effective_origin
+                fwd_headers["sec-fetch-site"] = "same-origin"
+                fwd_headers["sec-fetch-mode"] = "cors"
+                fwd_headers["sec-fetch-dest"] = request.headers.get("sec-fetch-dest", "empty")
 
             for hk, hv in request.headers.items():
                 hk_lower = hk.lower()

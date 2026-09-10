@@ -880,7 +880,12 @@
       'use strict';
 
       const PROXY_ENDPOINT = '/gateway?url=';
-      const SEARCH_BASE = 'https://www.google.com/search?q=';
+      const SEARCH_ENGINES = {
+        google: 'https://www.google.com/search?q=',
+        duckduckgo: 'https://duckduckgo.com/html/?q=',
+        bing: 'https://www.bing.com/search?q='
+      };
+      let currentEngine = 'google';
 
       let tabs = [];
       let activeTabId = null;
@@ -1025,7 +1030,8 @@
         if (/^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(trimmed) && !trimmed.includes(' ')) {
           return 'https://' + trimmed;
         }
-        return SEARCH_BASE + encodeURIComponent(trimmed);
+        const engineBase = SEARCH_ENGINES[currentEngine] || SEARCH_ENGINES.google;
+        return engineBase + encodeURIComponent(trimmed);
       }
 
       function getDomain(url) {
@@ -1182,6 +1188,14 @@
               <div class="speed-tile" data-url="https://news.ycombinator.com">
                 <div class="tile-badge" style="background: rgba(255, 102, 0, 0.16); color: #ff6600;">Y</div>
                 <div class="tile-label">HN</div>
+              </div>
+              <div class="speed-tile" data-url="https://duckduckgo.com">
+                <div class="tile-badge" style="background: rgba(222, 88, 51, 0.16); color: #de5833;">🦆</div>
+                <div class="tile-label">DuckDuckGo</div>
+              </div>
+              <div class="speed-tile" data-url="https://www.bing.com">
+                <div class="tile-badge" style="background: rgba(0, 128, 255, 0.16); color: #0080ff;">b</div>
+                <div class="tile-label">Bing</div>
               </div>
             </div>
 
