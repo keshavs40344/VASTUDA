@@ -212,14 +212,16 @@ def enforce_global_security_firewall():
     # 1. System File & Extension Shield
     # Skip extension-blocking when a proxied site is active (staunt_upstream cookie present)
     # so YouTube's manifest.json, API JSON responses, etc. are not 403'd.
+    # Also whitelist public Web App Manifests (manifest.json).
     _active_proxy = request.cookies.get("staunt_upstream")
     _is_proxy_subresource = bool(_active_proxy) and not any(
         clean_path.startswith(p) for p in ("/api/", "/assets/", "/static/")
     )
-    if not _is_proxy_subresource:
-        if any(base_name.endswith(ext) for ext in BLOCKED_EXTENSIONS) or base_name in BLOCKED_FILES:
-            logger.warning(f"[SECURITY FIREWALL] Blocked access to protected resource: {request.path}")
-            return jsonify({"error": "Access Denied: Protected System Resource"}), 403
+    if base_name not in ("manifest.json", "site.webmanifest"):
+        if not _is_proxy_subresource:
+            if any(base_name.endswith(ext) for ext in BLOCKED_EXTENSIONS) or base_name in BLOCKED_FILES:
+                logger.warning(f"[SECURITY FIREWALL] Blocked access to protected resource: {request.path}")
+                return jsonify({"error": "Access Denied: Protected System Resource"}), 403
 
     # 2. Directory Traversal Defense
     if ".." in clean_path:
@@ -2217,12 +2219,13 @@ def serve_static(path):
 
     clean_path = path.replace('\\', '/')
     base_name = os.path.basename(clean_path).lower()
-    # Only apply the extension block if NOT in active proxy mode
+    # Only apply the extension block if NOT in active proxy mode, and not a public webmanifest
     _proxy_active = bool(request.cookies.get("staunt_upstream"))
-    if not _proxy_active:
-        if any(base_name.endswith(ext) for ext in BLOCKED_EXTENSIONS) or base_name in BLOCKED_FILES:
-            logger.warning(f"[SECURITY] Protected system file blocked: {path}")
-            return jsonify({"error": "Access Denied: Protected System Resource"}), 403
+    if base_name not in ("manifest.json", "site.webmanifest"):
+        if not _proxy_active:
+            if any(base_name.endswith(ext) for ext in BLOCKED_EXTENSIONS) or base_name in BLOCKED_FILES:
+                logger.warning(f"[SECURITY] Protected system file blocked: {path}")
+                return jsonify({"error": "Access Denied: Protected System Resource"}), 403
 
     # Canonical realpath boundary check (prevents ../ and URL-encoded traversals)
     try:
