@@ -3,28 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Staunt Core — Safari-Class Native Web Engine</title>
-  <meta name="description" content="Authentic Apple Safari-class browser shell with dynamic frosted glass, 44px topbar, mobile bottom-docked ergonomic bar, and zero telemetry." />
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <meta name="description" content="Staunt Core — Authentic Apple Sequoia-grade Tri-Tier Cross-Platform Browser Engine." />
+  <title>Staunt Core</title>
 
   <style>
+    /* ==========================================================================
+       1. DESIGN TOKENS & TRI-TIER MEDIA SYSTEM (Obsidian Glassmorphism)
+       ========================================================================== */
     :root {
-      --topbar-height: 44px;
-      --bottombar-height: 56px;
-      --bg-shell: #101012;
-      --bg-frosted: rgba(28, 28, 30, 0.78);
-      --border-hairline: #38383a;
-      --bg-capsule: rgba(255, 255, 255, 0.08);
-      --bg-capsule-focus: rgba(44, 44, 46, 0.96);
-      --border-capsule: rgba(255, 255, 255, 0.08);
-      --border-capsule-focus: rgba(255, 255, 255, 0.22);
-      --text-primary: rgba(255, 255, 255, 0.92);
-      --text-muted: rgba(255, 255, 255, 0.50);
+      --bg-obsidian: #090a0f;
+      --bg-frosted: rgba(18, 20, 29, 0.78);
+      --border-highlight: rgba(255, 255, 255, 0.08);
+      --border-focus: #8b5cf6;
+      --glow-focus: rgba(139, 92, 246, 0.45);
+      --text-main: rgba(255, 255, 255, 0.94);
+      --text-muted: rgba(255, 255, 255, 0.48);
+      --accent-purple: #8b5cf6;
       --accent-blue: #0a84ff;
-      --system-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Inter", sans-serif;
+      --accent-emerald: #30d158;
+      --system-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Inter, Arial, sans-serif;
+      
+      /* Tier 1 Defaults (Desktop >= 1025px) */
+      --header-height: 44px;
+      --bottom-bar-height: 0px;
+      --glyph-size: 30px;
+      --icon-stroke: 15px;
+    }
+
+    /* Tier 2: Tablet / Foldable (681px - 1024px) */
+    @media (min-width: 681px) and (max-width: 1024px) {
+      :root {
+        --header-height: 50px;
+        --bottom-bar-height: 0px;
+        --glyph-size: 42px;
+        --icon-stroke: 18px;
+      }
+    }
+
+    /* Tier 3: Mobile Smartphone (<= 680px) */
+    @media (max-width: 680px) {
+      :root {
+        --header-height: 0px;
+        --bottom-bar-height: 56px;
+        --glyph-size: 44px;
+        --icon-stroke: 20px;
+      }
     }
 
     * {
@@ -33,130 +56,176 @@
       padding: 0;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     html, body {
       width: 100vw;
       height: 100vh;
       overflow: hidden;
-      background-color: var(--bg-shell);
+      background-color: var(--bg-obsidian);
       font-family: var(--system-font);
+      color: var(--text-main);
       user-select: none;
-      -webkit-tap-highlight-color: transparent;
     }
 
-    /* ================= 1. DESKTOP 44px TOP BAR ================= */
-    .desktop-top-bar {
-      height: var(--topbar-height);
-      width: 100%;
+    /* Tactile Micro-Interactions */
+    button, .interactive-tap {
+      transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease, opacity 0.15s ease;
+      cursor: pointer;
+    }
+    button:active, .interactive-tap:active {
+      transform: scale(0.92);
+    }
+
+    /* Animated Loading Progress Line */
+    .viewport-progress-bar {
+      position: fixed;
+      top: var(--header-height);
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(90deg, #8b5cf6, #0a84ff, #30d158);
+      z-index: 10000;
+      transition: width 0.3s ease, opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       2. TIER 1 & 2 TOP BAR (Desktop 44px / Tablet 50px)
+       ========================================================================== */
+    .top-navigation-bar {
       position: fixed;
       top: 0;
       left: 0;
-      z-index: 9999;
+      width: 100%;
+      height: var(--header-height);
+      background: var(--bg-frosted);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border-bottom: 0.5px solid var(--border-highlight);
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 12px;
-      background: var(--bg-frosted);
-      backdrop-filter: blur(28px) saturate(190%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%);
-      border-bottom: 0.5px solid var(--border-hairline);
+      z-index: 9999;
+      -webkit-app-region: drag;
+    }
+
+    @media (max-width: 680px) {
+      .top-navigation-bar {
+        display: none; /* Auto-hidden on mobile smartphone */
+      }
     }
 
     .top-left-cluster {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
+      -webkit-app-region: no-drag;
     }
 
+    /* Native macOS Traffic Lights (Desktop Only) */
     .traffic-lights {
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+    @media (max-width: 1024px) {
+      .traffic-lights { display: none; } /* Hidden on tablet / touch */
     }
 
     .traffic-dot {
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      border: 0.5px solid rgba(0, 0, 0, 0.2);
+      border: 0.5px solid rgba(0, 0, 0, 0.25);
       cursor: pointer;
     }
-
     .dot-close { background-color: #ff5f56; }
     .dot-min { background-color: #ffbd2e; }
     .dot-max { background-color: #27c93f; }
 
-    .nav-glyphs {
+    .nav-glyphs-group {
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
     }
 
-    .nav-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
+    .nav-glyph-btn {
+      width: var(--glyph-size);
+      height: var(--glyph-size);
+      border-radius: 8px;
       background: transparent;
       border: none;
-      color: var(--text-primary);
+      color: var(--text-main);
       opacity: 0.75;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      outline: none;
-      transition: opacity 0.15s ease, background-color 0.15s ease;
+      -webkit-app-region: no-drag;
     }
-
-    .nav-btn:hover {
+    .nav-glyph-btn:hover {
       opacity: 1;
       background-color: rgba(255, 255, 255, 0.08);
     }
 
-    .omnibox-capsule-wrap {
+    /* Center Omnibox Floating Capsule */
+    .omnibox-capsule-wrapper {
       flex: 1;
-      max-width: 640px;
-      min-width: 240px;
+      max-width: 620px;
+      min-width: 220px;
       margin: 0 16px;
       display: flex;
       justify-content: center;
+      -webkit-app-region: no-drag;
     }
 
     .omnibox-capsule {
       width: 100%;
-      height: 28px;
-      border-radius: 8px;
-      background: var(--bg-capsule);
-      border: 0.5px solid var(--border-capsule);
+      height: 30px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 0.5px solid var(--border-highlight);
       display: flex;
       align-items: center;
-      justify-content: center;
       padding: 0 10px;
       position: relative;
       cursor: text;
       transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
     }
+    @media (min-width: 681px) and (max-width: 1024px) {
+      .omnibox-capsule {
+        height: 34px;
+      }
+    }
 
+    .omnibox-capsule:hover {
+      background: rgba(255, 255, 255, 0.10);
+    }
     .omnibox-capsule.focused {
-      background: var(--bg-capsule-focus);
-      border-color: var(--border-capsule-focus);
-      box-shadow: 0 0 0 2.5px rgba(10, 132, 255, 0.35);
+      background: rgba(30, 32, 44, 0.96);
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2.5px var(--glow-focus);
       justify-content: flex-start;
     }
 
-    .omnibox-lock-icon {
+    .padlock-glyph {
+      color: var(--text-muted);
+      margin-right: 7px;
       display: flex;
       align-items: center;
-      color: var(--text-muted);
-      margin-right: 6px;
-      opacity: 0.7;
+      flex-shrink: 0;
+    }
+    .padlock-glyph.secure {
+      color: var(--accent-emerald);
     }
 
     .omnibox-display-text {
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 400;
-      color: var(--text-primary);
+      color: var(--text-main);
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
@@ -170,7 +239,7 @@
       border: none;
       outline: none;
       font-family: var(--system-font);
-      font-size: 12px;
+      font-size: 12.5px;
       color: #ffffff;
       padding: 0;
     }
@@ -179,131 +248,97 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      -webkit-app-region: no-drag;
     }
 
     .tab-counter-pill {
-      min-width: 22px;
-      height: 22px;
-      border-radius: 6px;
+      min-width: 24px;
+      height: 24px;
+      border-radius: 7px;
       background: rgba(255, 255, 255, 0.08);
-      border: 0.5px solid rgba(255, 255, 255, 0.15);
-      color: var(--text-primary);
+      border: 0.5px solid var(--border-highlight);
+      color: var(--text-main);
       font-size: 11px;
       font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 0 5px;
-      cursor: pointer;
+    }
+    .tab-counter-pill:hover {
+      background: rgba(255, 255, 255, 0.16);
     }
 
-    .download-app-btn {
-      padding: 4px 10px;
-      border-radius: 6px;
-      background: rgba(10, 132, 255, 0.15);
-      border: 0.5px solid rgba(10, 132, 255, 0.4);
-      color: var(--accent-blue);
-      font-size: 11px;
-      font-weight: 600;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.15s ease;
-    }
-
-    .download-app-btn:hover {
-      background: rgba(10, 132, 255, 0.25);
-    }
-
-    /* ================= 2. VIEWPORT HOST ================= */
-    .webview-stage-host {
-      position: absolute;
-      top: var(--topbar-height);
-      left: 0;
-      width: 100%;
-      height: calc(100vh - var(--topbar-height));
-      background-color: var(--bg-shell);
-      overflow: hidden;
-    }
-
-    .webview-stage-host iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
-
-    /* ================= 3. MOBILE BOTTOM-DOCKED BAR ================= */
-    .mobile-bottom-bar {
+    /* ==========================================================================
+       3. TIER 3 MOBILE BOTTOM-DOCKED BAR (<= 680px, Ergonomic Thumb Arc)
+       ========================================================================== */
+    .mobile-bottom-dock {
       display: none;
       position: fixed;
       bottom: 0;
       left: 0;
       width: 100%;
-      height: calc(var(--bottombar-height) + env(safe-area-inset-bottom, 0px));
+      height: calc(var(--bottom-bar-height) + env(safe-area-inset-bottom, 0px));
       padding-bottom: env(safe-area-inset-bottom, 0px);
       background: var(--bg-frosted);
-      backdrop-filter: blur(30px) saturate(190%);
-      -webkit-backdrop-filter: blur(30px) saturate(190%);
-      border-top: 0.5px solid var(--border-hairline);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border-top: 0.5px solid var(--border-highlight);
       z-index: 9999;
       transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1);
     }
 
-    .mobile-bar-inner {
+    @media (max-width: 680px) {
+      .mobile-bottom-dock {
+        display: block;
+      }
+    }
+
+    .mobile-dock-inner {
       display: flex;
       align-items: center;
       justify-content: space-around;
-      height: var(--bottombar-height);
-      padding: 0 12px;
-      gap: 8px;
+      height: var(--bottom-bar-height);
+      padding: 0 10px;
+      gap: 6px;
     }
 
-    .mobile-nav-btn {
+    .mobile-dock-btn {
+      width: var(--glyph-size);
+      height: var(--glyph-size);
+      border-radius: 10px;
       background: transparent;
       border: none;
-      color: var(--text-primary);
-      width: 38px;
-      height: 38px;
+      color: var(--text-main);
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 8px;
-      cursor: pointer;
     }
 
     .mobile-omnibox-capsule {
       flex: 1;
-      height: 36px;
-      border-radius: 10px;
-      background: var(--bg-capsule);
-      border: 0.5px solid var(--border-capsule);
+      height: 38px;
+      border-radius: 11px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 0.5px solid var(--border-highlight);
       display: flex;
       align-items: center;
       padding: 0 10px;
       gap: 6px;
-      cursor: text;
     }
-
     .mobile-omnibox-capsule.focused {
-      background: var(--bg-capsule-focus);
-      box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.35);
-    }
-
-    .mobile-lock {
-      color: var(--text-muted);
-      flex-shrink: 0;
+      background: rgba(30, 32, 44, 0.96);
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2px var(--glow-focus);
     }
 
     .mobile-omnibox-text {
       font-size: 13px;
-      color: var(--text-primary);
+      color: var(--text-main);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .mobile-omnibox-input {
       width: 100%;
       height: 100%;
@@ -314,78 +349,108 @@
       color: #fff;
     }
 
-    /* ================= 4. RESPONSIVE BREAKPOINTS ================= */
-    @media (max-width: 768px) {
-      .desktop-top-bar { display: none; }
-      .webview-stage-host {
-        top: 0;
-        height: calc(100vh - var(--bottombar-height) - env(safe-area-inset-bottom, 0px));
-      }
-      .mobile-bottom-bar { display: block; }
+    /* Auto-hide navigation on mobile scroll down */
+    .mobile-bottom-dock.autohidden {
+      transform: translateY(110%);
     }
 
-    /* ================= 5. START PAGE OVERLAY (FAVORITES) ================= */
-    .startpage-container {
+    /* ==========================================================================
+       4. VIEWPORT HOST (Direct Webview / Fallback Container)
+       ========================================================================== */
+    .viewport-stage-container {
+      position: absolute;
+      top: var(--header-height);
+      left: 0;
+      width: 100%;
+      height: calc(100vh - var(--header-height) - var(--bottom-bar-height) - env(safe-area-inset-bottom, 0px));
+      background-color: var(--bg-obsidian);
+      overflow: hidden;
+    }
+
+    @media (max-width: 680px) {
+      .viewport-stage-container {
+        top: 0;
+        padding-top: env(safe-area-inset-top, 0px);
+        height: calc(100vh - var(--bottom-bar-height) - env(safe-area-inset-bottom, 0px));
+      }
+    }
+
+    .viewport-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: #ffffff;
+    }
+
+    /* ==========================================================================
+       5. AUTHENTIC MINIMALIST START CANVAS (Dynamic Time & 8 Brand Favorites)
+       ========================================================================== */
+    .start-canvas {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: var(--bg-shell);
-      background-image: radial-gradient(ellipse at 50% 25%, #1b1b22 0%, #0d0d0f 100%);
+      background-color: var(--bg-obsidian);
+      background-image: radial-gradient(ellipse at 50% 25%, #181a26 0%, #090a0f 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 32px 20px;
+      padding: 30px 20px;
       z-index: 10;
+      overflow-y: auto;
     }
 
-    .greeting-time {
-      font-size: 54px;
+    .digital-clock-time {
+      font-size: 56px;
       font-weight: 200;
       letter-spacing: -0.03em;
-      color: rgba(255, 255, 255, 0.90);
+      color: rgba(255, 255, 255, 0.92);
       line-height: 1;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+    }
+    @media (max-width: 680px) {
+      .digital-clock-time { font-size: 42px; }
     }
 
-    .greeting-text {
+    .context-date-label {
       font-size: 14px;
       font-weight: 400;
       color: var(--text-muted);
       letter-spacing: -0.01em;
-      margin-bottom: 40px;
+      margin-bottom: 36px;
+      text-align: center;
     }
 
     .favorites-section {
       width: 100%;
-      max-width: 640px;
+      max-width: 680px;
     }
 
-    .favorites-header {
-      font-size: 12px;
+    .favorites-section-header {
+      font-size: 11.5px;
       font-weight: 600;
       color: var(--text-muted);
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       padding-left: 10px;
     }
 
+    /* Tri-Tier Favorites Grid: 4x2 Desktop, 4x2 Tablet, 2x4 / 3x2 Mobile */
     .favorites-grid {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(4, 1fr); /* 4x2 on Desktop / Tablet */
       gap: 20px 14px;
       justify-items: center;
     }
-
-    @media (max-width: 640px) {
+    @media (max-width: 680px) {
       .favorites-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px 12px;
+        grid-template-columns: repeat(3, 1fr); /* 3x2 / 2x4 on Smartphone */
+        gap: 22px 10px;
       }
-      .greeting-time { font-size: 44px; }
     }
 
     .favorite-tile {
@@ -394,10 +459,10 @@
       align-items: center;
       text-decoration: none;
       color: inherit;
-      cursor: pointer;
-      width: 76px;
+      width: 78px;
     }
 
+    /* 56x56 Squircle */
     .squircle {
       width: 56px;
       height: 56px;
@@ -405,301 +470,745 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.40);
       transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
+      position: relative;
     }
-
     .favorite-tile:hover .squircle {
       transform: scale(1.08);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
     }
-
     .favorite-tile:active .squircle {
-      transform: scale(0.96);
+      transform: scale(0.94);
     }
 
-    .tile-label {
+    .tile-name {
       font-size: 12px;
       font-weight: 400;
-      color: var(--text-primary);
+      color: var(--text-main);
       opacity: 0.85;
       margin-top: 8px;
       text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 78px;
     }
 
-    .hidden { display: none !important; }
+    /* ==========================================================================
+       6. TAB OVERVIEW & 2-COLUMN TABLET DRAWER OVERLAY
+       ========================================================================== */
+    .tab-overview-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(9, 10, 15, 0.92);
+      backdrop-filter: blur(35px) saturate(180%);
+      -webkit-backdrop-filter: blur(35px) saturate(180%);
+      z-index: 99999;
+      padding: calc(20px + env(safe-area-inset-top, 0px)) 24px calc(20px + env(safe-area-inset-bottom, 0px));
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .overview-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      max-width: 900px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .overview-heading {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .overview-action-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: var(--text-main);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Tablet 2-Column Grid Specifics */
+    @media (min-width: 681px) and (max-width: 1024px) {
+      .overview-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+      }
+    }
+    @media (max-width: 680px) {
+      .overview-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+    }
+
+    .tab-card {
+      background: rgba(30, 32, 44, 0.7);
+      border: 0.5px solid var(--border-highlight);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+    .tab-card.active {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 0 2px var(--glow-focus);
+    }
+
+    .tab-card-header {
+      height: 36px;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .tab-card-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+    }
+    .tab-card-title {
+      font-size: 11.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tab-card-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 16px;
+      padding: 0 4px;
+    }
+    .tab-card-preview {
+      height: 110px;
+      background: #13151f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
 
-  <!-- DESKTOP TOP BAR -->
-  <header class="desktop-top-bar" id="desktopTopBar">
+  <!-- Viewport Loading Progress Line -->
+  <div class="viewport-progress-bar" id="progressBar"></div>
+
+  <!-- ==========================================================================
+       TOP BAR (DESKTOP: 44px, TABLET: 50px)
+       ========================================================================== -->
+  <header class="top-navigation-bar" id="topNavBar">
+    
+    <!-- Left: Traffic Lights (Desktop) & Navigation Glyphs -->
     <div class="top-left-cluster">
       <div class="traffic-lights">
-        <div class="traffic-dot dot-close"></div>
-        <div class="traffic-dot dot-min"></div>
-        <div class="traffic-dot dot-max"></div>
+        <div class="traffic-dot dot-close" id="btnDeskClose" title="Close"></div>
+        <div class="traffic-dot dot-min" id="btnDeskMin" title="Minimize"></div>
+        <div class="traffic-dot dot-max" id="btnDeskMax" title="Maximize"></div>
       </div>
-      <div class="nav-glyphs">
-        <button class="nav-btn" id="btnBack" title="Back"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button>
-        <button class="nav-btn" id="btnForward" title="Forward"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
-        <button class="nav-btn" id="btnReload" title="Reload"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg></button>
+
+      <div class="nav-glyphs-group">
+        <button class="nav-glyph-btn" id="btnDeskBack" title="Back (⌘[)" aria-label="Back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button class="nav-glyph-btn" id="btnDeskForward" title="Forward (⌘])" aria-label="Forward">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <button class="nav-glyph-btn" id="btnDeskReload" title="Reload (⌘R)" aria-label="Reload">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+        </button>
       </div>
     </div>
 
-    <div class="omnibox-capsule-wrap">
-      <div class="omnibox-capsule" id="desktopCapsule">
-        <div class="omnibox-lock-icon">
+    <!-- Center: The Single Unified Omnibox Capsule -->
+    <div class="omnibox-capsule-wrapper">
+      <div class="omnibox-capsule" id="deskCapsule">
+        <div class="padlock-glyph" id="deskLock">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
-        <span class="omnibox-display-text" id="desktopDisplay">Search or enter website name</span>
-        <input type="text" id="desktopInput" class="omnibox-input hidden" placeholder="Search or enter website name" autocomplete="off" spellcheck="false" />
+        <span class="omnibox-display-text" id="deskDisplay">Search or enter website name</span>
+        <input type="text" id="deskInput" class="omnibox-input hidden" placeholder="Search or enter website name" autocomplete="off" spellcheck="false" />
       </div>
     </div>
 
+    <!-- Right: Tab Counter & Action Glyphs -->
     <div class="top-right-cluster">
-      <button class="tab-counter-pill" id="btnTabCount">1</button>
-      <button class="nav-btn" id="btnNewTab" title="New Tab"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
-      <a href="/assets/Staunt-Browser-Windows-Setup.zip" class="download-app-btn" title="Download Desktop App (x86_64)">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span>Install Windows</span>
-      </a>
+      <button class="tab-counter-pill" id="btnDeskTabCount" title="Show Tabs">
+        <span id="deskBadge">1</span>
+      </button>
+      <button class="nav-glyph-btn" id="btnDeskNewTab" title="New Tab (⌘T)" aria-label="New Tab">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      </button>
     </div>
+
   </header>
 
-  <!-- WEBVIEW VIEWPORT HOST -->
-  <main class="webview-stage-host" id="stageHost">
+  <!-- ==========================================================================
+       VIEWPORT HOST CONTAINER (Dual-Mode Rendering Engine)
+       ========================================================================== -->
+  <main class="viewport-stage-container" id="stageContainer">
     
-    <!-- Minimal Apple Start Page -->
-    <div class="startpage-container" id="startPage">
-      <div class="greeting-time" id="clockTime">09:41</div>
-      <div class="greeting-text" id="clockGreeting">Good Morning</div>
+    <!-- Minimalist Start Canvas (Shown on newtab) -->
+    <div class="start-canvas" id="startCanvas">
+      <div class="digital-clock-time" id="digitalClock">09:41</div>
+      <div class="context-date-label" id="contextDate">Good Morning • Thursday, Sep 10</div>
 
       <section class="favorites-section">
-        <div class="favorites-header">Favorites</div>
+        <div class="favorites-section-header">Favorites</div>
+        
+        <!-- 8 Authentic Pristine Brand Tiles -->
         <div class="favorites-grid">
-          <div class="favorite-tile" onclick="navigateTo('https://www.youtube.com')">
-            <div class="squircle" style="background: #ff0000;"><svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></div>
-            <span class="tile-label">YouTube</span>
+          
+          <!-- 1. YouTube -->
+          <div class="favorite-tile" onclick="execNavigate('https://www.youtube.com')">
+            <div class="squircle" style="background: #ff0000;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </div>
+            <span class="tile-name">YouTube</span>
           </div>
 
-          <div class="favorite-tile" onclick="navigateTo('https://github.com')">
-            <div class="squircle" style="background: #24292e; border: 0.5px solid rgba(255,255,255,0.15);"><svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></div>
-            <span class="tile-label">GitHub</span>
+          <!-- 2. Bing -->
+          <div class="favorite-tile" onclick="execNavigate('https://www.bing.com')">
+            <div class="squircle" style="background: #008373;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="#ffffff"><path d="M5 3v18l5-3 6 3 3-5-6-3V7l-8-4z"/></svg>
+            </div>
+            <span class="tile-name">Bing</span>
           </div>
 
-          <div class="favorite-tile" onclick="navigateTo('https://www.bing.com')">
-            <div class="squircle" style="background: #008373;"><svg width="26" height="26" viewBox="0 0 24 24" fill="#ffffff"><path d="M5 3v18l5-3 6 3 3-5-6-3V7l-8-4z"/></svg></div>
-            <span class="tile-label">Bing</span>
+          <!-- 3. ChatGPT -->
+          <div class="favorite-tile" onclick="execNavigate('https://chatgpt.com')">
+            <div class="squircle" style="background: #10a37f;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 4a6 6 0 1 0 0 12A6 6 0 0 0 12 6z"/></svg>
+            </div>
+            <span class="tile-name">ChatGPT</span>
           </div>
 
-          <div class="favorite-tile" onclick="navigateTo('https://chatgpt.com')">
-            <div class="squircle" style="background: #10a37f;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 4a6 6 0 1 0 0 12A6 6 0 0 0 12 6z"/></svg></div>
-            <span class="tile-label">ChatGPT</span>
+          <!-- 4. GitHub -->
+          <div class="favorite-tile" onclick="execNavigate('https://github.com')">
+            <div class="squircle" style="background: #24292e; border: 0.5px solid rgba(255,255,255,0.15);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+            </div>
+            <span class="tile-name">GitHub</span>
           </div>
 
-          <div class="favorite-tile" onclick="navigateTo('https://en.wikipedia.org')">
-            <div class="squircle" style="background: #ffffff;"><svg width="28" height="28" viewBox="0 0 24 24" fill="#000000"><path d="M12.09 13.124l2.678-6.044h1.724l-3.524 7.646 2.062 4.417c.307.653.64 1.05 1 .194l4.97-12.257h1.699L17.18 19.143c-.496 1.09-1.288 1.6-2.378 1.531-1.09-.07-1.802-.638-2.14-1.706l-1.99-4.708-2.02 4.708c-.337 1.068-1.05 1.636-2.139 1.706-1.09.07-1.882-.442-2.378-1.531L-.001 7.08h1.7l4.97 12.257c.36.856.693.459 1-.194l2.062-4.417-3.524-7.646h1.724l2.679 6.044 1.48-3.486 1.48 3.486z"/></svg></div>
-            <span class="tile-label">Wikipedia</span>
+          <!-- 5. Wikipedia -->
+          <div class="favorite-tile" onclick="execNavigate('https://en.wikipedia.org')">
+            <div class="squircle" style="background: #ffffff;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#000000"><path d="M12.09 13.124l2.678-6.044h1.724l-3.524 7.646 2.062 4.417c.307.653.64 1.05 1 .194l4.97-12.257h1.699L17.18 19.143c-.496 1.09-1.288 1.6-2.378 1.531-1.09-.07-1.802-.638-2.14-1.706l-1.99-4.708-2.02 4.708c-.337 1.068-1.05 1.636-2.139 1.706-1.09.07-1.882-.442-2.378-1.531L-.001 7.08h1.7l4.97 12.257c.36.856.693.459 1-.194l2.062-4.417-3.524-7.646h1.724l2.679 6.044 1.48-3.486 1.48 3.486z"/></svg>
+            </div>
+            <span class="tile-name">Wikipedia</span>
           </div>
 
-          <div class="favorite-tile" onclick="navigateTo('https://x.com')">
-            <div class="squircle" style="background: #000000; border: 0.5px solid rgba(255,255,255,0.2);"><svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>
-            <span class="tile-label">X</span>
+          <!-- 6. X -->
+          <div class="favorite-tile" onclick="execNavigate('https://x.com')">
+            <div class="squircle" style="background: #000000; border: 0.5px solid rgba(255,255,255,0.2);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </div>
+            <span class="tile-name">X</span>
           </div>
+
+          <!-- 7. Reddit -->
+          <div class="favorite-tile" onclick="execNavigate('https://www.reddit.com')">
+            <div class="squircle" style="background: #ff4500;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.702z"/></svg>
+            </div>
+            <span class="tile-name">Reddit</span>
+          </div>
+
+          <!-- 8. HackerNews -->
+          <div class="favorite-tile" onclick="execNavigate('https://news.ycombinator.com')">
+            <div class="squircle" style="background: #ff6600;">
+              <span style="font-size:26px; font-weight:800; color:#fff; font-family:monospace;">Y</span>
+            </div>
+            <span class="tile-name">HackerNews</span>
+          </div>
+
         </div>
       </section>
     </div>
 
-    <!-- Active Web Host Frame -->
-    <iframe id="webFrame" class="hidden"></iframe>
+    <!-- Fallback isolated frame for Web / Mobile / Tablet standalone -->
+    <iframe id="webStageFrame" class="viewport-iframe hidden" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+
   </main>
 
-  <!-- MOBILE BOTTOM BAR -->
-  <nav class="mobile-bottom-bar" id="mobileBar">
-    <div class="mobile-bar-inner">
-      <button class="mobile-nav-btn" id="btnMobBack"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg></button>
-      <button class="mobile-nav-btn" id="btnMobForward"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg></button>
+  <!-- ==========================================================================
+       TIER 3: MOBILE SMARTPHONE BOTTOM-DOCKED BAR (<= 680px)
+       ========================================================================== -->
+  <nav class="mobile-bottom-dock" id="mobileDock">
+    <div class="mobile-dock-inner">
+      <button class="mobile-dock-btn" id="btnMobBack" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
 
-      <div class="mobile-omnibox-capsule" id="mobileCapsule">
-        <svg class="mobile-lock" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span class="mobile-omnibox-text" id="mobileDisplay">Search</span>
-        <input type="text" id="mobileInput" class="mobile-omnibox-input hidden" placeholder="Search or enter website name" autocomplete="off" spellcheck="false" />
+      <button class="mobile-dock-btn" id="btnMobForward" aria-label="Forward">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+      <!-- Center Thumb Omnibox -->
+      <div class="mobile-omnibox-capsule" id="mobCapsule">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" id="mobLock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span class="mobile-omnibox-text" id="mobDisplay">Search</span>
+        <input type="text" id="mobInput" class="mobile-omnibox-input hidden" placeholder="Search or enter website name" autocomplete="off" spellcheck="false" />
       </div>
 
-      <button class="mobile-nav-btn" id="btnMobNewTab"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
-      <a href="/assets/Staunt-Browser-Windows-Setup.zip" class="mobile-nav-btn" title="Download"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a>
+      <button class="mobile-dock-btn" id="btnMobTabCount" aria-label="Tabs">
+        <div style="min-width:20px; height:20px; border-radius:6px; border:1px solid var(--border-highlight); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; padding:0 3px;">
+          <span id="mobBadge">1</span>
+        </div>
+      </button>
+
+      <button class="mobile-dock-btn" id="btnMobNewTab" aria-label="New Tab">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      </button>
     </div>
   </nav>
 
+  <!-- ==========================================================================
+       TAB OVERVIEW & TABLET 2-COLUMN DRAWER OVERLAY
+       ========================================================================== -->
+  <div class="tab-overview-overlay hidden" id="overviewOverlay">
+    <div class="overview-top-bar">
+      <span class="overview-heading">Open Tabs</span>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button class="overview-action-btn" id="btnOverviewAddTab" title="New Tab">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </button>
+        <button class="overview-action-btn" id="btnOverviewClose" title="Done">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="overview-grid" id="tabsGridContainer"></div>
+  </div>
+
+  <!-- ==========================================================================
+       INTERACTION LOGIC (VANILLA JS, RESILIENT DUAL-MODE ENGINE)
+       ========================================================================== -->
   <script>
-    // Universal Runtime Controller
-    let currentUrl = '';
-    const startPage = document.getElementById('startPage');
-    const webFrame = document.getElementById('webFrame');
+    (function() {
+      'use strict';
 
-    const desktopCapsule = document.getElementById('desktopCapsule');
-    const desktopDisplay = document.getElementById('desktopDisplay');
-    const desktopInput = document.getElementById('desktopInput');
+      // 1. DUAL-MODE RUNTIME DETECTION
+      const isElectron = Boolean(
+        window.stauntSecureBridge || 
+        window.stauntAPI || 
+        (window.process && window.process.type) || 
+        (typeof require === 'function' && window.require)
+      );
 
-    const mobileCapsule = document.getElementById('mobileCapsule');
-    const mobileDisplay = document.getElementById('mobileDisplay');
-    const mobileInput = document.getElementById('mobileInput');
+      // Local Tab State Storage (Synced for Standalone Web & Electron)
+      let tabs = [
+        { id: 1, url: 'staunt://newtab', title: 'Favorites', active: true }
+      ];
+      let activeTabId = 1;
+      let currentUrl = '';
+      let isOverviewOpen = false;
 
-    function updateClock() {
-      const now = new Date();
-      let hours = now.getHours();
-      const mins = String(now.getMinutes()).padStart(2, '0');
-      document.getElementById('clockTime').textContent = `${hours % 12 || 12}:${mins}`;
+      // DOM Elements
+      const startCanvas = document.getElementById('startCanvas');
+      const webStageFrame = document.getElementById('webStageFrame');
+      const progressBar = document.getElementById('progressBar');
 
-      let greet = 'Good Evening';
-      if (hours < 12) greet = 'Good Morning';
-      else if (hours < 18) greet = 'Good Afternoon';
-      
-      const opt = { weekday: 'long', month: 'short', day: 'numeric' };
-      document.getElementById('clockGreeting').textContent = `${greet} • ${now.toLocaleDateString(undefined, opt)}`;
-    }
-    updateClock();
-    setInterval(updateClock, 10000);
+      // Desktop Elements
+      const deskCapsule = document.getElementById('deskCapsule');
+      const deskDisplay = document.getElementById('deskDisplay');
+      const deskInput = document.getElementById('deskInput');
+      const deskLock = document.getElementById('deskLock');
+      const deskBadge = document.getElementById('deskBadge');
 
-    function navigateTo(url) {
-      if (!url || url === 'staunt://newtab') {
-        currentUrl = '';
-        webFrame.src = 'about:blank';
-        webFrame.classList.add('hidden');
-        startPage.classList.remove('hidden');
-        desktopDisplay.textContent = 'Search or enter website name';
-        mobileDisplay.textContent = 'Search';
-        return;
+      // Mobile Elements
+      const mobileDock = document.getElementById('mobileDock');
+      const mobCapsule = document.getElementById('mobCapsule');
+      const mobDisplay = document.getElementById('mobDisplay');
+      const mobInput = document.getElementById('mobInput');
+      const mobLock = document.getElementById('mobLock');
+      const mobBadge = document.getElementById('mobBadge');
+
+      // Overview Elements
+      const overviewOverlay = document.getElementById('overviewOverlay');
+      const tabsGridContainer = document.getElementById('tabsGridContainer');
+
+      // 2. DYNAMIC DIGITAL CLOCK & CONTEXT DATE
+      function updateClock() {
+        const now = new Date();
+        let hours = now.getHours();
+        const mins = String(now.getMinutes()).padStart(2, '0');
+        const timeStr = `${hours % 12 || 12}:${mins}`;
+        document.getElementById('digitalClock').textContent = timeStr;
+
+        let greeting = 'Good Evening';
+        if (hours < 12) greeting = 'Good Morning';
+        else if (hours < 18) greeting = 'Good Afternoon';
+
+        const opt = { weekday: 'long', month: 'short', day: 'numeric' };
+        document.getElementById('contextDate').textContent = `${greeting} • ${now.toLocaleDateString(undefined, opt)}`;
+      }
+      updateClock();
+      setInterval(updateClock, 10000);
+
+      // 3. COMPLETE OMNIBOX & URL PARSER (Auto-Prepend https & Privacy Search)
+      function parseUserInput(raw) {
+        const trimmed = (raw || '').trim();
+        if (!trimmed || trimmed === 'staunt://newtab' || trimmed === 'about:blank') {
+          return 'staunt://newtab';
+        }
+
+        if (/^https?:\/\//i.test(trimmed)) {
+          return trimmed;
+        }
+
+        // Domain format matching (github.com, localhost:3000, 192.168.1.1)
+        const isDomain = /^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/i.test(trimmed) || /^localhost(:\d+)?(\/.*)?$/i.test(trimmed);
+        if (isDomain) {
+          return trimmed.startsWith('localhost') ? 'http://' + trimmed : 'https://' + trimmed;
+        }
+
+        // Forward natural text to Encrypted Zero-Telemetry DuckDuckGo Lite
+        return `https://html.duckduckgo.com/html/?q=${encodeURIComponent(trimmed)}`;
       }
 
-      let target = url.trim();
-      if (!/^https?:\/\//i.test(target)) {
-        if (/^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}/i.test(target)) {
-          target = 'https://' + target;
+      // 4. DUAL-MODE NAVIGATION DISPATCHER
+      window.execNavigate = function(input) {
+        const target = parseUserInput(input);
+        currentUrl = target === 'staunt://newtab' ? '' : target;
+
+        // Progress bar visual loading trigger
+        progressBar.style.width = '35%';
+        progressBar.style.opacity = '1';
+        setTimeout(() => { progressBar.style.width = '75%'; }, 200);
+
+        if (isElectron) {
+          // Native IPC Forwarding for WebContentsView
+          const bridge = window.stauntSecureBridge || window.stauntAPI;
+          if (bridge && typeof bridge.navigate === 'function') {
+            bridge.navigate(target);
+          }
+        }
+
+        // Standalone Web / Tablet / Mobile Viewport update
+        if (target === 'staunt://newtab') {
+          webStageFrame.classList.add('hidden');
+          webStageFrame.src = 'about:blank';
+          startCanvas.classList.remove('hidden');
         } else {
-          // Zero-trace DuckDuckGo Lite search
-          target = 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(target);
+          startCanvas.classList.add('hidden');
+          webStageFrame.classList.remove('hidden');
+          webStageFrame.src = target;
+        }
+
+        setTimeout(() => {
+          progressBar.style.width = '100%';
+          setTimeout(() => {
+            progressBar.style.opacity = '0';
+            progressBar.style.width = '0%';
+          }, 300);
+        }, 600);
+
+        updateTabState(activeTabId, target);
+        updateOmniboxDisplays(target);
+      };
+
+      function updateTabState(id, url) {
+        const tab = tabs.find(t => t.id === id);
+        if (tab) {
+          tab.url = url;
+          try {
+            tab.title = url === 'staunt://newtab' ? 'Favorites' : new URL(url).hostname;
+          } catch(e) {
+            tab.title = url;
+          }
         }
       }
 
-      currentUrl = target;
-      startPage.classList.add('hidden');
-      webFrame.classList.remove('hidden');
-      webFrame.src = target;
+      function updateOmniboxDisplays(url) {
+        let domainDisplay = 'Search or enter website name';
+        let mobDomain = 'Search';
+        let isSecure = false;
 
-      try {
-        const u = new URL(target);
-        const host = u.hostname.replace(/^www\./, '');
-        desktopDisplay.textContent = host;
-        mobileDisplay.textContent = host;
-      } catch(e) {
-        desktopDisplay.textContent = target;
-        mobileDisplay.textContent = target;
-      }
-    }
+        if (url && url !== 'staunt://newtab') {
+          try {
+            const u = new URL(url);
+            domainDisplay = u.hostname.replace(/^www\./, '');
+            mobDomain = domainDisplay;
+            isSecure = u.protocol === 'https:';
+          } catch(e) {
+            domainDisplay = url;
+            mobDomain = url;
+          }
+        }
 
-    // Omnibox Event Listeners (Desktop)
-    desktopCapsule.addEventListener('click', () => {
-      desktopCapsule.classList.add('focused');
-      desktopDisplay.classList.add('hidden');
-      desktopInput.classList.remove('hidden');
-      desktopInput.value = currentUrl;
-      desktopInput.focus();
-      desktopInput.select();
-    });
+        deskDisplay.textContent = domainDisplay;
+        mobDisplay.textContent = mobDomain;
 
-    desktopInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        navigateTo(desktopInput.value);
-        desktopCapsule.classList.remove('focused');
-        desktopInput.classList.add('hidden');
-        desktopDisplay.classList.remove('hidden');
-      } else if (e.key === 'Escape') {
-        desktopCapsule.classList.remove('focused');
-        desktopInput.classList.add('hidden');
-        desktopDisplay.classList.remove('hidden');
-      }
-    });
-
-    desktopInput.addEventListener('blur', () => {
-      setTimeout(() => {
-        desktopCapsule.classList.remove('focused');
-        desktopInput.classList.add('hidden');
-        desktopDisplay.classList.remove('hidden');
-      }, 150);
-    });
-
-    // Omnibox Event Listeners (Mobile)
-    mobileCapsule.addEventListener('click', () => {
-      mobileCapsule.classList.add('focused');
-      mobileDisplay.classList.add('hidden');
-      mobileInput.classList.remove('hidden');
-      mobileInput.value = currentUrl;
-      mobileInput.focus();
-      mobileInput.select();
-    });
-
-    mobileInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        navigateTo(mobileInput.value);
-        mobileCapsule.classList.remove('focused');
-        mobileInput.classList.add('hidden');
-        mobileDisplay.classList.remove('hidden');
-      } else if (e.key === 'Escape') {
-        mobileCapsule.classList.remove('focused');
-        mobileInput.classList.add('hidden');
-        mobileDisplay.classList.remove('hidden');
-      }
-    });
-
-    mobileInput.addEventListener('blur', () => {
-      setTimeout(() => {
-        mobileCapsule.classList.remove('focused');
-        mobileInput.classList.add('hidden');
-        mobileDisplay.classList.remove('hidden');
-      }, 150);
-    });
-
-    // Nav buttons
-    document.getElementById('btnBack').addEventListener('click', () => { try { webFrame.contentWindow.history.back(); } catch(e){} });
-    document.getElementById('btnForward').addEventListener('click', () => { try { webFrame.contentWindow.history.forward(); } catch(e){} });
-    document.getElementById('btnReload').addEventListener('click', () => { if (currentUrl) webFrame.src = currentUrl; });
-    document.getElementById('btnNewTab').addEventListener('click', () => navigateTo('staunt://newtab'));
-
-    document.getElementById('btnMobBack').addEventListener('click', () => { try { webFrame.contentWindow.history.back(); } catch(e){} });
-    document.getElementById('btnMobForward').addEventListener('click', () => { try { webFrame.contentWindow.history.forward(); } catch(e){} });
-    document.getElementById('btnMobNewTab').addEventListener('click', () => navigateTo('staunt://newtab'));
-
-    // Visual Viewport Keyboard Adjustment for Mobile
-    if (window.visualViewport) {
-      const mobBar = document.getElementById('mobileBar');
-      window.visualViewport.addEventListener('resize', () => {
-        const diff = window.innerHeight - (window.visualViewport.height + window.visualViewport.offsetTop);
-        if (diff > 0) {
-          mobBar.style.transform = `translateY(-${diff}px)`;
+        if (isSecure) {
+          deskLock.classList.add('secure');
+          mobLock.style.color = '#30d158';
         } else {
-          mobBar.style.transform = 'translateY(0)';
+          deskLock.classList.remove('secure');
+          mobLock.style.color = 'var(--text-muted)';
+        }
+      }
+
+      // 5. OMNIBOX INTERACTION (FOCUS / SELECT BEHAVIOR)
+      function setupCapsule(capsule, displayEl, inputEl) {
+        capsule.addEventListener('click', () => {
+          capsule.classList.add('focused');
+          displayEl.classList.add('hidden');
+          inputEl.classList.remove('hidden');
+          inputEl.value = currentUrl;
+          inputEl.focus();
+          inputEl.select(); // Select-on-focus behavior
+        });
+
+        inputEl.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            deactivate();
+            execNavigate(inputEl.value);
+          } else if (e.key === 'Escape') {
+            deactivate();
+          }
+        });
+
+        inputEl.addEventListener('blur', () => setTimeout(deactivate, 150));
+
+        function deactivate() {
+          capsule.classList.remove('focused');
+          inputEl.classList.add('hidden');
+          displayEl.classList.remove('hidden');
+          updateOmniboxDisplays(currentUrl);
+        }
+      }
+
+      setupCapsule(deskCapsule, deskDisplay, deskInput);
+      setupCapsule(mobCapsule, mobDisplay, mobInput);
+
+      // 6. NAVIGATION BUTTONS
+      function handleBack() {
+        if (isElectron && window.stauntAPI?.goBack) return window.stauntAPI.goBack();
+        try { webStageFrame.contentWindow.history.back(); } catch(e){}
+      }
+      function handleForward() {
+        if (isElectron && window.stauntAPI?.goForward) return window.stauntAPI.goForward();
+        try { webStageFrame.contentWindow.history.forward(); } catch(e){}
+      }
+      function handleReload() {
+        if (isElectron && window.stauntAPI?.reload) return window.stauntAPI.reload();
+        if (currentUrl) webStageFrame.src = currentUrl;
+      }
+
+      document.getElementById('btnDeskBack').addEventListener('click', handleBack);
+      document.getElementById('btnDeskForward').addEventListener('click', handleForward);
+      document.getElementById('btnDeskReload').addEventListener('click', handleReload);
+
+      document.getElementById('btnMobBack').addEventListener('click', handleBack);
+      document.getElementById('btnMobForward').addEventListener('click', handleForward);
+
+      // Desktop Window Controls
+      if (isElectron && window.stauntAPI) {
+        document.getElementById('btnDeskClose').addEventListener('click', () => window.stauntAPI.closeWindow());
+        document.getElementById('btnDeskMin').addEventListener('click', () => window.stauntAPI.minimizeWindow());
+        document.getElementById('btnDeskMax').addEventListener('click', () => window.stauntAPI.maximizeWindow());
+      }
+
+      // 7. TAB MANAGEMENT & TABLET 2-COLUMN DRAWER
+      function handleNewTab() {
+        const newId = Date.now();
+        tabs.push({ id: newId, url: 'staunt://newtab', title: 'Favorites', active: true });
+        activeTabId = newId;
+        updateBadgeCounts();
+        closeOverview();
+        execNavigate('staunt://newtab');
+      }
+
+      function updateBadgeCounts() {
+        const count = tabs.length;
+        deskBadge.textContent = count;
+        mobBadge.textContent = count;
+      }
+
+      document.getElementById('btnDeskNewTab').addEventListener('click', handleNewTab);
+      document.getElementById('btnMobNewTab').addEventListener('click', handleNewTab);
+      document.getElementById('btnOverviewAddTab').addEventListener('click', handleNewTab);
+
+      function toggleOverview() {
+        isOverviewOpen = !isOverviewOpen;
+        if (isOverviewOpen) {
+          renderOverviewGrid();
+          overviewOverlay.classList.remove('hidden');
+        } else {
+          closeOverview();
+        }
+      }
+
+      function closeOverview() {
+        isOverviewOpen = false;
+        overviewOverlay.classList.add('hidden');
+      }
+
+      document.getElementById('btnDeskTabCount').addEventListener('click', toggleOverview);
+      document.getElementById('btnMobTabCount').addEventListener('click', toggleOverview);
+      document.getElementById('btnOverviewClose').addEventListener('click', closeOverview);
+
+      function renderOverviewGrid() {
+        tabsGridContainer.innerHTML = '';
+        tabs.forEach(tab => {
+          const card = document.createElement('div');
+          card.className = `tab-card ${tab.id === activeTabId ? 'active' : ''}`;
+          
+          let domain = 'Favorites';
+          try {
+            if (tab.url !== 'staunt://newtab') domain = new URL(tab.url).hostname;
+          } catch(e) {}
+
+          card.innerHTML = `
+            <div class="tab-card-header">
+              <div class="tab-card-info">
+                <span class="tab-card-title">${tab.title || domain}</span>
+              </div>
+              <button class="tab-card-close">&times;</button>
+            </div>
+            <div class="tab-card-preview">${domain}</div>
+          `;
+
+          card.querySelector('.tab-card-close').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (tabs.length > 1) {
+              tabs = tabs.filter(t => t.id !== tab.id);
+              if (activeTabId === tab.id) {
+                activeTabId = tabs[tabs.length - 1].id;
+                execNavigate(tabs[tabs.length - 1].url);
+              }
+              updateBadgeCounts();
+              renderOverviewGrid();
+            }
+          });
+
+          card.addEventListener('click', () => {
+            activeTabId = tab.id;
+            execNavigate(tab.url);
+            closeOverview();
+          });
+
+          tabsGridContainer.appendChild(card);
+        });
+      }
+
+      // 8. MOBILE SCROLL AUTO-HIDE & VISUAL VIEWPORT ADAPTATION
+      let lastScrollY = window.scrollY;
+      window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY && currentScrollY > 50) {
+          mobileDock.classList.add('autohidden');
+        } else {
+          mobileDock.classList.remove('autohidden');
+        }
+        lastScrollY = currentScrollY;
+      }, { passive: true });
+
+      // Visual Viewport Keyboard Lifting for Mobile
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+          const offset = window.innerHeight - (window.visualViewport.height + window.visualViewport.offsetTop);
+          if (offset > 0) {
+            mobileDock.style.transform = `translateY(-${offset}px)`;
+          } else {
+            mobileDock.style.transform = 'translateY(0)';
+          }
+        });
+      }
+
+      // 9. MOBILE EDGE-SWIPE GESTURES (Back & Forward)
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let isEdgeSwipe = false;
+
+      document.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        const width = window.innerWidth;
+        isEdgeSwipe = (touchStartX <= 35 || touchStartX >= width - 35);
+      }, { passive: true });
+
+      document.addEventListener('touchend', (e) => {
+        if (!isEdgeSwipe) return;
+        const touchEndX = e.changedTouches[0].clientX;
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY);
+
+        if (deltaY < 50) {
+          if (touchStartX <= 35 && deltaX > 70) {
+            handleBack(); // Swipe right from left edge -> Back
+          } else if (touchStartX >= window.innerWidth - 35 && deltaX < -70) {
+            handleForward(); // Swipe left from right edge -> Forward
+          }
+        }
+        isEdgeSwipe = false;
+      }, { passive: true });
+
+      // 10. KEYBOARD-FIRST SHORTCUTS (DESKTOP)
+      window.addEventListener('keydown', (e) => {
+        const isMeta = e.metaKey || e.ctrlKey;
+        if (isMeta && e.key.toLowerCase() === 'l') {
+          e.preventDefault();
+          deskCapsule.click();
+        } else if (isMeta && e.key.toLowerCase() === 't') {
+          e.preventDefault();
+          handleNewTab();
+        } else if (isMeta && e.key.toLowerCase() === 'w') {
+          e.preventDefault();
+          if (tabs.length > 1) {
+            tabs = tabs.filter(t => t.id !== activeTabId);
+            activeTabId = tabs[tabs.length - 1].id;
+            execNavigate(tabs[tabs.length - 1].url);
+            updateBadgeCounts();
+          }
+        } else if (isMeta && e.key.toLowerCase() === 'r') {
+          e.preventDefault();
+          handleReload();
+        } else if (isMeta && e.key === '\\') {
+          e.preventDefault();
+          toggleOverview();
         }
       });
-    }
 
-    // Edge Swipe Gestures
-    let touchStartX = 0;
-    document.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) touchStartX = e.touches[0].clientX;
-    }, { passive: true });
-
-    document.addEventListener('touchend', (e) => {
-      const deltaX = e.changedTouches[0].clientX - touchStartX;
-      if (touchStartX < 35 && deltaX > 75) {
-        // Edge swipe right -> Back
-        try { webFrame.contentWindow.history.back(); } catch(e){}
-      } else if (touchStartX > window.innerWidth - 35 && deltaX < -75) {
-        // Edge swipe left -> Forward
-        try { webFrame.contentWindow.history.forward(); } catch(e){}
-      }
-    }, { passive: true });
+      // Initialize
+      updateBadgeCounts();
+    })();
   </script>
 </body>
 </html>
