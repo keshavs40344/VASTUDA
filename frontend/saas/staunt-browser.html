@@ -3,30 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="theme-color" content="#0a0c13" />
-  <title>Staunt Browser Ultra • Sovereign Cloud Browser</title>
+  <title>Staunt Browser Ultra • Pure Web Engine</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238b5cf6'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'/></svg>" />
   <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#090a0f" />
 
   <style>
     :root {
-      --bg-root: #07090e;
-      --bg-toolbar: rgba(13, 16, 25, 0.96);
-      --bg-omnibox: rgba(255, 255, 255, 0.07);
-      --bg-omnibox-hover: rgba(255, 255, 255, 0.12);
-      --bg-omnibox-focus: rgba(255, 255, 255, 0.15);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-focus: rgba(139, 92, 246, 0.6);
+      --bg-chrome: #0d0f17;
+      --bg-omnibox: rgba(255, 255, 255, 0.05);
+      --bg-omnibox-hover: rgba(255, 255, 255, 0.08);
+      --bg-omnibox-focus: rgba(255, 255, 255, 0.12);
       --accent: #8b5cf6;
-      --accent-glow: rgba(139, 92, 246, 0.25);
+      --accent-gradient: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+      --border-subtle: rgba(255, 255, 255, 0.09);
+      --border-focus: rgba(139, 92, 246, 0.5);
       --text-white: #ffffff;
-      --text-dim: rgba(255, 255, 255, 0.65);
-      --text-muted: rgba(255, 255, 255, 0.4);
-      --header-h: 40px;
-      --tabs-h: 30px;
-      --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --text-dim: #94a3b8;
+      --text-muted: #64748b;
+      --header-h: 46px;
+      --tabs-h: 36px;
     }
 
     * {
@@ -36,91 +32,50 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    body, html {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: var(--bg-root);
-      font-family: var(--font-system);
+      background: #090a0f;
       color: var(--text-white);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, sans-serif;
       user-select: none;
     }
 
-    /* ─── HOVER TRIGGER ZONE FOR AUTO-HIDE TOOLBAR ─── */
-    .top-hover-trigger {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 8px;
-      z-index: 10000;
-    }
-
-    /* ─── CHROME-STYLE FLOATING APP HEADER ─── */
+    /* ─── APP HEADER / CHROME ─── */
     .app-header {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       height: var(--header-h);
-      background: var(--bg-toolbar);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(13, 15, 23, 0.88);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       border-bottom: 0.5px solid var(--border-subtle);
       display: flex;
       align-items: center;
-      padding: 0 10px;
-      gap: 8px;
-      z-index: 9999;
-      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 0 12px;
+      gap: 10px;
+      z-index: 10000;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     body.immersive-mode .app-header {
       transform: translateY(-100%);
     }
 
-    .top-hover-trigger:hover + .app-header,
-    .app-header:hover {
-      transform: translateY(0) !important;
-    }
-
-    /* Floating micro toggle when bar is hidden */
-    .immersive-floating-pill {
-      position: fixed;
-      top: 6px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(20, 24, 38, 0.9);
-      border: 0.5px solid var(--border-subtle);
-      color: var(--text-white);
-      font-size: 11px;
-      font-weight: 500;
-      padding: 4px 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      z-index: 9998;
-      display: none;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
-      backdrop-filter: blur(12px);
-    }
-
-    body.immersive-mode .immersive-floating-pill {
+    /* Navigation Icon Controls */
+    .nav-controls {
       display: flex;
       align-items: center;
       gap: 4px;
     }
 
-    /* Controls: Back, Forward, Refresh, Home */
-    .nav-controls {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-    }
-
     .btn-nav-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
       background: transparent;
       border: none;
       color: var(--text-dim);
@@ -136,45 +91,55 @@
       color: var(--text-white);
     }
 
-    .btn-nav-icon svg {
-      width: 14px;
-      height: 14px;
+    .btn-nav-icon:active {
+      transform: scale(0.92);
     }
 
-    /* Omnibox */
+    .btn-nav-icon svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    /* Omnibox Floating Bar */
     .omnibox-wrapper {
       flex: 1;
-      max-width: 720px;
-      height: 28px;
+      height: 32px;
       background: var(--bg-omnibox);
       border: 0.5px solid var(--border-subtle);
-      border-radius: 8px;
+      border-radius: 9px;
       display: flex;
       align-items: center;
-      padding: 0 8px;
-      gap: 6px;
+      padding: 0 10px;
+      gap: 8px;
       transition: all 0.2s ease;
     }
 
     .omnibox-wrapper:hover {
       background: var(--bg-omnibox-hover);
-      border-color: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.16);
     }
 
     .omnibox-wrapper:focus-within {
       background: var(--bg-omnibox-focus);
       border-color: var(--border-focus);
-      box-shadow: 0 0 0 2px var(--accent-glow);
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
     }
 
     .engine-badge {
       font-size: 11px;
       font-weight: 700;
-      color: var(--accent);
-      padding: 2px 5px;
-      border-radius: 4px;
-      background: rgba(139, 92, 246, 0.15);
+      color: #a78bfa;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: rgba(139, 92, 246, 0.16);
       cursor: pointer;
+    }
+
+    .ssl-lock {
+      width: 13px;
+      height: 13px;
+      color: #34d399;
+      flex-shrink: 0;
     }
 
     .omnibox-input {
@@ -183,7 +148,7 @@
       border: none;
       outline: none;
       color: var(--text-white);
-      font-size: 12px;
+      font-size: 13px;
       font-family: inherit;
     }
 
@@ -191,7 +156,7 @@
       color: var(--text-muted);
     }
 
-    /* Right Action Buttons */
+    /* Header Actions */
     .header-actions {
       display: flex;
       align-items: center;
@@ -199,30 +164,29 @@
     }
 
     .action-btn {
-      height: 26px;
+      height: 28px;
       padding: 0 10px;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.06);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.05);
       border: 0.5px solid var(--border-subtle);
       color: var(--text-dim);
       font-size: 11px;
       font-weight: 500;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       cursor: pointer;
       transition: all 0.15s ease;
-      text-decoration: none;
       white-space: nowrap;
     }
 
     .action-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.1);
       color: var(--text-white);
     }
 
     .btn-download-app {
-      background: linear-gradient(135deg, #7c3aed, #6366f1);
+      background: var(--accent-gradient);
       color: #fff !important;
       border: none;
       font-weight: 600;
@@ -230,7 +194,7 @@
 
     .btn-download-app:hover {
       opacity: 0.92;
-      box-shadow: 0 0 12px var(--accent-glow);
+      box-shadow: 0 0 14px rgba(139, 92, 246, 0.4);
     }
 
     /* ─── TABS STRIP ─── */
@@ -240,16 +204,17 @@
       left: 0;
       right: 0;
       height: var(--tabs-h);
-      background: rgba(10, 12, 19, 0.95);
+      background: rgba(10, 12, 18, 0.94);
+      backdrop-filter: blur(16px);
       border-bottom: 0.5px solid var(--border-subtle);
       display: flex;
       align-items: center;
-      padding: 0 8px;
-      gap: 4px;
+      padding: 0 10px;
+      gap: 5px;
       z-index: 9997;
       overflow-x: auto;
       scrollbar-width: none;
-      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .tabs-strip::-webkit-scrollbar { display: none; }
@@ -259,16 +224,16 @@
     }
 
     .tab-pill {
-      height: 24px;
-      min-width: 110px;
-      max-width: 200px;
-      background: rgba(255, 255, 255, 0.04);
+      height: 26px;
+      min-width: 120px;
+      max-width: 220px;
+      background: rgba(255, 255, 255, 0.03);
       border: 0.5px solid transparent;
-      border-radius: 6px;
-      padding: 0 8px;
+      border-radius: 7px;
+      padding: 0 10px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       font-size: 11px;
       color: var(--text-dim);
       cursor: pointer;
@@ -276,23 +241,23 @@
       transition: all 0.15s ease;
     }
 
-    .tab-favicon {
-      width: 13px;
-      height: 13px;
-      border-radius: 2px;
-      flex-shrink: 0;
-      object-fit: contain;
-    }
-
     .tab-pill:hover {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.07);
       color: var(--text-white);
     }
 
     .tab-pill.active {
       background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.12);
       color: #fff;
+    }
+
+    .tab-favicon {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      object-fit: contain;
     }
 
     .tab-title-span {
@@ -303,11 +268,11 @@
     }
 
     .tab-close-x {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-muted);
       border-radius: 50%;
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -319,17 +284,19 @@
     }
 
     .btn-new-tab {
-      width: 22px;
-      height: 22px;
-      border-radius: 6px;
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
       background: transparent;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
+      border: 0.5px solid transparent;
+      color: var(--text-dim);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
     }
 
     .btn-new-tab:hover {
@@ -337,25 +304,20 @@
       color: #fff;
     }
 
-    /* ─── PROGRESS BAR ─── */
+    /* Progress Strip */
     .progress-bar-strip {
       position: fixed;
       top: calc(var(--header-h) + var(--tabs-h));
       left: 0;
-      height: 2px;
       width: 0%;
-      background: linear-gradient(90deg, #8b5cf6, #38bdf8);
+      height: 2px;
+      background: linear-gradient(90deg, #8b5cf6, #ec4899, #3b82f6);
       z-index: 10001;
-      transition: width 0.2s ease, opacity 0.25s ease;
-      opacity: 0;
+      transition: width 0.15s ease, opacity 0.25s ease;
     }
 
     .progress-bar-strip.loading {
       opacity: 1;
-    }
-
-    body.immersive-mode .progress-bar-strip {
-      top: 0;
     }
 
     /* ─── VIEWPORT CANVAS ─── */
@@ -366,7 +328,8 @@
       right: 0;
       bottom: 0;
       background: #000;
-      transition: top 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+      transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     body.immersive-mode .viewport-canvas {
@@ -377,7 +340,9 @@
       position: absolute;
       inset: 0;
       display: none;
-      background: #000;
+      width: 100%;
+      height: 100%;
+      background: #090a0f;
     }
 
     .tab-viewport.active {
@@ -388,152 +353,135 @@
       width: 100%;
       height: 100%;
       border: none;
-      display: block;
       background: #fff;
+      display: block;
     }
 
-    /* ─── NEW TAB SPEED DIAL LAUNCHPAD ─── */
+    /* ─── NEW TAB LUXURY LAUNCHPAD ─── */
     .newtab-wall {
-      width: 100%;
-      height: 100%;
-      overflow-y: auto;
-      background: radial-gradient(circle at 50% 25%, #151824 0%, #07090e 70%);
+      position: absolute;
+      inset: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 20px 60px;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 30%, #151828 0%, #08090e 100%);
+      padding: 30px 20px;
+      overflow-y: auto;
+      text-align: center;
     }
 
     .launch-clock {
-      font-size: 54px;
+      font-size: 58px;
       font-weight: 200;
+      color: rgba(255, 255, 255, 0.95);
       letter-spacing: -1.5px;
-      color: rgba(255, 255, 255, 0.9);
-      margin-bottom: 12px;
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums;
     }
 
-    .launch-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 24px;
-      background: linear-gradient(135deg, #fff, rgba(255,255,255,0.6));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .launch-greeting {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 28px;
+      letter-spacing: 0.5px;
     }
 
     .speed-grid {
       display: grid;
-      grid-template-columns: repeat(5, 100px);
+      grid-template-columns: repeat(4, 1fr);
       gap: 16px;
-      margin-bottom: 32px;
+      max-width: 580px;
+      width: 100%;
+      margin-bottom: 36px;
     }
 
     @media (max-width: 600px) {
       .speed-grid {
-        grid-template-columns: repeat(3, 90px);
+        grid-template-columns: repeat(3, 1fr);
         gap: 12px;
       }
     }
 
     .speed-tile {
       background: rgba(255, 255, 255, 0.04);
-      border: 0.5px solid var(--border-subtle);
-      border-radius: 12px;
-      height: 90px;
+      border: 0.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 18px 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
+      gap: 10px;
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .speed-tile:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(139, 92, 246, 0.4);
       transform: translateY(-3px);
-      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     }
 
     .tile-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 20px;
       font-weight: 700;
     }
 
     .tile-label {
-      font-size: 11px;
-      color: var(--text-dim);
-      font-weight: 500;
-    }
-
-    /* Showcase Row */
-    .showcase-row {
-      display: flex;
-      gap: 16px;
-      max-width: 640px;
-      width: 100%;
-    }
-
-    @media (max-width: 640px) {
-      .showcase-row {
-        flex-direction: column;
-      }
-    }
-
-    .showcase-card {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.03);
-      border: 0.5px solid var(--border-subtle);
-      border-radius: 14px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .showcase-card h3 {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .showcase-card p {
-      font-size: 11px;
-      color: var(--text-muted);
-      line-height: 1.4;
-      flex: 1;
-    }
-
-    .showcase-btn {
-      display: block;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.08);
-      border: 0.5px solid rgba(255, 255, 255, 0.12);
-      color: #fff;
-      text-decoration: none;
-      padding: 8px;
-      border-radius: 8px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    /* App Showcase Banner */
+    .app-badge-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .app-badge-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 0.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
       transition: all 0.15s ease;
     }
 
-    .showcase-btn:hover {
-      background: var(--accent);
-      border-color: var(--accent);
+    .app-badge-card:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.16);
+      transform: translateY(-2px);
     }
 
-    /* Modal */
+    .badge-btn {
+      background: var(--accent-gradient);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 6px;
+    }
+
+    /* Download Modal */
     .download-modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -546,7 +494,7 @@
     }
 
     .modal-box {
-      background: #111420;
+      background: #10121d;
       border: 0.5px solid rgba(255, 255, 255, 0.15);
       border-radius: 16px;
       max-width: 440px;
@@ -555,7 +503,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
     }
 
     .modal-head {
@@ -574,216 +522,26 @@
       color: var(--text-muted);
       font-size: 16px;
     }
-  
-    /* ─── YOUTUBE HUB STYLES ─── */
-    .youtube-hub {
-      position: absolute;
-      inset: 0;
-      background: #090a0f;
-      overflow-y: auto;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      z-index: 10;
-    }
-    .ythub-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .ythub-logo {
-      font-size: 18px;
-      font-weight: 700;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .ythub-search-bar {
-      display: flex;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.06);
-      border: 0.5px solid rgba(255, 255, 255, 0.15);
-      border-radius: 24px;
-      padding: 4px 6px 4px 16px;
-      flex: 1;
-      max-width: 500px;
-    }
-    .ythub-search-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-size: 13px;
-      font-family: inherit;
-    }
-    .ythub-search-btn {
-      background: #ff453a;
-      border: none;
-      color: #fff;
-      padding: 6px 14px;
-      border-radius: 18px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .ythub-search-btn:hover {
-      background: #e0281d;
-    }
-    .ythub-popout-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 0.5px solid rgba(255, 255, 255, 0.12);
-      color: #cbd5e1;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .ythub-popout-btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: #fff;
-    }
-    .ythub-chips {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: none;
-    }
-    .ythub-chips::-webkit-scrollbar { display: none; }
-    .ythub-chip {
-      background: rgba(255, 255, 255, 0.06);
-      border: 0.5px solid rgba(255, 255, 255, 0.1);
-      color: #94a3b8;
-      padding: 5px 12px;
-      border-radius: 16px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-    }
-    .ythub-chip:hover, .ythub-chip.active {
-      background: rgba(255, 69, 58, 0.15);
-      border-color: rgba(255, 69, 58, 0.4);
-      color: #ff6961;
-    }
-    .ythub-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 16px;
-    }
-    .yt-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 0.5px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-    }
-    .yt-card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(255, 69, 58, 0.5);
-      box-shadow: 0 8px 24px rgba(255, 69, 58, 0.12);
-    }
-    .yt-thumb-wrapper {
-      position: relative;
-      width: 100%;
-      padding-top: 56.25%;
-      background: #000;
-    }
-    .yt-thumb-img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .yt-play-badge {
-      position: absolute;
-      bottom: 8px;
-      right: 8px;
-      background: rgba(0, 0, 0, 0.75);
-      color: #fff;
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-    .yt-card-info {
-      padding: 10px;
-    }
-    .yt-card-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: #fff;
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .yt-player-bar {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 20;
-      display: flex;
-      gap: 8px;
-    }
-    .yt-player-back-btn {
-      background: rgba(18, 20, 29, 0.85);
-      backdrop-filter: blur(8px);
-      border: 0.5px solid rgba(255, 255, 255, 0.2);
-      color: #fff;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    }
-    .yt-player-back-btn:hover {
-      background: #ff453a;
-      border-color: #ff453a;
-    }
-
   </style>
 </head>
 <body>
 
-  <!-- Top 8px hover zone for auto-hide toolbar -->
-  <div class="top-hover-trigger"></div>
-
-  <!-- Micro pill to restore toolbar when hidden -->
-  <div class="immersive-floating-pill" id="btn-show-toolbar">
-    ▼ Show Toolbar
-  </div>
-
   <!-- Browser Chrome Bar -->
   <header class="app-header" id="main-header">
     <div class="nav-controls">
-      <button class="btn-nav-icon" id="nav-back" title="Back">
+      <button class="btn-nav-icon" id="nav-back" title="Back (Alt+Left)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
-      <button class="btn-nav-icon" id="nav-forward" title="Forward">
+      <button class="btn-nav-icon" id="nav-forward" title="Forward (Alt+Right)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
       </button>
-      <button class="btn-nav-icon" id="nav-reload" title="Reload">
+      <button class="btn-nav-icon" id="nav-reload" title="Reload (Ctrl+R)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
       </button>
       <button class="btn-nav-icon" id="nav-home" title="New Tab Home">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       </button>
-      <button class="btn-nav-icon" id="nav-popout" title="Open in Dedicated Window (100% Native Compatibility)">
+      <button class="btn-nav-icon" id="nav-popout" title="Open Page in Dedicated Window (100% Native Speed)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </button>
     </div>
@@ -791,19 +549,13 @@
     <!-- Omnibox -->
     <div class="omnibox-wrapper">
       <span class="engine-badge" id="engine-badge" title="Click to cycle search engine">G</span>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <input type="text" class="omnibox-input" id="omnibox-input" placeholder="Search Google or enter address (e.g. youtube.com)" spellcheck="false" autocomplete="off" />
+      <svg class="ssl-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <input type="text" class="omnibox-input" id="omnibox-input" placeholder="Search Google or enter any address (e.g. youtube.com, wikipedia.org)" spellcheck="false" autocomplete="off" />
     </div>
 
     <div class="header-actions">
-      <button class="action-btn" id="btn-toggle-engine" title="Toggle between ⚡ Direct Local Gigabit and 🛡️ Cloud Proxy Shield" style="font-weight: 600;">
-        ⚡ Direct
-      </button>
-      <button class="action-btn" id="btn-toggle-immersive" title="Toggle Auto-Hide Toolbar (100% Screen Space)">
+      <button class="action-btn" id="btn-toggle-immersive" title="Toggle Auto-Hide Toolbar (F11)">
         ▲ Immersive
-      </button>
-      <button class="action-btn" id="btn-toggle-fs" title="True Full Screen">
-        ⛶ Full Screen
       </button>
       <button class="action-btn btn-download-app" id="btn-open-download-modal">
         Get App (EXE / APK)
@@ -813,8 +565,8 @@
 
   <!-- Tabs Strip -->
   <nav class="tabs-strip" id="tabs-strip">
-    <div id="tabs-rail" style="display: flex; gap: 4px; align-items: center;"></div>
-    <button class="btn-new-tab" id="btn-add-tab" title="New Tab">+</button>
+    <div id="tabs-rail" style="display: flex; gap: 5px; align-items: center;"></div>
+    <button class="btn-new-tab" id="btn-add-tab" title="New Tab (Ctrl+T)">+</button>
   </nav>
 
   <!-- Progress Bar Strip -->
@@ -827,18 +579,18 @@
   <div class="download-modal-overlay" id="download-modal">
     <div class="modal-box">
       <div class="modal-head">
-        <h2>Download Staunt Browser</h2>
+        <h2>Staunt Browser Native Apps</h2>
         <span class="modal-close" id="modal-close-btn">✕</span>
       </div>
-      <p style="font-size: 12px; color: var(--text-dim); line-height: 1.5;">
-        Experience Staunt Browser natively on your desktop or smartphone with built-in hardware acceleration and zero ad/tracker overhead.
+      <p style="font-size: 13px; color: var(--text-dim); line-height: 1.5;">
+        Get maximum hardware acceleration, local gigabit Wi-Fi speed, and zero web iframe restrictions.
       </p>
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <a href="/assets/Staunt-Browser-Setup.exe" download="Staunt-Browser-Setup.exe" class="showcase-btn" style="background: #8b5cf6;">
-          🪟 Download Windows .EXE (5.6 KB Setup)
+        <a href="/assets/Staunt-Browser-Setup.exe" download="Staunt-Browser-Setup.exe" class="action-btn" style="height: 38px; justify-content: center; background: #8b5cf6; color: #fff; font-size: 13px; text-decoration: none;">
+          🪟 Download Windows .EXE (Hardware Accelerated)
         </a>
-        <a href="/assets/Staunt-Browser-Mobile.apk" download="Staunt-Browser-Mobile.apk" class="showcase-btn" style="background: #10b981;">
-          📱 Download Android .APK (5.19 MB Universal)
+        <a href="/assets/Staunt-Browser-Mobile.apk" download="Staunt-Browser-Mobile.apk" class="action-btn" style="height: 38px; justify-content: center; background: #10b981; color: #fff; font-size: 13px; text-decoration: none;">
+          📱 Download Android .APK (Universal 5.19 MB)
         </a>
       </div>
     </div>
@@ -865,8 +617,6 @@
       const canvas = document.getElementById('viewport-canvas');
       const progressStrip = document.getElementById('progress-strip');
       const btnImmersive = document.getElementById('btn-toggle-immersive');
-      const btnShowToolbar = document.getElementById('btn-show-toolbar');
-      const btnFs = document.getElementById('btn-toggle-fs');
       const downloadModal = document.getElementById('download-modal');
 
       // ─── ENGINE SWITCHER ───
@@ -875,19 +625,19 @@
         const nextIdx = (engineKeys.indexOf(currentEngineKey) + 1) % engineKeys.length;
         currentEngineKey = engineKeys[nextIdx];
         engineBadge.textContent = SEARCH_ENGINES[currentEngineKey].name;
-        omnibox.placeholder = 'Search ' + currentEngineKey.toUpperCase() + ' or enter address';
+        omnibox.placeholder = 'Search ' + currentEngineKey.toUpperCase() + ' or enter any address';
       });
 
       // ─── PROGRESS BAR ───
       let progressTimer = null;
       function startProgress() {
         clearInterval(progressTimer);
-        progressStrip.style.width = '15%';
+        progressStrip.style.width = '20%';
         progressStrip.classList.add('loading');
-        let p = 15;
+        let p = 20;
         progressTimer = setInterval(() => {
           if (p < 85) {
-            p += Math.random() * 18;
+            p += Math.random() * 15;
             progressStrip.style.width = Math.min(p, 85) + '%';
           }
         }, 120);
@@ -902,21 +652,30 @@
         }, 250);
       }
 
-      // ─── URL RESOLVER ───
+      // ─── UNIVERSAL URL RESOLVER (ANY WEB ADDRESS) ───
       function resolveTargetUrl(raw) {
         if (!raw) return '';
         let trimmed = raw.trim();
-        if (!/^https?:\/\//i.test(trimmed)) {
-          if (/^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(trimmed) && !trimmed.includes(' ')) {
-            trimmed = 'https://' + trimmed;
-          } else {
-            return SEARCH_ENGINES[currentEngineKey].url + encodeURIComponent(trimmed);
-          }
+
+        // 1. If it's already a full protocol URL
+        if (/^https?:\/\//i.test(trimmed)) {
+          return optimizeUrl(trimmed);
         }
 
-        // YouTube video watch & youtu.be optimizer
+        // 2. If it's a domain name (e.g. youtube.com, google.com, en.wikipedia.org)
+        if (/^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(trimmed) && !trimmed.includes(' ')) {
+          return optimizeUrl('https://' + trimmed);
+        }
+
+        // 3. Otherwise, it is a search query
+        return SEARCH_ENGINES[currentEngineKey].url + encodeURIComponent(trimmed);
+      }
+
+      function optimizeUrl(url) {
         try {
-          const u = new URL(trimmed);
+          const u = new URL(url);
+          // YouTube specific video playback optimization:
+          // Google embed player is officially allowed in all iframes with zero bot-blocking and 1080p speed!
           if (u.hostname.includes('youtu.be')) {
             const vid = u.pathname.replace(/^\//, '').split('/')[0];
             if (vid) return 'https://www.youtube.com/embed/' + vid + '?autoplay=1&rel=0';
@@ -929,8 +688,7 @@
             }
           }
         } catch(e) {}
-
-        return trimmed;
+        return url;
       }
 
       function getDomain(url) {
@@ -938,6 +696,16 @@
           return new URL(url).hostname.replace(/^www\./, '');
         } catch(e) {
           return url || 'New Tab';
+        }
+      }
+
+      function getFaviconUrl(url) {
+        if (!url) return '';
+        try {
+          const u = new URL(url);
+          return 'https://www.google.com/s2/favicons?domain=' + u.hostname + '&sz=32';
+        } catch(e) {
+          return '';
         }
       }
 
@@ -998,16 +766,6 @@
         }
       }
 
-      function getFaviconUrl(url) {
-        if (!url) return '';
-        try {
-          const u = new URL(url);
-          return 'https://www.google.com/s2/favicons?domain=' + u.hostname + '&sz=32';
-        } catch(e) {
-          return '';
-        }
-      }
-
       function renderTabs() {
         tabsRail.innerHTML = '';
         tabs.forEach(tab => {
@@ -1026,7 +784,7 @@
           pill.innerHTML = `
             ${iconHtml}
             <span class="tab-title-span">${escapeHtml(tab.title)}</span>
-            <span class="tab-close-x" title="Close (Ctrl+W)">✕</span>
+            <span class="tab-close-x" title="Close">✕</span>
           `;
           pill.addEventListener('click', () => switchTab(tab.id));
           pill.querySelector('.tab-close-x').addEventListener('click', (e) => closeTab(tab.id, e));
@@ -1046,78 +804,67 @@
         vp.dataset.id = tab.id;
 
         vp.innerHTML = `
+          <!-- New Tab Luxury Launchpad -->
           <div class="newtab-wall" id="wall-${tab.id}">
             <div class="launch-clock" id="clock-${tab.id}">--:--</div>
-            <div class="launch-title">Staunt Browser Ultra</div>
+            <div class="launch-greeting">Staunt Browser Ultra • Pure Sovereign Web Engine</div>
 
             <div class="speed-grid">
-              <div class="speed-tile" data-url="https://www.youtube.com">
-                <div class="tile-icon" style="background: rgba(255,0,0,0.18); color: #ff453a;">▶</div>
-                <div class="tile-label">YouTube</div>
-              </div>
               <div class="speed-tile" data-url="https://www.google.com">
                 <div class="tile-icon" style="background: rgba(66,133,244,0.18); color: #4285f4;">G</div>
                 <div class="tile-label">Google</div>
               </div>
-              <div class="speed-tile" data-url="https://www.github.com">
-                <div class="tile-icon" style="background: rgba(255,255,255,0.15); color: #fff;">⌥</div>
-                <div class="tile-label">GitHub</div>
+              <div class="speed-tile" data-url="https://www.youtube.com">
+                <div class="tile-icon" style="background: rgba(255,0,0,0.18); color: #ff453a;">▶</div>
+                <div class="tile-label">YouTube</div>
               </div>
               <div class="speed-tile" data-url="https://www.wikipedia.org">
                 <div class="tile-icon" style="background: rgba(255,255,255,0.15); color: #cbd5e1;">W</div>
                 <div class="tile-label">Wikipedia</div>
               </div>
+              <div class="speed-tile" data-url="https://github.com">
+                <div class="tile-icon" style="background: rgba(255,255,255,0.15); color: #fff;">⌥</div>
+                <div class="tile-label">GitHub</div>
+              </div>
               <div class="speed-tile" data-url="https://www.reddit.com">
                 <div class="tile-icon" style="background: rgba(255,69,0,0.18); color: #ff4500;">R</div>
                 <div class="tile-label">Reddit</div>
               </div>
+              <div class="speed-tile" data-url="https://news.ycombinator.com">
+                <div class="tile-icon" style="background: rgba(255,102,0,0.18); color: #ff6600;">Y</div>
+                <div class="tile-label">Hacker News</div>
+              </div>
+              <div class="speed-tile" data-url="https://www.bbc.com/news">
+                <div class="tile-icon" style="background: rgba(187,25,25,0.18); color: #ef4444;">B</div>
+                <div class="tile-label">BBC News</div>
+              </div>
+              <div class="speed-tile" data-url="https://duckduckgo.com">
+                <div class="tile-icon" style="background: rgba(222,88,51,0.18); color: #de5833;">🦆</div>
+                <div class="tile-label">DuckDuckGo</div>
+              </div>
             </div>
 
-            <div class="showcase-row">
-              <div class="showcase-card">
-                <h3>🪟 Windows Desktop App</h3>
-                <p>Native Chromium runtime with hardware acceleration and ad/tracker shield.</p>
-                <a href="/assets/Staunt-Browser-Setup.exe" download="Staunt-Browser-Setup.exe" class="showcase-btn">Download Windows .EXE</a>
-              </div>
-              <div class="showcase-card">
-                <h3>📱 Android Mobile App</h3>
-                <p>Universal signed APK supporting all phones with 1-tap installation.</p>
-                <a href="/assets/Staunt-Browser-Mobile.apk" download="Staunt-Browser-Mobile.apk" class="showcase-btn">Download Android .APK</a>
-              </div>
+            <div class="app-badge-row">
+              <a href="/assets/Staunt-Browser-Setup.exe" download="Staunt-Browser-Setup.exe" class="app-badge-card">
+                <span>🪟</span>
+                <div style="text-align: left;">
+                  <div style="font-size: 12px; font-weight: 600;">Windows App</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Hardware GPU Acceleration</div>
+                </div>
+                <div class="badge-btn">Get .EXE</div>
+              </a>
+              <a href="/assets/Staunt-Browser-Mobile.apk" download="Staunt-Browser-Mobile.apk" class="app-badge-card">
+                <span>📱</span>
+                <div style="text-align: left;">
+                  <div style="font-size: 12px; font-weight: 600;">Android App</div>
+                  <div style="font-size: 11px; color: var(--text-muted);">Universal 5.19 MB APK</div>
+                </div>
+                <div class="badge-btn" style="background: linear-gradient(135deg, #10b981, #059669);">Get .APK</div>
+              </a>
             </div>
           </div>
 
-          <!-- YouTube Hub View -->
-          <div class="youtube-hub" id="ythub-${tab.id}" style="display: none;">
-            <div class="ythub-header">
-              <div class="ythub-logo"><span style="color:#ff453a;">▶</span> YouTube Hub</div>
-              <div class="ythub-search-bar">
-                <input type="text" class="ythub-search-input" id="ytsearch-${tab.id}" placeholder="Search YouTube videos, songs, series..." />
-                <button class="ythub-search-btn" id="ytbtn-${tab.id}">Search</button>
-              </div>
-              <button class="ythub-popout-btn" id="ytpop-${tab.id}">Open in Dedicated Window ↗</button>
-            </div>
-            <div class="ythub-chips" id="ytchips-${tab.id}">
-              <span class="ythub-chip active" data-q="trending">🔥 Trending</span>
-              <span class="ythub-chip" data-q="popular songs 2026">🎵 Songs</span>
-              <span class="ythub-chip" data-q="TMKOC full episode">📺 TMKOC</span>
-              <span class="ythub-chip" data-q="funny comedy scenes">😂 Comedy</span>
-              <span class="ythub-chip" data-q="latest technology news">💻 Tech</span>
-              <span class="ythub-chip" data-q="gaming highlights 2026">🎮 Gaming</span>
-              <span class="ythub-chip" data-q="live world news">📰 News</span>
-            </div>
-            <div class="ythub-grid" id="ytgrid-${tab.id}">
-              <div style="color: #94a3b8; font-size: 13px; grid-column: 1/-1; padding: 20px 0;">Loading trending videos...</div>
-            </div>
-          </div>
-
-          <!-- Video Back Control Bar -->
-          <div class="yt-player-bar" id="ytbar-${tab.id}" style="display: none;">
-            <button class="yt-player-back-btn" id="ytback-${tab.id}">
-              ◀ Back to YouTube Hub
-            </button>
-          </div>
-
+          <!-- Pure Webpage Canvas -->
           <iframe 
             class="embed-frame" 
             id="frame-${tab.id}" 
@@ -1128,7 +875,7 @@
 
         canvas.appendChild(vp);
 
-        // Speed dials
+        // Speed dials click listener
         vp.querySelectorAll('.speed-tile').forEach(tile => {
           tile.addEventListener('click', () => {
             const u = tile.dataset.url;
@@ -1153,42 +900,7 @@
         tabs.forEach(t => updateClock(t.id));
       }, 1000);
 
-      // ─── DUAL ENGINE MODE (⚡ DIRECT LOCAL GIGABIT vs 🛡️ CLOUD PROXY SHIELD) ───
-      const urlParams = new URLSearchParams(window.location.search);
-      // Standard web browsers enforce X-Frame-Options (YouTube/Google block iframes).
-      // Therefore, Web Version ALWAYS runs on Cloud Shield to strip X-Frame-Options.
-      // Direct Gigabit Mode is enabled automatically inside the compiled Windows Desktop App (?mode=direct).
-      const isNativeApp = urlParams.get('mode') === 'direct';
-      let currentEngineMode = isNativeApp ? 'direct' : 'cloud';
-      const btnToggleEngine = document.getElementById('btn-toggle-engine');
-
-      function updateEngineUI() {
-        if (!btnToggleEngine) return;
-        if (isNativeApp) {
-          btnToggleEngine.innerHTML = '⚡ Direct (Native)';
-          btnToggleEngine.title = 'Running in Native Desktop Mode: Hardware GPU & direct local speed.';
-          btnToggleEngine.style.background = 'rgba(16, 185, 129, 0.15)';
-          btnToggleEngine.style.color = '#34d399';
-          btnToggleEngine.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-        } else {
-          btnToggleEngine.innerHTML = '🛡️ Cloud Shield';
-          btnToggleEngine.title = 'Web Mode: Cloud Shield strips X-Frame-Options to allow YouTube, Google & all websites. (Click for Native App)';
-          btnToggleEngine.style.background = 'rgba(139, 92, 246, 0.15)';
-          btnToggleEngine.style.color = '#a78bfa';
-          btnToggleEngine.style.borderColor = 'rgba(139, 92, 246, 0.3)';
-        }
-      }
-
-      if (btnToggleEngine) {
-        updateEngineUI();
-        btnToggleEngine.addEventListener('click', () => {
-          if (!isNativeApp) {
-            downloadModal.classList.add('open');
-          }
-        });
-      }
-
-      // ─── NAVIGATION ENGINE ───
+      // ─── UNIVERSAL NAVIGATION ENGINE (LOADS ANY WEBSITE) ───
       function navigateTo(target, tabId = activeTabId) {
         const tab = tabs.find(t => t.id === tabId);
         if (!tab) return;
@@ -1205,40 +917,21 @@
         }
         renderTabs();
 
-        // Check if user is navigating to YouTube homepage or search
-        try {
-          const checkUrl = new URL(resolved);
-          if (checkUrl.hostname.includes('youtube.com') && !resolved.includes('/embed/')) {
-            const searchQ = checkUrl.searchParams.get('search_query') || checkUrl.searchParams.get('q');
-            showYouTubeHub(tab.id, searchQ || 'trending');
-            return;
-          }
-        } catch(e) {}
-
         const vp = document.getElementById('viewport-' + tab.id);
         if (vp) {
           const wall = vp.querySelector('.newtab-wall');
-          const hub = document.getElementById('ythub-' + tab.id);
-          const bar = document.getElementById('ytbar-' + tab.id);
           const iframe = vp.querySelector('.embed-frame');
 
           if (wall) wall.style.display = 'none';
-          if (hub) hub.style.display = 'none';
-          if (bar) bar.style.display = 'none';
           if (iframe) {
             iframe.style.display = 'block';
             startProgress();
 
             let targetSrc = resolved;
-            // If in cloud mode OR on standard web browser accessing sites with X-Frame-Options,
-            // route through our persistent keep-alive streaming gateway to strip frame-blocking headers!
-            if (currentEngineMode === 'cloud' || !isNativeApp) {
-              if (!resolved.includes('youtube.com/embed/')) {
-                targetSrc = '/gateway?url=' + encodeURIComponent(resolved);
-              }
-            } else {
-              // Only custom native Windows app with disabled web security can do true direct framing
-              targetSrc = resolved;
+            // Embeds (like YouTube player) load directly; all other websites route via our streaming proxy
+            // which strips X-Frame-Options & CSP so ANY website displays cleanly!
+            if (!resolved.includes('youtube.com/embed/')) {
+              targetSrc = '/gateway?url=' + encodeURIComponent(resolved);
             }
             iframe.src = targetSrc;
             iframe.onload = () => finishProgress();
@@ -1246,7 +939,7 @@
         }
       }
 
-      // ─── NAV CONTROLS ───
+      // ─── NAVIGATION CONTROLS ───
       document.getElementById('nav-back').addEventListener('click', () => {
         const vp = document.getElementById('viewport-' + activeTabId);
         if (vp) {
@@ -1278,128 +971,6 @@
         }
       });
 
-      document.getElementById('nav-popout').addEventListener('click', () => {
-        const tab = tabs.find(t => t.id === activeTabId);
-        const targetUrl = (tab && tab.url) ? tab.url : (omnibox.value || 'https://www.youtube.com');
-        window.open(targetUrl, '_blank', 'noopener,noreferrer');
-      });
-
-      // ─── YOUTUBE HUB SEARCH & RENDER ENGINE ───
-      async function loadYouTubeVideos(tabId, query = 'trending') {
-        const grid = document.getElementById('ytgrid-' + tabId);
-        if (!grid) return;
-        grid.innerHTML = '<div style="color:#94a3b8; font-size:13px; grid-column:1/-1; padding:20px 0;">Searching "' + escapeHtml(query) + '"...</div>';
-        try {
-          const resp = await fetch('/api/youtube/search?q=' + encodeURIComponent(query));
-          const data = await resp.json();
-          if (!data.results || data.results.length === 0) {
-            grid.innerHTML = '<div style="color:#94a3b8; font-size:13px; grid-column:1/-1; padding:20px 0;">No videos found. Try a different search!</div>';
-            return;
-          }
-          grid.innerHTML = '';
-          data.results.forEach(v => {
-            const card = document.createElement('div');
-            card.className = 'yt-card';
-            card.innerHTML = `
-              <div class="yt-thumb-wrapper">
-                <img class="yt-thumb-img" src="${v.thumbnail}" loading="lazy" alt="" />
-                <div class="yt-play-badge">▶ Play</div>
-              </div>
-              <div class="yt-card-info">
-                <div class="yt-card-title">${escapeHtml(v.title)}</div>
-              </div>
-            `;
-            card.addEventListener('click', () => {
-              playYouTubeVideo(v.embedUrl, v.title, tabId);
-            });
-            grid.appendChild(card);
-          });
-        } catch(e) {
-          grid.innerHTML = '<div style="color:#ef4444; font-size:13px; grid-column:1/-1; padding:20px 0;">Error loading videos. Please check internet connection.</div>';
-        }
-      }
-
-      function playYouTubeVideo(embedUrl, title, tabId) {
-        const vp = document.getElementById('viewport-' + tabId);
-        if (!vp) return;
-        const wall = vp.querySelector('.newtab-wall');
-        const hub = document.getElementById('ythub-' + tabId);
-        const bar = document.getElementById('ytbar-' + tabId);
-        const iframe = vp.querySelector('.embed-frame');
-
-        if (wall) wall.style.display = 'none';
-        if (hub) hub.style.display = 'none';
-        if (bar) bar.style.display = 'flex';
-        if (iframe) {
-          iframe.style.display = 'block';
-          startProgress();
-          iframe.src = embedUrl;
-          iframe.onload = () => finishProgress();
-        }
-
-        const tab = tabs.find(t => t.id === tabId);
-        if (tab) {
-          tab.url = embedUrl;
-          tab.title = title || 'YouTube Video';
-          if (tabId === activeTabId) {
-            omnibox.value = embedUrl;
-          }
-          renderTabs();
-        }
-      }
-
-      function showYouTubeHub(tabId, initialQuery = 'trending') {
-        const vp = document.getElementById('viewport-' + tabId);
-        if (!vp) return;
-        const wall = vp.querySelector('.newtab-wall');
-        const hub = document.getElementById('ythub-' + tabId);
-        const bar = document.getElementById('ytbar-' + tabId);
-        const iframe = vp.querySelector('.embed-frame');
-
-        if (wall) wall.style.display = 'none';
-        if (bar) bar.style.display = 'none';
-        if (iframe) {
-          iframe.style.display = 'none';
-          iframe.src = 'about:blank';
-        }
-        if (hub) {
-          hub.style.display = 'flex';
-          loadYouTubeVideos(tabId, initialQuery);
-        }
-
-        // Bind Hub events if not bound
-        if (!hub.dataset.bound) {
-          hub.dataset.bound = 'true';
-          const sInput = document.getElementById('ytsearch-' + tabId);
-          const sBtn = document.getElementById('ytbtn-' + tabId);
-          const popBtn = document.getElementById('ytpop-' + tabId);
-          const backBtn = document.getElementById('ytback-' + tabId);
-          const chips = document.getElementById('ytchips-' + tabId);
-
-          const triggerSearch = () => {
-            const q = sInput.value.trim();
-            if (q) loadYouTubeVideos(tabId, q);
-          };
-
-          if (sBtn) sBtn.addEventListener('click', triggerSearch);
-          if (sInput) sInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') triggerSearch(); });
-          if (popBtn) popBtn.addEventListener('click', () => window.open('https://www.youtube.com', '_blank'));
-          if (backBtn) backBtn.addEventListener('click', () => showYouTubeHub(tabId));
-
-          if (chips) {
-            chips.querySelectorAll('.ythub-chip').forEach(c => {
-              c.addEventListener('click', () => {
-                chips.querySelectorAll('.ythub-chip').forEach(x => x.classList.remove('active'));
-                c.classList.add('active');
-                const q = c.dataset.q;
-                if (sInput) sInput.value = q;
-                loadYouTubeVideos(tabId, q);
-              });
-            });
-          }
-        }
-      }
-
       document.getElementById('nav-home').addEventListener('click', () => {
         const tab = tabs.find(t => t.id === activeTabId);
         if (!tab) return;
@@ -1421,7 +992,13 @@
         }
       });
 
-      // ─── REAL-TIME POSTMESSAGE URL, NAVIGATION & SHORTCUT SYNC ───
+      document.getElementById('nav-popout').addEventListener('click', () => {
+        const tab = tabs.find(t => t.id === activeTabId);
+        const targetUrl = (tab && tab.url) ? tab.url : (omnibox.value || 'https://www.google.com');
+        window.open(targetUrl, '_blank', 'noopener,noreferrer');
+      });
+
+      // ─── REAL-TIME POSTMESSAGE URL & NAVIGATION SYNC ───
       window.addEventListener('message', (event) => {
         if (!event.data) return;
 
@@ -1435,10 +1012,6 @@
           let cleanUrl = rawUrl;
           if (rawUrl.includes('/gateway?url=')) {
             cleanUrl = decodeURIComponent(rawUrl.split('/gateway?url=')[1]);
-          } else if (rawUrl.startsWith(window.location.origin)) {
-            const relPath = rawUrl.slice(window.location.origin.length);
-            const activeUpstream = getCookie('staunt_upstream') || 'https://www.youtube.com';
-            cleanUrl = activeUpstream + relPath;
           }
 
           const tab = tabs.find(t => t.id === activeTabId);
@@ -1456,19 +1029,11 @@
         } else if (event.data.type === 'STAUNT_NAVIGATE') {
           if (event.data.url) {
             navigateTo(event.data.url);
-            if (event.data.rawUrl && document.activeElement !== omnibox) {
-              omnibox.value = event.data.rawUrl;
-            }
           }
         }
       });
 
-      function getCookie(name) {
-        const v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-        return v ? v[2] : null;
-      }
-
-      // ─── GLOBAL NATIVE DESKTOP KEYBOARD SHORTCUTS ENGINE ───
+      // ─── GLOBAL NATIVE DESKTOP KEYBOARD SHORTCUTS ───
       function handleGlobalShortcut(e) {
         const isMac = (navigator.platform || '').toUpperCase().indexOf('MAC') >= 0;
         const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
@@ -1553,29 +1118,9 @@
           }
           return;
         }
-
-        // Ctrl+1 .. Ctrl+8: Switch to tab index
-        if (cmdOrCtrl && e.key >= '1' && e.key <= '8') {
-          const targetIndex = parseInt(e.key, 10) - 1;
-          if (tabs[targetIndex]) {
-            if (e.preventDefault) e.preventDefault();
-            switchTab(tabs[targetIndex].id);
-          }
-          return;
-        }
-
-        // Ctrl+9: Switch to last tab
-        if (cmdOrCtrl && e.key === '9') {
-          if (tabs.length > 0) {
-            if (e.preventDefault) e.preventDefault();
-            switchTab(tabs[tabs.length - 1].id);
-          }
-          return;
-        }
       }
 
       window.addEventListener('keydown', (e) => {
-        // If omnibox is focused and user is typing normal text, don't trigger single-key actions
         if (document.activeElement === omnibox && e.key === 'Enter') return;
         handleGlobalShortcut(e);
       });
@@ -1599,9 +1144,7 @@
       }
 
       btnImmersive.addEventListener('click', () => toggleImmersive());
-      btnShowToolbar.addEventListener('click', () => toggleImmersive(false));
 
-      // ─── FULLSCREEN ───
       function toggleFullscreen() {
         if (!document.fullscreenElement) {
           document.documentElement.requestFullscreen().catch(() => {});
@@ -1611,15 +1154,6 @@
           toggleImmersive(false);
         }
       }
-      btnFs.addEventListener('click', toggleFullscreen);
-
-      // Auto fullscreen on first touch for app feel
-      function autoFsPrompt() {
-        if (!document.fullscreenElement && window.innerWidth < 768) {
-          document.documentElement.requestFullscreen().catch(() => {});
-        }
-      }
-      window.addEventListener('touchstart', autoFsPrompt, { once: true });
 
       // ─── DOWNLOAD MODAL ───
       const btnModal = document.getElementById('btn-open-download-modal');

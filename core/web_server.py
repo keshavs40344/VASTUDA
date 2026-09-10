@@ -2071,16 +2071,18 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
 }})();
 </script>"""
 
-        interceptor_bytes = interceptor_code.encode("utf-8")
-
-        # Strip any <base> tags with zero-overhead regex
+        # Strip any existing <base> tags with zero-overhead regex
         cleaned = re.sub(rb'<base\b[^>]*>', b'', raw_html_bytes, flags=re.IGNORECASE)
 
-        # Inject interceptor at the start of <head>
+        # Inject interceptor and target base tag so all relative assets (images, CSS, JS) resolve accurately
+        target_origin = f"{target_scheme}://{target_host}"
+        base_tag_bytes = f'<base href="{target_origin}/">'.encode("utf-8")
+        payload_bytes = interceptor_bytes + base_tag_bytes
+
         if re.search(rb'<head\b[^>]*>', cleaned, flags=re.IGNORECASE):
-            result = re.sub(rb'(<head\b[^>]*>)', rb'\1' + interceptor_bytes, cleaned, count=1, flags=re.IGNORECASE)
+            result = re.sub(rb'(<head\b[^>]*>)', rb'\1' + payload_bytes, cleaned, count=1, flags=re.IGNORECASE)
         else:
-            result = interceptor_bytes + cleaned
+            result = payload_bytes + cleaned
 
         return result
     except Exception as transform_err:
