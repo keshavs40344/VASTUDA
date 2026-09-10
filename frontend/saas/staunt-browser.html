@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-[#060911]">
+<html lang="en" class="h-full bg-[#05070d]">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Staunt Browser Ultra — Sovereign Web Operating System</title>
-  <meta name="description" content="Next-generation sovereign web browser with live multi-tabbing, proxy firewall, AI search synthesis, distraction-free reader mode, and 4K media sniffer." />
+  <title>Staunt Browser Ultra — Sovereign Arc-Class Web OS</title>
+  <meta name="description" content="Next-generation browser operating system with Arc-style vertical workspaces, Raycast floating command palette, live proxy firewall, and 4K media sniffer." />
   
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -17,7 +17,7 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'monospace'],
             serif: ['"Newsreader"', 'serif']
           },
@@ -27,6 +27,12 @@
               500: '#8b5cf6',
               600: '#7c3aed',
               700: '#6d28d9'
+            },
+            surface: {
+              base: '#05070d',
+              sidebar: '#080c18',
+              card: '#0e1424',
+              elevated: '#141c30'
             }
           }
         }
@@ -42,28 +48,46 @@
       height: 100%;
       width: 100%;
       overflow: hidden;
-      background-color: #060911;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #05070d;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       color: #f1f5f9;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
+
     input, textarea, select, .reader-content, #searchResultsList, #copilotMessages {
       user-select: auto !important;
     }
+
+    /* Glassmorphism & Acrylic Blur */
+    .acrylic-panel {
+      background: rgba(14, 20, 36, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .acrylic-floating {
+      background: rgba(11, 16, 29, 0.88);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    /* Scrollbars */
     .custom-scrollbar::-webkit-scrollbar {
       width: 5px;
       height: 5px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.2);
+      background: transparent;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.15);
+      background: rgba(255, 255, 255, 0.12);
       border-radius: 9999px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: rgba(139,92,246,0.5);
+      background: rgba(139, 92, 246, 0.5);
     }
     .hide-scrollbar::-webkit-scrollbar {
       display: none;
@@ -72,26 +96,55 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    
-    /* Chrome/Brave-style Tabs */
-    .browser-tab {
-      transition: all 0.15s ease;
+
+    /* Arc Vertical Tab Items */
+    .arc-tab-item {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
     }
-    .browser-tab.active {
-      background-color: #0e1526;
+    .arc-tab-item.active {
+      background: rgba(255, 255, 255, 0.08);
       color: #ffffff;
-      border-top: 2px solid #8b5cf6;
-      border-left: 1px solid rgba(255,255,255,0.08);
-      border-right: 1px solid rgba(255,255,255,0.08);
-      border-bottom: 1px solid transparent;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
     }
-    .browser-tab:not(.active):hover {
-      background-color: rgba(255,255,255,0.04);
+    .arc-tab-item.active::before {
+      content: '';
+      position: absolute;
+      left: -2px;
+      top: 6px;
+      bottom: 6px;
+      width: 3px;
+      border-radius: 999px;
+      background: #8b5cf6;
+      box-shadow: 0 0 8px #8b5cf6;
+    }
+    .arc-tab-item:not(.active):hover {
+      background: rgba(255, 255, 255, 0.04);
       color: #e2e8f0;
     }
 
-    /* Web Viewport Touch and Scroll */
+    /* Pinned Tab Tile */
+    .pinned-tile {
+      transition: all 0.15s ease;
+    }
+    .pinned-tile.active {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.4);
+      box-shadow: 0 0 12px rgba(139, 92, 246, 0.2);
+    }
+    .pinned-tile:not(.active):hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
+    }
+
+    /* Web Viewport Frame with Arc Rounded Aesthetics */
+    .browser-canvas-frame {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
     .tab-viewport-frame {
       width: 100%;
       height: 100%;
@@ -106,7 +159,7 @@
       margin-bottom: 1.5rem;
       line-height: 1.85;
       font-size: 1.15rem;
-      color: #e2e8f0;
+      color: #cbd5e1;
     }
     .reader-content h2, .reader-content h3 {
       font-weight: 700;
@@ -115,443 +168,498 @@
       color: #ffffff;
     }
 
-    /* Pulse Glow */
-    @keyframes pulseGlow {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
+    /* Sidebar collapse transitions */
+    #sidebar {
+      transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .pulse-glow {
-      animation: pulseGlow 2s infinite ease-in-out;
+    #sidebar.collapsed {
+      width: 64px !important;
+    }
+    #sidebar.collapsed .sidebar-expanded-only {
+      display: none !important;
+    }
+    #sidebar.collapsed .sidebar-collapsed-only {
+      display: flex !important;
+    }
+    .sidebar-collapsed-only {
+      display: none;
     }
   </style>
 </head>
-<body class="h-full w-full flex flex-col bg-[#060911] text-slate-200">
+<body class="h-full w-full flex bg-[#05070d] text-slate-200 overflow-hidden">
 
   <!-- ========================================================================= -->
-  <!-- 1. CHROME/BRAVE-STYLE TAB STRIP (Row 1, 38px) -->
+  <!-- 1. ADAPTIVE VERTICAL SIDEBAR (ARC-STYLE WORKSPACES & DOCK) -->
   <!-- ========================================================================= -->
-  <div class="h-[38px] bg-[#070b16] border-b border-slate-800/80 flex items-center justify-between px-2 gap-1.5 flex-shrink-0 z-30 select-none">
+  <aside id="sidebar" class="w-[260px] h-full bg-[#080c18] border-r border-white/[0.06] flex flex-col flex-shrink-0 z-30 select-none relative">
     
-    <!-- Left: Brand Emblem & Quick Menu -->
-    <div class="flex items-center gap-1.5 pr-2 flex-shrink-0 cursor-pointer" onclick="createNewTab('staunt://newtab')">
-      <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-violet-500/20">
-        <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+    <!-- Top Chrome / Traffic Light Integration & Branding -->
+    <div class="h-12 flex items-center justify-between px-3 border-b border-white/[0.04]">
+      
+      <!-- Traffic Lights / Minimal OS Window Dots -->
+      <div class="flex items-center gap-1.5">
+        <button onclick="minimizeWindowMock()" title="Minimize" class="w-3 h-3 rounded-full bg-amber-500/80 hover:bg-amber-400 transition-colors"></button>
+        <button onclick="maximizeWindowMock()" title="Maximize / Fullscreen" class="w-3 h-3 rounded-full bg-emerald-500/80 hover:bg-emerald-400 transition-colors"></button>
+        <button onclick="closeActiveTabQuick()" title="Close Tab" class="w-3 h-3 rounded-full bg-rose-500/80 hover:bg-rose-400 transition-colors"></button>
       </div>
-      <span class="font-extrabold text-[11px] text-white tracking-wider hidden sm:inline">STAUNT</span>
+
+      <!-- Staunt Brand Crest -->
+      <div class="sidebar-expanded-only flex items-center gap-1.5 cursor-pointer" onclick="createNewTab('staunt://newtab')">
+        <div class="w-5 h-5 rounded-md bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-sm shadow-violet-500/30">
+          <i data-lucide="shield" class="w-3 h-3"></i>
+        </div>
+        <span class="font-extrabold text-xs tracking-wider text-white">STAUNT</span>
+        <span class="text-[9px] px-1 py-0.2 rounded bg-violet-500/20 text-violet-300 font-mono">ARC</span>
+      </div>
+
+      <!-- Collapse Sidebar Toggle Button -->
+      <button onclick="toggleSidebarCollapse()" title="Toggle Sidebar (Cmd+S / Ctrl+S)" class="w-7 h-7 rounded-lg hover:bg-white/[0.06] text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+        <i data-lucide="panel-left-close" class="w-3.5 h-3.5" id="sidebarToggleIcon"></i>
+      </button>
+
     </div>
 
-    <!-- Center: Dynamic Scrollable Tab Strip -->
-    <div id="tabStripContainer" class="flex-1 flex items-center gap-1 overflow-x-auto hide-scrollbar h-full py-0.5">
-      <!-- Tabs injected dynamically by JS -->
+    <!-- Pinned Tabs Section (Arc 2-Column Grid) -->
+    <div class="p-2 border-b border-white/[0.04]">
+      <div class="sidebar-expanded-only flex items-center justify-between px-1 mb-1.5">
+        <span class="text-[10px] font-bold tracking-wider uppercase text-slate-500">Pinned Essentials</span>
+        <button onclick="promptAddPinnedTab()" title="Pin Current Tab" class="text-slate-500 hover:text-slate-300">
+          <i data-lucide="plus" class="w-3 h-3"></i>
+        </button>
+      </div>
+
+      <!-- Pinned Grid -->
+      <div id="pinnedTabsGrid" class="grid grid-cols-2 gap-1.5">
+        <!-- Injected dynamically by JS -->
+      </div>
     </div>
 
-    <!-- New Tab Button -->
-    <button onclick="createNewTab('staunt://newtab')" title="New Tab (Ctrl+T)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center flex-shrink-0 transition-colors">
-      <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-    </button>
+    <!-- Active Workspace Tabs Section -->
+    <div class="flex-1 flex flex-col min-h-0 py-2">
+      
+      <!-- Space Header & Quick Actions -->
+      <div class="sidebar-expanded-only flex items-center justify-between px-3 mb-1">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full" id="activeSpaceDot"></span>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400" id="activeSpaceTitle">Personal</span>
+        </div>
+        <button onclick="createNewTab('staunt://newtab')" title="New Tab in this Space (Ctrl+T)" class="w-5 h-5 rounded hover:bg-white/[0.08] text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
 
-    <!-- Right Header Controls -->
-    <div class="flex items-center gap-1 pl-1 flex-shrink-0 border-l border-slate-800/80">
-      <!-- History Drawer Toggle -->
-      <button onclick="toggleHistoryDrawer()" title="Browsing History (Ctrl+H)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-        <i data-lucide="history" class="w-3.5 h-3.5"></i>
-      </button>
+      <!-- Vertical Tabs List -->
+      <div id="verticalTabsList" class="flex-1 overflow-y-auto px-2 space-y-0.5 custom-scrollbar">
+        <!-- Injected dynamically by JS -->
+      </div>
 
-      <!-- Downloads Drawer Toggle -->
-      <button onclick="toggleDownloadsDrawer()" id="btnDownloadsTop" title="Downloads Manager" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors relative">
-        <i data-lucide="download" class="w-3.5 h-3.5"></i>
-        <span id="downloadsBadge" class="hidden absolute top-1 right-1 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></span>
-      </button>
-
-      <!-- Bookmarks Drawer Toggle -->
-      <button onclick="toggleBookmarksDrawer()" title="Bookmarks Manager (Ctrl+B)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-        <i data-lucide="bookmark" class="w-3.5 h-3.5"></i>
-      </button>
-
-      <!-- Fullscreen Toggle -->
-      <button onclick="toggleFullscreen()" title="Immersive Mode" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors hidden md:flex">
-        <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
-      </button>
-
-      <!-- Native Desktop App Download -->
-      <a href="/api/browser/download/windows" download title="Download Real Native Windows App (.zip)" class="ml-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-[11px] font-bold flex items-center gap-1 shadow-md shadow-violet-600/20 transition-all flex-shrink-0">
-        <i data-lucide="download-cloud" class="w-3 h-3"></i>
-        <span class="hidden lg:inline">Download Windows App</span>
-        <span class="lg:hidden">App</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- ========================================================================= -->
-  <!-- 2. COMMAND & OMNIBOX BAR (Row 2, 44px) -->
-  <!-- ========================================================================= -->
-  <div class="h-[44px] bg-[#0c1222] border-b border-slate-800 flex items-center justify-between px-2 sm:px-3 gap-2 flex-shrink-0 z-20 shadow-md">
-    
-    <!-- Navigation Buttons -->
-    <div class="flex items-center gap-0.5 flex-shrink-0">
-      <button onclick="navigateBack()" id="btnBack" title="Back (Alt+Left)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-      </button>
-      <button onclick="navigateForward()" id="btnForward" title="Forward (Alt+Right)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-      </button>
-      <button onclick="reloadActiveTab()" title="Reload (Ctrl+R)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-        <i data-lucide="rotate-cw" class="w-3.5 h-3.5" id="reloadIcon"></i>
-      </button>
-      <button onclick="goHome()" title="Staunt Start Page" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-        <i data-lucide="home" class="w-3.5 h-3.5"></i>
-      </button>
     </div>
 
-    <!-- Center: Smart Omnibox -->
-    <div class="relative flex-1 max-w-3xl mx-auto">
-      <div class="flex items-center bg-[#070a13] border border-slate-700/80 rounded-xl px-2.5 py-1 focus-within:border-violet-500 focus-within:ring-1 focus-within:ring-violet-500/30 transition-all">
+    <!-- Workspaces / Spaces Selector (Arc-style bottom pill switcher) -->
+    <div class="p-2 border-t border-white/[0.04] bg-[#070a14]">
+      
+      <!-- Spaces Switcher Bar -->
+      <div class="sidebar-expanded-only flex items-center justify-around bg-white/[0.03] border border-white/[0.06] rounded-xl p-1 mb-2">
+        <button onclick="switchWorkspace('personal')" id="spaceBtn_personal" class="flex-1 py-1 rounded-lg text-center text-xs font-semibold flex items-center justify-center gap-1.5 transition-all text-violet-300 bg-violet-500/10 border border-violet-500/20">
+          <i data-lucide="compass" class="w-3 h-3"></i>
+          <span>Personal</span>
+        </button>
+        <button onclick="switchWorkspace('dev')" id="spaceBtn_dev" class="flex-1 py-1 rounded-lg text-center text-xs font-semibold flex items-center justify-center gap-1.5 transition-all text-slate-400 hover:text-white">
+          <i data-lucide="terminal" class="w-3 h-3"></i>
+          <span>Code</span>
+        </button>
+        <button onclick="switchWorkspace('research')" id="spaceBtn_research" class="flex-1 py-1 rounded-lg text-center text-xs font-semibold flex items-center justify-center gap-1.5 transition-all text-slate-400 hover:text-white">
+          <i data-lucide="book-open" class="w-3 h-3"></i>
+          <span>Research</span>
+        </button>
+      </div>
+
+      <!-- Bottom Status & Quick Utilities -->
+      <div class="flex items-center justify-between px-1 text-xs">
         
-        <!-- Brave-Style Shield Pill -->
-        <button onclick="toggleShieldModal()" id="shieldPillBtn" title="Staunt Brave-Style Shield Matrix" class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold mr-1.5 transition-colors flex-shrink-0">
-          <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400" id="shieldPillIcon"></i>
-          <span id="shieldPillText" class="hidden sm:inline">Brave: Standard</span>
+        <!-- Shield Status Trigger -->
+        <button onclick="toggleShieldModal()" title="Staunt Brave Shield Matrix" class="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+          <span class="sidebar-expanded-only text-[11px] font-mono" id="sidebarShieldCounter">38 Blocked</span>
         </button>
 
-        <!-- Security Lock Icon -->
-        <div class="text-slate-400 mr-1.5 hidden sm:block" id="securityLockIcon" title="Connection is verified & secured">
-          <i data-lucide="lock" class="w-3 h-3 text-emerald-400"></i>
-        </div>
+        <!-- Command Palette Trigger Chip -->
+        <button onclick="openCommandPalette()" title="Open Command Palette (Ctrl+K / Cmd+K)" class="sidebar-expanded-only flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] text-slate-300 text-[10px] font-mono transition-colors">
+          <span>⌘K</span>
+        </button>
 
-        <!-- Address / Search Input -->
-        <input 
-          id="omniboxInput" 
-          type="text" 
-          spellcheck="false"
-          autocomplete="off"
-          placeholder="Search with AI, enter any URL, or paste video link to sniff..." 
-          class="bg-transparent text-white placeholder-slate-500 text-xs font-mono w-full focus:outline-none"
-          onkeydown="handleOmniboxKey(event)"
-          oninput="handleOmniboxInput(event)"
-          onfocus="this.select()"
-          onblur="setTimeout(closeAutocomplete, 250)"
-        />
-
-        <!-- Right Inside Omnibox Actions -->
-        <div class="flex items-center gap-1 text-slate-400 flex-shrink-0">
-          <!-- Bookmark Current Tab -->
-          <button onclick="toggleBookmarkActiveTab()" id="btnBookmarkStar" title="Bookmark this tab (Ctrl+D)" class="hover:text-amber-400 p-1 transition-colors">
-            <i data-lucide="star" class="w-3.5 h-3.5" id="bookmarkStarIcon"></i>
-          </button>
-
-          <!-- Copy URL Button -->
-          <button onclick="copyCurrentUrl()" title="Copy Link" class="hover:text-white p-1 hidden sm:block transition-colors">
-            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-          </button>
-
-          <!-- Clear Omnibox -->
-          <button onclick="clearOmnibox()" title="Clear" class="hover:text-white p-1 transition-colors">
-            <i data-lucide="x" class="w-3 h-3"></i>
-          </button>
-
-          <!-- Go Button -->
-          <button onclick="submitOmnibox()" title="Browse URL or Search AI" class="bg-violet-600 hover:bg-violet-500 text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all">
-            <span>Go</span>
-            <i data-lucide="arrow-right" class="w-2.5 h-2.5"></i>
-          </button>
-        </div>
+        <!-- Downloads Tray -->
+        <button onclick="toggleDownloadsDrawer()" title="Downloads Manager" class="w-6 h-6 rounded-lg hover:bg-white/[0.06] text-slate-400 hover:text-white flex items-center justify-center transition-colors relative">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span id="downloadsBadge" class="hidden absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-ping"></span>
+        </button>
 
       </div>
 
-      <!-- Autocomplete Dropdown -->
-      <div id="autocompleteDropdown" class="absolute left-0 right-0 top-full mt-1 bg-[#0c1222] border border-slate-700 rounded-xl p-1 shadow-2xl hidden z-50"></div>
     </div>
 
-    <!-- Right: Browser Modes & Intelligence Tools -->
-    <div class="flex items-center gap-1 flex-shrink-0">
+  </aside>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN BROWSER STAGE (TOP NAVIGATION + ACTIVE CANVAS VIEWPORT) -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 h-full flex flex-col overflow-hidden bg-[#05070d] p-1.5 sm:p-2.5">
+    
+    <!-- TOP SLIM CONTROL HEADER (38px) -->
+    <header class="h-[38px] flex items-center justify-between px-2 gap-2 flex-shrink-0 z-20 mb-1.5">
       
-      <!-- Reader Mode -->
-      <button onclick="toggleReaderMode()" id="readerBtn" title="Distraction-Free Reader View" class="px-2 py-1 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1 transition-colors">
-        <i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-400"></i>
-        <span class="hidden xl:inline">Reader</span>
-      </button>
+      <!-- Left: Navigation Controls -->
+      <div class="flex items-center gap-1 flex-shrink-0">
+        <button onclick="navigateBack()" id="btnBack" title="Back (Alt+Left)" class="w-7 h-7 rounded-lg hover:bg-white/[0.06] text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+        </button>
+        <button onclick="navigateForward()" id="btnForward" title="Forward (Alt+Right)" class="w-7 h-7 rounded-lg hover:bg-white/[0.06] text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+        <button onclick="reloadActiveTab()" title="Reload (Ctrl+R)" class="w-7 h-7 rounded-lg hover:bg-white/[0.06] text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+          <i data-lucide="rotate-cw" class="w-3.5 h-3.5" id="reloadIcon"></i>
+        </button>
+      </div>
 
-      <!-- 4K Media Sniffer -->
-      <button onclick="toggleMediaDrawer()" id="snifferBtn" title="Universal 4K Media Sniffer" class="px-2 py-1 rounded-lg bg-cyan-600/10 hover:bg-cyan-600/20 text-cyan-300 border border-cyan-500/20 text-xs font-semibold flex items-center gap-1 transition-colors">
-        <i data-lucide="video" class="w-3.5 h-3.5 text-cyan-400"></i>
-        <span class="hidden md:inline">Sniffer</span>
-      </button>
-
-      <!-- AI Copilot -->
-      <button onclick="toggleCopilot()" id="copilotBtn" title="Staunt AI Neural Copilot" class="px-2 py-1 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 border border-violet-500/30 text-xs font-semibold flex items-center gap-1 transition-colors">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-violet-400"></i>
-        <span class="hidden sm:inline">Copilot</span>
-      </button>
-
-    </div>
-
-  </div>
-
-  <!-- ========================================================================= -->
-  <!-- 3. BOOKMARKS BAR (Row 3, 28px) -->
-  <!-- ========================================================================= -->
-  <div id="bookmarksBar" class="h-[28px] bg-[#090e1a] border-b border-slate-800/80 flex items-center px-3 gap-1 overflow-x-auto hide-scrollbar text-[11px] font-medium text-slate-300 flex-shrink-0 z-10">
-    <button onclick="toggleBookmarksDrawer()" class="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white mr-1 flex-shrink-0">
-      <i data-lucide="bookmark" class="w-3 h-3 text-amber-400"></i>
-      <span class="font-bold text-[10px] uppercase tracking-wider text-slate-400">Bookmarks:</span>
-    </button>
-    <div id="bookmarksBarItems" class="flex items-center gap-1">
-      <!-- Injected by JS -->
-    </div>
-  </div>
-
-  <!-- Animated Loading Progress Bar -->
-  <div id="pageProgressBar" class="h-0.5 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400 w-0 transition-all duration-300 z-40"></div>
-
-  <!-- ========================================================================= -->
-  <!-- 4. MAIN BROWSER VIEWPORT & MULTI-TAB CONTAINERS -->
-  <!-- ========================================================================= -->
-  <main class="relative flex-1 w-full h-[calc(100%-110px)] overflow-hidden flex bg-[#060911]">
-
-    <!-- MULTI-TAB CANVAS CONTAINER -->
-    <div id="mainCanvasContainer" class="relative flex-1 h-full w-full overflow-hidden bg-[#060911]">
-      <!-- Each tab gets its own persistent sub-container tab-canvas-{id} -->
-    </div>
-
-    <!-- ======================================================================= -->
-    <!-- VIEW 2: DISTRACTION-FREE READER CANVAS (OVERLAY) -->
-    <!-- ======================================================================= -->
-    <div id="readerCanvas" class="hidden absolute inset-0 z-30 bg-[#0c101d] overflow-y-auto custom-scrollbar flex flex-col items-center p-6 sm:p-12">
-      <div class="max-w-2xl w-full space-y-6">
-        
-        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-          <div class="flex items-center gap-2 text-xs text-slate-400">
-            <span id="readerDomain" class="font-mono text-violet-400">domain.com</span>
-            <span>•</span>
-            <span id="readerReadTime">3 min read</span>
+      <!-- Center: Floating Command Bar Capsule (Triggers Raycast / Spotlight Palette) -->
+      <div class="flex-1 max-w-xl mx-auto cursor-pointer" onclick="openCommandPalette()">
+        <div class="flex items-center justify-between bg-[#0b101e] hover:bg-[#10172c] border border-white/[0.08] hover:border-violet-500/40 rounded-xl px-3 py-1 shadow-sm transition-all group">
+          
+          <!-- Left: SSL Status Chip & Domain Title -->
+          <div class="flex items-center gap-2 overflow-hidden flex-1">
+            <button onclick="openSslCertificateModal(event)" title="Connection Security" class="flex items-center text-emerald-400 hover:text-emerald-300">
+              <i data-lucide="lock" class="w-3 h-3"></i>
+            </button>
+            <span id="topBarDomainTitle" class="text-xs font-mono font-medium text-slate-200 truncate">staunt://newtab</span>
           </div>
+
+          <!-- Right: Shortcut Cue & Bookmark Star -->
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="toggleBookmarkActiveTab(event)" id="btnTopBookmark" title="Bookmark tab (Ctrl+D)" class="text-slate-400 hover:text-amber-400 p-0.5 transition-colors">
+              <i data-lucide="star" class="w-3 h-3" id="topBookmarkStar"></i>
+            </button>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-white/[0.06] text-slate-400 font-mono group-hover:text-white transition-colors">⌘K</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Right: Intelligence & Mode Extensions -->
+      <div class="flex items-center gap-1 flex-shrink-0">
+        
+        <!-- Reader Mode -->
+        <button onclick="toggleReaderMode()" id="readerBtn" title="Distraction-Free Reader Mode" class="px-2 py-1 rounded-lg hover:bg-white/[0.06] text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1 transition-colors">
+          <i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span class="hidden xl:inline">Reader</span>
+        </button>
+
+        <!-- 4K Media Sniffer -->
+        <button onclick="toggleMediaDrawer()" id="snifferBtn" title="4K Stream Sniffer" class="px-2 py-1 rounded-lg bg-cyan-600/10 hover:bg-cyan-600/20 text-cyan-300 border border-cyan-500/20 text-xs font-semibold flex items-center gap-1 transition-colors">
+          <i data-lucide="video" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span class="hidden md:inline">Sniffer</span>
+        </button>
+
+        <!-- AI Copilot -->
+        <button onclick="toggleCopilot()" id="copilotBtn" title="Staunt AI Neural Copilot" class="px-2 py-1 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 border border-violet-500/30 text-xs font-semibold flex items-center gap-1 transition-colors">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-violet-400"></i>
+          <span class="hidden sm:inline">Copilot</span>
+        </button>
+
+        <!-- Download Native Desktop App -->
+        <a href="/api/browser/download/windows" download title="Download Real Windows Desktop Package (.zip)" class="ml-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1 shadow-md shadow-violet-600/20 transition-all">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span class="hidden lg:inline">Get App</span>
+        </a>
+
+      </div>
+
+    </header>
+
+    <!-- Animated Loading Progress Bar -->
+    <div id="pageProgressBar" class="h-0.5 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400 w-0 transition-all duration-300 z-40 rounded-full"></div>
+
+    <!-- MAIN BROWSER CANVAS VIEWPORT (100% HEIGHT WITH ARC RADIUS) -->
+    <main class="relative flex-1 w-full overflow-hidden browser-canvas-frame bg-[#090d18] flex">
+      
+      <!-- MULTI-TAB CANVAS CONTAINER -->
+      <div id="mainCanvasContainer" class="relative flex-1 h-full w-full overflow-hidden">
+        <!-- Sub-canvases canvas_{tabId} injected dynamically -->
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- VIEW 2: DISTRACTION-FREE READER CANVAS (OVERLAY) -->
+      <!-- ===================================================================== -->
+      <div id="readerCanvas" class="hidden absolute inset-0 z-30 bg-[#0c101d] overflow-y-auto custom-scrollbar flex flex-col items-center p-6 sm:p-12">
+        <div class="max-w-2xl w-full space-y-6">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div class="flex items-center gap-2 text-xs text-slate-400">
+              <span id="readerDomain" class="font-mono text-violet-400">domain.com</span>
+              <span>•</span>
+              <span id="readerReadTime">3 min read</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="adjustReaderFont(-1)" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-xs font-bold">A-</button>
+              <button onclick="adjustReaderFont(1)" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-xs font-bold">A+</button>
+              <button onclick="closeReaderMode()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-semibold flex items-center gap-1">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                <span>Exit Reader</span>
+              </button>
+            </div>
+          </div>
+
+          <h1 id="readerTitle" class="text-2xl sm:text-4xl font-extrabold text-white leading-tight font-serif"></h1>
+          <div id="readerImageContainer" class="hidden rounded-2xl overflow-hidden border border-slate-800">
+            <img id="readerLeadImg" class="w-full object-cover max-h-96" src="" alt="Article feature" />
+          </div>
+          <article id="readerBody" class="reader-content text-slate-200 font-serif text-lg leading-relaxed space-y-4"></article>
+        </div>
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- VIEW 3: AI COPILOT SLIDE-OVER DRAWER -->
+      <!-- ===================================================================== -->
+      <aside id="copilotDrawer" class="hidden w-80 sm:w-96 h-full bg-[#0c1222] border-l border-slate-800 flex flex-col z-40 shadow-2xl flex-shrink-0">
+        <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-[#111a30]">
           <div class="flex items-center gap-2">
-            <button onclick="adjustReaderFont(-1)" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-xs font-bold">A-</button>
-            <button onclick="adjustReaderFont(1)" class="w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-xs font-bold">A+</button>
-            <button onclick="closeReaderMode()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-semibold flex items-center gap-1">
-              <i data-lucide="x" class="w-3.5 h-3.5"></i>
-              <span>Exit Reader</span>
+            <div class="w-6 h-6 rounded-lg bg-violet-600 flex items-center justify-center text-white">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-xs text-white">Staunt AI Copilot</h3>
+              <p class="text-[9px] text-slate-400">Zero-Telemetry In-Page Intelligence</p>
+            </div>
+          </div>
+          <button onclick="toggleCopilot()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="p-2 border-b border-slate-800 flex flex-wrap gap-1 bg-[#070a13]">
+          <button onclick="askCopilot('summary')" class="px-2 py-1 rounded bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/30 text-violet-300 text-[11px] font-semibold flex items-center gap-1 transition-all">
+            <i data-lucide="zap" class="w-3 h-3"></i>
+            <span>3-Bullet Summary</span>
+          </button>
+          <button onclick="askCopilot('hindi')" class="px-2 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-semibold flex items-center gap-1 transition-all">
+            <span>🇮🇳</span>
+            <span>हिंदी सारांश</span>
+          </button>
+          <button onclick="askCopilot('security')" class="px-2 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold flex items-center gap-1 transition-all">
+            <i data-lucide="shield-check" class="w-3 h-3"></i>
+            <span>Security Audit</span>
+          </button>
+        </div>
+
+        <div id="copilotMessages" class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar text-xs text-slate-300">
+          <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 space-y-1">
+            <div class="font-bold text-violet-400 flex items-center gap-1 text-xs">
+              <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+              <span>Staunt AI Assistant</span>
+            </div>
+            <p class="text-slate-300 text-[11px] leading-relaxed">
+              I inspect the active webpage securely inside your browser. Click any prompt chip above or type below to analyze this page.
+            </p>
+          </div>
+        </div>
+
+        <div class="p-2.5 border-t border-slate-800 bg-[#090d18]">
+          <div class="flex items-center gap-2 bg-[#070a13] border border-slate-700 rounded-xl px-2.5 py-1.5 focus-within:border-violet-500">
+            <input 
+              id="copilotInput" 
+              type="text" 
+              placeholder="Ask question about this page..." 
+              class="bg-transparent text-white text-xs w-full focus:outline-none"
+              onkeydown="if(event.key==='Enter') sendCustomCopilotQuery()"
+            />
+            <button onclick="sendCustomCopilotQuery()" class="p-1 text-violet-400 hover:text-white">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
             </button>
           </div>
         </div>
+      </aside>
 
-        <h1 id="readerTitle" class="text-2xl sm:text-4xl font-extrabold text-white leading-tight font-serif"></h1>
-
-        <div id="readerImageContainer" class="hidden rounded-2xl overflow-hidden border border-slate-800">
-          <img id="readerLeadImg" class="w-full object-cover max-h-96" src="" alt="Article feature" />
-        </div>
-
-        <article id="readerBody" class="reader-content text-slate-200 font-serif text-lg leading-relaxed space-y-4"></article>
-      </div>
-    </div>
-
-    <!-- ======================================================================= -->
-    <!-- VIEW 3: AI COPILOT SLIDE-OVER DRAWER -->
-    <!-- ======================================================================= -->
-    <aside id="copilotDrawer" class="hidden w-80 sm:w-96 h-full bg-[#0c1222] border-l border-slate-800 flex flex-col z-40 shadow-2xl flex-shrink-0">
-      <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-[#111a30]">
-        <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded-lg bg-violet-600 flex items-center justify-center text-white">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+      <!-- ===================================================================== -->
+      <!-- VIEW 4: 4K MEDIA SNIFFER DRAWER -->
+      <!-- ===================================================================== -->
+      <aside id="mediaDrawer" class="hidden w-80 sm:w-96 h-full bg-[#0c1222] border-l border-slate-800 flex flex-col z-40 shadow-2xl flex-shrink-0">
+        <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-[#111a30]">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-cyan-600 flex items-center justify-center text-white">
+              <i data-lucide="video" class="w-3.5 h-3.5"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-xs text-white">In-Engine Media Sniffer</h3>
+              <p class="text-[9px] text-slate-400">4K Video, Audio & Stream Extractor</p>
+            </div>
           </div>
-          <div>
-            <h3 class="font-bold text-xs text-white">Staunt AI Copilot</h3>
-            <p class="text-[9px] text-slate-400">Zero-Telemetry In-Page Intelligence</p>
-          </div>
-        </div>
-        <button onclick="toggleCopilot()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div class="p-2 border-b border-slate-800 flex flex-wrap gap-1 bg-[#070a13]">
-        <button onclick="askCopilot('summary')" class="px-2 py-1 rounded bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/30 text-violet-300 text-[11px] font-semibold flex items-center gap-1 transition-all">
-          <i data-lucide="zap" class="w-3 h-3"></i>
-          <span>3-Bullet Summary</span>
-        </button>
-        <button onclick="askCopilot('hindi')" class="px-2 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-semibold flex items-center gap-1 transition-all">
-          <span>🇮🇳</span>
-          <span>हिंदी सारांश</span>
-        </button>
-        <button onclick="askCopilot('security')" class="px-2 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold flex items-center gap-1 transition-all">
-          <i data-lucide="shield-check" class="w-3 h-3"></i>
-          <span>Security Audit</span>
-        </button>
-      </div>
-
-      <div id="copilotMessages" class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar text-xs text-slate-300">
-        <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 space-y-1">
-          <div class="font-bold text-violet-400 flex items-center gap-1 text-xs">
-            <i data-lucide="bot" class="w-3.5 h-3.5"></i>
-            <span>Staunt AI Assistant</span>
-          </div>
-          <p class="text-slate-300 text-[11px] leading-relaxed">
-            I inspect the active webpage securely inside your browser. Click any quick action above or type below to summarize or analyze this page.
-          </p>
-        </div>
-      </div>
-
-      <div class="p-2.5 border-t border-slate-800 bg-[#090d18]">
-        <div class="flex items-center gap-2 bg-[#070a13] border border-slate-700 rounded-xl px-2.5 py-1.5 focus-within:border-violet-500">
-          <input 
-            id="copilotInput" 
-            type="text" 
-            placeholder="Ask question about this page..." 
-            class="bg-transparent text-white text-xs w-full focus:outline-none"
-            onkeydown="if(event.key==='Enter') sendCustomCopilotQuery()"
-          />
-          <button onclick="sendCustomCopilotQuery()" class="p-1 text-violet-400 hover:text-white">
-            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          <button onclick="toggleMediaDrawer()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
-      </div>
-    </aside>
 
-    <!-- ======================================================================= -->
-    <!-- VIEW 4: 4K MEDIA SNIFFER DRAWER -->
-    <!-- ======================================================================= -->
-    <aside id="mediaDrawer" class="hidden w-80 sm:w-96 h-full bg-[#0c1222] border-l border-slate-800 flex flex-col z-40 shadow-2xl flex-shrink-0">
-      <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-[#111a30]">
-        <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded-lg bg-cyan-600 flex items-center justify-center text-white">
-            <i data-lucide="video" class="w-3.5 h-3.5"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-xs text-white">In-Engine Media Sniffer</h3>
-            <p class="text-[9px] text-slate-400">4K Video, Audio & Stream Extractor</p>
+        <div id="mediaListContainer" class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar text-xs">
+          <div class="text-center py-10 text-slate-500">
+            <i data-lucide="video" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+            <p>Paste any YouTube, Twitter, Instagram, or video link into the command bar to sniff high-speed 4K streams.</p>
           </div>
         </div>
-        <button onclick="toggleMediaDrawer()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
+
+        <div class="p-2.5 border-t border-slate-800 bg-[#090d18] flex justify-between items-center text-xs text-slate-400">
+          <span id="mediaCountText">0 streams sniffed</span>
+          <button onclick="rescanMedia()" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs flex items-center gap-1">
+            <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+            <span>Rescan</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ===================================================================== -->
+      <!-- VIEW 5: DOWNLOADS TRAY SLIDE-OVER DRAWER -->
+      <!-- ===================================================================== -->
+      <aside id="downloadsDrawer" class="hidden w-80 sm:w-96 h-full bg-[#0c1222] border-l border-slate-800 flex flex-col z-40 shadow-2xl flex-shrink-0">
+        <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-[#111a30]">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-cyan-600 flex items-center justify-center text-white">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-xs text-white">Downloads Tray</h3>
+              <p class="text-[9px] text-slate-400">Captured Files & Streams</p>
+            </div>
+          </div>
+          <button onclick="toggleDownloadsDrawer()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div id="downloadsListContainer" class="flex-1 overflow-y-auto p-2.5 space-y-2 custom-scrollbar text-xs"></div>
+
+        <div class="p-2 border-t border-slate-800 bg-[#070a13] flex justify-between items-center text-xs text-slate-400">
+          <button onclick="clearDownloadsList()" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs">Clear List</button>
+          <span class="text-[10px] text-slate-500">Auto-saved to device</span>
+        </div>
+      </aside>
+
+    </main>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. RAYCAST / SPOTLIGHT-STYLE FLOATING COMMAND PALETTE (Cmd+K / Ctrl+K) -->
+  <!-- ========================================================================= -->
+  <div id="commandPaletteModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden flex items-start justify-center pt-16 sm:pt-24 p-4" onclick="handlePaletteBackdropClick(event)">
+    <div class="acrylic-floating rounded-2xl max-w-2xl w-full p-3 shadow-2xl space-y-3" onclick="event.stopPropagation()">
+      
+      <!-- Search & Command Input -->
+      <div class="flex items-center gap-2.5 bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 focus-within:border-violet-500/70 focus-within:ring-1 focus-within:ring-violet-500/30 transition-all">
+        <i data-lucide="search" class="w-4 h-4 text-violet-400 flex-shrink-0"></i>
+        <input 
+          id="commandPaletteInput" 
+          type="text" 
+          spellcheck="false"
+          autocomplete="off"
+          placeholder="Search with AI, enter URL, or type a command (>bookmarks, >history, >clear cache)..." 
+          class="bg-transparent text-white placeholder-slate-500 text-sm font-medium w-full focus:outline-none"
+          onkeydown="handlePaletteKeyDown(event)"
+          oninput="handlePaletteInput(event)"
+        />
+        <button onclick="submitCommandPalette()" class="px-2.5 py-1 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold transition-all flex items-center gap-1 flex-shrink-0">
+          <span>Go</span>
+          <i data-lucide="arrow-right" class="w-3 h-3"></i>
+        </button>
+      </div>
+
+      <!-- Quick Action Command Chips -->
+      <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar text-[11px] text-slate-400 py-0.5">
+        <span class="text-[10px] font-bold uppercase text-slate-500 mr-1 flex-shrink-0">Actions:</span>
+        <button onclick="executePaletteCommand('>bookmarks')" class="px-2 py-0.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] hover:text-white border border-white/[0.06] transition-colors flex-shrink-0">
+          &gt;bookmarks
+        </button>
+        <button onclick="executePaletteCommand('>history')" class="px-2 py-0.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] hover:text-white border border-white/[0.06] transition-colors flex-shrink-0">
+          &gt;history
+        </button>
+        <button onclick="executePaletteCommand('>clear cache')" class="px-2 py-0.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] hover:text-white border border-white/[0.06] transition-colors flex-shrink-0">
+          &gt;clear cache
+        </button>
+        <button onclick="executePaletteCommand('>reader')" class="px-2 py-0.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] hover:text-white border border-white/[0.06] transition-colors flex-shrink-0">
+          &gt;reader
+        </button>
+        <button onclick="executePaletteCommand('>shield')" class="px-2 py-0.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] hover:text-white border border-white/[0.06] transition-colors flex-shrink-0">
+          &gt;shield
+        </button>
+        <button onclick="executePaletteCommand('>copilot')" class="px-2 py-0.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] hover:text-white border border-white/[0.06] transition-colors flex-shrink-0">
+          &gt;copilot
+        </button>
+      </div>
+
+      <!-- Autocomplete & Quick Results Container -->
+      <div id="paletteResultsList" class="max-h-72 overflow-y-auto space-y-1 custom-scrollbar text-xs">
+        <!-- Injected dynamically -->
+      </div>
+
+      <!-- Footer Help Hints -->
+      <div class="flex items-center justify-between border-t border-white/[0.06] pt-2 text-[10px] text-slate-500 font-mono">
+        <div class="flex items-center gap-3">
+          <span><kbd class="px-1 py-0.5 rounded bg-white/[0.08] text-slate-300">↵</kbd> Select</span>
+          <span><kbd class="px-1 py-0.5 rounded bg-white/[0.08] text-slate-300">↑↓</kbd> Navigate</span>
+          <span><kbd class="px-1 py-0.5 rounded bg-white/[0.08] text-slate-300">ESC</kbd> Close</span>
+        </div>
+        <span>Staunt Sovereign Core</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. SSL SECURITY STATUS POPOVER MODAL -->
+  <!-- ========================================================================= -->
+  <div id="sslCertificateModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="closeSslCertificateModal()">
+    <div class="acrylic-panel rounded-2xl max-w-sm w-full p-4 shadow-2xl space-y-3" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between border-b border-white/[0.06] pb-2">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-xs text-white">Connection Verified</h4>
+            <p class="text-[10px] text-emerald-400">Strict TLS 1.3 Encryption</p>
+          </div>
+        </div>
+        <button onclick="closeSslCertificateModal()" class="text-slate-400 hover:text-white">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
 
-      <div id="mediaListContainer" class="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar text-xs">
-        <div class="text-center py-10 text-slate-500">
-          <i data-lucide="video" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
-          <p>Paste any YouTube, Twitter, Instagram, or video link into the omnibox to sniff high-speed 4K streams.</p>
+      <div class="space-y-2 text-xs text-slate-300 leading-relaxed font-mono text-[11px]">
+        <div class="flex justify-between p-2 rounded-lg bg-white/[0.03]">
+          <span class="text-slate-500">Protocol</span>
+          <span class="text-emerald-400">TLS 1.3 / QUIC</span>
+        </div>
+        <div class="flex justify-between p-2 rounded-lg bg-white/[0.03]">
+          <span class="text-slate-500">Certificate Authority</span>
+          <span class="text-white truncate max-w-[160px]" id="sslCaText">Let's Encrypt Authority</span>
+        </div>
+        <div class="flex justify-between p-2 rounded-lg bg-white/[0.03]">
+          <span class="text-slate-500">WebRTC Protection</span>
+          <span class="text-emerald-400">IP Masked</span>
+        </div>
+        <div class="flex justify-between p-2 rounded-lg bg-white/[0.03]">
+          <span class="text-slate-500">Fingerprinting Defense</span>
+          <span class="text-emerald-400">Canvas & Audio Spoofed</span>
         </div>
       </div>
 
-      <div class="p-2.5 border-t border-slate-800 bg-[#090d18] flex justify-between items-center text-xs text-slate-400">
-        <span id="mediaCountText">0 streams sniffed</span>
-        <button onclick="rescanMedia()" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs flex items-center gap-1">
-          <i data-lucide="refresh-cw" class="w-3 h-3"></i>
-          <span>Rescan</span>
-        </button>
-      </div>
-    </aside>
-
-    <!-- ======================================================================= -->
-    <!-- VIEW 5: BROWSING HISTORY SLIDE-OVER DRAWER -->
-    <!-- ======================================================================= -->
-    <aside id="historyDrawer" class="hidden w-80 sm:w-96 h-full bg-[#0c1222] border-l border-slate-800 flex flex-col z-40 shadow-2xl flex-shrink-0">
-      <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-[#111a30]">
-        <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded-lg bg-amber-600 flex items-center justify-center text-white">
-            <i data-lucide="history" class="w-3.5 h-3.5"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-xs text-white">Browsing History</h3>
-            <p class="text-[9px] text-slate-400">Local &amp; Encrypted in Browser</p>
-          </div>
-        </div>
-        <button onclick="toggleHistoryDrawer()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div class="p-2 border-b border-slate-800 bg-[#070a13] flex items-center gap-2">
-        <div class="flex items-center bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1 flex-1">
-          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 mr-1.5"></i>
-          <input 
-            id="historySearchInput" 
-            type="text" 
-            placeholder="Search history..." 
-            class="bg-transparent text-white text-xs w-full focus:outline-none"
-            oninput="renderHistoryList(this.value)"
-          />
-        </div>
-        <button onclick="clearAllHistory()" title="Clear All History" class="p-1.5 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs border border-rose-500/30 transition-all flex items-center gap-1">
-          <i data-lucide="trash-2" class="w-3 h-3"></i>
-          <span class="text-[10px]">Clear</span>
-        </button>
-      </div>
-
-      <div id="historyListContainer" class="flex-1 overflow-y-auto p-2 space-y-1.5 custom-scrollbar text-xs">
-        <!-- Injected by JS -->
-      </div>
-    </aside>
-
-    <!-- ======================================================================= -->
-    <!-- VIEW 6: BOOKMARKS MANAGER SLIDE-OVER DRAWER -->
-    <!-- ======================================================================= -->
-    <aside id="bookmarksDrawer" class="hidden w-80 sm:w-96 h-full bg-[#0c1222] border-l border-slate-800 flex flex-col z-40 shadow-2xl flex-shrink-0">
-      <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-[#111a30]">
-        <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded-lg bg-emerald-600 flex items-center justify-center text-white">
-            <i data-lucide="bookmark" class="w-3.5 h-3.5"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-xs text-white">Bookmarks Manager</h3>
-            <p class="text-[9px] text-slate-400">Quick Access Hub</p>
-          </div>
-        </div>
-        <button onclick="toggleBookmarksDrawer()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div class="p-2 border-b border-slate-800 bg-[#070a13] flex items-center justify-between">
-        <span id="bookmarksCountText" class="text-slate-400 text-xs font-mono">0 bookmarks</span>
-        <button onclick="addCustomBookmarkPrompt()" class="px-2 py-1 rounded bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold flex items-center gap-1">
-          <i data-lucide="plus" class="w-3 h-3"></i>
-          <span>Add Current</span>
-        </button>
-      </div>
-
-      <div id="bookmarksListContainer" class="flex-1 overflow-y-auto p-2 space-y-1.5 custom-scrollbar text-xs">
-        <!-- Injected by JS -->
-      </div>
-    </aside>
-
-    <!-- ======================================================================= -->
-    <!-- VIEW 7: DOWNLOADS MANAGER SLIDE-OVER DRAWER -->
-    <!-- ======================================================================= -->
-    <aside id="downloadsDrawer" class="hidden w-80 sm:w-96 h-full bg-[#0c1222] border-l border-slate-800 flex flex-col z-40 shadow-2xl flex-shrink-0">
-      <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-[#111a30]">
-        <div class="flex items-center gap-2">
-          <div class="w-6 h-6 rounded-lg bg-cyan-600 flex items-center justify-center text-white">
-            <i data-lucide="download" class="w-3.5 h-3.5"></i>
-          </div>
-          <div>
-            <h3 class="font-bold text-xs text-white">Downloads Tray</h3>
-            <p class="text-[9px] text-slate-400">Files &amp; Media Captures</p>
-          </div>
-        </div>
-        <button onclick="toggleDownloadsDrawer()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <div id="downloadsListContainer" class="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar text-xs">
-        <!-- Injected by JS -->
-      </div>
-
-      <div class="p-2 border-t border-slate-800 bg-[#070a13] flex justify-between items-center text-xs text-slate-400">
-        <button onclick="clearDownloadsList()" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs">Clear List</button>
-        <span class="text-[10px] text-slate-500">Auto-saved to device</span>
-      </div>
-    </aside>
-
-  </main>
+      <button onclick="closeSslCertificateModal()" class="w-full py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
+        Close
+      </button>
+    </div>
+  </div>
 
   <!-- ========================================================================= -->
   <!-- 5. SHIELD DEFENSE MODAL (BRAVE-STYLE CONTROL MATRIX) -->
   <!-- ========================================================================= -->
-  <div id="shieldModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+  <div id="shieldModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="toggleShieldModal()">
+    <div class="acrylic-panel rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between border-b border-white/[0.06] pb-3">
         <div class="flex items-center gap-2">
           <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
             <i data-lucide="shield-check" class="w-4 h-4"></i>
@@ -566,7 +674,6 @@
         </button>
       </div>
 
-      <!-- Shield Mode Switcher Options -->
       <div class="space-y-2">
         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Shield Protection Level</div>
         <div class="grid grid-cols-1 gap-2">
@@ -631,499 +738,862 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- 6. JAVASCRIPT BROWSER OPERATING SYSTEM ENGINE -->
+  <!-- 6. PRODUCTION-GRADE STATE CONTROLLER LOGIC (ES6) -->
   <!-- ========================================================================= -->
   <script>
-    // State
-    let tabs = [];
-    let activeTabId = null;
-    let nextTabCounter = 1;
-    let currentShieldMode = "standard"; // standard | aggressive | off
-    let readerFontSize = 18;
+    /**
+     * Staunt Browser Architecture — Arc-Class State Controller
+     */
+    class BrowserStateManager {
+      constructor() {
+        this.activeWorkspaceId = 'personal';
+        this.activeTabId = null;
+        this.nextTabId = 1;
+        this.shieldMode = 'standard'; // standard | aggressive | off
+        this.readerFontSize = 18;
+        this.isSidebarCollapsed = false;
 
-    // Local Storage Keys
-    const LS_BOOKMARKS = "staunt_bookmarks_v1";
-    const LS_HISTORY = "staunt_history_v1";
-    const LS_DOWNLOADS = "staunt_downloads_v1";
+        // Local Storage Keys
+        this.LS_BOOKMARKS = 'staunt_arc_bookmarks_v2';
+        this.LS_HISTORY = 'staunt_arc_history_v2';
+        this.LS_DOWNLOADS = 'staunt_arc_downloads_v2';
+        this.LS_WORKSPACES = 'staunt_arc_workspaces_v2';
 
-    // Default Bookmarks
-    const defaultBookmarks = [
-      { id: 'b1', title: 'Hacker News', url: 'https://news.ycombinator.com', icon: 'orange' },
-      { id: 'b2', title: 'Wikipedia', url: 'https://en.wikipedia.org', icon: 'slate' },
-      { id: 'b3', title: 'GitHub', url: 'https://github.com', icon: 'black' },
-      { id: 'b4', title: 'BBC News', url: 'https://www.bbc.com/news', icon: 'red' },
-      { id: 'b5', title: 'arXiv Research', url: 'https://arxiv.org', icon: 'rose' },
-      { id: 'b6', title: 'HuggingFace', url: 'https://huggingface.co', icon: 'amber' },
-      { id: 'b7', title: 'Reddit', url: 'https://reddit.com', icon: 'orange' }
-    ];
+        // Workspaces Architecture (Arc-Style Spaces)
+        this.workspaces = {
+          personal: {
+            id: 'personal',
+            name: 'Personal Space',
+            color: '#8b5cf6',
+            pinned: [
+              { id: 'pin_yt', title: 'YouTube', url: 'https://youtube.com', icon: 'youtube' },
+              { id: 'pin_wiki', title: 'Wikipedia', url: 'https://en.wikipedia.org', icon: 'globe' },
+              { id: 'pin_hn', title: 'Hacker News', url: 'https://news.ycombinator.com', icon: 'compass' },
+              { id: 'pin_reddit', title: 'Reddit', url: 'https://reddit.com', icon: 'message-square' }
+            ],
+            tabs: []
+          },
+          dev: {
+            id: 'dev',
+            name: 'Code & Dev Space',
+            color: '#06b6d4',
+            pinned: [
+              { id: 'pin_gh', title: 'GitHub', url: 'https://github.com', icon: 'github' },
+              { id: 'pin_hf', title: 'HuggingFace', url: 'https://huggingface.co', icon: 'cpu' },
+              { id: 'pin_so', title: 'StackOverflow', url: 'https://stackoverflow.com', icon: 'code' },
+              { id: 'pin_npm', title: 'npm Registry', url: 'https://npmjs.com', icon: 'box' }
+            ],
+            tabs: []
+          },
+          research: {
+            id: 'research',
+            name: 'Deep Research Space',
+            color: '#f59e0b',
+            pinned: [
+              { id: 'pin_arxiv', title: 'arXiv CS/AI', url: 'https://arxiv.org', icon: 'book' },
+              { id: 'pin_nature', title: 'Nature Scientific', url: 'https://nature.com', icon: 'file-text' },
+              { id: 'pin_scholar', title: 'Google Scholar', url: 'https://scholar.google.com', icon: 'graduation-cap' },
+              { id: 'pin_bbc', title: 'BBC World News', url: 'https://bbc.com/news', icon: 'newspaper' }
+            ],
+            tabs: []
+          }
+        };
 
-    function getStoredBookmarks() {
-      try {
-        const d = localStorage.getItem(LS_BOOKMARKS);
-        if (d) return JSON.parse(d);
-      } catch(e) {}
-      localStorage.setItem(LS_BOOKMARKS, JSON.stringify(defaultBookmarks));
-      return defaultBookmarks;
-    }
-
-    function saveStoredBookmarks(bms) {
-      localStorage.setItem(LS_BOOKMARKS, JSON.stringify(bms));
-      renderBookmarksBar();
-      renderBookmarksDrawer();
-    }
-
-    function getStoredHistory() {
-      try {
-        const d = localStorage.getItem(LS_HISTORY);
-        if (d) return JSON.parse(d);
-      } catch(e) {}
-      return [];
-    }
-
-    function addHistoryEntry(url, title) {
-      if (!url || url.startsWith('staunt://') || url.startsWith('about:')) return;
-      try {
-        let history = getStoredHistory();
-        // Remove duplicate of the same URL in top 5
-        history = history.filter(h => h.url !== url);
-        history.unshift({
-          url: url,
-          title: title || url,
-          timestamp: Date.now()
-        });
-        if (history.length > 200) history = history.slice(0, 200);
-        localStorage.setItem(LS_HISTORY, JSON.stringify(history));
-      } catch(e) {}
-    }
-
-    function getStoredDownloads() {
-      try {
-        const d = localStorage.getItem(LS_DOWNLOADS);
-        if (d) return JSON.parse(d);
-      } catch(e) {}
-      return [];
-    }
-
-    function addDownloadEntry(title, url, format, size) {
-      try {
-        let list = getStoredDownloads();
-        list.unshift({
-          id: 'dl_' + Date.now(),
-          title: title,
-          url: url,
-          format: format || 'Direct',
-          size: size || 'Complete',
-          timestamp: Date.now()
-        });
-        if (list.length > 50) list = list.slice(0, 50);
-        localStorage.setItem(LS_DOWNLOADS, JSON.stringify(list));
-        renderDownloadsDrawer();
-        // Flash badge
-        const badge = document.getElementById("downloadsBadge");
-        if (badge) {
-          badge.classList.remove("hidden");
-          setTimeout(() => badge.classList.add("hidden"), 4000);
-        }
-      } catch(e) {}
-    }
-
-    // =========================================================================
-    // INITIALIZATION & EVENT LISTENERS
-    // =========================================================================
-    function initBrowser() {
-      renderBookmarksBar();
-      createNewTab('staunt://newtab');
-      setupKeyboardShortcuts();
-      lucide.createIcons();
-    }
-
-    // =========================================================================
-    // MULTI-TAB ENGINE CORE
-    // =========================================================================
-    function createNewTab(initialUrl = 'staunt://newtab') {
-      const tabId = 'tab_' + (nextTabCounter++);
-      const newTabObj = {
-        id: tabId,
-        url: initialUrl,
-        title: initialUrl === 'staunt://newtab' ? 'New Tab' : initialUrl,
-        favicon: '',
-        mode: initialUrl === 'staunt://newtab' ? 'start' : 'proxy',
-        history: [initialUrl],
-        historyIndex: 0,
-        domElement: null
-      };
-
-      tabs.push(newTabObj);
-
-      // Create DOM Container for this tab inside #mainCanvasContainer
-      const container = document.getElementById('mainCanvasContainer');
-      const tabCanvas = document.createElement('div');
-      tabCanvas.id = `canvas_${tabId}`;
-      tabCanvas.className = 'w-full h-full relative';
-      container.appendChild(tabCanvas);
-
-      newTabObj.domElement = tabCanvas;
-
-      // Switch to new tab
-      switchToTab(tabId);
-
-      // Render content
-      if (initialUrl === 'staunt://newtab') {
-        renderStartPageContent(tabId);
-      } else {
-        renderProxyContent(tabId, initialUrl);
+        this.init();
       }
 
-      renderTabStrip();
-      return tabId;
-    }
+      init() {
+        this.loadWorkspacesFromStorage();
+        this.renderPinnedGrid();
+        
+        // Create initial tab in active workspace
+        this.createNewTab('staunt://newtab');
+        this.setupKeyboardShortcuts();
+        lucide.createIcons();
+      }
 
-    function switchToTab(tabId) {
-      const targetTab = tabs.find(t => t.id === tabId);
-      if (!targetTab) return;
+      loadWorkspacesFromStorage() {
+        try {
+          const stored = localStorage.getItem(this.LS_WORKSPACES);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            // Merge pinned tabs
+            for (let k in parsed) {
+              if (this.workspaces[k]) {
+                this.workspaces[k].pinned = parsed[k].pinned || this.workspaces[k].pinned;
+              }
+            }
+          }
+        } catch(e) {}
+      }
 
-      activeTabId = tabId;
+      saveWorkspacesToStorage() {
+        try {
+          localStorage.setItem(this.LS_WORKSPACES, JSON.stringify(this.workspaces));
+        } catch(e) {}
+      }
 
-      // Hide all other canvas divs, display this tab's canvas div
-      tabs.forEach(t => {
-        const c = document.getElementById(`canvas_${t.id}`);
-        if (c) {
-          if (t.id === tabId) {
-            c.style.display = 'block';
+      // Workspaces Management
+      switchWorkspace(spaceId) {
+        if (!this.workspaces[spaceId]) return;
+        this.activeWorkspaceId = spaceId;
+
+        const currentSpace = this.workspaces[spaceId];
+        document.getElementById('activeSpaceTitle').textContent = currentSpace.name;
+        document.getElementById('activeSpaceDot').style.backgroundColor = currentSpace.color;
+
+        // Update switcher buttons UI
+        ['personal', 'dev', 'research'].forEach(id => {
+          const btn = document.getElementById(`spaceBtn_${id}`);
+          if (btn) {
+            if (id === spaceId) {
+              btn.className = "flex-1 py-1 rounded-lg text-center text-xs font-semibold flex items-center justify-center gap-1.5 transition-all text-violet-300 bg-violet-500/10 border border-violet-500/20";
+            } else {
+              btn.className = "flex-1 py-1 rounded-lg text-center text-xs font-semibold flex items-center justify-center gap-1.5 transition-all text-slate-400 hover:text-white";
+            }
+          }
+        });
+
+        this.renderPinnedGrid();
+
+        // Switch to the first tab of this space or create one
+        if (currentSpace.tabs.length > 0) {
+          this.switchToTab(currentSpace.tabs[0].id);
+        } else {
+          this.createNewTab('staunt://newtab');
+        }
+
+        this.renderVerticalTabs();
+      }
+
+      // Pinned Tabs Grid
+      renderPinnedGrid() {
+        const grid = document.getElementById('pinnedTabsGrid');
+        if (!grid) return;
+        const currentSpace = this.workspaces[this.activeWorkspaceId];
+
+        grid.innerHTML = currentSpace.pinned.map(p => {
+          const isCurrentActive = this.getActiveTab() && this.getActiveTab().url === p.url;
+          return `
+            <div 
+              onclick="browser.openPinnedUrl('${p.url}')"
+              class="pinned-tile ${isCurrentActive ? 'active' : ''} flex items-center gap-2 p-2 rounded-xl bg-white/[0.03] border border-white/[0.06] cursor-pointer group"
+              title="${escapeHtml(p.title)} (${escapeHtml(p.url)})"
+            >
+              <img src="https://www.google.com/s2/favicons?domain=${new URL(p.url).hostname}&sz=32" class="w-4 h-4 rounded" onerror="this.style.display='none'" />
+              <span class="text-xs font-medium text-slate-300 group-hover:text-white truncate">${escapeHtml(p.title)}</span>
+            </div>
+          `;
+        }).join('');
+
+        lucide.createIcons();
+      }
+
+      openPinnedUrl(url) {
+        // Look if already open
+        const currentSpace = this.workspaces[this.activeWorkspaceId];
+        const existing = currentSpace.tabs.find(t => t.url === url);
+        if (existing) {
+          this.switchToTab(existing.id);
+        } else {
+          this.createNewTab(url);
+        }
+      }
+
+      // Tab Management
+      createNewTab(initialUrl = 'staunt://newtab') {
+        const tabId = 'tab_' + (this.nextTabId++);
+        const newTab = {
+          id: tabId,
+          workspaceId: this.activeWorkspaceId,
+          url: initialUrl,
+          title: initialUrl === 'staunt://newtab' ? 'New Tab' : initialUrl,
+          favicon: '',
+          mode: initialUrl === 'staunt://newtab' ? 'start' : 'proxy',
+          history: [initialUrl],
+          historyIndex: 0
+        };
+
+        this.workspaces[this.activeWorkspaceId].tabs.push(newTab);
+
+        // Create isolated viewport DOM element
+        const container = document.getElementById('mainCanvasContainer');
+        const tabCanvas = document.createElement('div');
+        tabCanvas.id = `canvas_${tabId}`;
+        tabCanvas.className = 'w-full h-full relative';
+        container.appendChild(tabCanvas);
+
+        this.switchToTab(tabId);
+
+        if (initialUrl === 'staunt://newtab') {
+          this.renderStartPageContent(tabId);
+        } else {
+          this.renderProxyContent(tabId, initialUrl);
+        }
+
+        this.renderVerticalTabs();
+        return tabId;
+      }
+
+      switchToTab(tabId) {
+        const currentSpace = this.workspaces[this.activeWorkspaceId];
+        const targetTab = currentSpace.tabs.find(t => t.id === tabId);
+        if (!targetTab) return;
+
+        this.activeTabId = tabId;
+
+        // Toggle DOM display
+        Object.values(this.workspaces).forEach(space => {
+          space.tabs.forEach(t => {
+            const el = document.getElementById(`canvas_${t.id}`);
+            if (el) {
+              el.style.display = t.id === tabId ? 'block' : 'none';
+            }
+          });
+        });
+
+        // Synchronize Top Header Capsule
+        this.updateTopBarState(targetTab);
+        this.renderVerticalTabs();
+        this.renderPinnedGrid();
+        closeReaderMode();
+      }
+
+      closeTab(tabId, event) {
+        if (event) event.stopPropagation();
+
+        const currentSpace = this.workspaces[this.activeWorkspaceId];
+        const idx = currentSpace.tabs.findIndex(t => t.id === tabId);
+        if (idx === -1) return;
+
+        // Clean Canvas DOM
+        const el = document.getElementById(`canvas_${tabId}`);
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+
+        currentSpace.tabs.splice(idx, 1);
+
+        if (currentSpace.tabs.length === 0) {
+          this.createNewTab('staunt://newtab');
+          return;
+        }
+
+        if (this.activeTabId === tabId) {
+          const nextIndex = Math.max(0, idx - 1);
+          this.switchToTab(currentSpace.tabs[nextIndex].id);
+        } else {
+          this.renderVerticalTabs();
+        }
+      }
+
+      getActiveTab() {
+        const currentSpace = this.workspaces[this.activeWorkspaceId];
+        return currentSpace.tabs.find(t => t.id === this.activeTabId);
+      }
+
+      renderVerticalTabs() {
+        const list = document.getElementById('verticalTabsList');
+        if (!list) return;
+        const currentSpace = this.workspaces[this.activeWorkspaceId];
+
+        list.innerHTML = currentSpace.tabs.map(t => {
+          const isActive = t.id === this.activeTabId;
+          const faviconSrc = t.favicon || (t.url.startsWith('http') ? `https://www.google.com/s2/favicons?domain=${new URL(t.url).hostname}&sz=32` : '');
+
+          return `
+            <div 
+              onclick="browser.switchToTab('${t.id}')"
+              class="arc-tab-item ${isActive ? 'active' : ''} group flex items-center justify-between px-2.5 py-1.5 rounded-xl cursor-pointer text-xs"
+              title="${escapeHtml(t.title)}"
+            >
+              <div class="flex items-center gap-2 overflow-hidden flex-1">
+                ${faviconSrc ? `<img src="${faviconSrc}" class="w-3.5 h-3.5 rounded flex-shrink-0" onerror="this.style.display='none'" />` : `<i data-lucide="${t.url === 'staunt://newtab' ? 'compass' : 'globe'}" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>`}
+                <span class="truncate font-medium text-slate-200 group-hover:text-white">${escapeHtml(t.title || 'Untitled')}</span>
+              </div>
+              <button 
+                onclick="browser.closeTab('${t.id}', event)" 
+                title="Close Tab" 
+                class="w-4 h-4 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.1] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-1"
+              >
+                <i data-lucide="x" class="w-2.5 h-2.5"></i>
+              </button>
+            </div>
+          `;
+        }).join('');
+
+        lucide.createIcons();
+      }
+
+      updateTopBarState(tab) {
+        const domainEl = document.getElementById('topBarDomainTitle');
+        if (domainEl) {
+          if (tab.url === 'staunt://newtab') {
+            domainEl.textContent = 'Search live web, enter URL, or ⌘K...';
+            domainEl.className = 'text-xs font-mono font-medium text-slate-400 truncate';
           } else {
-            c.style.display = 'none';
+            domainEl.textContent = tab.url;
+            domainEl.className = 'text-xs font-mono font-medium text-slate-200 truncate';
           }
         }
-      });
 
-      // Synchronize Omnibox
-      const omnibox = document.getElementById('omniboxInput');
-      if (targetTab.url === 'staunt://newtab') {
-        omnibox.value = '';
-        omnibox.placeholder = "Search with AI, enter any URL, or paste video link to sniff...";
-      } else {
-        omnibox.value = targetTab.url;
+        // Nav Back/Forward Buttons
+        const btnBack = document.getElementById('btnBack');
+        const btnForward = document.getElementById('btnForward');
+        if (btnBack) btnBack.style.opacity = tab.historyIndex > 0 ? "1" : "0.4";
+        if (btnForward) btnForward.style.opacity = tab.historyIndex < (tab.history.length - 1) ? "1" : "0.4";
+
+        this.updateBookmarkStar(tab.url);
       }
 
-      // Update Bookmark Star state
-      updateBookmarkStarState(targetTab.url);
-
-      // Update Nav Buttons
-      updateNavButtonsState();
-
-      renderTabStrip();
-      closeReaderMode();
-    }
-
-    function closeTab(tabId, event) {
-      if (event) event.stopPropagation();
-
-      if (tabs.length === 1) {
-        // If closing last tab, reset it to New Tab
-        const singleTab = tabs[0];
-        singleTab.url = 'staunt://newtab';
-        singleTab.title = 'New Tab';
-        singleTab.history = ['staunt://newtab'];
-        singleTab.historyIndex = 0;
-        renderStartPageContent(singleTab.id);
-        switchToTab(singleTab.id);
-        return;
+      updateBookmarkStar(url) {
+        const star = document.getElementById('topBookmarkStar');
+        if (!star) return;
+        const bms = this.getStoredBookmarks();
+        const isSaved = bms.some(b => b.url === url);
+        if (isSaved) {
+          star.classList.add('fill-amber-400', 'text-amber-400');
+        } else {
+          star.classList.remove('fill-amber-400', 'text-amber-400');
+        }
       }
 
-      const index = tabs.findIndex(t => t.id === tabId);
-      if (index === -1) return;
+      // START PAGE RENDERER
+      renderStartPageContent(tabId) {
+        const canvas = document.getElementById(`canvas_${tabId}`);
+        if (!canvas) return;
 
-      // Remove Canvas DOM element
-      const c = document.getElementById(`canvas_${tabId}`);
-      if (c && c.parentNode) c.parentNode.removeChild(c);
+        const tab = this.getActiveTab();
+        if (tab && tab.id === tabId) {
+          tab.url = "staunt://newtab";
+          tab.title = "New Tab";
+          tab.mode = "start";
+        }
 
-      tabs.splice(index, 1);
+        canvas.innerHTML = `
+          <div class="w-full h-full overflow-y-auto custom-scrollbar flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#090d18] via-[#0e1424] to-[#090d18]">
+            <div class="max-w-2xl w-full text-center space-y-6 -mt-8">
+              
+              <div class="space-y-1">
+                <div class="clock-display text-5xl sm:text-6xl font-black text-white tracking-tight font-mono">12:00</div>
+                <div class="text-xs text-slate-400 font-medium">Staunt Arc-Class Engine Active • Sovereign Enclave</div>
+              </div>
 
-      // If closed tab was active, switch to adjacent tab
-      if (activeTabId === tabId) {
-        const nextIndex = Math.max(0, index - 1);
-        switchToTab(tabs[nextIndex].id);
-      } else {
-        renderTabStrip();
-      }
-    }
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-mono">
+                <span class="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></span>
+                <span>ARC WORKSPACES • FLOATING COMMAND PALETTE (⌘K)</span>
+              </div>
 
-    function renderTabStrip() {
-      const container = document.getElementById('tabStripContainer');
-      container.innerHTML = tabs.map(t => {
-        const isActive = t.id === activeTabId;
-        const faviconSrc = t.favicon || (t.url.startsWith('http') ? `https://www.google.com/s2/favicons?domain=${new URL(t.url).hostname}&sz=32` : '');
-        
-        return `
-          <div 
-            onclick="switchToTab('${t.id}')"
-            class="browser-tab ${isActive ? 'active' : ''} group flex items-center gap-1.5 px-3 py-1 rounded-t-lg text-xs cursor-pointer max-w-[200px] min-w-[120px] h-[34px] border-b-0"
-            title="${escapeHtml(t.title)}"
-          >
-            ${faviconSrc ? `<img src="${faviconSrc}" class="w-3.5 h-3.5 rounded flex-shrink-0" onerror="this.style.display='none'" />` : `<i data-lucide="${t.url === 'staunt://newtab' ? 'compass' : 'globe'}" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>`}
-            <span class="truncate font-medium text-[11px] flex-1 select-none">${escapeHtml(t.title || 'Untitled')}</span>
-            <button 
-              onclick="closeTab('${t.id}', event)" 
-              title="Close Tab (Ctrl+W)" 
-              class="w-4 h-4 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700/60 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-            >
-              <i data-lucide="x" class="w-2.5 h-2.5"></i>
-            </button>
+              <!-- Quick Command Bar Trigger Box -->
+              <div class="relative max-w-xl mx-auto cursor-pointer" onclick="openCommandPalette()">
+                <div class="flex items-center bg-[#070a13] border border-white/10 hover:border-violet-500/60 rounded-2xl p-3.5 shadow-2xl transition-all group">
+                  <i data-lucide="search" class="w-5 h-5 text-violet-400 ml-1 mr-3 group-hover:scale-110 transition-transform"></i>
+                  <span class="text-sm font-medium text-slate-400 group-hover:text-slate-200">Search with AI, enter any website, or type commands...</span>
+                  <span class="ml-auto px-2 py-0.5 rounded-lg bg-white/[0.08] text-slate-300 text-xs font-mono">⌘K</span>
+                </div>
+              </div>
+
+              <!-- Speed Dial Tiles -->
+              <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 pt-2 max-w-xl mx-auto">
+                <button onclick="browser.browseTo('https://news.ycombinator.com')" class="flex flex-col items-center p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-violet-500/40 transition-all group">
+                  <div class="w-9 h-9 rounded-xl bg-orange-500 flex items-center justify-center text-white font-black text-sm shadow-md group-hover:scale-110 transition-transform">Y</div>
+                  <span class="text-[11px] text-slate-300 mt-2 font-medium">Hacker News</span>
+                </button>
+                <button onclick="browser.browseTo('https://en.wikipedia.org')" class="flex flex-col items-center p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-violet-500/40 transition-all group">
+                  <div class="w-9 h-9 rounded-xl bg-slate-700 flex items-center justify-center text-white font-bold text-sm shadow-md group-hover:scale-110 transition-transform">W</div>
+                  <span class="text-[11px] text-slate-300 mt-2 font-medium">Wikipedia</span>
+                </button>
+                <button onclick="browser.browseTo('https://github.com')" class="flex flex-col items-center p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-violet-500/40 transition-all group">
+                  <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-white text-sm shadow-md group-hover:scale-110 transition-transform"><i data-lucide="github" class="w-4 h-4"></i></div>
+                  <span class="text-[11px] text-slate-300 mt-2 font-medium">GitHub</span>
+                </button>
+                <button onclick="browser.browseTo('https://bbc.com/news')" class="flex flex-col items-center p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-violet-500/40 transition-all group">
+                  <div class="w-9 h-9 rounded-xl bg-red-600 flex items-center justify-center text-white font-bold text-[10px] shadow-md group-hover:scale-110 transition-transform">BBC</div>
+                  <span class="text-[11px] text-slate-300 mt-2 font-medium">BBC News</span>
+                </button>
+                <button onclick="browser.browseTo('https://arxiv.org')" class="flex flex-col items-center p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-violet-500/40 transition-all group">
+                  <div class="w-9 h-9 rounded-xl bg-rose-700 flex items-center justify-center text-white font-bold text-[10px] shadow-md group-hover:scale-110 transition-transform">arXiv</div>
+                  <span class="text-[11px] text-slate-300 mt-2 font-medium">Research</span>
+                </button>
+                <button onclick="browser.browseTo('https://huggingface.co')" class="flex flex-col items-center p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.06] hover:border-violet-500/40 transition-all group">
+                  <div class="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center text-white text-sm shadow-md group-hover:scale-110 transition-transform">🤗</div>
+                  <span class="text-[11px] text-slate-300 mt-2 font-medium">AI Models</span>
+                </button>
+              </div>
+
+              <!-- Native Windows Standalone App Banner -->
+              <div class="p-4 rounded-2xl bg-gradient-to-r from-violet-900/30 via-indigo-900/20 to-cyan-900/30 border border-violet-500/30 flex items-center justify-between text-left max-w-xl mx-auto shadow-xl">
+                <div>
+                  <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <i data-lucide="monitor" class="w-4 h-4 text-violet-400"></i>
+                    <span>Staunt Browser Ultra for Windows</span>
+                  </div>
+                  <p class="text-[11px] text-slate-300 mt-1">Native Chromium 130 Core • Socket Ad-Firewall • 4K Media Sniffer</p>
+                </div>
+                <a href="/api/browser/download/windows" download class="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold flex items-center gap-1 flex-shrink-0 transition-all shadow-md shadow-violet-600/30">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                  <span>Download .zip</span>
+                </a>
+              </div>
+
+            </div>
           </div>
         `;
-      }).join('');
 
-      lucide.createIcons();
-    }
-
-    function updateNavButtonsState() {
-      const tab = tabs.find(t => t.id === activeTabId);
-      if (!tab) return;
-      const btnBack = document.getElementById('btnBack');
-      const btnForward = document.getElementById('btnForward');
-      if (btnBack) btnBack.style.opacity = tab.historyIndex > 0 ? "1" : "0.4";
-      if (btnForward) btnForward.style.opacity = tab.historyIndex < (tab.history.length - 1) ? "1" : "0.4";
-    }
-
-    // =========================================================================
-    // START PAGE CONTENT
-    // =========================================================================
-    function renderStartPageContent(tabId) {
-      const canvas = document.getElementById(`canvas_${tabId}`);
-      if (!canvas) return;
-
-      const tab = tabs.find(t => t.id === tabId);
-      if (tab) {
-        tab.url = "staunt://newtab";
-        tab.title = "New Tab";
-        tab.mode = "start";
+        updateClocks();
+        lucide.createIcons();
       }
 
-      canvas.innerHTML = `
-        <div class="w-full h-full overflow-y-auto custom-scrollbar flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#060911] via-[#0b1020] to-[#060911]">
-          <div class="max-w-2xl w-full text-center space-y-6 -mt-8">
-            
-            <div class="space-y-1">
-              <div class="clock-display text-4xl sm:text-5xl font-black text-white tracking-tight font-mono">12:00</div>
-              <div class="text-xs text-slate-400 font-medium">Staunt Sovereign Engine Active • Chromium 130 Core</div>
-            </div>
+      // NAVIGATION & PROXY LOADER
+      browseTo(targetUrl) {
+        const tab = this.getActiveTab();
+        if (!tab) return;
 
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-mono">
-              <span class="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></span>
-              <span>STAUNT ULTRA CORE • MULTI-TAB SOVEREIGN WORKSPACE</span>
-            </div>
+        if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
+          targetUrl = "https://" + targetUrl;
+        }
 
-            <div class="relative max-w-xl mx-auto">
-              <div class="flex items-center bg-[#0d1322] border border-slate-700 rounded-2xl p-2 shadow-2xl focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-500/30 transition-all">
-                <i data-lucide="search" class="w-5 h-5 text-slate-400 ml-2 mr-2"></i>
-                <input 
-                  type="text" 
-                  placeholder="Search live web with AI or enter any website..." 
-                  class="bg-transparent text-white placeholder-slate-500 text-sm font-medium w-full focus:outline-none"
-                  onkeydown="if(event.key==='Enter') executeSmartSearch(this.value)"
-                  id="startInput_${tabId}"
-                />
-                <button onclick="executeSmartSearch(document.getElementById('startInput_${tabId}').value)" class="bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex-shrink-0">
-                  Search
+        tab.url = targetUrl;
+        tab.mode = "proxy";
+        tab.title = targetUrl.replace(/^https?:\/\//, '').split('/')[0];
+
+        tab.historyIndex++;
+        tab.history = tab.history.slice(0, tab.historyIndex);
+        tab.history.push(targetUrl);
+
+        this.addHistoryEntry(targetUrl, tab.title);
+        this.updateTopBarState(tab);
+        this.renderProxyContent(tab.id, targetUrl);
+        this.renderVerticalTabs();
+      }
+
+      renderProxyContent(tabId, url) {
+        const canvas = document.getElementById(`canvas_${tabId}`);
+        if (!canvas) return;
+
+        startProgress();
+
+        canvas.innerHTML = `
+          <iframe 
+            id="iframe_${tabId}" 
+            src="/api/browser/proxy?url=${encodeURIComponent(url)}&shield=${encodeURIComponent(this.shieldMode)}" 
+            class="tab-viewport-frame"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+            allowfullscreen="true"
+            onload="endProgress()"
+          ></iframe>
+        `;
+      }
+
+      navigateBack() {
+        const tab = this.getActiveTab();
+        if (!tab || tab.historyIndex <= 0) return;
+
+        tab.historyIndex--;
+        const prev = tab.history[tab.historyIndex];
+        tab.url = prev;
+
+        if (prev === 'staunt://newtab') {
+          this.renderStartPageContent(tab.id);
+        } else {
+          this.renderProxyContent(tab.id, prev);
+        }
+
+        this.updateTopBarState(tab);
+        this.renderVerticalTabs();
+      }
+
+      navigateForward() {
+        const tab = this.getActiveTab();
+        if (!tab || tab.historyIndex >= tab.history.length - 1) return;
+
+        tab.historyIndex++;
+        const next = tab.history[tab.historyIndex];
+        tab.url = next;
+
+        if (next === 'staunt://newtab') {
+          this.renderStartPageContent(tab.id);
+        } else {
+          this.renderProxyContent(tab.id, next);
+        }
+
+        this.updateTopBarState(tab);
+        this.renderVerticalTabs();
+      }
+
+      reloadActiveTab() {
+        const tab = this.getActiveTab();
+        if (!tab) return;
+
+        startProgress();
+        const rot = document.getElementById('reloadIcon');
+        if (rot) rot.classList.add('animate-spin');
+
+        if (tab.mode === 'proxy') {
+          const iframe = document.getElementById(`iframe_${tab.id}`);
+          if (iframe) iframe.src = iframe.src;
+        } else if (tab.mode === 'search') {
+          this.executeSmartSearch(tab.url.replace("staunt://search?q=", ""));
+        } else {
+          this.renderStartPageContent(tab.id);
+          endProgress();
+        }
+
+        setTimeout(() => { if (rot) rot.classList.remove('animate-spin'); }, 800);
+      }
+
+      // SOVEREIGN AI SEARCH
+      executeSmartSearch(query) {
+        if (!query || !query.trim()) return;
+        query = query.trim();
+
+        const tab = this.getActiveTab();
+        if (!tab) return;
+
+        tab.mode = "search";
+        tab.url = "staunt://search?q=" + encodeURIComponent(query);
+        tab.title = query + " — Search";
+        tab.historyIndex++;
+        tab.history.push(tab.url);
+
+        this.updateTopBarState(tab);
+        this.renderVerticalTabs();
+
+        startProgress();
+
+        const canvas = document.getElementById(`canvas_${tab.id}`);
+        canvas.innerHTML = `
+          <div class="w-full h-full overflow-y-auto custom-scrollbar p-4 sm:p-8 bg-[#090d18]">
+            <div class="max-w-3xl mx-auto space-y-6">
+              
+              <div class="flex items-center gap-2 text-xs text-slate-400">
+                <i data-lucide="sparkles" class="w-4 h-4 text-violet-400"></i>
+                <span>Staunt Sovereign AI Web Engine</span>
+                <span>•</span>
+                <span class="font-mono text-violet-300">Searching live internet</span>
+              </div>
+
+              <!-- AI Synthesis Box -->
+              <div class="p-5 rounded-2xl bg-[#0e1424] border border-violet-500/30 shadow-2xl space-y-3">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+                    <span>AI Knowledge Synthesis</span>
+                  </h3>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20 font-mono">Zero Telemetry</span>
+                </div>
+                <div id="searchAiContent_${tab.id}" class="space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  <div class="animate-pulse space-y-2 py-2">
+                    <div class="h-3 bg-slate-800 rounded w-3/4"></div>
+                    <div class="h-3 bg-slate-800 rounded w-5/6"></div>
+                    <div class="h-3 bg-slate-800 rounded w-2/3"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between pt-2">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Verified Web Sources</h4>
+                <span id="sourcesCount_${tab.id}" class="text-xs text-slate-500 font-mono">Scanning...</span>
+              </div>
+
+              <div id="searchResultsList_${tab.id}" class="space-y-3"></div>
+
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+
+        fetch("/api/browser/search?q=" + encodeURIComponent(query))
+          .then(res => res.json())
+          .then(data => {
+            endProgress();
+            this.renderSearchResults(tab.id, data);
+          })
+          .catch(err => {
+            endProgress();
+            const el = document.getElementById(`searchAiContent_${tab.id}`);
+            if (el) el.innerHTML = `<p class="text-rose-400">Search error: ${err.message}</p>`;
+          });
+      }
+
+      renderSearchResults(tabId, data) {
+        const aiContent = document.getElementById(`searchAiContent_${tabId}`);
+        if (aiContent && data.ai_summary && data.ai_summary.points) {
+          aiContent.innerHTML = data.ai_summary.points.map(p => `
+            <div class="flex items-start gap-2">
+              <span class="text-violet-400 font-bold">•</span>
+              <span>${escapeHtml(p)}</span>
+            </div>
+          `).join("");
+        }
+
+        const sourcesCount = document.getElementById(`sourcesCount_${tabId}`);
+        if (sourcesCount) sourcesCount.textContent = `${data.results ? data.results.length : 0} sources found`;
+
+        const list = document.getElementById(`searchResultsList_${tabId}`);
+        if (!list) return;
+
+        if (!data.results || data.results.length === 0) {
+          list.innerHTML = `<div class="p-4 rounded-xl bg-slate-800/40 text-xs text-slate-400">No web results returned for this query.</div>`;
+          return;
+        }
+
+        list.innerHTML = data.results.map(r => `
+          <div class="p-4 rounded-xl bg-[#0e1424] hover:bg-[#12192e] border border-white/[0.06] hover:border-white/[0.12] transition-all space-y-2 group">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-mono text-violet-400 text-[11px]">${escapeHtml(r.domain)}</span>
+              <div class="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
+                <button onclick="openReaderMode('${r.url}')" class="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 text-[10px] font-semibold flex items-center gap-1">
+                  <i data-lucide="book-open" class="w-3 h-3"></i>
+                  <span>Reader</span>
+                </button>
+                <button onclick="browser.browseTo('${r.url}')" class="px-2 py-0.5 rounded bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/20 text-[10px] font-semibold flex items-center gap-1">
+                  <i data-lucide="external-link" class="w-3 h-3"></i>
+                  <span>Open</span>
                 </button>
               </div>
             </div>
-
-            <!-- Speed Dial Grid -->
-            <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 pt-2 max-w-xl mx-auto">
-              <button onclick="browseTo('https://news.ycombinator.com')" class="flex flex-col items-center p-3 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 hover:border-violet-500/50 transition-all group">
-                <div class="w-9 h-9 rounded-xl bg-orange-500 flex items-center justify-center text-white font-black text-sm shadow-md group-hover:scale-110 transition-transform">Y</div>
-                <span class="text-[11px] text-slate-300 mt-2 font-medium">Hacker News</span>
-              </button>
-              <button onclick="browseTo('https://en.wikipedia.org')" class="flex flex-col items-center p-3 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 hover:border-violet-500/50 transition-all group">
-                <div class="w-9 h-9 rounded-xl bg-slate-700 flex items-center justify-center text-white font-bold text-sm shadow-md group-hover:scale-110 transition-transform">W</div>
-                <span class="text-[11px] text-slate-300 mt-2 font-medium">Wikipedia</span>
-              </button>
-              <button onclick="browseTo('https://github.com')" class="flex flex-col items-center p-3 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 hover:border-violet-500/50 transition-all group">
-                <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-white text-sm shadow-md group-hover:scale-110 transition-transform"><i data-lucide="github" class="w-4 h-4"></i></div>
-                <span class="text-[11px] text-slate-300 mt-2 font-medium">GitHub</span>
-              </button>
-              <button onclick="browseTo('https://www.bbc.com/news')" class="flex flex-col items-center p-3 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 hover:border-violet-500/50 transition-all group">
-                <div class="w-9 h-9 rounded-xl bg-red-600 flex items-center justify-center text-white font-bold text-[10px] shadow-md group-hover:scale-110 transition-transform">BBC</div>
-                <span class="text-[11px] text-slate-300 mt-2 font-medium">BBC News</span>
-              </button>
-              <button onclick="browseTo('https://arxiv.org')" class="flex flex-col items-center p-3 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 hover:border-violet-500/50 transition-all group">
-                <div class="w-9 h-9 rounded-xl bg-rose-700 flex items-center justify-center text-white font-bold text-[10px] shadow-md group-hover:scale-110 transition-transform">arXiv</div>
-                <span class="text-[11px] text-slate-300 mt-2 font-medium">Research</span>
-              </button>
-              <button onclick="browseTo('https://huggingface.co')" class="flex flex-col items-center p-3 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 hover:border-violet-500/50 transition-all group">
-                <div class="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center text-white text-sm shadow-md group-hover:scale-110 transition-transform">🤗</div>
-                <span class="text-[11px] text-slate-300 mt-2 font-medium">AI Models</span>
-              </button>
-            </div>
-
-            <!-- Windows Native App Feature Card -->
-            <div class="p-4 rounded-2xl bg-gradient-to-r from-violet-900/30 via-indigo-900/20 to-cyan-900/30 border border-violet-500/30 flex items-center justify-between text-left max-w-xl mx-auto shadow-xl">
-              <div>
-                <div class="text-xs font-bold text-white flex items-center gap-1.5">
-                  <i data-lucide="monitor" class="w-4 h-4 text-violet-400"></i>
-                  <span>Staunt Browser Ultra for Windows</span>
-                </div>
-                <p class="text-[11px] text-slate-300 mt-1">Stand-alone Chromium 130 • Socket Ad-Firewall • 4K Media Sniffer • Zero Telemetry</p>
-              </div>
-              <a href="/api/browser/download/windows" download class="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold flex items-center gap-1 flex-shrink-0 transition-all shadow-md shadow-violet-600/30">
-                <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                <span>Download .zip</span>
-              </a>
-            </div>
-
+            <h3 onclick="browser.browseTo('${r.url}')" class="text-sm sm:text-base font-bold text-white hover:text-violet-300 cursor-pointer transition-colors leading-snug">
+              ${escapeHtml(r.title)}
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(r.snippet)}</p>
           </div>
-        </div>
-      `;
+        `).join("");
 
-      updateClocks();
-      renderTabStrip();
+        lucide.createIcons();
+      }
+
+      // Storage & History Handlers
+      getStoredBookmarks() {
+        try {
+          const d = localStorage.getItem(this.LS_BOOKMARKS);
+          if (d) return JSON.parse(d);
+        } catch(e) {}
+        return [];
+      }
+
+      saveStoredBookmarks(bms) {
+        localStorage.setItem(this.LS_BOOKMARKS, JSON.stringify(bms));
+        const tab = this.getActiveTab();
+        if (tab) this.updateBookmarkStar(tab.url);
+      }
+
+      addHistoryEntry(url, title) {
+        if (!url || url.startsWith('staunt://') || url.startsWith('about:')) return;
+        try {
+          let list = JSON.parse(localStorage.getItem(this.LS_HISTORY) || '[]');
+          list = list.filter(h => h.url !== url);
+          list.unshift({ url, title: title || url, timestamp: Date.now() });
+          if (list.length > 200) list = list.slice(0, 200);
+          localStorage.setItem(this.LS_HISTORY, JSON.stringify(list));
+        } catch(e) {}
+      }
+
+      setupKeyboardShortcuts() {
+        window.addEventListener('keydown', (e) => {
+          const isCtrl = e.ctrlKey || e.metaKey;
+
+          // Cmd+K / Ctrl+K / Ctrl+L: Command Palette
+          if (isCtrl && (e.key.toLowerCase() === 'k' || e.key.toLowerCase() === 'l')) {
+            e.preventDefault();
+            openCommandPalette();
+            return;
+          }
+
+          // Cmd+T / Ctrl+T: New Tab
+          if (isCtrl && e.key.toLowerCase() === 't') {
+            e.preventDefault();
+            this.createNewTab('staunt://newtab');
+            return;
+          }
+
+          // Cmd+W / Ctrl+W: Close Tab
+          if (isCtrl && e.key.toLowerCase() === 'w') {
+            e.preventDefault();
+            if (this.activeTabId) this.closeTab(this.activeTabId);
+            return;
+          }
+
+          // Cmd+S / Ctrl+S: Toggle Sidebar Collapse
+          if (isCtrl && e.key.toLowerCase() === 's') {
+            e.preventDefault();
+            toggleSidebarCollapse();
+            return;
+          }
+
+          // Cmd+R / Ctrl+R / F5: Reload Tab
+          if ((isCtrl && e.key.toLowerCase() === 'r') || e.key === 'F5') {
+            e.preventDefault();
+            this.reloadActiveTab();
+            return;
+          }
+
+          // Alt+Left / Alt+Right
+          if (e.altKey && e.key === 'ArrowLeft') {
+            e.preventDefault();
+            this.navigateBack();
+          } else if (e.altKey && e.key === 'ArrowRight') {
+            e.preventDefault();
+            this.navigateForward();
+          }
+        });
+      }
+    }
+
+    // Instantiate Global Browser State Manager
+    const browser = new BrowserStateManager();
+
+    // =========================================================================
+    // RAYCAST / SPOTLIGHT COMMAND PALETTE LOGIC
+    // =========================================================================
+    function openCommandPalette() {
+      const modal = document.getElementById("commandPaletteModal");
+      const input = document.getElementById("commandPaletteInput");
+      modal.classList.remove("hidden");
+      input.value = "";
+      input.focus();
+      renderDefaultPaletteSuggestions();
       lucide.createIcons();
     }
 
-    function updateClocks() {
-      const now = new Date();
-      const str = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      document.querySelectorAll('.clock-display').forEach(el => { el.textContent = str; });
+    function closeCommandPalette() {
+      document.getElementById("commandPaletteModal").classList.add("hidden");
     }
-    setInterval(updateClocks, 1000);
 
-    // =========================================================================
-    // NAVIGATION & PROXY ENGINE
-    // =========================================================================
-    function browseTo(targetUrl) {
-      const tab = tabs.find(t => t.id === activeTabId);
-      if (!tab) return;
+    function handlePaletteBackdropClick(e) {
+      closeCommandPalette();
+    }
 
-      if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
-        targetUrl = "https://" + targetUrl;
+    function handlePaletteKeyDown(e) {
+      if (e.key === "Escape") {
+        closeCommandPalette();
+      } else if (e.key === "Enter") {
+        submitCommandPalette();
       }
-
-      tab.url = targetUrl;
-      tab.mode = "proxy";
-      tab.title = targetUrl.replace(/^https?:\/\//, '').split('/')[0];
-      
-      // History record
-      tab.historyIndex++;
-      tab.history = tab.history.slice(0, tab.historyIndex);
-      tab.history.push(targetUrl);
-
-      addHistoryEntry(targetUrl, tab.title);
-
-      document.getElementById("omniboxInput").value = targetUrl;
-      updateBookmarkStarState(targetUrl);
-      updateNavButtonsState();
-
-      renderProxyContent(tab.id, targetUrl);
-      renderTabStrip();
     }
 
-    function renderProxyContent(tabId, url) {
-      const canvas = document.getElementById(`canvas_${tabId}`);
-      if (!canvas) return;
-
-      startProgress();
-
-      canvas.innerHTML = `
-        <iframe 
-          id="iframe_${tabId}" 
-          src="/api/browser/proxy?url=${encodeURIComponent(url)}&shield=${encodeURIComponent(currentShieldMode)}" 
-          class="tab-viewport-frame"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-          allowfullscreen="true"
-          onload="endProgress()"
-        ></iframe>
+    function renderDefaultPaletteSuggestions() {
+      const list = document.getElementById("paletteResultsList");
+      list.innerHTML = `
+        <div class="px-2 py-1 text-[10px] font-bold uppercase text-slate-500">Quick Actions</div>
+        <div onclick="executePaletteCommand('>bookmarks')" class="flex items-center justify-between p-2 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] cursor-pointer transition-colors">
+          <div class="flex items-center gap-2">
+            <i data-lucide="bookmark" class="w-3.5 h-3.5 text-amber-400"></i>
+            <span class="font-medium text-slate-200">Manage Bookmarks</span>
+          </div>
+          <span class="text-[10px] text-slate-500 font-mono">&gt;bookmarks</span>
+        </div>
+        <div onclick="executePaletteCommand('>history')" class="flex items-center justify-between p-2 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] cursor-pointer transition-colors">
+          <div class="flex items-center gap-2">
+            <i data-lucide="history" class="w-3.5 h-3.5 text-cyan-400"></i>
+            <span class="font-medium text-slate-200">View Browsing History</span>
+          </div>
+          <span class="text-[10px] text-slate-500 font-mono">&gt;history</span>
+        </div>
+        <div onclick="executePaletteCommand('>clear cache')" class="flex items-center justify-between p-2 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] cursor-pointer transition-colors">
+          <div class="flex items-center gap-2">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
+            <span class="font-medium text-slate-200">Clear Storage &amp; Cache</span>
+          </div>
+          <span class="text-[10px] text-slate-500 font-mono">&gt;clear cache</span>
+        </div>
+        <div onclick="executePaletteCommand('>copilot')" class="flex items-center justify-between p-2 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] cursor-pointer transition-colors">
+          <div class="flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-violet-400"></i>
+            <span class="font-medium text-slate-200">Launch AI Copilot</span>
+          </div>
+          <span class="text-[10px] text-slate-500 font-mono">&gt;copilot</span>
+        </div>
       `;
     }
 
-    function reloadActiveTab() {
-      const tab = tabs.find(t => t.id === activeTabId);
-      if (!tab) return;
+    let paletteSuggestTimer = null;
+    function handlePaletteInput(e) {
+      const q = e.target.value.trim();
+      clearTimeout(paletteSuggestTimer);
 
-      startProgress();
-      const rot = document.getElementById("reloadIcon");
-      if (rot) rot.classList.add("animate-spin");
-
-      if (tab.mode === 'proxy') {
-        const iframe = document.getElementById(`iframe_${tab.id}`);
-        if (iframe) iframe.src = iframe.src;
-      } else if (tab.mode === 'search') {
-        executeSmartSearch(tab.url.replace("staunt://search?q=", ""));
-      } else {
-        renderStartPageContent(tab.id);
-        endProgress();
+      if (q.startsWith(">")) {
+        // Command execution mode
+        return;
       }
 
-      setTimeout(() => {
-        if (rot) rot.classList.remove("animate-spin");
-      }, 800);
-    }
-
-    function navigateBack() {
-      const tab = tabs.find(t => t.id === activeTabId);
-      if (!tab || tab.historyIndex <= 0) return;
-
-      tab.historyIndex--;
-      const prevUrl = tab.history[tab.historyIndex];
-      tab.url = prevUrl;
-
-      if (prevUrl === 'staunt://newtab') {
-        renderStartPageContent(tab.id);
-      } else {
-        renderProxyContent(tab.id, prevUrl);
+      if (q.length < 2) {
+        renderDefaultPaletteSuggestions();
+        lucide.createIcons();
+        return;
       }
 
-      document.getElementById("omniboxInput").value = prevUrl === 'staunt://newtab' ? '' : prevUrl;
-      updateNavButtonsState();
-      renderTabStrip();
+      paletteSuggestTimer = setTimeout(() => {
+        fetch("/api/browser/suggest?q=" + encodeURIComponent(q))
+          .then(res => res.json())
+          .then(data => {
+            if (data.suggestions && data.suggestions.length > 0) {
+              const list = document.getElementById("paletteResultsList");
+              list.innerHTML = `
+                <div class="px-2 py-1 text-[10px] font-bold uppercase text-slate-500">Live Suggestions</div>
+                ${data.suggestions.map(s => `
+                  <div onclick="executeSearchFromPalette('${escapeHtml(s)}')" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/[0.08] text-slate-300 hover:text-white cursor-pointer transition-colors">
+                    <i data-lucide="search" class="w-3.5 h-3.5 text-violet-400"></i>
+                    <span>${escapeHtml(s)}</span>
+                  </div>
+                `).join("")}
+              `;
+              lucide.createIcons();
+            }
+          })
+          .catch(() => {});
+      }, 150);
     }
 
-    function navigateForward() {
-      const tab = tabs.find(t => t.id === activeTabId);
-      if (!tab || tab.historyIndex >= tab.history.length - 1) return;
-
-      tab.historyIndex++;
-      const nextUrl = tab.history[tab.historyIndex];
-      tab.url = nextUrl;
-
-      if (nextUrl === 'staunt://newtab') {
-        renderStartPageContent(tab.id);
-      } else {
-        renderProxyContent(tab.id, nextUrl);
-      }
-
-      document.getElementById("omniboxInput").value = nextUrl === 'staunt://newtab' ? '' : nextUrl;
-      updateNavButtonsState();
-      renderTabStrip();
-    }
-
-    function goHome() {
-      const tab = tabs.find(t => t.id === activeTabId);
-      if (!tab) return;
-      closeReaderMode();
-      renderStartPageContent(tab.id);
-    }
-
-    // =========================================================================
-    // OMNIBOX ROUTER
-    // =========================================================================
-    function submitOmnibox() {
-      const val = document.getElementById("omniboxInput").value.trim();
+    function submitCommandPalette() {
+      const val = document.getElementById("commandPaletteInput").value.trim();
       if (!val) return;
+      closeCommandPalette();
 
-      closeAutocomplete();
+      if (val.startsWith(">")) {
+        executePaletteCommand(val);
+        return;
+      }
 
-      // 1. Detect media URL
       if (isMediaUrl(val)) {
         sniffVideoUrl(val);
         return;
       }
 
-      // 2. Detect URL vs Search
       if (val.startsWith("http://") || val.startsWith("https://") || (val.includes(".") && !val.includes(" "))) {
-        browseTo(val);
+        browser.browseTo(val);
       } else {
-        executeSmartSearch(val);
+        browser.executeSmartSearch(val);
+      }
+    }
+
+    function executeSearchFromPalette(query) {
+      closeCommandPalette();
+      browser.executeSmartSearch(query);
+    }
+
+    function executePaletteCommand(cmd) {
+      closeCommandPalette();
+      cmd = cmd.toLowerCase().trim();
+
+      if (cmd === ">bookmarks") {
+        alert("Bookmarks: " + JSON.stringify(browser.getStoredBookmarks(), null, 2));
+      } else if (cmd === ">history") {
+        const history = JSON.parse(localStorage.getItem(browser.LS_HISTORY) || '[]');
+        alert(`Recent History (${history.length} items):
+` + history.slice(0, 10).map(h => `${new Date(h.timestamp).toLocaleTimeString()}: ${h.title} (${h.url})`).join("
+"));
+      } else if (cmd === ">clear cache") {
+        if (confirm("Clear all browser local data, history, and cache?")) {
+          localStorage.clear();
+          location.reload();
+        }
+      } else if (cmd === ">reader") {
+        toggleReaderMode();
+      } else if (cmd === ">shield") {
+        toggleShieldModal();
+      } else if (cmd === ">copilot") {
+        toggleCopilot();
+      } else if (cmd === ">new tab") {
+        browser.createNewTab('staunt://newtab');
       }
     }
 
@@ -1131,495 +1601,179 @@
       return /youtube\.com|youtu\.be|vimeo\.com|twitter\.com|x\.com|tiktok\.com|instagram\.com|reddit\.com\/r\/.*\/comments/i.test(url);
     }
 
-    function handleOmniboxKey(e) {
-      if (e.key === "Enter") submitOmnibox();
-      else if (e.key === "Escape") closeAutocomplete();
-    }
-
-    function clearOmnibox() {
-      const el = document.getElementById("omniboxInput");
-      el.value = "";
-      el.focus();
-      closeAutocomplete();
-    }
-
-    function copyCurrentUrl() {
-      const tab = tabs.find(t => t.id === activeTabId);
-      if (!tab) return;
-      navigator.clipboard.writeText(tab.url).then(() => {
-        alert("Link copied to clipboard: " + tab.url);
-      });
-    }
-
-    let suggestTimer = null;
-    function handleOmniboxInput(e) {
-      const q = e.target.value.trim();
-      clearTimeout(suggestTimer);
-      if (q.length < 2) {
-        closeAutocomplete();
-        return;
-      }
-      suggestTimer = setTimeout(() => {
-        fetch("/api/browser/suggest?q=" + encodeURIComponent(q))
-          .then(res => res.json())
-          .then(data => {
-            if (data.suggestions && data.suggestions.length > 0) {
-              const dd = document.getElementById("autocompleteDropdown");
-              dd.innerHTML = data.suggestions.map(s => `
-                <div onmousedown="executeSmartSearch('${escapeHtml(s)}'); closeAutocomplete();" class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white cursor-pointer text-xs transition-colors">
-                  <i data-lucide="search" class="w-3 h-3 text-violet-400"></i>
-                  <span>${escapeHtml(s)}</span>
-                </div>
-              `).join("");
-              dd.classList.remove("hidden");
-              lucide.createIcons();
-            }
-          })
-          .catch(() => closeAutocomplete());
-      }, 180);
-    }
-
-    function closeAutocomplete() {
-      document.getElementById("autocompleteDropdown").classList.add("hidden");
-    }
-
     // =========================================================================
-    // SOVEREIGN AI SEARCH ENGINE
+    // SIDEBAR & WINDOW CONTROL ACTIONS
     // =========================================================================
-    function executeSmartSearch(query) {
-      if (!query || !query.trim()) return;
-      query = query.trim();
+    function toggleSidebarCollapse() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.classList.toggle("collapsed");
+      browser.isSidebarCollapsed = sidebar.classList.contains("collapsed");
+    }
 
-      const tab = tabs.find(t => t.id === activeTabId);
-      if (!tab) return;
+    function switchWorkspace(spaceId) {
+      browser.switchWorkspace(spaceId);
+    }
 
-      tab.mode = "search";
-      tab.url = "staunt://search?q=" + encodeURIComponent(query);
-      tab.title = query + " — Staunt Search";
-      tab.historyIndex++;
-      tab.history.push(tab.url);
-
-      document.getElementById("omniboxInput").value = query;
-      updateNavButtonsState();
-      renderTabStrip();
-
-      startProgress();
-
-      const canvas = document.getElementById(`canvas_${tab.id}`);
-      canvas.innerHTML = `
-        <div class="w-full h-full overflow-y-auto custom-scrollbar p-4 sm:p-8 bg-[#060911]">
-          <div class="max-w-3xl mx-auto space-y-6">
-            
-            <div class="flex items-center gap-2 text-xs text-slate-400">
-              <i data-lucide="sparkles" class="w-4 h-4 text-violet-400"></i>
-              <span>Staunt Sovereign AI Web Engine</span>
-              <span>•</span>
-              <span class="font-mono text-violet-300">Searching live internet</span>
-            </div>
-
-            <!-- AI Insight Box -->
-            <div id="searchAiBox_${tab.id}" class="p-4 sm:p-6 rounded-2xl bg-[#0c1222] border border-violet-500/30 shadow-2xl space-y-3">
-              <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                  <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
-                  <span>AI Knowledge Synthesis</span>
-                </h3>
-                <span class="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20 font-mono">Zero Telemetry</span>
-              </div>
-              <div id="searchAiContent_${tab.id}" class="space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
-                <div class="animate-pulse space-y-2 py-2">
-                  <div class="h-3 bg-slate-800 rounded w-3/4"></div>
-                  <div class="h-3 bg-slate-800 rounded w-5/6"></div>
-                  <div class="h-3 bg-slate-800 rounded w-2/3"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="flex items-center justify-between pt-2">
-              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Verified Web Sources</h4>
-              <span id="sourcesCount_${tab.id}" class="text-xs text-slate-500 font-mono">Scanning...</span>
-            </div>
-
-            <div id="searchResultsList_${tab.id}" class="space-y-3"></div>
-
-          </div>
-        </div>
-      `;
-      lucide.createIcons();
-
-      fetch("/api/browser/search?q=" + encodeURIComponent(query))
-        .then(res => res.json())
-        .then(data => {
-          endProgress();
-          renderSearchResults(tab.id, data);
-        })
-        .catch(err => {
-          endProgress();
-          const box = document.getElementById(`searchAiContent_${tab.id}`);
-          if (box) box.innerHTML = `<p class="text-rose-400">Search error: ${err.message}</p>`;
+    function promptAddPinnedTab() {
+      const tab = browser.getActiveTab();
+      if (!tab || tab.url.startsWith("staunt://")) {
+        const u = prompt("Enter website URL to pin:");
+        if (u) {
+          const t = prompt("Enter title:", u);
+          browser.workspaces[browser.activeWorkspaceId].pinned.push({
+            id: 'pin_' + Date.now(),
+            title: t || u,
+            url: u,
+            icon: 'globe'
+          });
+          browser.saveWorkspacesToStorage();
+          browser.renderPinnedGrid();
+        }
+      } else {
+        browser.workspaces[browser.activeWorkspaceId].pinned.push({
+          id: 'pin_' + Date.now(),
+          title: tab.title || tab.url,
+          url: tab.url,
+          icon: 'globe'
         });
+        browser.saveWorkspacesToStorage();
+        browser.renderPinnedGrid();
+      }
     }
 
-    function renderSearchResults(tabId, data) {
-      const aiContent = document.getElementById(`searchAiContent_${tabId}`);
-      if (aiContent && data.ai_summary && data.ai_summary.points) {
-        aiContent.innerHTML = data.ai_summary.points.map(p => `
-          <div class="flex items-start gap-2">
-            <span class="text-violet-400 font-bold">•</span>
-            <span>${escapeHtml(p)}</span>
-          </div>
-        `).join("");
+    function closeActiveTabQuick() {
+      if (browser.activeTabId) browser.closeTab(browser.activeTabId);
+    }
+
+    function minimizeWindowMock() {
+      alert("Staunt Browser: Minimizing window to dock.");
+    }
+
+    function maximizeWindowMock() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
       }
+    }
 
-      const sourcesCount = document.getElementById(`sourcesCount_${tabId}`);
-      if (sourcesCount) sourcesCount.textContent = `${data.results ? data.results.length : 0} sources found`;
-
-      const list = document.getElementById(`searchResultsList_${tabId}`);
-      if (!list) return;
-
-      if (!data.results || data.results.length === 0) {
-        list.innerHTML = `<div class="p-4 rounded-xl bg-slate-800/40 text-xs text-slate-400">No web results returned for this query.</div>`;
-        return;
+    function openSslCertificateModal(e) {
+      if (e) e.stopPropagation();
+      const tab = browser.getActiveTab();
+      if (tab && tab.url.startsWith("http")) {
+        document.getElementById("sslCaText").textContent = new URL(tab.url).hostname + " (TLS 1.3)";
       }
-
-      list.innerHTML = data.results.map(r => `
-        <div class="p-4 rounded-xl bg-[#0c1222]/80 hover:bg-[#0c1222] border border-slate-800 hover:border-slate-700 transition-all space-y-2 group">
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-mono text-violet-400 text-[11px]">${escapeHtml(r.domain)}</span>
-            <div class="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
-              <button onclick="openReaderMode('${r.url}')" class="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 text-[10px] font-semibold flex items-center gap-1">
-                <i data-lucide="book-open" class="w-3 h-3"></i>
-                <span>Reader</span>
-              </button>
-              <button onclick="browseTo('${r.url}')" class="px-2 py-0.5 rounded bg-violet-500/10 hover:bg-violet-500/20 text-violet-300 border border-violet-500/20 text-[10px] font-semibold flex items-center gap-1">
-                <i data-lucide="external-link" class="w-3 h-3"></i>
-                <span>Open Live</span>
-              </button>
-            </div>
-          </div>
-          <h3 onclick="browseTo('${r.url}')" class="text-sm sm:text-base font-bold text-white hover:text-violet-300 cursor-pointer transition-colors leading-snug">
-            ${escapeHtml(r.title)}
-          </h3>
-          <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(r.snippet)}</p>
-        </div>
-      `).join("");
-
+      document.getElementById("sslCertificateModal").classList.remove("hidden");
       lucide.createIcons();
     }
 
-    // =========================================================================
-    // BOOKMARKS MANAGER
-    // =========================================================================
-    function renderBookmarksBar() {
-      const bms = getStoredBookmarks();
-      const container = document.getElementById("bookmarksBarItems");
-      if (!container) return;
-
-      container.innerHTML = bms.map(b => `
-        <button 
-          onclick="browseTo('${b.url}')" 
-          class="flex items-center gap-1.5 px-2 py-0.5 rounded hover:bg-slate-800 text-slate-300 hover:text-white transition-colors flex-shrink-0"
-          title="${escapeHtml(b.url)}"
-        >
-          <img src="https://www.google.com/s2/favicons?domain=${new URL(b.url).hostname}&sz=16" class="w-3 h-3 rounded" onerror="this.style.display='none'" />
-          <span class="truncate max-w-[100px]">${escapeHtml(b.title)}</span>
-        </button>
-      `).join("");
+    function closeSslCertificateModal() {
+      document.getElementById("sslCertificateModal").classList.add("hidden");
     }
 
-    function toggleBookmarksDrawer() {
-      const drawer = document.getElementById("bookmarksDrawer");
-      drawer.classList.toggle("hidden");
-      if (!drawer.classList.contains("hidden")) {
-        renderBookmarksDrawer();
-      }
-    }
-
-    function renderBookmarksDrawer() {
-      const bms = getStoredBookmarks();
-      const countEl = document.getElementById("bookmarksCountText");
-      if (countEl) countEl.textContent = `${bms.length} saved bookmarks`;
-
-      const list = document.getElementById("bookmarksListContainer");
-      if (!list) return;
-
-      if (bms.length === 0) {
-        list.innerHTML = `<div class="text-center py-8 text-slate-500">No bookmarks saved yet. Click the Star (★) in the address bar to bookmark any page!</div>`;
-        return;
-      }
-
-      list.innerHTML = bms.map((b, i) => `
-        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 transition-all group">
-          <div onclick="browseTo('${b.url}'); toggleBookmarksDrawer();" class="flex items-center gap-2 overflow-hidden flex-1 cursor-pointer">
-            <img src="https://www.google.com/s2/favicons?domain=${new URL(b.url).hostname}&sz=32" class="w-4 h-4 rounded flex-shrink-0" onerror="this.style.display='none'" />
-            <div class="truncate">
-              <div class="font-bold text-white text-xs truncate">${escapeHtml(b.title)}</div>
-              <div class="text-[10px] text-slate-400 font-mono truncate">${escapeHtml(b.url)}</div>
-            </div>
-          </div>
-          <button onclick="deleteBookmark('${b.id}')" title="Delete Bookmark" class="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-slate-700 flex-shrink-0">
-            <i data-lucide="trash-2" class="w-3 h-3"></i>
-          </button>
-        </div>
-      `).join("");
-
-      lucide.createIcons();
-    }
-
-    function toggleBookmarkActiveTab() {
-      const tab = tabs.find(t => t.id === activeTabId);
-      if (!tab || !tab.url || tab.url.startsWith("staunt://")) {
+    function toggleBookmarkActiveTab(e) {
+      if (e) e.stopPropagation();
+      const tab = browser.getActiveTab();
+      if (!tab || tab.url.startsWith("staunt://")) {
         alert("Cannot bookmark an internal start page.");
         return;
       }
 
-      let bms = getStoredBookmarks();
-      const existingIndex = bms.findIndex(b => b.url === tab.url);
-
-      if (existingIndex >= 0) {
-        // Remove bookmark
-        bms.splice(existingIndex, 1);
-        saveStoredBookmarks(bms);
-        updateBookmarkStarState(tab.url);
+      let bms = browser.getStoredBookmarks();
+      const idx = bms.findIndex(b => b.url === tab.url);
+      if (idx >= 0) {
+        bms.splice(idx, 1);
       } else {
-        // Add bookmark
-        bms.push({
-          id: 'b_' + Date.now(),
-          title: tab.title || tab.url,
-          url: tab.url,
-          icon: 'default'
-        });
-        saveStoredBookmarks(bms);
-        updateBookmarkStarState(tab.url);
+        bms.push({ id: 'b_' + Date.now(), title: tab.title || tab.url, url: tab.url });
       }
-    }
-
-    function deleteBookmark(id) {
-      let bms = getStoredBookmarks().filter(b => b.id !== id);
-      saveStoredBookmarks(bms);
-    }
-
-    function addCustomBookmarkPrompt() {
-      const tab = tabs.find(t => t.id === activeTabId);
-      if (tab && tab.url && !tab.url.startsWith('staunt://')) {
-        toggleBookmarkActiveTab();
-      } else {
-        const u = prompt("Enter bookmark URL:");
-        if (u) {
-          const t = prompt("Enter bookmark Title:", u);
-          let bms = getStoredBookmarks();
-          bms.push({ id: 'b_' + Date.now(), title: t || u, url: u });
-          saveStoredBookmarks(bms);
-        }
-      }
-    }
-
-    function updateBookmarkStarState(url) {
-      const star = document.getElementById("bookmarkStarIcon");
-      if (!star) return;
-      const bms = getStoredBookmarks();
-      const isSaved = bms.some(b => b.url === url);
-      if (isSaved) {
-        star.classList.add("fill-amber-400", "text-amber-400");
-      } else {
-        star.classList.remove("fill-amber-400", "text-amber-400");
-      }
+      browser.saveStoredBookmarks(bms);
     }
 
     // =========================================================================
-    // BROWSING HISTORY MANAGER
+    // GENERAL UTILITIES & DRAWERS
     // =========================================================================
-    function toggleHistoryDrawer() {
-      const drawer = document.getElementById("historyDrawer");
-      drawer.classList.toggle("hidden");
-      if (!drawer.classList.contains("hidden")) {
-        renderHistoryList();
-      }
-    }
+    function navigateBack() { browser.navigateBack(); }
+    function navigateForward() { browser.navigateForward(); }
+    function reloadActiveTab() { browser.reloadActiveTab(); }
+    function createNewTab(url) { browser.createNewTab(url); }
 
-    function renderHistoryList(filterQuery = "") {
-      let history = getStoredHistory();
-      if (filterQuery) {
-        const q = filterQuery.toLowerCase();
-        history = history.filter(h => h.title.toLowerCase().includes(q) || h.url.toLowerCase().includes(q));
-      }
-
-      const list = document.getElementById("historyListContainer");
-      if (!list) return;
-
-      if (history.length === 0) {
-        list.innerHTML = `<div class="text-center py-8 text-slate-500">No browsing history matches.</div>`;
-        return;
-      }
-
-      list.innerHTML = history.map((h, i) => {
-        const timeStr = new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        return `
-          <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 transition-all group">
-            <div onclick="browseTo('${h.url}'); toggleHistoryDrawer();" class="flex items-center gap-2 overflow-hidden flex-1 cursor-pointer">
-              <span class="text-[10px] text-slate-500 font-mono flex-shrink-0">${timeStr}</span>
-              <div class="truncate">
-                <div class="font-bold text-white text-xs truncate">${escapeHtml(h.title)}</div>
-                <div class="text-[10px] text-slate-400 font-mono truncate">${escapeHtml(h.url)}</div>
-              </div>
-            </div>
-            <button onclick="deleteHistoryItem(${i})" title="Remove item" class="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-slate-700 flex-shrink-0">
-              <i data-lucide="x" class="w-3 h-3"></i>
-            </button>
-          </div>
-        `;
-      }).join("");
-
-      lucide.createIcons();
-    }
-
-    function deleteHistoryItem(index) {
-      let history = getStoredHistory();
-      history.splice(index, 1);
-      localStorage.setItem(LS_HISTORY, JSON.stringify(history));
-      renderHistoryList(document.getElementById("historySearchInput").value);
-    }
-
-    function clearAllHistory() {
-      if (confirm("Are you sure you want to clear all browsing history?")) {
-        localStorage.removeItem(LS_HISTORY);
-        renderHistoryList();
-      }
-    }
-
-    // =========================================================================
-    // DOWNLOADS TRAY MANAGER
-    // =========================================================================
     function toggleDownloadsDrawer() {
-      const drawer = document.getElementById("downloadsDrawer");
-      drawer.classList.toggle("hidden");
-      if (!drawer.classList.contains("hidden")) {
-        renderDownloadsDrawer();
-      }
+      const d = document.getElementById("downloadsDrawer");
+      d.classList.toggle("hidden");
+      if (!d.classList.contains("hidden")) renderDownloadsDrawer();
     }
 
     function renderDownloadsDrawer() {
-      const dls = getStoredDownloads();
       const list = document.getElementById("downloadsListContainer");
-      if (!list) return;
-
+      const dls = JSON.parse(localStorage.getItem(browser.LS_DOWNLOADS) || '[]');
       if (dls.length === 0) {
-        list.innerHTML = `<div class="text-center py-8 text-slate-500">No downloads yet. Media sniffed or downloaded files will appear here.</div>`;
+        list.innerHTML = `<div class="text-center py-8 text-slate-500">No downloads recorded yet.</div>`;
         return;
       }
-
       list.innerHTML = dls.map(d => `
-        <div class="p-2.5 rounded-xl bg-slate-800/40 border border-slate-700/60 space-y-1.5">
+        <div class="p-2.5 rounded-xl bg-slate-800/40 border border-white/[0.06] space-y-1.5">
           <div class="flex items-center justify-between">
             <div class="text-xs font-bold text-white truncate max-w-[200px]">${escapeHtml(d.title)}</div>
             <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">${escapeHtml(d.format)}</span>
           </div>
           <div class="flex items-center justify-between text-[11px] text-slate-400">
-            <span>Status: Complete (${escapeHtml(d.size)})</span>
-            <a href="${d.url}" target="_blank" download class="text-cyan-400 hover:underline font-bold flex items-center gap-1">
-              <i data-lucide="download" class="w-3 h-3"></i>
-              <span>Save File</span>
-            </a>
+            <span>${escapeHtml(d.size)}</span>
+            <a href="${d.url}" target="_blank" download class="text-cyan-400 hover:underline font-bold">Save File</a>
           </div>
         </div>
       `).join("");
-
       lucide.createIcons();
     }
 
     function clearDownloadsList() {
-      localStorage.removeItem(LS_DOWNLOADS);
+      localStorage.removeItem(browser.LS_DOWNLOADS);
       renderDownloadsDrawer();
     }
 
-    // =========================================================================
-    // 4K MEDIA SNIFFER
-    // =========================================================================
-    function sniffVideoUrl(url) {
-      toggleMediaDrawer(true);
-      const container = document.getElementById("mediaListContainer");
-      container.innerHTML = `
-        <div class="p-4 rounded-xl bg-slate-800/60 text-center space-y-2 animate-pulse">
-          <i data-lucide="loader" class="w-6 h-6 animate-spin mx-auto text-cyan-400"></i>
-          <p class="text-xs text-slate-300">Sniffing video & audio streams from URL...</p>
-        </div>
-      `;
-      lucide.createIcons();
-
-      fetch("/api/browser/sniff", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          container.innerHTML = `<div class="p-3 rounded-lg bg-rose-500/10 text-rose-300 text-xs">${escapeHtml(data.error)}</div>`;
-          return;
-        }
-
-        document.getElementById("mediaCountText").textContent = `${data.formats.length} formats available`;
-
-        container.innerHTML = `
-          <div class="p-3 rounded-xl bg-[#070a13] border border-cyan-500/30 space-y-3">
-            <div class="text-xs font-bold text-white leading-snug">${escapeHtml(data.title)}</div>
-            ${data.thumbnail ? `<img src="${data.thumbnail}" class="w-full rounded-lg object-cover max-h-40" />` : ''}
-            <div class="text-[11px] text-slate-400">Duration: ${escapeHtml(data.duration)}</div>
-            
-            <div class="space-y-1.5 pt-1">
-              <div class="text-[10px] uppercase font-bold text-slate-500">Available Direct Downloads</div>
-              ${data.formats.map(f => {
-                const downloadLink = `${data.download_route}&resolution=${f.resolution.replace('p','')}`;
-                return `
-                  <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/80 text-xs">
-                    <span class="font-bold text-cyan-300">${f.resolution} (${f.ext})</span>
-                    <span class="text-slate-400 text-[10px]">${f.filesize_mb > 0 ? f.filesize_mb + ' MB' : 'Direct'}</span>
-                    <a 
-                      href="${downloadLink}" 
-                      target="_blank" 
-                      onclick="addDownloadEntry('${escapeHtml(data.title).replace(/'/g, "\'")}', '${downloadLink}', '${f.resolution}', '${f.filesize_mb > 0 ? f.filesize_mb + ' MB' : 'Stream'}')"
-                      class="px-2 py-0.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px]"
-                    >
-                      Download
-                    </a>
-                  </div>
-                `;
-              }).join("")}
-            </div>
-          </div>
-        `;
-        lucide.createIcons();
-      })
-      .catch(err => {
-        container.innerHTML = `<div class="p-3 rounded-lg bg-rose-500/10 text-rose-300 text-xs">Error: ${err.message}</div>`;
-      });
+    function toggleShieldModal() {
+      document.getElementById("shieldModal").classList.toggle("hidden");
     }
 
-    function toggleMediaDrawer(forceOpen = false) {
-      const drawer = document.getElementById("mediaDrawer");
-      if (forceOpen) drawer.classList.remove("hidden");
-      else drawer.classList.toggle("hidden");
+    function setShieldMode(mode) {
+      browser.shieldMode = mode;
+      updateShieldUI();
     }
 
-    function rescanMedia() {
-      const tab = tabs.find(t => t.id === activeTabId);
-      if (tab && tab.url && tab.url.startsWith("http")) {
-        sniffVideoUrl(tab.url);
+    function updateShieldUI() {
+      const std = document.getElementById("shieldOptStandard");
+      const agg = document.getElementById("shieldOptAggressive");
+      const off = document.getElementById("shieldOptOff");
+      const rStd = document.getElementById("shieldRadioStandard");
+      const rAgg = document.getElementById("shieldRadioAggressive");
+      const rOff = document.getElementById("shieldRadioOff");
+
+      [std, agg, off].forEach(el => { el.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-700 bg-slate-800/40 text-left transition-all hover:bg-slate-800/70"; });
+      [rStd, rAgg, rOff].forEach(el => { el.className = "w-2 h-2 rounded-full bg-transparent"; });
+
+      if (browser.shieldMode === "standard") {
+        std.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-left transition-all";
+        rStd.className = "w-2 h-2 rounded-full bg-emerald-400";
+      } else if (browser.shieldMode === "aggressive") {
+        agg.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 text-left transition-all";
+        rAgg.className = "w-2 h-2 rounded-full bg-amber-400";
+      } else {
+        off.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-rose-500/40 bg-rose-500/10 text-left transition-all";
+        rOff.className = "w-2 h-2 rounded-full bg-rose-400";
       }
     }
 
-    // =========================================================================
-    // DISTRACTION-FREE READER MODE CANVAS
-    // =========================================================================
+    function applyAndReloadShield() {
+      toggleShieldModal();
+      browser.reloadActiveTab();
+    }
+
+    // READER MODE
     function toggleReaderMode() {
       const canvas = document.getElementById("readerCanvas");
       if (canvas.classList.contains("hidden")) {
-        const tab = tabs.find(t => t.id === activeTabId);
-        if (tab && tab.url && tab.url.startsWith("http")) {
-          openReaderMode(tab.url);
-        } else {
-          alert("Open any webpage first to view it in Reader Mode.");
-        }
+        const tab = browser.getActiveTab();
+        if (tab && tab.url.startsWith("http")) openReaderMode(tab.url);
+        else alert("Open any webpage first to view it in Reader Mode.");
       } else {
         closeReaderMode();
       }
@@ -1631,11 +1785,7 @@
         .then(res => res.json())
         .then(data => {
           endProgress();
-          if (data.error) {
-            alert(data.error);
-            return;
-          }
-
+          if (data.error) { alert(data.error); return; }
           document.getElementById("readerDomain").textContent = data.domain;
           document.getElementById("readerReadTime").textContent = data.read_time;
           document.getElementById("readerTitle").textContent = data.title;
@@ -1670,21 +1820,83 @@
     }
 
     function adjustReaderFont(delta) {
-      readerFontSize = Math.max(14, Math.min(28, readerFontSize + delta));
-      const body = document.getElementById("readerBody");
-      body.style.fontSize = readerFontSize + "px";
+      browser.readerFontSize = Math.max(14, Math.min(28, browser.readerFontSize + delta));
+      document.getElementById("readerBody").style.fontSize = browser.readerFontSize + "px";
     }
 
-    // =========================================================================
+    // 4K MEDIA SNIFFER
+    function toggleMediaDrawer(forceOpen = false) {
+      const d = document.getElementById("mediaDrawer");
+      if (forceOpen) d.classList.remove("hidden");
+      else d.classList.toggle("hidden");
+    }
+
+    function rescanMedia() {
+      const tab = browser.getActiveTab();
+      if (tab && tab.url.startsWith("http")) sniffVideoUrl(tab.url);
+    }
+
+    function sniffVideoUrl(url) {
+      toggleMediaDrawer(true);
+      const container = document.getElementById("mediaListContainer");
+      container.innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-800/60 text-center space-y-2 animate-pulse">
+          <i data-lucide="loader" class="w-6 h-6 animate-spin mx-auto text-cyan-400"></i>
+          <p class="text-xs text-slate-300">Sniffing video & audio streams from URL...</p>
+        </div>
+      `;
+      lucide.createIcons();
+
+      fetch("/api/browser/sniff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: url })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          container.innerHTML = `<div class="p-3 rounded-lg bg-rose-500/10 text-rose-300 text-xs">${escapeHtml(data.error)}</div>`;
+          return;
+        }
+        document.getElementById("mediaCountText").textContent = `${data.formats.length} formats available`;
+
+        container.innerHTML = `
+          <div class="p-3 rounded-xl bg-[#070a13] border border-cyan-500/30 space-y-3">
+            <div class="text-xs font-bold text-white leading-snug">${escapeHtml(data.title)}</div>
+            ${data.thumbnail ? `<img src="${data.thumbnail}" class="w-full rounded-lg object-cover max-h-40" />` : ''}
+            <div class="text-[11px] text-slate-400">Duration: ${escapeHtml(data.duration)}</div>
+            
+            <div class="space-y-1.5 pt-1">
+              <div class="text-[10px] uppercase font-bold text-slate-500">Available Direct Downloads</div>
+              ${data.formats.map(f => {
+                const downloadLink = `${data.download_route}&resolution=${f.resolution.replace('p','')}`;
+                return `
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/80 text-xs">
+                    <span class="font-bold text-cyan-300">${f.resolution} (${f.ext})</span>
+                    <span class="text-slate-400 text-[10px]">${f.filesize_mb > 0 ? f.filesize_mb + ' MB' : 'Direct'}</span>
+                    <a href="${downloadLink}" target="_blank" class="px-2 py-0.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px]">
+                      Download
+                    </a>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+      })
+      .catch(err => {
+        container.innerHTML = `<div class="p-3 rounded-lg bg-rose-500/10 text-rose-300 text-xs">Error: ${err.message}</div>`;
+      });
+    }
+
     // AI COPILOT LOGIC
-    // =========================================================================
     function toggleCopilot() {
-      const drawer = document.getElementById("copilotDrawer");
-      drawer.classList.toggle("hidden");
+      document.getElementById("copilotDrawer").classList.toggle("hidden");
     }
 
     function askCopilot(mode) {
-      const tab = tabs.find(t => t.id === activeTabId);
+      const tab = browser.getActiveTab();
       const url = tab ? tab.url : "Active Tab";
 
       appendCopilotMessage("user", `Action: ${mode.toUpperCase()}`);
@@ -1693,19 +1905,11 @@
       fetch("/api/browser/copilot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode: mode,
-          page_url: url,
-          page_text: url
-        })
+        body: JSON.stringify({ mode: mode, page_url: url, page_text: url })
       })
       .then(res => res.json())
-      .then(data => {
-        replaceLastCopilotMessage(formatMarkdown(data.response));
-      })
-      .catch(err => {
-        replaceLastCopilotMessage(`⚠️ AI Synthesis Error: ${err.message}`);
-      });
+      .then(data => replaceLastCopilotMessage(formatMarkdown(data.response)))
+      .catch(err => replaceLastCopilotMessage(`⚠️ AI Synthesis Error: ${err.message}`));
     }
 
     function sendCustomCopilotQuery() {
@@ -1713,7 +1917,7 @@
       const prompt = input.value.trim();
       if (!prompt) return;
 
-      const tab = tabs.find(t => t.id === activeTabId);
+      const tab = browser.getActiveTab();
       const url = tab ? tab.url : "Active Tab";
 
       input.value = "";
@@ -1723,20 +1927,11 @@
       fetch("/api/browser/copilot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mode: "chat",
-          prompt: prompt,
-          page_url: url,
-          page_text: url
-        })
+        body: JSON.stringify({ mode: "chat", prompt: prompt, page_url: url, page_text: url })
       })
       .then(res => res.json())
-      .then(data => {
-        replaceLastCopilotMessage(formatMarkdown(data.response));
-      })
-      .catch(err => {
-        replaceLastCopilotMessage(`⚠️ Error: ${err.message}`);
-      });
+      .then(data => replaceLastCopilotMessage(formatMarkdown(data.response)))
+      .catch(err => replaceLastCopilotMessage(`⚠️ Error: ${err.message}`));
     }
 
     function appendCopilotMessage(sender, text) {
@@ -1768,75 +1963,14 @@
         .replace(/• (.*?)\n/g, '<div class="flex items-start gap-1 mb-1"><span class="text-violet-400 font-bold">•</span><span>$1</span></div>');
     }
 
-    // =========================================================================
-    // SHIELD MODAL & PROTECTION LEVELS
-    // =========================================================================
-    function toggleShieldModal() {
-      document.getElementById("shieldModal").classList.toggle("hidden");
+    // CLOCKS & HELPERS
+    function updateClocks() {
+      const now = new Date();
+      const str = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      document.querySelectorAll('.clock-display').forEach(el => { el.textContent = str; });
     }
+    setInterval(updateClocks, 1000);
 
-    function setShieldMode(mode) {
-      currentShieldMode = mode;
-      updateShieldUI();
-    }
-
-    function updateShieldUI() {
-      const standardOpt = document.getElementById("shieldOptStandard");
-      const aggressiveOpt = document.getElementById("shieldOptAggressive");
-      const offOpt = document.getElementById("shieldOptOff");
-
-      const rStd = document.getElementById("shieldRadioStandard");
-      const rAgg = document.getElementById("shieldRadioAggressive");
-      const rOff = document.getElementById("shieldRadioOff");
-
-      const pillBtn = document.getElementById("shieldPillBtn");
-      const pillText = document.getElementById("shieldPillText");
-      const subTitle = document.getElementById("shieldStatusSubtitle");
-      const compatScore = document.getElementById("modalCompatScore");
-
-      [standardOpt, aggressiveOpt, offOpt].forEach(el => {
-        el.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-700 bg-slate-800/40 text-left transition-all hover:bg-slate-800/70";
-      });
-      [rStd, rAgg, rOff].forEach(el => { el.className = "w-2 h-2 rounded-full bg-transparent"; });
-
-      if (currentShieldMode === "standard") {
-        standardOpt.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-left transition-all";
-        rStd.className = "w-2 h-2 rounded-full bg-emerald-400";
-        pillBtn.className = "flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold mr-1.5 transition-colors flex-shrink-0";
-        pillText.textContent = "Brave: Standard";
-        subTitle.textContent = "Brave Protection Active (100% Site Fidelity)";
-        subTitle.className = "text-[11px] text-emerald-400";
-        compatScore.textContent = "100% (Brave)";
-        compatScore.className = "text-xl font-bold text-emerald-400 mt-1";
-      } else if (currentShieldMode === "aggressive") {
-        aggressiveOpt.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 text-left transition-all";
-        rAgg.className = "w-2 h-2 rounded-full bg-amber-400";
-        pillBtn.className = "flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 text-[10px] font-semibold mr-1.5 transition-colors flex-shrink-0";
-        pillText.textContent = "Shield: Aggressive";
-        subTitle.textContent = "Aggressive Network Filtering Active";
-        subTitle.className = "text-[11px] text-amber-400";
-        compatScore.textContent = "80% (Strict)";
-        compatScore.className = "text-xl font-bold text-amber-400 mt-1";
-      } else {
-        offOpt.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-rose-500/40 bg-rose-500/10 text-left transition-all";
-        rOff.className = "w-2 h-2 rounded-full bg-rose-400";
-        pillBtn.className = "flex items-center gap-1 px-2 py-0.5 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-semibold mr-1.5 transition-colors flex-shrink-0";
-        pillText.textContent = "Shields Down";
-        subTitle.textContent = "Protection Disabled for this site";
-        subTitle.className = "text-[11px] text-rose-400";
-        compatScore.textContent = "Raw / Unfiltered";
-        compatScore.className = "text-xl font-bold text-rose-400 mt-1";
-      }
-    }
-
-    function applyAndReloadShield() {
-      toggleShieldModal();
-      reloadActiveTab();
-    }
-
-    // =========================================================================
-    // PROGRESS & HELPERS
-    // =========================================================================
     let progTimer = null;
     function startProgress() {
       const bar = document.getElementById("pageProgressBar");
@@ -1855,14 +1989,6 @@
       setTimeout(() => { bar.style.width = "0%"; }, 300);
     }
 
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
-      }
-    }
-
     function escapeHtml(str) {
       if (!str) return "";
       return String(str)
@@ -1873,100 +1999,21 @@
         .replace(/'/g, "&#039;");
     }
 
-    // =========================================================================
-    // POWER-USER KEYBOARD SHORTCUTS
-    // =========================================================================
-    function setupKeyboardShortcuts() {
-      window.addEventListener('keydown', (e) => {
-        const isCtrl = e.ctrlKey || e.metaKey;
-        
-        // Ctrl+T: New Tab
-        if (isCtrl && e.key.toLowerCase() === 't') {
-          e.preventDefault();
-          createNewTab('staunt://newtab');
-          return;
-        }
-
-        // Ctrl+W: Close Tab
-        if (isCtrl && e.key.toLowerCase() === 'w') {
-          e.preventDefault();
-          if (activeTabId) closeTab(activeTabId);
-          return;
-        }
-
-        // Ctrl+L: Focus Omnibox
-        if (isCtrl && e.key.toLowerCase() === 'l') {
-          e.preventDefault();
-          const omni = document.getElementById("omniboxInput");
-          if (omni) {
-            omni.focus();
-            omni.select();
-          }
-          return;
-        }
-
-        // Ctrl+R or F5: Reload Tab
-        if ((isCtrl && e.key.toLowerCase() === 'r') || e.key === 'F5') {
-          e.preventDefault();
-          reloadActiveTab();
-          return;
-        }
-
-        // Ctrl+H: History Drawer
-        if (isCtrl && e.key.toLowerCase() === 'h') {
-          e.preventDefault();
-          toggleHistoryDrawer();
-          return;
-        }
-
-        // Ctrl+D: Bookmark Tab
-        if (isCtrl && e.key.toLowerCase() === 'd') {
-          e.preventDefault();
-          toggleBookmarkActiveTab();
-          return;
-        }
-
-        // Ctrl+B: Toggle Bookmarks Bar
-        if (isCtrl && e.key.toLowerCase() === 'b') {
-          e.preventDefault();
-          const bb = document.getElementById("bookmarksBar");
-          if (bb) bb.classList.toggle("hidden");
-          return;
-        }
-
-        // Alt+Left / Alt+Right
-        if (e.altKey && e.key === 'ArrowLeft') {
-          e.preventDefault();
-          navigateBack();
-        } else if (e.altKey && e.key === 'ArrowRight') {
-          e.preventDefault();
-          navigateForward();
-        }
-      });
-    }
-
-    // Listen for cross-origin navigation messages from proxy iframe
+    // Proxy iframe cross-origin postMessage listener
     window.addEventListener("message", function(evt) {
       if (!evt.data || !evt.data.type) return;
       if (evt.data.type === "STAUNT_NAVIGATED") {
-        const tab = tabs.find(t => t.id === activeTabId);
+        const tab = browser.getActiveTab();
         if (tab && evt.data.url) {
           tab.url = evt.data.url;
           if (evt.data.title) tab.title = evt.data.title;
-          
-          addHistoryEntry(tab.url, tab.title);
-
-          const input = document.getElementById("omniboxInput");
-          if (input && document.activeElement !== input) {
-            input.value = tab.url;
-          }
-          updateBookmarkStarState(tab.url);
-          renderTabStrip();
+          browser.addHistoryEntry(tab.url, tab.title);
+          browser.updateTopBarState(tab);
+          browser.renderVerticalTabs();
         }
       }
     });
 
-    window.addEventListener("DOMContentLoaded", initBrowser);
   </script>
 
 </body>
