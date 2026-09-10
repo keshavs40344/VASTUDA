@@ -431,21 +431,27 @@ def staunt_web_proxy():
                 }}
             }} catch(e) {{}}
 
-            // Intercept user clicks on links safely without breaking React/Next.js DOM hydration
+            // Intercept user navigation clicks without interfering with buttons, inputs, dropdowns or touch handlers
             document.addEventListener('click', function(e) {{
-                var link = e.target.closest('a');
-                if (!link || !link.href) return;
-
-                var href = link.getAttribute('href');
-                if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {{
+                // If the clicked element is inside a button or form control, let it handle naturally
+                if (e.target.closest('button, input, select, textarea, [role="button"]')) {{
                     return;
                 }}
 
-                // Prevent default new window / blank tabs
-                e.preventDefault();
+                var link = e.target.closest('a');
+                if (!link || !link.href) return;
+
+                var rawHref = link.getAttribute('href');
+                if (!rawHref || rawHref.startsWith('#') || rawHref.startsWith('javascript:') || rawHref.startsWith('mailto:') || rawHref.startsWith('tel:') || rawHref.startsWith('data:')) {{
+                    return;
+                }}
+
                 var fullUrl = link.href;
-                window.location.href = '/api/browser/proxy?url=' + encodeURIComponent(fullUrl) + '&shield=' + encodeURIComponent(window.__STAUNT_SHIELD_MODE__);
-            }}, true);
+                if (fullUrl.startsWith('http://') || fullUrl.startsWith('https://')) {{
+                    e.preventDefault();
+                    window.location.href = '/api/browser/proxy?url=' + encodeURIComponent(fullUrl) + '&shield=' + encodeURIComponent(window.__STAUNT_SHIELD_MODE__);
+                }}
+            }}, false);
 
             window.addEventListener('message', function(evt) {{
                 if (!evt.data || !evt.data.type) return;
@@ -511,7 +517,7 @@ def staunt_web_proxy():
                 head.append(vp)
 
             style_patch = soup.new_tag("style", id="staunt-viewport-patch")
-            style_patch.string = "html, body { min-height: 100% !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; }"
+            style_patch.string = "html, body { min-height: 100% !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; touch-action: pan-y pinch-zoom !important; -webkit-tap-highlight-color: rgba(0,0,0,0); }"
             head.append(style_patch)
 
             # Clean form actions to route through proxy

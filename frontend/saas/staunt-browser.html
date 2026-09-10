@@ -45,7 +45,19 @@
       background-color: #060911;
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
       color: #f1f5f9;
-      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    #mainCanvasContainer {
+      touch-action: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      user-select: auto !important;
+    }
+    #proxyIframe {
+      touch-action: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      user-select: auto !important;
+      pointer-events: auto !important;
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
@@ -703,6 +715,9 @@
           id="proxyIframe" 
           src="/api/browser/proxy?url=${encodeURIComponent(targetUrl)}&shield=${encodeURIComponent(currentShieldMode)}" 
           class="w-full h-full border-none block bg-white"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+          allowfullscreen="true"
+          style="touch-action: auto !important; -webkit-overflow-scrolling: touch !important;"
           onload="endProgress()"
         ></iframe>
       `;
