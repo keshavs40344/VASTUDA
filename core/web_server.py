@@ -1987,11 +1987,18 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
   document.addEventListener('click', function(e) {{
     var a = e.target && e.target.closest ? e.target.closest('a') : null;
     if (a && a.href && !a.href.startsWith('javascript:') && !a.href.startsWith('#')) {{
-      var isSameOrigin = false;
-      for (var i = 0; i < UPSTREAM_ORIGINS.length; i++) {{
-        if (a.href.indexOf(UPSTREAM_ORIGINS[i]) === 0) {{ isSameOrigin = true; break; }}
+      // 1. If link is already on the current domain (e.g. proxy domain), let it navigate natively!
+      if (a.hostname === window.location.hostname) {{
+        return;
       }}
-      if (!isSameOrigin && (a.href.startsWith('http://') || a.href.startsWith('https://'))) {{
+      // 2. If link is on upstream origin, let it navigate natively!
+      for (var i = 0; i < UPSTREAM_ORIGINS.length; i++) {{
+        if (a.href.indexOf(UPSTREAM_ORIGINS[i]) === 0) {{
+          return;
+        }}
+      }}
+      // 3. Only different external domains get routed via gateway
+      if (a.href.startsWith('http://') || a.href.startsWith('https://')) {{
         e.preventDefault();
         window.location.href = '/gateway?url=' + encodeURIComponent(a.href);
       }}
@@ -2079,6 +2086,13 @@ def handle_gateway_proxy():
         target_url = "https://" + target_url
 
     parsed_target = urllib.parse.urlparse(target_url)
+    if parsed_target.netloc in (request.host, "127.0.0.1", "localhost"):
+        # Prevent self-proxy recursion deadlock!
+        local_target = parsed_target.path or "/"
+        if parsed_target.query:
+            local_target += "?" + parsed_target.query
+        return redirect(local_target)
+
     target_origin = f"{parsed_target.scheme}://{parsed_target.netloc}"
     ACTIVE_UPSTREAM_ORIGIN = target_origin
 
