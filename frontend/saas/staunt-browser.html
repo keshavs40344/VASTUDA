@@ -1163,13 +1163,33 @@
       // ─── URL RESOLVER ───────────────────────────────────────────────────
       function resolveUrl(raw) {
         if (!raw) return '';
-        const trimmed = raw.trim();
-        if (/^https?:\/\//i.test(trimmed)) return trimmed;
-        if (/^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(trimmed) && !trimmed.includes(' ')) {
-          return 'https://' + trimmed;
+        let trimmed = raw.trim();
+        if (!/^https?:\/\//i.test(trimmed)) {
+          if (/^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(trimmed) && !trimmed.includes(' ')) {
+            trimmed = 'https://' + trimmed;
+          } else {
+            const engineBase = SEARCH_ENGINES[currentEngine] || SEARCH_ENGINES.google;
+            return engineBase + encodeURIComponent(trimmed);
+          }
         }
-        const engineBase = SEARCH_ENGINES[currentEngine] || SEARCH_ENGINES.google;
-        return engineBase + encodeURIComponent(trimmed);
+
+        // Smart YouTube Video Optimizer: Convert watch/youtu.be/shorts to seamless embed player
+        try {
+          const u = new URL(trimmed);
+          if (u.hostname.includes('youtu.be')) {
+            const videoId = u.pathname.replace(/^\//, '').split('/')[0];
+            if (videoId) return 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
+          } else if (u.hostname.includes('youtube.com')) {
+            if (u.pathname === '/watch' && u.searchParams.get('v')) {
+              return 'https://www.youtube.com/embed/' + u.searchParams.get('v') + '?autoplay=1&rel=0';
+            } else if (u.pathname.startsWith('/shorts/')) {
+              const videoId = u.pathname.split('/shorts/')[1].split('/')[0];
+              if (videoId) return 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
+            }
+          }
+        } catch(e) {}
+
+        return trimmed;
       }
 
       function getDomain(url) {

@@ -1992,10 +1992,12 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
   document.addEventListener('click', function(e) {{
     var a = e.target && e.target.closest ? e.target.closest('a') : null;
     if (a && a.href && !a.href.startsWith('javascript:') && !a.href.startsWith('#')) {{
-      e.preventDefault();
-      if (_realParent) {{
-        _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: a.href }}, '*');
-      }} else {{
+      var isSameOrigin = false;
+      for (var i = 0; i < UPSTREAM_ORIGINS.length; i++) {{
+        if (a.href.indexOf(UPSTREAM_ORIGINS[i]) === 0) {{ isSameOrigin = true; break; }}
+      }}
+      if (!isSameOrigin && (a.href.startsWith('http://') || a.href.startsWith('https://'))) {{
+        e.preventDefault();
         window.location.href = '/gateway?url=' + encodeURIComponent(a.href);
       }}
     }}
@@ -2078,10 +2080,11 @@ def handle_gateway_proxy():
     ACTIVE_UPSTREAM_ORIGIN = target_origin
 
     # Authentic browser outbound request headers (Prevents Google/Cloudflare bot blocking)
+    # NOTE: Do NOT set explicit Host header because requests must dynamically recalculate
+    # it across redirect hops (e.g. youtu.be -> www.youtube.com).
     is_doc_nav = request.method in ("GET", "HEAD") and not request.headers.get("X-Requested-With")
 
     req_headers = {
-        "Host": parsed_target.netloc,
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
         "Accept-Language": request.headers.get("Accept-Language", "en-US,en;q=0.9"),
     }
@@ -2123,12 +2126,17 @@ def handle_gateway_proxy():
             verify=False
         )
 
+        # After potential redirects, resolve actual final landing origin
+        parsed_final = urllib.parse.urlparse(upstream.url)
+        target_origin = f"{parsed_final.scheme}://{parsed_final.netloc}"
+        ACTIVE_UPSTREAM_ORIGIN = target_origin
+
         content_type = upstream.headers.get("Content-Type", "").lower()
         response_data = upstream.content
 
         # For HTML responses, rewrite relative paths and inject client message bridge
         if "text/html" in content_type:
-            response_data = transform_proxied_html(upstream.content, parsed_target)
+            response_data = transform_proxied_html(upstream.content, parsed_final)
 
         resp = app.response_class(
             response=response_data,
@@ -2276,7 +2284,6 @@ def serve_static(path):
             
             # Forward incoming client headers (Content-Type, User-Agent, X-YouTube-*, etc.)
             fwd_headers = {
-                "Host": parsed_up.netloc,
                 "Referer": effective_origin + "/",
                 "User-Agent": (
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
