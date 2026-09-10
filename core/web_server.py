@@ -29,7 +29,7 @@ logger = logging.getLogger("VASTUDA_SECURITY_ENCLAVE")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 
-app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
+app = Flask(__name__, static_folder=None)
 
 # ==============================================================================
 # DEFENSE-IN-DEPTH: SLIDING-WINDOW THREAD-SAFE RATE LIMITER & BRUTE-FORCE SHIELD
@@ -1862,6 +1862,162 @@ def serve_tool_site(tool_id):
 # ==============================================================================
 # DYNAMIC FRAME-UNBLOCKER REVERSE-PROXY GATEWAY (/gateway & /api/gateway)
 # ==============================================================================
+
+def transform_proxied_html(raw_html_bytes, parsed_target):
+    """
+    Transforms upstream HTML by decomposing <base> tags, rewriting relative URLs,
+    and injecting client fetch/XHR/navigation interceptor as first element of <head>.
+    """
+    try:
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(raw_html_bytes, "html.parser")
+
+        target_scheme = parsed_target.scheme or "https"
+        target_host = parsed_target.netloc
+        clean_host = target_host[4:] if target_host.startswith("www.") else target_host
+        www_host = target_host if target_host.startswith("www.") else f"www.{target_host}"
+        dyn_origins = list(dict.fromkeys([
+            f"{target_scheme}://{target_host}",
+            f"{target_scheme}://{clean_host}",
+            f"{target_scheme}://{www_host}",
+            f"https://{clean_host}",
+            f"http://{clean_host}",
+            f"https://{www_host}",
+            f"http://{www_host}",
+            "https://www.youtube.com",
+            "https://youtube.com",
+            "https://m.youtube.com"
+        ]))
+        dyn_origins_json = json.dumps(dyn_origins)
+
+        interceptor = soup.new_tag("script")
+        interceptor.string = f"""
+(function() {{
+  'use strict';
+  var UPSTREAM_ORIGINS = {dyn_origins_json};
+
+  var _realParent = null;
+  try {{
+    if (window.parent && window.parent !== window) {{
+      _realParent = window.parent;
+    }}
+  }} catch(e) {{}}
+
+  try {{
+    Object.defineProperty(window, 'top', {{ get: function() {{ return window; }}, configurable: true }});
+    Object.defineProperty(window, 'parent', {{ get: function() {{ return window; }}, configurable: true }});
+    Object.defineProperty(window, 'frameElement', {{ get: function() {{ return null; }}, configurable: true }});
+  }} catch(e) {{}}
+
+  function rewriteUrl(url) {{
+    if (!url || typeof url !== 'string') return url;
+    for (var i = 0; i < UPSTREAM_ORIGINS.length; i++) {{
+      if (url.indexOf(UPSTREAM_ORIGINS[i]) === 0) {{
+        return url.slice(UPSTREAM_ORIGINS[i].length) || '/';
+      }}
+    }}
+    return url;
+  }}
+
+  var _origFetch = window.fetch;
+  window.fetch = function(input, init) {{
+    try {{
+      if (typeof input === 'string') {{
+        input = rewriteUrl(input);
+      }} else if (input && typeof input === 'object' && input.url) {{
+        var newUrl = rewriteUrl(input.url);
+        if (newUrl !== input.url) input = new Request(newUrl, input);
+      }}
+    }} catch(e) {{}}
+    return _origFetch.call(this, input, init);
+  }};
+
+  var _origOpen = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function(method, url) {{
+    try {{ url = rewriteUrl(url); }} catch(e) {{}}
+    var args = Array.prototype.slice.call(arguments);
+    args[1] = url;
+    return _origOpen.apply(this, args);
+  }};
+
+  if (navigator.sendBeacon) {{
+    var _origBeacon = navigator.sendBeacon.bind(navigator);
+    navigator.sendBeacon = function(url, data) {{
+      try {{ url = rewriteUrl(url); }} catch(e) {{}}
+      return _origBeacon(url, data);
+    }};
+  }}
+
+  var _origWindowOpen = window.open;
+  window.open = function(url, target, features) {{
+    if (url && _realParent) {{
+      _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: url }}, '*');
+      return null;
+    }}
+    return _origWindowOpen.apply(this, arguments);
+  }};
+
+  var _origSetAttribute = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value) {{
+    if ((name === 'src' || name === 'href' || name === 'action') && typeof value === 'string') {{
+      value = rewriteUrl(value);
+    }}
+    return _origSetAttribute.call(this, name, value);
+  }};
+
+  document.addEventListener('click', function(e) {{
+    var a = e.target && e.target.closest ? e.target.closest('a') : null;
+    if (a && a.href && !a.href.startsWith('javascript:') && !a.href.startsWith('#')) {{
+      e.preventDefault();
+      if (_realParent) {{
+        _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: a.href }}, '*');
+      }} else {{
+        window.location.href = '/gateway?url=' + encodeURIComponent(a.href);
+      }}
+    }}
+  }}, true);
+
+  document.addEventListener('submit', function(e) {{
+    var form = e.target;
+    if (form && form.action) {{
+      var act = form.getAttribute('action') || '';
+      if (!act.startsWith('/')) {{
+        for (var i = 0; i < UPSTREAM_ORIGINS.length; i++) {{
+          if (act.indexOf(UPSTREAM_ORIGINS[i]) === 0) {{
+            form.setAttribute('action', act.slice(UPSTREAM_ORIGINS[i].length) || '/');
+            break;
+          }}
+        }}
+      }}
+    }}
+  }}, true);
+
+  console.log('[Staunt Proxy] Dynamic multi-domain interceptor active for', UPSTREAM_ORIGINS);
+}})();
+"""
+        if soup.head:
+            soup.head.insert(0, interceptor)
+        else:
+            soup.insert(0, interceptor)
+
+        for b in soup.find_all("base"):
+            b.decompose()
+
+        for tag in soup.find_all(["script", "link", "img"]):
+            for attr in ("src", "href"):
+                if tag.has_attr(attr):
+                    val = tag[attr]
+                    for up_org in dyn_origins:
+                        if val.startswith(up_org):
+                            tag[attr] = val[len(up_org):] or "/"
+                            break
+
+        return str(soup).encode("utf-8")
+    except Exception as transform_err:
+        logger.warning(f"[GATEWAY HTML TRANSFORM WARNING] {transform_err}")
+        return raw_html_bytes
+
+
 ACTIVE_UPSTREAM_ORIGIN = None  # Set dynamically when user navigates via /gateway
 @app.route("/gateway", methods=["GET", "POST", "HEAD", "OPTIONS"])
 @app.route("/api/gateway", methods=["GET", "POST", "HEAD", "OPTIONS"])
@@ -1948,153 +2104,7 @@ def handle_gateway_proxy():
 
         # For HTML responses, rewrite relative paths and inject client message bridge
         if "text/html" in content_type:
-            try:
-                from bs4 import BeautifulSoup
-                soup = BeautifulSoup(upstream.content, "html.parser")
-
-                # Generate dynamic upstream origins for active site
-                target_scheme = parsed_target.scheme
-                target_host = parsed_target.netloc
-                clean_host = target_host[4:] if target_host.startswith("www.") else target_host
-                www_host = target_host if target_host.startswith("www.") else f"www.{target_host}"
-                dyn_origins = list(dict.fromkeys([
-                    f"{target_scheme}://{target_host}",
-                    f"{target_scheme}://{clean_host}",
-                    f"{target_scheme}://{www_host}",
-                    f"https://{clean_host}",
-                    f"http://{clean_host}",
-                    f"https://{www_host}",
-                    f"http://{www_host}",
-                    "https://www.youtube.com",
-                    "https://youtube.com",
-                    "https://m.youtube.com"
-                ]))
-                dyn_origins_json = json.dumps(dyn_origins)
-
-                # ── Fetch / XHR / Frame-Busting Interceptor (must be FIRST in <head>) ──
-                interceptor = soup.new_tag("script")
-                interceptor.string = f"""
-(function() {{
-  'use strict';
-  var UPSTREAM_ORIGINS = {dyn_origins_json};
-
-  // Preserve reference to real parent for postMessage before spoofing
-  var _realParent = null;
-  try {{
-    if (window.parent && window.parent !== window) {{
-      _realParent = window.parent;
-    }}
-  }} catch(e) {{}}
-
-  // Spoof window.top and window.parent so sites (YouTube, Google, Reddit)
-  // believe they are running as native top windows and do not trigger iframe blocks
-  try {{
-    Object.defineProperty(window, 'top', {{ get: function() {{ return window; }}, configurable: true }});
-    Object.defineProperty(window, 'parent', {{ get: function() {{ return window; }}, configurable: true }});
-    Object.defineProperty(window, 'frameElement', {{ get: function() {{ return null; }}, configurable: true }});
-  }} catch(e) {{}}
-
-  function rewriteUrl(url) {{
-    if (!url || typeof url !== 'string') return url;
-    for (var i = 0; i < UPSTREAM_ORIGINS.length; i++) {{
-      if (url.indexOf(UPSTREAM_ORIGINS[i]) === 0) {{
-        return url.slice(UPSTREAM_ORIGINS[i].length) || '/';
-      }}
-    }}
-    return url;
-  }}
-
-  /* ── Override fetch() ─────────────────────────────────────────── */
-  var _origFetch = window.fetch;
-  window.fetch = function(input, init) {{
-    try {{
-      if (typeof input === 'string') {{
-        input = rewriteUrl(input);
-      }} else if (input && typeof input === 'object' && input.url) {{
-        var newUrl = rewriteUrl(input.url);
-        if (newUrl !== input.url) input = new Request(newUrl, input);
-      }}
-    }} catch(e) {{}}
-    return _origFetch.call(this, input, init);
-  }};
-
-  /* ── Override XMLHttpRequest.open() ──────────────────────────── */
-  var _origOpen = XMLHttpRequest.prototype.open;
-  XMLHttpRequest.prototype.open = function(method, url) {{
-    try {{ url = rewriteUrl(url); }} catch(e) {{}}
-    var args = Array.prototype.slice.call(arguments);
-    args[1] = url;
-    return _origOpen.apply(this, args);
-  }};
-
-  /* ── Override navigator.sendBeacon() ─────────────────────────── */
-  if (navigator.sendBeacon) {{
-    var _origBeacon = navigator.sendBeacon.bind(navigator);
-    navigator.sendBeacon = function(url, data) {{
-      try {{ url = rewriteUrl(url); }} catch(e) {{}}
-      return _origBeacon(url, data);
-    }};
-  }}
-
-  /* ── Intercept window.open to keep tabs inside browser ──────── */
-  var _origWindowOpen = window.open;
-  window.open = function(url, target, features) {{
-    if (url && _realParent) {{
-      _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: url }}, '*');
-      return null;
-    }}
-    return _origWindowOpen.apply(this, arguments);
-  }};
-
-  /* ── Rewrite any <script src> or <link href> set dynamically ─── */
-  var _origSetAttribute = Element.prototype.setAttribute;
-  Element.prototype.setAttribute = function(name, value) {{
-    if ((name === 'src' || name === 'href' || name === 'action') && typeof value === 'string') {{
-      value = rewriteUrl(value);
-    }}
-    return _origSetAttribute.call(this, name, value);
-  }};
-
-  /* ── Intercept link clicks ── */
-  document.addEventListener('click', function(e) {{
-    var a = e.target && e.target.closest ? e.target.closest('a') : null;
-    if (a && a.href && !a.href.startsWith('javascript:') && !a.href.startsWith('#')) {{
-      e.preventDefault();
-      if (_realParent) {{
-        _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: a.href }}, '*');
-      }} else {{
-        window.location.href = '/gateway?url=' + encodeURIComponent(a.href);
-      }}
-    }}
-  }}, true);
-
-  console.log('[Staunt Proxy] Dynamic multi-domain interceptor active for', UPSTREAM_ORIGINS);
-}})();
-"""
-                # Insert as absolute first element of <head> — before any site JS
-                if soup.head:
-                    soup.head.insert(0, interceptor)
-                else:
-                    soup.insert(0, interceptor)
-
-                # Decompose any <base> tags so browser resolves assets against the first-party proxy domain
-                for b in soup.find_all("base"):
-                    b.decompose()
-
-                # Rewrite absolute asset tags to same-origin paths so Edge tracker-prevention does not block them
-                for tag in soup.find_all(["script", "link", "img"]):
-                    for attr in ("src", "href"):
-                        if tag.has_attr(attr):
-                            val = tag[attr]
-                            for up_org in dyn_origins:
-                                if val.startswith(up_org):
-                                    tag[attr] = val[len(up_org):] or "/"
-                                    break
-
-                response_data = str(soup).encode("utf-8")
-            except Exception as transform_err:
-                logger.warning(f"[GATEWAY HTML TRANSFORM WARNING] {transform_err}")
-                response_data = upstream.content
+            response_data = transform_proxied_html(upstream.content, parsed_target)
 
         resp = app.response_class(
             response=response_data,
@@ -2277,8 +2287,13 @@ def serve_static(path):
                 verify=False,
             )
             c_type = upstream_resp.headers.get("Content-Type", "").lower()
+            if "text/html" in c_type:
+                resp_payload = transform_proxied_html(upstream_resp.content, parsed_up)
+            else:
+                resp_payload = upstream_resp.content
+
             resp = app.response_class(
-                response=upstream_resp.content,
+                response=resp_payload,
                 status=upstream_resp.status_code,
                 mimetype=c_type.split(";")[0].strip() if c_type else "application/octet-stream",
             )
@@ -2352,10 +2367,11 @@ def handle_clean_tool_address_fallback(e):
 
     # Catch-All Reverse Proxy Fallback for dynamic SPA subresources (/youtubei/v1/..., /s/desktop/..., etc.)
     global ACTIVE_UPSTREAM_ORIGIN
-    if ACTIVE_UPSTREAM_ORIGIN and not any(raw_path.startswith(p) for p in ("api/", "assets/", "static/")):
+    effective_origin = ACTIVE_UPSTREAM_ORIGIN or request.cookies.get("staunt_upstream")
+    if effective_origin and re.match(r"^https?://", effective_origin) and not any(raw_path.startswith(p) for p in ("api/", "assets/", "static/")):
         try:
-            upstream_url = f"{ACTIVE_UPSTREAM_ORIGIN}{request.full_path if request.query_string else request.path}"
-            parsed_up = urllib.parse.urlparse(ACTIVE_UPSTREAM_ORIGIN)
+            upstream_url = f"{effective_origin}{request.full_path if request.query_string else request.path}"
+            parsed_up = urllib.parse.urlparse(effective_origin)
             fwd_headers = {
                 "Host": parsed_up.netloc,
                 "Origin": ACTIVE_UPSTREAM_ORIGIN,
