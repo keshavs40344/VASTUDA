@@ -2046,10 +2046,19 @@ def handle_gateway_proxy():
                 else:
                     soup.insert(0, interceptor)
 
-                # Inject <base href> after the interceptor
-                if not soup.find("base") and soup.head:
-                    base_tag = soup.new_tag("base", href=target_url)
-                    soup.head.insert(1, base_tag)
+                # Decompose any <base> tags so browser resolves assets against the first-party proxy domain
+                for b in soup.find_all("base"):
+                    b.decompose()
+
+                # Rewrite absolute asset tags to same-origin paths so Edge tracker-prevention does not block them
+                for tag in soup.find_all(["script", "link", "img"]):
+                    for attr in ("src", "href"):
+                        if tag.has_attr(attr):
+                            val = tag[attr]
+                            for up_org in dyn_origins:
+                                if val.startswith(up_org):
+                                    tag[attr] = val[len(up_org):] or "/"
+                                    break
 
                 response_data = str(soup).encode("utf-8")
             except Exception as transform_err:
