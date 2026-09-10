@@ -2122,14 +2122,23 @@ def handle_gateway_proxy():
         return resp
 
 
-@app.route("/<path:path>")
+@app.route("/<path:path>", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"])
 def serve_static(path):
     """
-    Airtight Static File Gateway & Smart Address Resolver:
+    Airtight Static File Gateway, SPA Proxy, & Smart Address Resolver:
+    - Allows all HTTP methods (GET, POST, PUT, DELETE, OPTIONS) for proxied SPAs.
     - Path Traversal Block: Enforces canonical realpath boundary within FRONTEND_DIR.
-    - File Extension Filter: Blocks all .py, .env, .json, .sh, .git, etc.
     - Smart Address Resolver: Automatically resolves clean tool slugs to saas/<tool>.html.
+    - Catch-All Reverse Proxy: Forwards all dynamic subresource calls (/youtubei/v1/browse, etc.) to upstream origin.
     """
+    if request.method == "OPTIONS":
+        resp = app.response_class("", status=204)
+        resp.headers["Access-Control-Allow-Origin"] = "*"
+        resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS"
+        resp.headers["Access-Control-Allow-Headers"] = "*"
+        resp.headers["Access-Control-Allow-Credentials"] = "true"
+        return resp
+
     clean_path = path.replace('\\', '/')
     base_name = os.path.basename(clean_path).lower()
     # Only apply the extension block if NOT in active proxy mode
@@ -2147,12 +2156,12 @@ def serve_static(path):
             logger.warning(f"[PATH TRAVERSAL BLOCKED] Attempted escape: {path}")
             return jsonify({"error": "Access Denied: Path Traversal Detected"}), 403
 
-        if os.path.isfile(resolved_abs):
+        if request.method == "GET" and os.path.isfile(resolved_abs):
             rel_file = os.path.relpath(resolved_abs, canonical_frontend)
             return send_from_directory(canonical_frontend, rel_file)
 
         # Smart clean-URL fallback: if requested path is a tool (e.g. /resume-builder)
-        if not any(clean_path.startswith(prefix) for prefix in ("api/", "assets/")):
+        if request.method == "GET" and not any(clean_path.startswith(prefix) for prefix in ("api/", "assets/")):
             slug = clean_path.split("/")[-1].lower()
             if slug.endswith(".html"):
                 slug = slug[:-5]
@@ -2170,12 +2179,11 @@ def serve_static(path):
         logger.error(f"[STATIC SERVE ERROR] {e}")
 
     # ─── Catch-All Reverse Proxy Fallback ─────────────────────────────────────
-    # If ACTIVE_UPSTREAM_ORIGIN is set (i.e. a site is loaded in the browser),
-    # forward all unmatched subresource requests (e.g. /youtubei/v1/browse,
+    # If ACTIVE_UPSTREAM_ORIGIN or staunt_upstream cookie is set,
+    # forward all unmatched subresource requests (e.g. POST /youtubei/v1/browse,
     # /s/desktop/*, JS/CSS bundles) directly to the upstream origin so the SPA
-    # hydrates correctly instead of returning JSON 404.
+    # hydrates correctly instead of returning JSON 404 or 405 Method Not Allowed.
     global ACTIVE_UPSTREAM_ORIGIN
-    # Cookie fallback: works across all Gunicorn worker processes
     effective_origin = ACTIVE_UPSTREAM_ORIGIN or request.cookies.get("staunt_upstream")
     if effective_origin and re.match(r"^https?://", effective_origin) and not any(
         clean_path.startswith(p) for p in ("api/", "assets/", "static/")
@@ -2186,6 +2194,8 @@ def serve_static(path):
                 f"{request.full_path if request.query_string else request.path}"
             )
             parsed_up = urllib.parse.urlparse(effective_origin)
+            
+            # Forward incoming client headers (Content-Type, User-Agent, X-YouTube-*, etc.)
             fwd_headers = {
                 "Host": parsed_up.netloc,
                 "Origin": effective_origin,
@@ -2201,6 +2211,15 @@ def serve_static(path):
                 "sec-fetch-mode": "cors",
                 "sec-fetch-dest": request.headers.get("sec-fetch-dest", "empty"),
             }
+
+            for hk, hv in request.headers.items():
+                hk_lower = hk.lower()
+                if hk_lower not in ("host", "origin", "referer", "content-length", "cookie"):
+                    fwd_headers[hk] = hv
+
+            if request.headers.get("Cookie"):
+                fwd_headers["Cookie"] = request.headers["Cookie"]
+
             body_data = request.get_data() if request.method in ("POST", "PUT", "PATCH") else None
             upstream_resp = requests.request(
                 method=request.method,
@@ -2225,10 +2244,17 @@ def serve_static(path):
                 "cross-origin-resource-policy",
             }
             for hk, hv in upstream_resp.headers.items():
-                if hk.lower() not in _EXCLUDED:
+                hk_lower = hk.lower()
+                if hk_lower not in _EXCLUDED and hk_lower != "set-cookie":
                     resp.headers[hk] = hv
+                elif hk_lower == "set-cookie":
+                    clean_c = re.sub(r'Domain=[^;]+;?', '', hv, flags=re.IGNORECASE)
+                    if 'samesite' not in clean_c.lower():
+                        clean_c += '; SameSite=None; Secure'
+                    resp.headers.add('Set-Cookie', clean_c)
+
             resp.headers["Access-Control-Allow-Origin"] = "*"
-            resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+            resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS"
             resp.headers["Access-Control-Allow-Headers"] = "*"
             resp.headers["Access-Control-Allow-Credentials"] = "true"
             resp.headers["X-Frame-Options"] = "ALLOWALL"
