@@ -1,6 +1,33 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-[#05070d]">
 <head>
+
+  <!-- Global Bulletproof Resilience & Error Boundary for All Devices -->
+  <script>
+    window.onerror = function(msg, url, line, col, error) {
+      console.warn('[STAUNT SHIELD CAUGHT]', msg, 'at', line + ':' + col);
+      return true; // Suppress red screen crashes on Android/iOS/WebKit
+    };
+    window.onunhandledrejection = function(event) {
+      console.warn('[STAUNT PROMISE REJECTION SHIELDED]', event.reason);
+      event.preventDefault();
+    };
+
+    // Safe Storage Fallback for Incognito / Safari Private Browsing
+    const memoryStorage = {};
+    window.safeStorage = {
+      getItem: function(k) {
+        try { return localStorage.getItem(k); } catch(e) { return memoryStorage[k] || null; }
+      },
+      setItem: function(k, v) {
+        try { localStorage.setItem(k, v); } catch(e) { memoryStorage[k] = String(v); }
+      },
+      removeItem: function(k) {
+        try { localStorage.removeItem(k); } catch(e) { delete memoryStorage[k]; }
+      }
+    };
+  </script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Staunt Browser Ultra — Sovereign Arc-Class Web OS</title>
@@ -1207,6 +1234,7 @@
         canvas.innerHTML = `
           <iframe 
             id="iframe_${tabId}" 
+            onerror="this.src='/api/browser/proxy?url=' + encodeURIComponent('${url}') + '&shield=standard'"  
             src="/api/browser/proxy?url=${encodeURIComponent(url)}&shield=${encodeURIComponent(this.shieldMode)}" 
             class="tab-viewport-frame"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
