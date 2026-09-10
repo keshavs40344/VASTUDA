@@ -611,6 +611,9 @@
     </div>
 
     <div class="header-actions">
+      <button class="action-btn" id="btn-toggle-engine" title="Toggle between ⚡ Direct Local Gigabit and 🛡️ Cloud Proxy Shield" style="font-weight: 600;">
+        ⚡ Direct
+      </button>
       <button class="action-btn" id="btn-toggle-immersive" title="Toggle Auto-Hide Toolbar (100% Screen Space)">
         ▲ Immersive
       </button>
@@ -934,6 +937,43 @@
         tabs.forEach(t => updateClock(t.id));
       }, 1000);
 
+      // ─── DUAL ENGINE MODE (⚡ DIRECT LOCAL GIGABIT vs 🛡️ CLOUD PROXY SHIELD) ───
+      const urlParams = new URLSearchParams(window.location.search);
+      // Default to 'direct' if ?mode=direct or running inside native app, otherwise check localStorage
+      let currentEngineMode = urlParams.get('mode') === 'direct' ? 'direct' : (localStorage.getItem('staunt_engine_mode') || 'direct');
+      const btnToggleEngine = document.getElementById('btn-toggle-engine');
+
+      function updateEngineUI() {
+        if (!btnToggleEngine) return;
+        if (currentEngineMode === 'direct') {
+          btnToggleEngine.innerHTML = '⚡ Direct';
+          btnToggleEngine.title = 'Current: ⚡ Direct Gigabit Engine (Local speed, no proxy lag). Click to switch to Cloud Shield.';
+          btnToggleEngine.style.background = 'rgba(16, 185, 129, 0.15)';
+          btnToggleEngine.style.color = '#34d399';
+          btnToggleEngine.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        } else {
+          btnToggleEngine.innerHTML = '🛡️ Cloud';
+          btnToggleEngine.title = 'Current: 🛡️ Cloud Proxy Shield (Anonymized via server). Click to switch to Direct Gigabit.';
+          btnToggleEngine.style.background = 'rgba(139, 92, 246, 0.15)';
+          btnToggleEngine.style.color = '#a78bfa';
+          btnToggleEngine.style.borderColor = 'rgba(139, 92, 246, 0.3)';
+        }
+      }
+
+      if (btnToggleEngine) {
+        updateEngineUI();
+        btnToggleEngine.addEventListener('click', () => {
+          currentEngineMode = currentEngineMode === 'direct' ? 'cloud' : 'direct';
+          localStorage.setItem('staunt_engine_mode', currentEngineMode);
+          updateEngineUI();
+          // Reload active tab with new engine mode
+          const tab = tabs.find(t => t.id === activeTabId);
+          if (tab && tab.url && !tab.isNewTab) {
+            navigateTo(tab.url, tab.id);
+          }
+        });
+      }
+
       // ─── NAVIGATION ENGINE ───
       function navigateTo(target, tabId = activeTabId) {
         const tab = tabs.find(t => t.id === tabId);
@@ -962,8 +1002,14 @@
             startProgress();
 
             let targetSrc = resolved;
-            if (!resolved.includes('youtube.com/embed/')) {
-              targetSrc = '/gateway?url=' + encodeURIComponent(resolved);
+            if (currentEngineMode === 'direct') {
+              // Direct Gigabit Mode: render directly without proxy hops!
+              targetSrc = resolved;
+            } else {
+              // Cloud Shield Mode: route through persistent keep-alive streaming gateway
+              if (!resolved.includes('youtube.com/embed/')) {
+                targetSrc = '/gateway?url=' + encodeURIComponent(resolved);
+              }
             }
             iframe.src = targetSrc;
             iframe.onload = () => finishProgress();
