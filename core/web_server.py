@@ -1921,108 +1921,135 @@ def handle_gateway_proxy():
                 from bs4 import BeautifulSoup
                 soup = BeautifulSoup(upstream.content, "html.parser")
 
-                # ── Fetch / XHR Interceptor (must be FIRST in <head>) ─────────────────
-                # Rewrites all absolute youtube.com calls to relative paths so the
-                # parent browser (Edge/Chrome) never sees cross-origin Google requests.
-                # Without this, Edge's tracker-prevention blocks YouTube's background
-                # API calls (e.g. /youtubei/v1/browse) as "Google (6) trackers".
-                interceptor = soup.new_tag("script")
-                interceptor.string = """
-(function() {
-  'use strict';
-  var UPSTREAM_ORIGINS = [
-    'https://www.youtube.com',
-    'https://youtube.com',
-    'https://m.youtube.com',
-    'http://www.youtube.com',
-    'http://youtube.com'
-  ];
+                # Generate dynamic upstream origins for active site
+                target_scheme = parsed_target.scheme
+                target_host = parsed_target.netloc
+                clean_host = target_host[4:] if target_host.startswith("www.") else target_host
+                www_host = target_host if target_host.startswith("www.") else f"www.{target_host}"
+                dyn_origins = list(dict.fromkeys([
+                    f"{target_scheme}://{target_host}",
+                    f"{target_scheme}://{clean_host}",
+                    f"{target_scheme}://{www_host}",
+                    f"https://{clean_host}",
+                    f"http://{clean_host}",
+                    f"https://{www_host}",
+                    f"http://{www_host}",
+                    "https://www.youtube.com",
+                    "https://youtube.com",
+                    "https://m.youtube.com"
+                ]))
+                dyn_origins_json = json.dumps(dyn_origins)
 
-  function rewriteUrl(url) {
+                # ── Fetch / XHR / Frame-Busting Interceptor (must be FIRST in <head>) ──
+                interceptor = soup.new_tag("script")
+                interceptor.string = f"""
+(function() {{
+  'use strict';
+  var UPSTREAM_ORIGINS = {dyn_origins_json};
+
+  // Preserve reference to real parent for postMessage before spoofing
+  var _realParent = null;
+  try {{
+    if (window.parent && window.parent !== window) {{
+      _realParent = window.parent;
+    }}
+  }} catch(e) {{}}
+
+  // Spoof window.top and window.parent so sites (YouTube, Google, Reddit)
+  // believe they are running as native top windows and do not trigger iframe blocks
+  try {{
+    Object.defineProperty(window, 'top', {{ get: function() {{ return window; }}, configurable: true }});
+    Object.defineProperty(window, 'parent', {{ get: function() {{ return window; }}, configurable: true }});
+    Object.defineProperty(window, 'frameElement', {{ get: function() {{ return null; }}, configurable: true }});
+  }} catch(e) {{}}
+
+  function rewriteUrl(url) {{
     if (!url || typeof url !== 'string') return url;
-    for (var i = 0; i < UPSTREAM_ORIGINS.length; i++) {
-      if (url.indexOf(UPSTREAM_ORIGINS[i]) === 0) {
+    for (var i = 0; i < UPSTREAM_ORIGINS.length; i++) {{
+      if (url.indexOf(UPSTREAM_ORIGINS[i]) === 0) {{
         return url.slice(UPSTREAM_ORIGINS[i].length) || '/';
-      }
-    }
+      }}
+    }}
     return url;
-  }
+  }}
 
   /* ── Override fetch() ─────────────────────────────────────────── */
   var _origFetch = window.fetch;
-  window.fetch = function(input, init) {
-    try {
-      if (typeof input === 'string') {
+  window.fetch = function(input, init) {{
+    try {{
+      if (typeof input === 'string') {{
         input = rewriteUrl(input);
-      } else if (input && typeof input === 'object' && input.url) {
+      }} else if (input && typeof input === 'object' && input.url) {{
         var newUrl = rewriteUrl(input.url);
         if (newUrl !== input.url) input = new Request(newUrl, input);
-      }
-    } catch(e) {}
+      }}
+    }} catch(e) {{}}
     return _origFetch.call(this, input, init);
-  };
+  }};
 
   /* ── Override XMLHttpRequest.open() ──────────────────────────── */
   var _origOpen = XMLHttpRequest.prototype.open;
-  XMLHttpRequest.prototype.open = function(method, url) {
-    try { url = rewriteUrl(url); } catch(e) {}
+  XMLHttpRequest.prototype.open = function(method, url) {{
+    try {{ url = rewriteUrl(url); }} catch(e) {{}}
     var args = Array.prototype.slice.call(arguments);
     args[1] = url;
     return _origOpen.apply(this, args);
-  };
+  }};
 
   /* ── Override navigator.sendBeacon() ─────────────────────────── */
-  if (navigator.sendBeacon) {
+  if (navigator.sendBeacon) {{
     var _origBeacon = navigator.sendBeacon.bind(navigator);
-    navigator.sendBeacon = function(url, data) {
-      try { url = rewriteUrl(url); } catch(e) {}
+    navigator.sendBeacon = function(url, data) {{
+      try {{ url = rewriteUrl(url); }} catch(e) {{}}
       return _origBeacon(url, data);
-    };
-  }
+    }};
+  }}
+
+  /* ── Intercept window.open to keep tabs inside browser ──────── */
+  var _origWindowOpen = window.open;
+  window.open = function(url, target, features) {{
+    if (url && _realParent) {{
+      _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: url }}, '*');
+      return null;
+    }}
+    return _origWindowOpen.apply(this, arguments);
+  }};
 
   /* ── Rewrite any <script src> or <link href> set dynamically ─── */
   var _origSetAttribute = Element.prototype.setAttribute;
-  Element.prototype.setAttribute = function(name, value) {
-    if ((name === 'src' || name === 'href' || name === 'action') && typeof value === 'string') {
+  Element.prototype.setAttribute = function(name, value) {{
+    if ((name === 'src' || name === 'href' || name === 'action') && typeof value === 'string') {{
       value = rewriteUrl(value);
-    }
+    }}
     return _origSetAttribute.call(this, name, value);
-  };
+  }};
 
-  console.log('[Staunt Proxy] Fetch/XHR interceptor active for ' + UPSTREAM_ORIGINS[0]);
-})();
+  /* ── Intercept link clicks ── */
+  document.addEventListener('click', function(e) {{
+    var a = e.target && e.target.closest ? e.target.closest('a') : null;
+    if (a && a.href && !a.href.startsWith('javascript:') && !a.href.startsWith('#')) {{
+      e.preventDefault();
+      if (_realParent) {{
+        _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: a.href }}, '*');
+      }} else {{
+        window.location.href = '/gateway?url=' + encodeURIComponent(a.href);
+      }}
+    }}
+  }}, true);
+
+  console.log('[Staunt Proxy] Dynamic multi-domain interceptor active for', UPSTREAM_ORIGINS);
+}})();
 """
-                # Insert as absolute first element of <head> — before any YouTube JS
+                # Insert as absolute first element of <head> — before any site JS
                 if soup.head:
                     soup.head.insert(0, interceptor)
                 else:
-                    # Fallback: prepend to document
                     soup.insert(0, interceptor)
 
                 # Inject <base href> after the interceptor
                 if not soup.find("base") and soup.head:
                     base_tag = soup.new_tag("base", href=target_url)
                     soup.head.insert(1, base_tag)
-
-                # Inject in-page navigation interceptor
-                nav_script = soup.new_tag("script")
-                nav_script.string = """
-                (function() {
-                  document.addEventListener('click', function(e) {
-                    var a = e.target.closest('a');
-                    if (a && a.href && !a.href.startsWith('javascript:') && !a.href.startsWith('#')) {
-                      e.preventDefault();
-                      if (window.parent && window.parent !== window) {
-                        window.parent.postMessage({ type: 'STAUNT_NAVIGATE', url: a.href }, '*');
-                      } else {
-                        window.location.href = '/gateway?url=' + encodeURIComponent(a.href);
-                      }
-                    }
-                  }, true);
-                })();
-                """
-                if soup.body:
-                    soup.body.append(nav_script)
 
                 response_data = str(soup).encode("utf-8")
             except Exception as transform_err:

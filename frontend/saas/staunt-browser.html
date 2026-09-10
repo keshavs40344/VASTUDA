@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="description" content="Staunt Web — High-Performance Cloud Browser Engine with Apple Sequoia Interface" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#090a0f" />
+  <meta name="description" content="Staunt Web — Sovereign Cloud Browser Engine with Apple Sequoia Fullscreen Interface" />
   <title>Staunt Web • Cloud Edition</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238b5cf6'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'/%3E%3C/svg%3E" />
 
@@ -13,20 +16,20 @@
        ========================================================================== */
     :root {
       --bg-canvas: #090a0f;
-      --bg-bar: rgba(14, 16, 25, 0.88);
+      --bg-bar: rgba(14, 16, 25, 0.92);
       --bg-tab: rgba(255, 255, 255, 0.05);
-      --bg-tab-active: rgba(255, 255, 255, 0.11);
+      --bg-tab-active: rgba(255, 255, 255, 0.12);
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-focus: #8b5cf6;
       --accent-purple: #8b5cf6;
       --accent-blue: #0a84ff;
       --accent-emerald: #30d158;
       --text-main: rgba(255, 255, 255, 0.95);
-      --text-muted: rgba(255, 255, 255, 0.50);
+      --text-muted: rgba(255, 255, 255, 0.52);
       --text-dim: rgba(255, 255, 255, 0.28);
       --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
       --header-height: 48px;
-      --tabs-height: 34px;
+      --tabs-height: 36px;
       --bottom-bar-height: 0px;
     }
 
@@ -137,7 +140,7 @@
     /* Unified Omnibox */
     .omnibox-container {
       flex: 1;
-      max-width: 720px;
+      max-width: 700px;
       position: relative;
       display: flex;
       align-items: center;
@@ -186,31 +189,35 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       flex-shrink: 0;
     }
 
-    /* Mode Pill Badge */
-    .mode-badge {
+    /* Fullscreen Toggle Button */
+    .btn-fullscreen {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      background: rgba(139, 92, 246, 0.14);
-      border: 0.5px solid rgba(139, 92, 246, 0.35);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: #c4b5fd;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 0.5px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-main);
+      font-size: 11.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
     }
-    .mode-badge .dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--accent-purple);
-      box-shadow: 0 0 6px var(--accent-purple);
+    .btn-fullscreen:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+    .btn-fullscreen svg {
+      width: 13px;
+      height: 13px;
+      stroke-width: 2.2;
     }
 
     /* Download Desktop App Button */
@@ -218,7 +225,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 12px;
+      padding: 5px 11px;
       border-radius: 8px;
       background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(10, 132, 255, 0.25) 100%);
       border: 0.5px solid rgba(139, 92, 246, 0.45);
@@ -244,12 +251,10 @@
     @media (max-width: 900px) {
       .btn-download-app span.text-full { display: none; }
       .btn-download-app span.text-short { display: inline; }
+      .btn-fullscreen span { display: none; }
     }
     @media (min-width: 901px) {
       .btn-download-app span.text-short { display: none; }
-    }
-    @media (max-width: 600px) {
-      .mode-badge { display: none; }
     }
 
     /* Top Progress Bar */
@@ -276,12 +281,12 @@
       left: 0;
       right: 0;
       height: var(--tabs-height);
-      background: rgba(10, 11, 18, 0.95);
+      background: rgba(10, 11, 18, 0.96);
       border-bottom: 0.5px solid var(--border-subtle);
       display: flex;
       align-items: center;
       padding: 0 10px;
-      gap: 5px;
+      gap: 6px;
       overflow-x: auto;
       z-index: 9999;
     }
@@ -292,9 +297,9 @@
     }
 
     .tab-item {
-      height: 27px;
+      height: 28px;
       min-width: 120px;
-      max-width: 200px;
+      max-width: 210px;
       padding: 0 10px;
       display: flex;
       align-items: center;
@@ -370,7 +375,7 @@
     }
 
     /* ==========================================================================
-       4. VIEWPORT & CONTAINER
+       4. VIEWPORT CONTAINER
        ========================================================================== */
     #viewport-container {
       position: fixed;
@@ -406,13 +411,13 @@
     .newtab-surface {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 60%), #090a0f;
+      background: radial-gradient(circle at 50% 18%, rgba(139, 92, 246, 0.10) 0%, transparent 65%), #090a0f;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 24px;
-      gap: 32px;
+      gap: 26px;
       overflow-y: auto;
     }
 
@@ -420,12 +425,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       text-align: center;
     }
     .brand-icon {
-      width: 58px;
-      height: 58px;
+      width: 56px;
+      height: 56px;
       border-radius: 16px;
       background: linear-gradient(135deg, #8b5cf6 0%, #0a84ff 100%);
       display: flex;
@@ -452,7 +457,7 @@
     /* Centered Search Bar on New Tab */
     .newtab-searchbox {
       width: 100%;
-      max-width: 520px;
+      max-width: 540px;
       height: 48px;
       background: rgba(255, 255, 255, 0.06);
       border: 0.5px solid rgba(255, 255, 255, 0.12);
@@ -486,12 +491,12 @@
     /* Quick Shortcuts Grid */
     .shortcuts-grid {
       display: grid;
-      grid-template-columns: repeat(4, 76px);
+      grid-template-columns: repeat(4, 78px);
       gap: 16px;
     }
     @media (max-width: 480px) {
       .shortcuts-grid {
-        grid-template-columns: repeat(3, 72px);
+        grid-template-columns: repeat(3, 74px);
       }
     }
     .shortcut-card {
@@ -531,49 +536,52 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 68px;
+      max-width: 70px;
     }
 
-    /* Desktop App Promo Banner */
-    .desktop-promo-card {
-      max-width: 520px;
+    /* Fullscreen & Desktop Promo Bar */
+    .immersive-banner {
+      max-width: 540px;
       width: 100%;
       background: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(10, 132, 255, 0.08) 100%);
       border: 0.5px solid rgba(139, 92, 246, 0.28);
       border-radius: 14px;
-      padding: 16px 20px;
+      padding: 14px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 14px;
     }
-    .promo-info h3 {
-      font-size: 13.5px;
+    .banner-info h3 {
+      font-size: 13px;
       font-weight: 600;
       color: #fff;
-      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
     }
-    .promo-info p {
-      font-size: 11.5px;
+    .banner-info p {
+      font-size: 11px;
       color: var(--text-muted);
-      line-height: 1.4;
+      line-height: 1.35;
     }
-    .promo-btn {
-      padding: 7px 14px;
+    .banner-action-btn {
+      padding: 6px 13px;
       border-radius: 8px;
       background: var(--accent-purple);
       color: #fff;
       font-size: 11.5px;
       font-weight: 600;
-      text-decoration: none;
+      border: none;
       white-space: nowrap;
       cursor: pointer;
       transition: all 0.15s ease;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
-    .promo-btn:hover {
+    .banner-action-btn:hover {
       background: #7c3aed;
       transform: scale(1.02);
     }
@@ -594,7 +602,7 @@
       border-top: 0.5px solid var(--border-subtle);
       align-items: center;
       justify-content: space-around;
-      padding: 0 16px;
+      padding: 0 12px;
       z-index: 10000;
     }
     @media (max-width: 768px) {
@@ -620,8 +628,8 @@
       color: var(--text-main);
     }
     .mobile-tab-btn svg {
-      width: 20px;
-      height: 20px;
+      width: 19px;
+      height: 19px;
       stroke-width: 2;
     }
     .mobile-tab-btn span {
@@ -738,9 +746,9 @@
   <header id="top-bar">
     <!-- Traffic Lights (macOS) -->
     <div class="traffic-lights">
-      <div class="tl-dot tl-close" id="btn-tl-close" title="Close Tab"></div>
-      <div class="tl-dot tl-min" id="btn-tl-min" title="Home"></div>
-      <div class="tl-dot tl-max" id="btn-tl-max" title="New Tab"></div>
+      <div class="tl-dot tl-close" id="btn-tl-close" title="Close Current Tab"></div>
+      <div class="tl-dot tl-min" id="btn-tl-min" title="Home (New Tab)"></div>
+      <div class="tl-dot tl-max" id="btn-tl-max" title="Toggle Fullscreen"></div>
     </div>
 
     <!-- Navigation Controls -->
@@ -769,7 +777,7 @@
           type="text" 
           id="omnibox-input" 
           class="omnibox-input" 
-          placeholder="Search or enter web address" 
+          placeholder="Search with Google or enter web address" 
           autocomplete="off" 
           spellcheck="false" 
         />
@@ -778,11 +786,11 @@
 
     <!-- Right Header Actions -->
     <div class="header-actions">
-      <!-- Mode Badge -->
-      <div class="mode-badge" title="Running in Cloud Web Sandbox">
-        <span class="dot"></span>
-        <span>Cloud Web</span>
-      </div>
+      <!-- Fullscreen Toggle Button -->
+      <button class="btn-fullscreen" id="btn-fullscreen-toggle" title="Toggle Fullscreen Mode (F11)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" id="fs-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        <span id="fs-label">Full Screen</span>
+      </button>
 
       <!-- Download Desktop App Button -->
       <button class="btn-download-app" id="btn-open-download" title="Get Staunt Desktop App for 4K streaming & native adblocking">
@@ -829,13 +837,13 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
       <span>Home</span>
     </button>
+    <button class="mobile-tab-btn" id="mob-fs">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+      <span>Full</span>
+    </button>
     <button class="mobile-tab-btn" id="mob-newtab">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       <span>New Tab</span>
-    </button>
-    <button class="mobile-tab-btn" id="mob-app">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      <span>Get App</span>
     </button>
   </nav>
 
@@ -858,7 +866,7 @@
       <div class="features-list">
         <div class="feature-item">
           <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          <div><strong>100% Unrestricted Web:</strong> No iframe boundaries, no CSP frame-ancestors block, no proxy latency.</div>
+          <div><strong>100% Unrestricted Web:</strong> No iframe boundaries, no CSP frame-ancestors block, zero proxy latency.</div>
         </div>
         <div class="feature-item">
           <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
@@ -909,18 +917,65 @@
       const btnTlClose = document.getElementById('btn-tl-close');
       const btnTlMin = document.getElementById('btn-tl-min');
       const btnTlMax = document.getElementById('btn-tl-max');
+      const btnFullscreenToggle = document.getElementById('btn-fullscreen-toggle');
+      const fsIcon = document.getElementById('fs-icon');
+      const fsLabel = document.getElementById('fs-label');
 
       // Mobile Buttons
       const mobBack = document.getElementById('mob-back');
       const mobFwd = document.getElementById('mob-fwd');
       const mobHome = document.getElementById('mob-home');
+      const mobFs = document.getElementById('mob-fs');
       const mobNewtab = document.getElementById('mob-newtab');
-      const mobApp = document.getElementById('mob-app');
 
       // Modal
       const downloadModal = document.getElementById('download-modal');
       const btnOpenDownload = document.getElementById('btn-open-download');
       const btnCloseModal = document.getElementById('btn-close-modal');
+
+      // ─── FULLSCREEN ENGINE ──────────────────────────────────────────────
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          const el = document.documentElement;
+          const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+          if (rfs) {
+            rfs.call(el).then(() => updateFullscreenUI(true)).catch(() => {});
+          }
+        } else {
+          const efs = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+          if (efs) {
+            efs.call(document).then(() => updateFullscreenUI(false)).catch(() => {});
+          }
+        }
+      }
+
+      function updateFullscreenUI(isFs) {
+        if (fsLabel) fsLabel.textContent = isFs ? 'Exit Full' : 'Full Screen';
+        if (btnFullscreenToggle) {
+          btnFullscreenToggle.classList.toggle('active', isFs);
+        }
+      }
+
+      document.addEventListener('fullscreenchange', () => {
+        updateFullscreenUI(!!document.fullscreenElement);
+      });
+
+      // Auto-trigger Fullscreen on First User Interaction (Click/Tap)
+      function autoFullscreenOnFirstGesture() {
+        if (!document.fullscreenElement) {
+          const el = document.documentElement;
+          const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+          if (rfs) {
+            rfs.call(el).catch(() => {});
+          }
+        }
+      }
+      window.addEventListener('click', autoFullscreenOnFirstGesture, { once: true });
+      window.addEventListener('touchstart', autoFullscreenOnFirstGesture, { once: true });
+
+      btnFullscreenToggle.addEventListener('click', toggleFullscreen);
+      btnTlMax.addEventListener('click', toggleFullscreen);
+      if (mobFs) mobFs.addEventListener('click', toggleFullscreen);
 
       // ─── MODAL CONTROLS ─────────────────────────────────────────────────
       function openDownloadModal() {
@@ -934,21 +989,20 @@
       downloadModal.addEventListener('click', (e) => {
         if (e.target === downloadModal) closeDownloadModal();
       });
-      if (mobApp) mobApp.addEventListener('click', openDownloadModal);
 
       // ─── PROGRESS BAR ANIMATION ─────────────────────────────────────────
       function startProgress() {
         clearTimeout(progressTimer);
         progressLine.style.width = '0%';
         progressLine.classList.add('active');
-        let pct = 10;
+        let pct = 12;
         progressLine.style.width = pct + '%';
         progressTimer = setInterval(() => {
           if (pct < 85) {
-            pct += Math.random() * 14;
+            pct += Math.random() * 16;
             progressLine.style.width = Math.min(pct, 85) + '%';
           }
-        }, 180);
+        }, 160);
       }
 
       function finishProgress() {
@@ -965,11 +1019,11 @@
         if (!input) return '';
         const trimmed = input.trim();
         if (/^https?:\/\//i.test(trimmed)) return trimmed;
-        // Check if looks like domain name
+        // Check if looks like a valid domain or path
         if (/^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(trimmed) && !trimmed.includes(' ')) {
           return 'https://' + trimmed;
         }
-        // Fallback to Google Search
+        // Direct Search Query
         return SEARCH_BASE + encodeURIComponent(trimmed);
       }
 
@@ -1026,7 +1080,7 @@
         // Update Omnibox
         if (tab.isNewTab || !tab.url) {
           omnibox.value = '';
-          omnibox.placeholder = 'Search or enter web address';
+          omnibox.placeholder = 'Search with Google or enter web address';
           lockIndicator.style.color = 'var(--text-muted)';
         } else {
           omnibox.value = tab.url;
@@ -1059,7 +1113,6 @@
       }
 
       function renderTabStrip() {
-        // Keep the add-tab button
         const addBtn = btnAddTab;
         tabsBar.innerHTML = '';
         tabs.forEach(tab => {
@@ -1071,7 +1124,7 @@
           tabEl.innerHTML = `
             <span class="tab-favicon">${favIcon}</span>
             <span class="tab-title">${escapeHtml(tab.title)}</span>
-            <button class="tab-close-btn" title="Close" aria-label="Close Tab">×</button>
+            <button class="tab-close-btn" title="Close Tab" aria-label="Close Tab">×</button>
           `;
 
           tabEl.addEventListener('click', () => switchTab(tab.id));
@@ -1095,21 +1148,21 @@
                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
               </div>
               <h1 class="brand-title">Staunt Web</h1>
-              <p class="brand-subtitle">High-speed sandboxed cloud browsing engine with zero client install required.</p>
+              <p class="brand-subtitle">High-speed full-screen cloud browser. Browse YouTube, Google, and any site with zero restrictions.</p>
             </div>
 
             <div class="newtab-searchbox">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="text" class="newtab-search-input" placeholder="Search with Google or enter address…" />
+              <input type="text" class="newtab-search-input" placeholder="Search Google or enter any address (e.g. youtube.com)…" />
             </div>
 
             <div class="shortcuts-grid">
               <div class="shortcut-card" data-url="https://www.youtube.com">
-                <div class="shortcut-icon" style="background: rgba(255, 0, 0, 0.15); color: #ff453a;">▶</div>
+                <div class="shortcut-icon" style="background: rgba(255, 0, 0, 0.16); color: #ff453a;">▶</div>
                 <div class="shortcut-label">YouTube</div>
               </div>
               <div class="shortcut-card" data-url="https://www.google.com">
-                <div class="shortcut-icon" style="background: rgba(66, 133, 244, 0.15); color: #4285f4;">G</div>
+                <div class="shortcut-icon" style="background: rgba(66, 133, 244, 0.16); color: #4285f4;">G</div>
                 <div class="shortcut-label">Google</div>
               </div>
               <div class="shortcut-card" data-url="https://www.github.com">
@@ -1117,7 +1170,7 @@
                 <div class="shortcut-label">GitHub</div>
               </div>
               <div class="shortcut-card" data-url="https://www.reddit.com">
-                <div class="shortcut-icon" style="background: rgba(255, 69, 0, 0.15); color: #ff4500;">R</div>
+                <div class="shortcut-icon" style="background: rgba(255, 69, 0, 0.16); color: #ff4500;">R</div>
                 <div class="shortcut-label">Reddit</div>
               </div>
               <div class="shortcut-card" data-url="https://www.wikipedia.org">
@@ -1125,27 +1178,27 @@
                 <div class="shortcut-label">Wikipedia</div>
               </div>
               <div class="shortcut-card" data-url="https://twitter.com">
-                <div class="shortcut-icon" style="background: rgba(29, 155, 240, 0.15); color: #1d9bf0;">𝕏</div>
+                <div class="shortcut-icon" style="background: rgba(29, 155, 240, 0.16); color: #1d9bf0;">𝕏</div>
                 <div class="shortcut-label">X</div>
               </div>
               <div class="shortcut-card" data-url="https://chatgpt.com">
-                <div class="shortcut-icon" style="background: rgba(16, 163, 127, 0.15); color: #10a37f;">✦</div>
+                <div class="shortcut-icon" style="background: rgba(16, 163, 127, 0.16); color: #10a37f;">✦</div>
                 <div class="shortcut-label">ChatGPT</div>
               </div>
               <div class="shortcut-card" data-url="https://news.ycombinator.com">
-                <div class="shortcut-icon" style="background: rgba(255, 102, 0, 0.15); color: #ff6600;">Y</div>
+                <div class="shortcut-icon" style="background: rgba(255, 102, 0, 0.16); color: #ff6600;">Y</div>
                 <div class="shortcut-label">HN</div>
               </div>
             </div>
 
-            <div class="desktop-promo-card">
-              <div class="promo-info">
-                <h3>Want 4K Video, DRM & Native Adblocking?</h3>
-                <p>Run Staunt Ultra natively on Windows for zero iframe limits & 100% login compatibility.</p>
+            <div class="immersive-banner">
+              <div class="banner-info">
+                <h3>⚡ Native Immersive App Mode</h3>
+                <p>Click anywhere or press F11 to go full screen for an authentic desktop browser experience.</p>
               </div>
-              <button class="promo-btn" onclick="document.getElementById('download-modal').classList.add('active')">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Get App
+              <button class="banner-action-btn" onclick="toggleFullscreen()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                Full Screen
               </button>
             </div>
           </div>
@@ -1201,7 +1254,7 @@
         tab.history.push(resolved);
         tab.historyIdx = tab.history.length - 1;
 
-        // Update Omnibox if this is active tab
+        // Update Omnibox if active tab
         if (targetTabId === activeTabId) {
           omnibox.value = resolved;
           lockIndicator.style.color = resolved.startsWith('https') ? 'var(--accent-emerald)' : 'var(--text-muted)';
@@ -1241,7 +1294,7 @@
 
         if (targetTabId === activeTabId) {
           omnibox.value = '';
-          omnibox.placeholder = 'Search or enter web address';
+          omnibox.placeholder = 'Search with Google or enter web address';
           lockIndicator.style.color = 'var(--text-muted)';
         }
 
@@ -1298,16 +1351,9 @@
       btnReload.addEventListener('click', reloadCurrent);
       btnHome.addEventListener('click', () => goHome());
 
-      // Traffic light helpers
+      // Traffic lights
       btnTlClose.addEventListener('click', () => closeTab(activeTabId));
       btnTlMin.addEventListener('click', () => goHome());
-      btnTlMax.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(() => {});
-        } else {
-          document.exitFullscreen().catch(() => {});
-        }
-      });
 
       // Mobile Bar Handlers
       if (mobBack) mobBack.addEventListener('click', goBack);
@@ -1337,6 +1383,9 @@
           e.preventDefault();
           omnibox.focus();
           omnibox.select();
+        } else if (e.key === 'F11') {
+          e.preventDefault();
+          toggleFullscreen();
         }
       });
 
@@ -1347,6 +1396,9 @@
 
       // Initialize default first tab
       createTab();
+
+      // Expose toggleFullscreen globally
+      window.toggleFullscreen = toggleFullscreen;
 
     })();
   </script>
