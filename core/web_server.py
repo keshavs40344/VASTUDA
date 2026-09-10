@@ -2005,20 +2005,36 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
         }}
       }} catch(err) {{}}
 
-      // 1. If link is already on the current domain (e.g. proxy domain), let it navigate natively!
-      if (a.hostname === window.location.hostname) {{
+      // 1. If link is already routed through our gateway proxy, let it proceed!
+      if (a.hostname === window.location.hostname && a.pathname.indexOf('/gateway') === 0) {{
         return;
       }}
-      // 2. If link is on upstream origin, let it navigate natively!
-      for (var i = 0; i < UPSTREAM_ORIGINS.length; i++) {{
-        if (a.href.indexOf(UPSTREAM_ORIGINS[i]) === 0) {{
-          return;
-        }}
-      }}
-      // 3. Only different external domains get routed via gateway
+
+      // 2. Route ALL external HTTP/HTTPS links through the gateway proxy to guarantee X-Frame-Options is stripped
       if (a.href.startsWith('http://') || a.href.startsWith('https://')) {{
         e.preventDefault();
         window.location.href = '/gateway?url=' + encodeURIComponent(a.href);
+      }}
+    }}
+  }}, true);
+
+  // Form Submissions Interceptor (for searches, forms on Wikipedia, DuckDuckGo, etc.)
+  document.addEventListener('submit', function(e) {{
+    var form = e.target;
+    if (form && form.action) {{
+      var method = (form.method || 'GET').toUpperCase();
+      if (method === 'GET') {{
+        e.preventDefault();
+        try {{
+          var actionUrl = new URL(form.action, window.location.href);
+          var formData = new FormData(form);
+          var searchParams = new URLSearchParams(formData);
+          var sep = actionUrl.search ? '&' : '?';
+          var fullTarget = actionUrl.origin + actionUrl.pathname + actionUrl.search + sep + searchParams.toString();
+          window.location.href = '/gateway?url=' + encodeURIComponent(fullTarget);
+        }} catch(err) {{
+          form.submit();
+        }}
       }}
     }}
   }}, true);
