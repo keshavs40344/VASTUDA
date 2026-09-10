@@ -2,49 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#08090d" />
-  <title>Staunt — Cloud Web Browser</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238b5cf6'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'/%3E%3C/svg%3E" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#090a0f" />
+  <title>Staunt — Sovereign Cloud & Web Browser</title>
+  <link rel="manifest" href="/manifest.json" />
 
   <style>
     /* ==========================================================================
-       1. LUXURY OBSIDIAN GLASS DESIGN SYSTEM (macOS Sequoia / Arc)
+       1. LUXURY SYSTEM VARIABLES & RESETS
        ========================================================================== */
     :root {
-      --bg-root: #08090d;
-      --bg-panel: rgba(13, 15, 22, 0.94);
-      --bg-omnibox: rgba(255, 255, 255, 0.05);
-      --bg-omnibox-focus: rgba(255, 255, 255, 0.09);
+      --bg-root: #090a0f;
+      --bg-panel: rgba(14, 16, 23, 0.88);
+      --bg-surface: rgba(22, 25, 37, 0.75);
+      --bg-omnibox: rgba(255, 255, 255, 0.07);
+      --bg-omnibox-hover: rgba(255, 255, 255, 0.11);
+      --bg-omnibox-focus: rgba(255, 255, 255, 0.14);
       --bg-tab: rgba(255, 255, 255, 0.04);
-      --bg-tab-hover: rgba(255, 255, 255, 0.08);
       --bg-tab-active: rgba(255, 255, 255, 0.12);
-      --border-light: rgba(255, 255, 255, 0.07);
-      --border-focus: #8b5cf6;
-      --accent-violet: #8b5cf6;
-      --accent-glow: rgba(139, 92, 246, 0.35);
+      --bg-card: rgba(18, 21, 31, 0.7);
+      --border-light: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(139, 92, 246, 0.55);
+      --text-white: #ffffff;
+      --text-dim: rgba(255, 255, 255, 0.65);
+      --text-muted: rgba(255, 255, 255, 0.38);
+      --accent-purple: #8b5cf6;
       --accent-blue: #0a84ff;
       --accent-green: #30d158;
-      --text-white: rgba(255, 255, 255, 0.95);
-      --text-dim: rgba(255, 255, 255, 0.55);
-      --text-muted: rgba(255, 255, 255, 0.30);
-      --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Inter, sans-serif;
+      --accent-red: #ff453a;
       --header-h: 42px;
       --tabs-h: 32px;
       --bottom-h: 0px;
+      --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     }
 
     @media (max-width: 768px) {
       :root {
-        --header-h: 48px;
         --tabs-h: 0px;
-        --bottom-h: 54px;
+        --bottom-h: 52px;
       }
     }
 
-    *, *::before, *::after {
+    * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -64,7 +66,7 @@
     }
 
     /* ==========================================================================
-       2. UNIFIED TOP CONTROLS (Single 42px Luxury Toolbar)
+       2. TOPBAR CHROME (Single 42px Luxury Toolbar)
        ========================================================================== */
     #staunt-chrome {
       position: fixed;
@@ -109,7 +111,7 @@
       .traffic-controls { display: none; }
     }
 
-    /* Navigation Arrows */
+    /* Navigation Cluster */
     .nav-actions {
       display: flex;
       align-items: center;
@@ -119,22 +121,22 @@
     .nav-icon-btn {
       width: 28px;
       height: 28px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 6px;
-      background: transparent;
-      border: none;
-      color: var(--text-dim);
       cursor: pointer;
-      transition: background 0.12s ease, color 0.12s ease, transform 0.1s ease;
+      transition: all 0.15s ease;
     }
     .nav-icon-btn:hover {
       background: rgba(255, 255, 255, 0.08);
       color: var(--text-white);
     }
     .nav-icon-btn:active {
-      transform: scale(0.90);
+      transform: scale(0.94);
     }
     .nav-icon-btn svg {
       width: 14px;
@@ -145,98 +147,96 @@
     /* Floating Omnibox */
     .omnibox-wrapper {
       flex: 1;
-      max-width: 660px;
+      max-width: 680px;
+      height: 28px;
       margin: 0 auto;
-      height: 29px;
       background: var(--bg-omnibox);
       border: 0.5px solid var(--border-light);
-      border-radius: 8px;
+      border-radius: 7px;
       display: flex;
       align-items: center;
-      padding: 0 9px;
+      padding: 0 10px;
       gap: 7px;
-      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .omnibox-wrapper:hover {
+      background: var(--bg-omnibox-hover);
+      border-color: rgba(255, 255, 255, 0.15);
     }
     .omnibox-wrapper:focus-within {
       background: var(--bg-omnibox-focus);
       border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px var(--accent-glow);
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.16);
     }
     .lock-chip {
+      color: var(--accent-green);
       display: flex;
       align-items: center;
-      color: var(--accent-green);
-      font-size: 11px;
+      flex-shrink: 0;
     }
     .lock-chip svg { width: 12px; height: 12px; }
     .omnibox-field {
       flex: 1;
-      background: transparent;
       border: none;
+      background: transparent;
       outline: none;
       color: var(--text-white);
-      font-family: var(--font-system);
-      font-size: 12.5px;
-      font-weight: 400;
-      letter-spacing: -0.01em;
+      font-size: 12px;
+      font-family: inherit;
+      width: 100%;
     }
     .omnibox-field::placeholder {
-      color: var(--text-dim);
+      color: var(--text-muted);
     }
 
-    /* Header Actions */
+    /* Right Controls */
     .header-right {
       display: flex;
       align-items: center;
       gap: 6px;
       flex-shrink: 0;
     }
-
-    /* Fullscreen Pill Button */
     .pill-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
+      height: 27px;
+      padding: 0 9px;
       border-radius: 6px;
       background: rgba(255, 255, 255, 0.06);
       border: 0.5px solid var(--border-light);
-      color: var(--text-white);
+      color: var(--text-dim);
       font-size: 11px;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
       cursor: pointer;
       transition: all 0.15s ease;
-      white-space: nowrap;
     }
     .pill-btn:hover {
       background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-1px);
+      color: var(--text-white);
     }
-    .pill-btn svg { width: 12px; height: 12px; stroke-width: 2.2; }
+    .pill-btn svg { width: 12px; height: 12px; }
 
-    /* Download App Glow Button */
     .btn-app-glow {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 11px;
+      height: 27px;
+      padding: 0 10px;
       border-radius: 6px;
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.28) 0%, rgba(10, 132, 255, 0.22) 100%);
-      border: 0.5px solid rgba(139, 92, 246, 0.45);
+      background: linear-gradient(135deg, #8b5cf6, #0a84ff);
+      border: none;
       color: #fff;
       font-size: 11px;
-      font-weight: 500;
-      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
       cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      transition: all 0.15s ease;
     }
     .btn-app-glow:hover {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.45) 0%, rgba(10, 132, 255, 0.4) 100%);
-      border-color: rgba(139, 92, 246, 0.7);
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-      transform: translateY(-1px);
+      filter: brightness(1.15);
+      transform: translateY(-0.5px);
+      box-shadow: 0 6px 16px rgba(139, 92, 246, 0.45);
     }
     .btn-app-glow svg { width: 12px; height: 12px; }
 
@@ -300,33 +300,27 @@
       background: var(--bg-tab);
       border: 0.5px solid transparent;
       color: var(--text-dim);
-      font-size: 11.5px;
+      font-size: 11px;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.12s ease;
-      position: relative;
+      flex-shrink: 0;
     }
     .tab-chip:hover {
-      background: var(--bg-tab-hover);
+      background: rgba(255, 255, 255, 0.08);
       color: var(--text-white);
     }
     .tab-chip.active {
       background: var(--bg-tab-active);
+      color: var(--text-white);
       border-color: rgba(255, 255, 255, 0.12);
-      color: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     }
-    .tab-ico {
-      width: 13px;
-      height: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-    }
-    .tab-name {
+    .tab-title-text {
       flex: 1;
-      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .tab-x {
       width: 14px;
@@ -335,8 +329,6 @@
       align-items: center;
       justify-content: center;
       border-radius: 50%;
-      border: none;
-      background: transparent;
       color: var(--text-muted);
       font-size: 11px;
       cursor: pointer;
@@ -396,7 +388,7 @@
     }
 
     /* ==========================================================================
-       5. ULTRA-LUXURY NEW TAB (Apple Sequoia Gradient & Shortcuts)
+       5. ULTRA-LUXURY NEW TAB LAUNCHPAD
        ========================================================================== */
     .newtab-wall {
       position: absolute;
@@ -407,9 +399,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 24px;
-      gap: 28px;
+      justify-content: flex-start;
+      padding: 30px 20px 40px;
+      gap: 20px;
       overflow-y: auto;
     }
 
@@ -418,47 +410,77 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
       text-align: center;
     }
     .live-clock {
-      font-size: 50px;
-      font-weight: 200;
-      letter-spacing: -0.03em;
-      color: rgba(255, 255, 255, 0.90);
-      line-height: 1;
+      font-size: 38px;
+      font-weight: 300;
+      letter-spacing: -1px;
+      color: rgba(255, 255, 255, 0.92);
+      font-variant-numeric: tabular-nums;
     }
     .hero-brand {
       display: flex;
       align-items: center;
       gap: 8px;
+      margin-top: 2px;
     }
     .hero-logo {
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      background: linear-gradient(135deg, #8b5cf6 0%, #0a84ff 100%);
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #8b5cf6, #0a84ff);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
     }
-    .hero-logo svg { width: 16px; height: 16px; fill: white; }
+    .hero-logo svg { width: 14px; height: 14px; fill: white; }
     .hero-title {
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      color: var(--text-white);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #fff;
     }
     .hero-desc {
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-dim);
     }
 
-    /* Centered Search Capsule */
+    /* Engine Switcher */
+    .engine-switcher {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: -6px;
+    }
+    .engine-chip {
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 500;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .engine-chip:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .engine-chip.active {
+      background: rgba(139, 92, 246, 0.25);
+      border-color: #8b5cf6;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Search Capsule */
     .search-capsule {
       width: 100%;
-      max-width: 520px;
+      max-width: 540px;
       height: 44px;
       background: rgba(255, 255, 255, 0.06);
       border: 0.5px solid rgba(255, 255, 255, 0.12);
@@ -467,111 +489,165 @@
       align-items: center;
       padding: 0 14px;
       gap: 10px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      transition: all 0.2s ease;
     }
     .search-capsule:focus-within {
-      background: rgba(255, 255, 255, 0.09);
-      border-color: var(--accent-violet);
-      box-shadow: 0 8px 30px rgba(139, 92, 246, 0.25);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--border-focus);
+      box-shadow: 0 10px 36px rgba(139, 92, 246, 0.22);
       transform: translateY(-1px);
     }
-    .search-capsule svg { width: 16px; height: 16px; color: var(--text-dim); }
+    .search-capsule svg { width: 17px; height: 17px; color: var(--text-dim); flex-shrink: 0; }
     .search-input-field {
       flex: 1;
-      background: transparent;
       border: none;
+      background: transparent;
       outline: none;
-      color: var(--text-white);
-      font-family: var(--font-system);
-      font-size: 14px;
+      color: #fff;
+      font-size: 13.5px;
+      font-family: inherit;
     }
-    .search-input-field::placeholder {
-      color: var(--text-dim);
-    }
+    .search-input-field::placeholder { color: var(--text-muted); }
 
-    /* Luxury Tiles Grid */
+    /* Speed Dial Grid */
     .speed-dial-grid {
       display: grid;
-      grid-template-columns: repeat(4, 76px);
-      gap: 16px;
+      grid-template-columns: repeat(5, 78px);
+      gap: 12px;
     }
-    @media (max-width: 480px) {
-      .speed-dial-grid {
-        grid-template-columns: repeat(3, 72px);
-        gap: 12px;
-      }
+    @media (max-width: 520px) {
+      .speed-dial-grid { grid-template-columns: repeat(4, 70px); gap: 10px; }
     }
     .speed-tile {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 7px;
-      padding: 10px 4px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 0.5px solid rgba(255, 255, 255, 0.06);
-      text-decoration: none;
+      gap: 6px;
       cursor: pointer;
-      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
-    }
-    .speed-tile:hover {
-      background: rgba(255, 255, 255, 0.09);
-      border-color: rgba(255, 255, 255, 0.14);
-      transform: translateY(-2px);
-    }
-    .speed-tile:active {
-      transform: scale(0.94);
+      text-decoration: none;
     }
     .tile-badge {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
+      width: 48px;
+      height: 48px;
+      border-radius: 13px;
+      background: var(--bg-card);
+      border: 0.5px solid var(--border-light);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 19px;
-      font-weight: 600;
+      font-weight: 700;
+      color: #fff;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+    .speed-tile:hover .tile-badge {
+      transform: translateY(-3px) scale(1.05);
+      border-color: rgba(255, 255, 255, 0.22);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     }
     .tile-label {
       font-size: 11px;
       color: var(--text-dim);
+      font-weight: 500;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 68px;
+      max-width: 74px;
+      text-align: center;
     }
 
-    /* Minimal Quick Prompt Card */
-    .quick-prompt-bar {
-      max-width: 520px;
+    /* Cross-Platform Showcase Cards */
+    .platform-cards-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      max-width: 620px;
       width: 100%;
-      background: rgba(255, 255, 255, 0.03);
-      border: 0.5px solid var(--border-light);
-      border-radius: 10px;
-      padding: 10px 14px;
+      margin-top: 6px;
+    }
+    .platform-card {
+      background: rgba(18, 20, 29, 0.7);
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(16px);
+    }
+    .platform-card:hover {
+      border-color: rgba(139, 92, 246, 0.4);
+      background: rgba(24, 26, 38, 0.85);
+      transform: translateY(-2px);
+    }
+    .plat-head {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: 10px;
+    }
+    .plat-icon { font-size: 22px; }
+    .plat-name { font-size: 13.5px; font-weight: 700; color: #fff; }
+    .plat-badge { font-size: 10.5px; color: var(--accent-purple); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .plat-desc { font-size: 11.5px; color: var(--text-dim); line-height: 1.4; margin: 0; }
+    .plat-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 7px;
+      background: linear-gradient(135deg, #8b5cf6, #0a84ff);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.15s ease;
+    }
+    .plat-btn:hover { opacity: 0.9; }
+    .plat-btn-group { display: flex; gap: 8px; align-items: center; }
+    .plat-btn-sub {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 0.5px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .plat-btn-sub:hover { background: rgba(255, 255, 255, 0.16); }
+
+    /* Quick Prompt Bar */
+    .quick-prompt-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 0.5px solid var(--border-light);
+      padding: 7px 14px;
+      border-radius: 20px;
       font-size: 11.5px;
       color: var(--text-dim);
     }
-    .quick-prompt-bar span { display: flex; align-items: center; gap: 6px; }
     .btn-fs-pill {
-      background: rgba(139, 92, 246, 0.2);
-      border: 0.5px solid rgba(139, 92, 246, 0.4);
-      color: #c4b5fd;
-      border-radius: 5px;
-      padding: 3px 8px;
+      background: #8b5cf6;
+      border: none;
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 12px;
       font-size: 10.5px;
       font-weight: 600;
       cursor: pointer;
     }
-    .btn-fs-pill:hover { background: rgba(139, 92, 246, 0.35); }
 
     /* ==========================================================================
-       6. MOBILE DOCKED BAR (Ergonomic Single-Hand Navigation <= 768px)
+       6. MOBILE DOCKED BAR (<= 768px)
        ========================================================================== */
     #docked-mobile-bar {
       display: none;
@@ -581,74 +657,58 @@
       right: 0;
       height: var(--bottom-h);
       background: var(--bg-panel);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
       border-top: 0.5px solid var(--border-light);
       align-items: center;
       justify-content: space-around;
-      padding: 0 10px;
       z-index: 10000;
+      padding: 0 8px;
     }
     @media (max-width: 768px) {
       #docked-mobile-bar { display: flex; }
     }
     .dock-btn {
-      width: 44px;
-      height: 44px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      border: none;
+      gap: 3px;
       background: transparent;
+      border: none;
       color: var(--text-dim);
-      border-radius: 8px;
+      font-size: 9.5px;
       cursor: pointer;
-      gap: 2px;
-      transition: all 0.12s ease;
     }
-    .dock-btn:active {
-      transform: scale(0.92);
-      color: var(--text-white);
-    }
-    .dock-btn svg {
-      width: 18px;
-      height: 18px;
-      stroke-width: 2.1;
-    }
-    .dock-btn span {
-      font-size: 9px;
-      font-weight: 500;
-    }
+    .dock-btn svg { width: 17px; height: 17px; stroke-width: 2.2; }
+    .dock-btn:active { color: var(--text-white); }
 
     /* ==========================================================================
-       7. DESKTOP APP MODAL
-       ======================================================================== */
+       7. CROSS-PLATFORM DOWNLOAD MODAL
+       ========================================================================== */
     #app-modal {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.78);
-      backdrop-filter: blur(14px);
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 20px;
       z-index: 20000;
+      padding: 16px;
     }
-    #app-modal.open {
-      display: flex;
-    }
+    #app-modal.open { display: flex; }
     .app-card {
       width: 100%;
-      max-width: 440px;
-      background: #11131a;
-      border: 0.5px solid rgba(255, 255, 255, 0.12);
-      border-radius: 16px;
-      padding: 26px;
+      max-width: 460px;
+      background: rgba(18, 20, 29, 0.95);
+      border: 0.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      padding: 24px;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
       position: relative;
     }
     .app-modal-close {
@@ -687,7 +747,7 @@
     .perks-list {
       display: flex;
       flex-direction: column;
-      gap: 9px;
+      gap: 8px;
     }
     .perk-item {
       display: flex;
@@ -698,28 +758,48 @@
       line-height: 1.4;
     }
     .perk-item svg { width: 15px; height: 15px; color: var(--accent-green); flex-shrink: 0; margin-top: 1px; }
+
+    /* Modal Download Grid */
+    .modal-download-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
     .btn-download-action {
       width: 100%;
-      height: 42px;
-      border-radius: 9px;
-      background: linear-gradient(135deg, #8b5cf6 0%, #0a84ff 100%);
+      min-height: 44px;
+      border-radius: 10px;
       color: #fff;
       font-weight: 600;
       font-size: 13px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
+      justify-content: flex-start;
+      padding: 0 16px;
+      gap: 12px;
       text-decoration: none;
-      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
       transition: all 0.2s ease;
       border: none;
       cursor: pointer;
     }
+    .btn-download-action.btn-win {
+      background: linear-gradient(135deg, #0078d4, #00a4ef);
+      box-shadow: 0 6px 18px rgba(0, 120, 212, 0.3);
+    }
+    .btn-download-action.btn-apk {
+      background: linear-gradient(135deg, #3ddc84, #07823f);
+      box-shadow: 0 6px 18px rgba(61, 220, 132, 0.3);
+    }
+    .btn-download-action.btn-pwa {
+      background: linear-gradient(135deg, #8b5cf6, #0a84ff);
+      box-shadow: 0 6px 18px rgba(139, 92, 246, 0.3);
+    }
     .btn-download-action:hover {
       transform: translateY(-1px);
-      box-shadow: 0 10px 28px rgba(139, 92, 246, 0.5);
+      filter: brightness(1.1);
     }
+    .dl-title { font-size: 13px; font-weight: 700; line-height: 1.2; }
+    .dl-sub { font-size: 10.5px; opacity: 0.85; font-weight: 400; }
   </style>
 </head>
 <body>
@@ -735,7 +815,7 @@
       <div class="traffic-dot dot-green" id="tl-max" title="Full Screen"></div>
     </div>
 
-    <!-- Nav Arrows -->
+    <!-- Navigation Arrows -->
     <div class="nav-actions">
       <button class="nav-icon-btn" id="btn-back" title="Back (Alt+Left)" aria-label="Back">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
@@ -779,11 +859,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </button>
 
-      <!-- Get Desktop App Button -->
-      <button class="btn-app-glow" id="btn-launch-modal" title="Download Desktop App for native 4K streaming & kernel adblocker">
+      <!-- Get Apps Button -->
+      <button class="btn-app-glow" id="btn-launch-modal" title="Download for Windows (.EXE) or Mobile (.APK)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span class="full-text">Get App</span>
-        <span class="short-text">App</span>
+        <span class="full-text">Get App (EXE / APK)</span>
+        <span class="short-text">Apps</span>
       </button>
     </div>
   </header>
@@ -795,7 +875,6 @@
        INTEGRATED SLIM TABS STRIP (Desktop >= 769px)
        ======================================================================== -->
   <nav id="tabs-rail" aria-label="Open tabs">
-    <!-- Injected dynamically via JS -->
     <button class="btn-newtab-plus" id="btn-plus-tab" title="New Tab (Ctrl+T)">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
@@ -828,6 +907,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
       <span>Full</span>
     </button>
+    <button class="dock-btn" id="mob-dl-btn" onclick="document.getElementById('app-modal').classList.add('open')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Apps</span>
+    </button>
     <button class="dock-btn" id="mob-nt">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       <span>New</span>
@@ -835,7 +918,7 @@
   </nav>
 
   <!-- ========================================================================
-       DESKTOP APP MODAL
+       CROSS-PLATFORM DOWNLOAD MODAL
        ======================================================================== -->
   <div id="app-modal" role="dialog" aria-modal="true">
     <div class="app-card">
@@ -845,30 +928,58 @@
           <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
         </div>
         <div>
-          <h2>Staunt Browser Ultra</h2>
-          <p>Windows 10 / 11 Native Chromium Engine</p>
+          <h2>Staunt Browser Apps</h2>
+          <p>Windows 10/11 (.EXE) • Mobile Android (.APK)</p>
         </div>
       </div>
 
       <div class="perks-list">
         <div class="perk-item">
           <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          <div><strong>Kernel Adblocker & Anti-Tracking:</strong> Exclusive to Desktop App — blocks 100% YouTube video ads and background trackers at native Chromium network level.</div>
+          <div><strong>Hardware Kernel Adblocker & Anti-Tracking:</strong> Exclusive to Desktop App — blocks 100% video ads and trackers at native Chromium layer.</div>
         </div>
         <div class="perk-item">
           <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          <div><strong>100% Native Web:</strong> Zero iframe boundaries, direct GPU decode, 4K 60fps streaming & full DRM support.</div>
+          <div><strong>Direct GPU 4K Decode & DRM:</strong> Zero iframe boundaries, 60fps streaming, Spotify & Netflix support.</div>
         </div>
         <div class="perk-item">
           <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-          <div><strong>Web Edition Compatibility:</strong> Runs in 100% Pass-Through mode (allows all tracking, cookies & scripts so sites work without errors).</div>
+          <div><strong>Web Edition Compatibility:</strong> Runs in 100% Pass-Through mode (allows all tracking, cookies & scripts so sites never freeze).</div>
         </div>
       </div>
 
-      <a href="/assets/Staunt-Browser-Windows-Setup.zip" download="Staunt-Browser-Windows-Setup.zip" class="btn-download-action">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Download Windows Setup (.ZIP)
-      </a>
+      <!-- Action Downloads -->
+      <div class="modal-download-grid">
+        <a href="/assets/Staunt-Browser-Setup.exe" download="Staunt-Browser-Setup.exe" class="btn-download-action btn-win">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.949-1.801"/></svg>
+          <div>
+            <div class="dl-title">Download for Windows (.EXE)</div>
+            <div class="dl-sub">Windows 10 / 11 64-bit Installer</div>
+          </div>
+        </a>
+
+        <a href="/assets/Staunt-Browser-Mobile.apk" download="Staunt-Browser-Mobile.apk" class="btn-download-action btn-apk">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4111 13.8533 8.081 12 8.081s-3.5902.3301-5.1367.8687L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
+          <div>
+            <div class="dl-title">Download for Mobile (.APK)</div>
+            <div class="dl-sub">Android 8.0+ Application Package</div>
+          </div>
+        </a>
+
+        <button class="btn-download-action btn-pwa" id="btn-install-webapk" onclick="window.triggerPwaInstall()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <div>
+            <div class="dl-title">Install to Mobile Homescreen</div>
+            <div class="dl-sub">Instant Android WebAPK Installation</div>
+          </div>
+        </button>
+      </div>
+
+      <div style="text-align: center; margin-top: 4px;">
+        <a href="/assets/Staunt-Browser-Windows-Setup.zip" download="Staunt-Browser-Windows-Setup.zip" style="color: var(--text-muted); font-size: 11px; text-decoration: underline;">
+          Or download Portable Windows ZIP (.ZIP)
+        </a>
+      </div>
     </div>
   </div>
 
@@ -882,7 +993,7 @@
       const PROXY_ENDPOINT = '/gateway?url=';
       const SEARCH_ENGINES = {
         google: 'https://www.google.com/search?q=',
-        duckduckgo: 'https://duckduckgo.com/html/?q=',
+        duckduckgo: 'https://duckduckgo.com/?q=',
         bing: 'https://www.bing.com/search?q='
       };
       let currentEngine = 'google';
@@ -891,6 +1002,7 @@
       let activeTabId = null;
       let nextTabId = 1;
       let progressTimer = null;
+      let deferredPwaPrompt = null;
 
       // DOM Elements
       const omnibox = document.getElementById('omnibox-in');
@@ -924,6 +1036,32 @@
       const btnLaunchModal = document.getElementById('btn-launch-modal');
       const modalX = document.getElementById('modal-x');
 
+      // PWA Install Prompt Capture
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPwaPrompt = e;
+        const pwaBtn = document.getElementById('btn-install-webapk');
+        if (pwaBtn) pwaBtn.style.display = 'flex';
+      });
+
+      window.triggerPwaInstall = function() {
+        if (deferredPwaPrompt) {
+          deferredPwaPrompt.prompt();
+          deferredPwaPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              console.log('[PWA] User accepted WebAPK install prompt');
+            }
+            deferredPwaPrompt = null;
+          });
+        } else {
+          // Trigger APK download fallback
+          const a = document.createElement('a');
+          a.href = '/assets/Staunt-Browser-Mobile.apk';
+          a.download = 'Staunt-Browser-Mobile.apk';
+          a.click();
+        }
+      };
+
       // ─── FULLSCREEN CONTROLS ────────────────────────────────────────────
       function toggleFullscreen() {
         if (!document.fullscreenElement) {
@@ -953,7 +1091,7 @@
         syncFsUI(!!document.fullscreenElement);
       });
 
-      // Auto fullscreen on first user interaction (click, touch, or key)
+      // Auto fullscreen on first user gesture
       function autoFsOnFirstTouch() {
         if (!document.fullscreenElement) {
           const el = document.documentElement;
@@ -1064,36 +1202,37 @@
         }
       }
 
-      function switchTab(id) {
-        const tab = tabs.find(t => t.id === id);
+      function switchTab(targetTabId) {
+        activeTabId = targetTabId;
+        const tab = tabs.find(t => t.id === targetTabId);
         if (!tab) return;
-        activeTabId = id;
 
-        document.querySelectorAll('.tab-chip').forEach(el => {
-          el.classList.toggle('active', Number(el.dataset.id) === id);
-        });
-
-        document.querySelectorAll('.tab-viewport').forEach(el => {
-          el.classList.toggle('active', Number(el.dataset.id) === id);
-        });
-
-        if (tab.isNewTab || !tab.url) {
+        // Omnibox sync
+        if (tab.isNewTab) {
           omnibox.value = '';
-          omnibox.placeholder = 'Search with Google or enter address';
+          omnibox.placeholder = 'Search with ' + currentEngine.toUpperCase() + ' or enter address';
           sslChip.style.color = 'var(--text-muted)';
         } else {
           omnibox.value = tab.url;
           sslChip.style.color = tab.url.startsWith('https') ? 'var(--accent-green)' : 'var(--text-muted)';
         }
+
+        renderTabs();
+
+        // Switch visible viewports
+        document.querySelectorAll('.tab-viewport').forEach(vp => {
+          vp.classList.toggle('active', String(vp.dataset.id) === String(targetTabId));
+        });
       }
 
-      function closeTab(id, e) {
-        if (e) e.stopPropagation();
-        const idx = tabs.findIndex(t => t.id === id);
+      function closeTab(targetTabId, event) {
+        if (event) event.stopPropagation();
+        const idx = tabs.findIndex(t => t.id === targetTabId);
         if (idx === -1) return;
 
-        const viewEl = document.getElementById('tab-view-' + id);
-        if (viewEl) viewEl.remove();
+        // Remove DOM viewport
+        const vp = document.getElementById('tab-view-' + targetTabId);
+        if (vp) vp.remove();
 
         tabs.splice(idx, 1);
 
@@ -1102,27 +1241,28 @@
           return;
         }
 
-        if (activeTabId === id) {
-          const newActive = tabs[Math.max(0, idx - 1)];
-          switchTab(newActive.id);
+        if (activeTabId === targetTabId) {
+          const newIdx = Math.min(idx, tabs.length - 1);
+          switchTab(tabs[newIdx].id);
+        } else {
+          renderTabs();
         }
-
-        renderTabs();
       }
 
       function renderTabs() {
-        const plusBtn = btnPlusTab;
+        // Clear all except the plus button
+        const plusBtn = document.getElementById('btn-plus-tab');
         tabsRail.innerHTML = '';
+
         tabs.forEach(tab => {
           const tabChip = document.createElement('div');
           tabChip.className = 'tab-chip' + (tab.id === activeTabId ? ' active' : '');
           tabChip.dataset.id = tab.id;
 
-          const ico = tab.isNewTab ? '✨' : '🌐';
           tabChip.innerHTML = `
-            <span class="tab-ico">${ico}</span>
-            <span class="tab-name">${escapeHtml(tab.title)}</span>
-            <button class="tab-x" title="Close">×</button>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span class="tab-title-text">${escapeHtml(tab.title)}</span>
+            <span class="tab-x" title="Close">✕</span>
           `;
 
           tabChip.addEventListener('click', () => switchTab(tab.id));
@@ -1148,12 +1288,19 @@
                 </div>
                 <h1 class="hero-title">Staunt Web</h1>
               </div>
-              <p class="hero-desc">High-speed sovereign cloud browser engine</p>
+              <p class="hero-desc">High-speed sovereign cloud browser engine • 100% Native Web</p>
+            </div>
+
+            <!-- Engine Switcher -->
+            <div class="engine-switcher">
+              <span class="engine-chip active" data-engine="google">Google</span>
+              <span class="engine-chip" data-engine="duckduckgo">DuckDuckGo</span>
+              <span class="engine-chip" data-engine="bing">Bing</span>
             </div>
 
             <div class="search-capsule">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="text" class="search-input-field" placeholder="Search Google or enter address (e.g. youtube.com)…" />
+              <input type="text" class="search-input-field" placeholder="Search web or enter address (e.g. youtube.com)…" />
             </div>
 
             <div class="speed-dial-grid">
@@ -1199,8 +1346,38 @@
               </div>
             </div>
 
+            <!-- Cross-Platform Download Showcase -->
+            <div class="platform-cards-row">
+              <div class="platform-card">
+                <div class="plat-head">
+                  <span class="plat-icon">🪟</span>
+                  <div>
+                    <div class="plat-name">Staunt for Windows</div>
+                    <div class="plat-badge">Desktop (.EXE)</div>
+                  </div>
+                </div>
+                <p class="plat-desc">Native Chromium 130 • Hardware 4K & GPU • Kernel Adblocker & Zero Trackers</p>
+                <a href="/assets/Staunt-Browser-Setup.exe" download="Staunt-Browser-Setup.exe" class="plat-btn">Download Windows .EXE</a>
+              </div>
+
+              <div class="platform-card">
+                <div class="plat-head">
+                  <span class="plat-icon">📱</span>
+                  <div>
+                    <div class="plat-name">Staunt for Mobile</div>
+                    <div class="plat-badge">Android (.APK)</div>
+                  </div>
+                </div>
+                <p class="plat-desc">Gesture Navigation • Zero Ads • Instant WebAPK Install & Offline Sync</p>
+                <div class="plat-btn-group">
+                  <a href="/assets/Staunt-Browser-Mobile.apk" download="Staunt-Browser-Mobile.apk" class="plat-btn">Download .APK</a>
+                  <button class="plat-btn-sub" onclick="window.triggerPwaInstall()">Install to Phone</button>
+                </div>
+              </div>
+            </div>
+
             <div class="quick-prompt-bar">
-              <span>⚡ <strong>App Experience:</strong> Press F11 or tap Full Screen for native view</span>
+              <span>⚡ <strong>App Experience:</strong> Press F11 or tap Full Screen for edge-to-edge view</span>
               <button class="btn-fs-pill" onclick="window.stauntFsToggle()">Full Screen</button>
             </div>
           </div>
@@ -1221,6 +1398,16 @@
           card.addEventListener('click', () => {
             const u = card.dataset.url;
             if (u) navigateTo(u, tab.id);
+          });
+        });
+
+        // Bind Engine Switcher Chips
+        viewEl.querySelectorAll('.engine-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            viewEl.querySelectorAll('.engine-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentEngine = chip.dataset.engine;
+            omnibox.placeholder = 'Search with ' + currentEngine.toUpperCase() + ' or enter address';
           });
         });
 
@@ -1291,7 +1478,7 @@
 
         if (targetTabId === activeTabId) {
           omnibox.value = '';
-          omnibox.placeholder = 'Search with Google or enter address';
+          omnibox.placeholder = 'Search with ' + currentEngine.toUpperCase() + ' or enter address';
           sslChip.style.color = 'var(--text-muted)';
         }
 

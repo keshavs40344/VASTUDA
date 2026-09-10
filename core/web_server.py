@@ -1818,10 +1818,32 @@ def serve_tools_directory():
         return send_from_directory(FRONTEND_DIR, "tools.html")
     return send_from_directory(FRONTEND_DIR, "user_dashboard.html")
 
+@app.route("/manifest.json")
+def serve_manifest():
+    """Serves the Web App Manifest for Android PWA / WebAPK installation."""
+    return send_from_directory(FRONTEND_DIR, "manifest.json", mimetype="application/manifest+json")
+
+@app.route("/assets/<path:asset_path>")
+def serve_global_assets(asset_path):
+    """Serves global downloadable application packages (.exe, .apk, .zip) and static assets."""
+    assets_dir = os.path.join(FRONTEND_DIR, "assets")
+    ext = os.path.splitext(asset_path)[1].lower()
+    mimetype = None
+    if ext == ".exe":
+        mimetype = "application/vnd.microsoft.portable-executable"
+    elif ext == ".apk":
+        mimetype = "application/vnd.android.package-archive"
+    elif ext == ".zip":
+        mimetype = "application/zip"
+    resp = send_from_directory(assets_dir, asset_path, mimetype=mimetype)
+    if ext in (".exe", ".apk", ".zip"):
+        resp.headers["Content-Disposition"] = f'attachment; filename="{os.path.basename(asset_path)}"'
+    return resp
+
 @app.route("/tools/assets/<path:asset_path>")
 def serve_tools_nested_assets(asset_path):
     """Ensures static assets resolve cleanly when loaded from /tools/<tool-id> URLs."""
-    return send_from_directory(os.path.join(FRONTEND_DIR, "assets"), asset_path)
+    return serve_global_assets(asset_path)
 
 @app.route("/tools/config.js")
 def serve_tools_config():
