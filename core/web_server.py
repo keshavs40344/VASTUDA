@@ -2075,6 +2075,7 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
         cleaned = re.sub(rb'<base\b[^>]*>', b'', raw_html_bytes, flags=re.IGNORECASE)
 
         # Inject interceptor and target base tag so all relative assets (images, CSS, JS) resolve accurately
+        interceptor_bytes = interceptor_code.encode("utf-8")
         target_origin = f"{target_scheme}://{target_host}"
         base_tag_bytes = f'<base href="{target_origin}/">'.encode("utf-8")
         payload_bytes = interceptor_bytes + base_tag_bytes
