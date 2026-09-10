@@ -1987,6 +1987,22 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
   document.addEventListener('click', function(e) {{
     var a = e.target && e.target.closest ? e.target.closest('a') : null;
     if (a && a.href && !a.href.startsWith('javascript:') && !a.href.startsWith('#')) {{
+      // YouTube Video Watch Click Handler: Route directly to Google's embed player to avoid datacenter 429 and playback freezes
+      try {{
+        var parsedUrl = new URL(a.href, window.location.href);
+        if (parsedUrl.pathname === '/watch' && parsedUrl.searchParams.get('v')) {{
+          var vId = parsedUrl.searchParams.get('v');
+          e.preventDefault();
+          var embedTarget = 'https://www.youtube.com/embed/' + vId + '?autoplay=1&rel=0';
+          if (_realParent) {{
+            _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: embedTarget, rawUrl: a.href }}, '*');
+          }} else {{
+            window.location.href = embedTarget;
+          }}
+          return;
+        }}
+      }} catch(err) {{}}
+
       // 1. If link is already on the current domain (e.g. proxy domain), let it navigate natively!
       if (a.hostname === window.location.hostname) {{
         return;

@@ -1023,7 +1023,12 @@
             renderTabs();
           }
         } else if (event.data.type === 'STAUNT_NAVIGATE') {
-          if (event.data.url) navigateTo(event.data.url);
+          if (event.data.url) {
+            navigateTo(event.data.url);
+            if (event.data.rawUrl && document.activeElement !== omnibox) {
+              omnibox.value = event.data.rawUrl;
+            }
+          }
         }
       });
 
