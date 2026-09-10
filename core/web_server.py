@@ -1921,10 +1921,88 @@ def handle_gateway_proxy():
                 from bs4 import BeautifulSoup
                 soup = BeautifulSoup(upstream.content, "html.parser")
 
-                # Inject <base href="..."> if not present
+                # ── Fetch / XHR Interceptor (must be FIRST in <head>) ─────────────────
+                # Rewrites all absolute youtube.com calls to relative paths so the
+                # parent browser (Edge/Chrome) never sees cross-origin Google requests.
+                # Without this, Edge's tracker-prevention blocks YouTube's background
+                # API calls (e.g. /youtubei/v1/browse) as "Google (6) trackers".
+                interceptor = soup.new_tag("script")
+                interceptor.string = """
+(function() {
+  'use strict';
+  var UPSTREAM_ORIGINS = [
+    'https://www.youtube.com',
+    'https://youtube.com',
+    'https://m.youtube.com',
+    'http://www.youtube.com',
+    'http://youtube.com'
+  ];
+
+  function rewriteUrl(url) {
+    if (!url || typeof url !== 'string') return url;
+    for (var i = 0; i < UPSTREAM_ORIGINS.length; i++) {
+      if (url.indexOf(UPSTREAM_ORIGINS[i]) === 0) {
+        return url.slice(UPSTREAM_ORIGINS[i].length) || '/';
+      }
+    }
+    return url;
+  }
+
+  /* ── Override fetch() ─────────────────────────────────────────── */
+  var _origFetch = window.fetch;
+  window.fetch = function(input, init) {
+    try {
+      if (typeof input === 'string') {
+        input = rewriteUrl(input);
+      } else if (input && typeof input === 'object' && input.url) {
+        var newUrl = rewriteUrl(input.url);
+        if (newUrl !== input.url) input = new Request(newUrl, input);
+      }
+    } catch(e) {}
+    return _origFetch.call(this, input, init);
+  };
+
+  /* ── Override XMLHttpRequest.open() ──────────────────────────── */
+  var _origOpen = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function(method, url) {
+    try { url = rewriteUrl(url); } catch(e) {}
+    var args = Array.prototype.slice.call(arguments);
+    args[1] = url;
+    return _origOpen.apply(this, args);
+  };
+
+  /* ── Override navigator.sendBeacon() ─────────────────────────── */
+  if (navigator.sendBeacon) {
+    var _origBeacon = navigator.sendBeacon.bind(navigator);
+    navigator.sendBeacon = function(url, data) {
+      try { url = rewriteUrl(url); } catch(e) {}
+      return _origBeacon(url, data);
+    };
+  }
+
+  /* ── Rewrite any <script src> or <link href> set dynamically ─── */
+  var _origSetAttribute = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value) {
+    if ((name === 'src' || name === 'href' || name === 'action') && typeof value === 'string') {
+      value = rewriteUrl(value);
+    }
+    return _origSetAttribute.call(this, name, value);
+  };
+
+  console.log('[Staunt Proxy] Fetch/XHR interceptor active for ' + UPSTREAM_ORIGINS[0]);
+})();
+"""
+                # Insert as absolute first element of <head> — before any YouTube JS
+                if soup.head:
+                    soup.head.insert(0, interceptor)
+                else:
+                    # Fallback: prepend to document
+                    soup.insert(0, interceptor)
+
+                # Inject <base href> after the interceptor
                 if not soup.find("base") and soup.head:
                     base_tag = soup.new_tag("base", href=target_url)
-                    soup.head.insert(0, base_tag)
+                    soup.head.insert(1, base_tag)
 
                 # Inject in-page navigation interceptor
                 nav_script = soup.new_tag("script")
