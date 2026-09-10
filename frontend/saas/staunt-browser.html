@@ -753,6 +753,312 @@
       color: var(--text-muted);
       font-size: 16px;
     }
+
+    /* ─── NATIVE VIDEO & YT DOWNLOADER MODAL / MOBILE SHEET ─── */
+    .yt-downloader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 35000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      transition: opacity 0.2s ease;
+    }
+    .yt-downloader-overlay.open {
+      display: flex;
+    }
+    .yt-modal-card {
+      background: #0f121d;
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+    }
+    .yt-modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(18, 22, 36, 0.96);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .yt-modal-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .yt-modal-title .yt-logo-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .yt-modal-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .yt-search-box {
+      display: flex;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 6px 8px;
+      transition: border-color 0.2s;
+    }
+    .yt-search-box:focus-within {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+    }
+    .yt-search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 13px;
+      padding: 6px 8px;
+    }
+    .yt-btn-fetch {
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      border: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 0 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.15s;
+    }
+    .yt-btn-fetch:active { transform: scale(0.97); }
+    .yt-btn-paste {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 0 10px;
+      cursor: pointer;
+    }
+    .yt-btn-paste:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .yt-quick-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .yt-chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 4px 10px;
+      cursor: pointer;
+      color: #cbd5e1;
+      transition: all 0.15s;
+    }
+    .yt-chip:hover {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.4);
+      color: #fff;
+    }
+    .yt-result-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .yt-media-info {
+      display: flex;
+      gap: 14px;
+    }
+    .yt-thumb-wrap {
+      width: 140px;
+      height: 82px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .yt-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .yt-thumb-dur {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .yt-meta-col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .yt-meta-title {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .yt-meta-sub {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .yt-tabs-nav {
+      display: flex;
+      gap: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+    }
+    .yt-tab-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .yt-tab-btn.active {
+      background: rgba(139, 92, 246, 0.2);
+      color: #c4b5fd;
+    }
+    .yt-format-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .yt-format-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      transition: background 0.15s;
+    }
+    .yt-format-row:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .yt-fmt-tag {
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      background: rgba(139, 92, 246, 0.15);
+      color: #c4b5fd;
+    }
+    .yt-fmt-tag.audio {
+      background: rgba(16, 185, 129, 0.15);
+      color: #6ee7b7;
+    }
+    .yt-btn-dl {
+      background: #8b5cf6;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+    }
+    .yt-btn-dl:hover { background: #7c3aed; }
+    .yt-btn-dl.audio { background: #10b981; }
+    .yt-btn-dl.audio:hover { background: #059669; }
+
+    .btn-header-yt {
+      background: rgba(239, 68, 68, 0.14) !important;
+      color: #f87171 !important;
+      border: 0.5px solid rgba(239, 68, 68, 0.3) !important;
+      font-weight: 600 !important;
+    }
+    .btn-header-yt:hover {
+      background: rgba(239, 68, 68, 0.25) !important;
+      color: #fff !important;
+    }
+
+    @media (max-width: 768px) {
+      .yt-downloader-overlay {
+        align-items: flex-end !important;
+        padding: 0 !important;
+      }
+      .yt-modal-card {
+        max-height: 86vh !important;
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+      }
+      .yt-thumb-wrap {
+        width: 105px !important;
+        height: 62px !important;
+      }
+      .mobile-bottom-bar {
+        height: 56px !important;
+        padding-bottom: env(safe-area-inset-bottom, 6px);
+      }
+      .m-nav-btn {
+        width: 48px !important;
+        height: 48px !important;
+      }
+      .m-nav-btn.active-tool {
+        background: rgba(239, 68, 68, 0.2) !important;
+        color: #ef4444 !important;
+      }
+    }
+    
   </style>
 </head>
 <body>
@@ -787,6 +1093,11 @@
 
     <!-- Desktop Header Actions -->
     <div class="header-actions desktop-only">
+      <button class="action-btn btn-header-yt" id="btn-open-yt-downloader" title="Video & Audio Downloader">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+        YT Downloader
+      </button>
+
       <button class="action-btn" id="btn-toggle-immersive" title="Toggle Auto-Hide Toolbar (F11)">
         ▲ Immersive
       </button>
@@ -821,6 +1132,9 @@
     <button class="m-nav-btn" id="m-nav-forward" title="Forward">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
     </button>
+    <button class="m-nav-btn" id="m-nav-ytdl" title="Video Downloader" style="color: #f87171;">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+    </button>
     <button class="m-nav-btn" id="m-nav-home" title="Home">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     </button>
@@ -844,6 +1158,69 @@
       <button class="drawer-new-tab-btn" id="drawer-btn-new-tab">
         + New Tab
       </button>
+    </div>
+  </div>
+
+  <!-- YT Video Downloader Modal / Mobile Drawer -->
+  <div class="yt-downloader-overlay" id="yt-downloader-modal">
+    <div class="yt-modal-card">
+      <div class="yt-modal-header">
+        <div class="yt-modal-title">
+          <div class="yt-logo-icon">▶</div>
+          <div>
+            <div>VASTUDA Video &amp; Audio Downloader</div>
+            <div style="font-size: 11px; font-weight: normal; color: var(--text-dim);">YouTube, Shorts, Reels &amp; TikTok • 4K/1080p/MP3</div>
+          </div>
+        </div>
+        <span class="modal-close" id="yt-modal-close-btn" style="cursor: pointer; padding: 4px 8px; font-size: 18px;">✕</span>
+      </div>
+
+      <div class="yt-modal-body">
+        <!-- Input row -->
+        <div class="yt-search-box">
+          <input type="text" class="yt-search-input" id="yt-url-input" placeholder="Paste YouTube, Shorts, Reel or video URL here..." autocomplete="off" />
+          <button class="yt-btn-paste" id="yt-btn-paste">Paste</button>
+          <button class="yt-btn-fetch" id="yt-btn-fetch">Fetch</button>
+        </div>
+
+        <div class="yt-quick-actions">
+          <span>Quick Samples:</span>
+          <span class="yt-chip" onclick="window.loadYtSample('https://www.youtube.com/watch?v=aqz-KE-bpKQ')">🎵 Rick Astley</span>
+          <span class="yt-chip" onclick="window.loadYtSample('https://www.youtube.com/shorts/aqz-KE-bpKQ')">📱 YouTube Shorts</span>
+          <button class="yt-chip" id="yt-btn-use-current" style="border-color: rgba(139,92,246,0.4); color: #a78bfa;">🔗 Use Current Tab</button>
+        </div>
+
+        <!-- Skeleton Loading -->
+        <div id="yt-loading" style="display: none; padding: 30px; text-align: center; color: #a78bfa;">
+          <div style="width: 32px; height: 32px; border: 3px solid #8b5cf6; border-top-color: transparent; border-radius: 50%; margin: 0 auto 12px; animation: spin 0.8s linear infinite;"></div>
+          <p style="font-size: 13px; font-weight: 600;">Analyzing Video &amp; Extracting HD Formats...</p>
+        </div>
+
+        <!-- Error Msg -->
+        <div id="yt-error" style="display: none; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); padding: 12px; border-radius: 10px; font-size: 12px; color: #fca5a5;"></div>
+
+        <!-- Result Card -->
+        <div id="yt-result" class="yt-result-card" style="display: none;">
+          <div class="yt-media-info">
+            <div class="yt-thumb-wrap">
+              <img id="yt-thumb-img" src="" alt="Thumbnail" />
+              <div class="yt-thumb-dur" id="yt-dur">--:--</div>
+            </div>
+            <div class="yt-meta-col">
+              <div class="yt-meta-title" id="yt-title">Video Title</div>
+              <div class="yt-meta-sub" id="yt-uploader">Creator • Views</div>
+            </div>
+          </div>
+
+          <div class="yt-tabs-nav">
+            <button class="yt-tab-btn active" id="yt-tab-video-btn" onclick="window.switchYtTab('video')">📹 Video (MP4)</button>
+            <button class="yt-tab-btn" id="yt-tab-audio-btn" onclick="window.switchYtTab('audio')">🎵 Audio (MP3)</button>
+          </div>
+
+          <div id="yt-video-list" class="yt-format-list"></div>
+          <div id="yt-audio-list" class="yt-format-list" style="display: none;"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1129,6 +1506,10 @@
               <div class="speed-tile" data-url="https://www.google.com">
                 <div class="tile-icon" style="background: rgba(66,133,244,0.18); color: #4285f4;">G</div>
                 <div class="tile-label">Google</div>
+              </div>
+              <div class="speed-tile" id="speed-tile-ytdl">
+                <div class="tile-icon" style="background: rgba(239,68,68,0.2); color: #ef4444;">⬇</div>
+                <div class="tile-label">Downloader</div>
               </div>
               <div class="speed-tile" data-url="https://www.youtube.com">
                 <div class="tile-icon" style="background: rgba(255,0,0,0.18); color: #ff453a;">▶</div>
@@ -1476,6 +1857,186 @@
       downloadModal.addEventListener('click', (e) => {
         if (e.target === downloadModal) downloadModal.classList.remove('open');
       });
+
+
+      // ─── YOUTUBE & VIDEO DOWNLOADER CONTROLLER ───
+      const ytModal = document.getElementById('yt-downloader-modal');
+      const ytCloseBtn = document.getElementById('yt-modal-close-btn');
+      const ytUrlInput = document.getElementById('yt-url-input');
+      const ytBtnFetch = document.getElementById('yt-btn-fetch');
+      const ytBtnPaste = document.getElementById('yt-btn-paste');
+      const ytLoading = document.getElementById('yt-loading');
+      const ytError = document.getElementById('yt-error');
+      const ytResult = document.getElementById('yt-result');
+      const ytBtnUseCurrent = document.getElementById('yt-btn-use-current');
+
+      function openYtDownloader(prefillUrl = '') {
+        if (prefillUrl) {
+          ytUrlInput.value = prefillUrl;
+        } else {
+          const tab = tabs.find(t => t.id === activeTabId);
+          if (tab && tab.url && (tab.url.includes('youtube.com') || tab.url.includes('youtu.be') || tab.url.includes('instagram.com') || tab.url.includes('tiktok.com'))) {
+            ytUrlInput.value = tab.url;
+          }
+        }
+        ytModal.classList.add('open');
+        if (ytUrlInput.value.trim()) {
+          fetchYtMedia(ytUrlInput.value.trim());
+        }
+      }
+
+      function closeYtDownloader() {
+        ytModal.classList.remove('open');
+      }
+
+      if (ytCloseBtn) ytCloseBtn.addEventListener('click', closeYtDownloader);
+      ytModal.addEventListener('click', (e) => {
+        if (e.target === ytModal) closeYtDownloader();
+      });
+
+      const btnOpenYtDesktop = document.getElementById('btn-open-yt-downloader');
+      if (btnOpenYtDesktop) btnOpenYtDesktop.addEventListener('click', () => openYtDownloader());
+
+      const btnOpenYtMobile = document.getElementById('m-nav-ytdl');
+      if (btnOpenYtMobile) btnOpenYtMobile.addEventListener('click', () => openYtDownloader());
+
+      document.addEventListener('click', (e) => {
+        const tile = e.target.closest('#speed-tile-ytdl');
+        if (tile) openYtDownloader();
+      });
+
+      if (ytBtnPaste) {
+        ytBtnPaste.addEventListener('click', async () => {
+          try {
+            const text = await navigator.clipboard.readText();
+            if (text) {
+              ytUrlInput.value = text.trim();
+              fetchYtMedia(text.trim());
+            }
+          } catch(err) {
+            ytUrlInput.focus();
+          }
+        });
+      }
+
+      if (ytBtnUseCurrent) {
+        ytBtnUseCurrent.addEventListener('click', () => {
+          const tab = tabs.find(t => t.id === activeTabId);
+          if (tab && tab.url) {
+            ytUrlInput.value = tab.url;
+            fetchYtMedia(tab.url);
+          } else {
+            alert('Current tab does not have an active webpage URL.');
+          }
+        });
+      }
+
+      if (ytBtnFetch) {
+        ytBtnFetch.addEventListener('click', () => {
+          const url = ytUrlInput.value.trim();
+          if (url) fetchYtMedia(url);
+        });
+      }
+
+      ytUrlInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const url = ytUrlInput.value.trim();
+          if (url) fetchYtMedia(url);
+        }
+      });
+
+      window.loadYtSample = function(url) {
+        ytUrlInput.value = url;
+        fetchYtMedia(url);
+      };
+
+      window.switchYtTab = function(type) {
+        const vList = document.getElementById('yt-video-list');
+        const aList = document.getElementById('yt-audio-list');
+        const vBtn = document.getElementById('yt-tab-video-btn');
+        const aBtn = document.getElementById('yt-tab-audio-btn');
+        if (type === 'video') {
+          vList.style.display = 'flex';
+          aList.style.display = 'none';
+          vBtn.classList.add('active');
+          aBtn.classList.remove('active');
+        } else {
+          vList.style.display = 'none';
+          aList.style.display = 'flex';
+          vBtn.classList.remove('active');
+          aBtn.classList.add('active');
+        }
+      };
+
+      async function fetchYtMedia(url) {
+        ytLoading.style.display = 'block';
+        ytError.style.display = 'none';
+        ytResult.style.display = 'none';
+
+        try {
+          const resp = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: url })
+          });
+          const data = await resp.json();
+          ytLoading.style.display = 'none';
+
+          if (!resp.ok) {
+            throw new Error(data.error || 'Failed to analyze video. Check URL and try again.');
+          }
+
+          renderYtDetails(url, data);
+        } catch(err) {
+          ytLoading.style.display = 'none';
+          ytError.style.display = 'block';
+          ytError.textContent = err.message || 'Error communicating with downloader server.';
+        }
+      }
+
+      function renderYtDetails(originalUrl, data) {
+        document.getElementById('yt-thumb-img').src = data.thumbnail || '';
+        document.getElementById('yt-dur').textContent = data.duration_string || '--:--';
+        document.getElementById('yt-title').textContent = data.title || 'Video Title';
+        document.getElementById('yt-uploader').textContent = (data.uploader || 'Creator') + ' • ' + (Number(data.views || 0).toLocaleString()) + ' views';
+
+        const vList = document.getElementById('yt-video-list');
+        const aList = document.getElementById('yt-audio-list');
+        vList.innerHTML = '';
+        aList.innerHTML = '';
+
+        (data.video_formats || []).forEach(f => {
+          const row = document.createElement('div');
+          row.className = 'yt-format-row';
+          row.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="yt-fmt-tag">${f.resolution}</span>
+              <span style="font-size: 11.5px; color: #94a3b8;">${f.filesize_approx || 'HD'}</span>
+            </div>
+            <a class="yt-btn-dl" href="/api/download/video?url=${encodeURIComponent(originalUrl)}&resolution=${encodeURIComponent(f.resolution)}&height=${f.height || ''}&format_id=${f.format_id || ''}" target="_blank">
+              ⬇ Download MP4
+            </a>
+          `;
+          vList.appendChild(row);
+        });
+
+        (data.audio_formats || []).forEach(a => {
+          const row = document.createElement('div');
+          row.className = 'yt-format-row';
+          row.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="yt-fmt-tag audio">MP3 ${a.quality}</span>
+              <span style="font-size: 11.5px; color: #94a3b8;">${a.approx_size || ''}</span>
+            </div>
+            <a class="yt-btn-dl audio" href="/api/download/video?url=${encodeURIComponent(originalUrl)}&is_audio=1&audio_bitrate=${encodeURIComponent(a.bitrate)}&audio_format=mp3" target="_blank">
+              🎵 Download MP3
+            </a>
+          `;
+          aList.appendChild(row);
+        });
+
+        ytResult.style.display = 'flex';
+      }
 
       // Initialize initial tab
       createTab();
