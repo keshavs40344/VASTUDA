@@ -20,7 +20,9 @@ import requests
 import re
 import urllib.parse
 from functools import wraps
-from flask import Flask, jsonify, request, send_from_directory, g
+from flask import Flask, jsonify, request, send_from_directory, g, stream_with_context, Response
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from flask_cors import CORS
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -2046,6 +2048,22 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
     syncUrlToParent();
     return r;
   }};
+  window.addEventListener('keydown', function(e) {{
+    var cmdOrCtrl = e.metaKey || e.ctrlKey;
+    var k = (e.key || '').toLowerCase();
+    if ((cmdOrCtrl && (k === 't' || k === 'w' || k === 'r' || k === 'l')) || e.key === 'F11' || e.key === 'F5' || (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || k === 'd'))) {{
+      if (_realParent) {{
+        _realParent.postMessage({{
+          type: 'STAUNT_SHORTCUT',
+          key: e.key,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey
+        }}, '*');
+      }}
+    }}
+  }}, true);
   window.addEventListener('popstate', syncUrlToParent);
   window.addEventListener('load', syncUrlToParent);
   setInterval(syncUrlToParent, 1200);
@@ -2069,6 +2087,18 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
         logger.warning(f"[GATEWAY HTML TRANSFORM WARNING] {transform_err}")
         return raw_html_bytes
 
+
+# ─── ULTRA-FAST PERSISTENT CONNECTION POOL FOR PROXY GATEWAY ─────────────────
+# Reuses keep-alive TCP/TLS connections to upstream targets (YouTube, Google, CDNs)
+# Eliminates 100-300ms TLS handshakes per resource request
+GATEWAY_SESSION = requests.Session()
+_pool_adapter = HTTPAdapter(
+    pool_connections=100,
+    pool_maxsize=100,
+    max_retries=Retry(total=2, backoff_factor=0.1, status_forcelist=[502, 503, 504])
+)
+GATEWAY_SESSION.mount("https://", _pool_adapter)
+GATEWAY_SESSION.mount("http://", _pool_adapter)
 
 ACTIVE_UPSTREAM_ORIGIN = None  # Set dynamically when user navigates via /gateway
 @app.route("/gateway", methods=["GET", "POST", "HEAD", "OPTIONS"])
@@ -2150,14 +2180,15 @@ def handle_gateway_proxy():
 
     try:
         data_payload = request.get_data() if request.method in ("POST", "PUT", "PATCH") else None
-        upstream = requests.request(
+        upstream = GATEWAY_SESSION.request(
             method=request.method,
             url=target_url,
             headers=req_headers,
             data=data_payload,
             timeout=15,
             allow_redirects=True,
-            verify=False
+            verify=False,
+            stream=True
         )
 
         # After potential redirects, resolve actual final landing origin
@@ -2166,17 +2197,22 @@ def handle_gateway_proxy():
         ACTIVE_UPSTREAM_ORIGIN = target_origin
 
         content_type = upstream.headers.get("Content-Type", "").lower()
-        response_data = upstream.content
 
-        # For HTML responses, rewrite relative paths and inject client message bridge
+        # For HTML responses, buffer & rewrite relative paths and inject client message bridge
         if "text/html" in content_type:
             response_data = transform_proxied_html(upstream.content, parsed_final)
-
-        resp = app.response_class(
-            response=response_data,
-            status=upstream.status_code,
-            mimetype=content_type.split(";")[0] if content_type else "text/html"
-        )
+            resp = app.response_class(
+                response=response_data,
+                status=upstream.status_code,
+                mimetype=content_type.split(";")[0] if content_type else "text/html"
+            )
+        else:
+            # Zero-buffering chunked streaming for media, video, audio, and large bundles
+            resp = Response(
+                stream_with_context(upstream.iter_content(chunk_size=32768)),
+                status=upstream.status_code,
+                mimetype=content_type.split(";")[0] if content_type else "application/octet-stream"
+            )
 
         # Forward safe response headers while stripping all frame-blocking policies
         EXCLUDED_HEADERS = {
@@ -2346,7 +2382,7 @@ def serve_static(path):
                 fwd_headers["Cookie"] = request.headers["Cookie"]
 
             body_data = request.get_data() if request.method in ("POST", "PUT", "PATCH") else None
-            upstream_resp = requests.request(
+            upstream_resp = GATEWAY_SESSION.request(
                 method=request.method,
                 url=upstream_url,
                 headers=fwd_headers,
@@ -2354,18 +2390,22 @@ def serve_static(path):
                 timeout=15,
                 allow_redirects=True,
                 verify=False,
+                stream=True
             )
             c_type = upstream_resp.headers.get("Content-Type", "").lower()
             if "text/html" in c_type:
                 resp_payload = transform_proxied_html(upstream_resp.content, parsed_up)
+                resp = app.response_class(
+                    response=resp_payload,
+                    status=upstream_resp.status_code,
+                    mimetype=c_type.split(";")[0].strip() if c_type else "text/html",
+                )
             else:
-                resp_payload = upstream_resp.content
-
-            resp = app.response_class(
-                response=resp_payload,
-                status=upstream_resp.status_code,
-                mimetype=c_type.split(";")[0].strip() if c_type else "application/octet-stream",
-            )
+                resp = Response(
+                    stream_with_context(upstream_resp.iter_content(chunk_size=32768)),
+                    status=upstream_resp.status_code,
+                    mimetype=c_type.split(";")[0].strip() if c_type else "application/octet-stream",
+                )
             _EXCLUDED = {
                 "x-frame-options", "content-security-policy",
                 "content-security-policy-report-only", "frame-options",

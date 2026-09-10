@@ -259,9 +259,9 @@
     }
 
     .tab-pill {
-      height: 22px;
-      min-width: 100px;
-      max-width: 180px;
+      height: 24px;
+      min-width: 110px;
+      max-width: 200px;
       background: rgba(255, 255, 255, 0.04);
       border: 0.5px solid transparent;
       border-radius: 6px;
@@ -272,7 +272,16 @@
       font-size: 11px;
       color: var(--text-dim);
       cursor: pointer;
+      user-select: none;
       transition: all 0.15s ease;
+    }
+
+    .tab-favicon {
+      width: 13px;
+      height: 13px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      object-fit: contain;
     }
 
     .tab-pill:hover {
@@ -801,15 +810,35 @@
         }
       }
 
+      function getFaviconUrl(url) {
+        if (!url) return '';
+        try {
+          const u = new URL(url);
+          return 'https://www.google.com/s2/favicons?domain=' + u.hostname + '&sz=32';
+        } catch(e) {
+          return '';
+        }
+      }
+
       function renderTabs() {
         tabsRail.innerHTML = '';
         tabs.forEach(tab => {
           const pill = document.createElement('div');
           pill.className = 'tab-pill' + (tab.id === activeTabId ? ' active' : '');
           pill.dataset.id = tab.id;
+          
+          let iconHtml = '';
+          const fav = getFaviconUrl(tab.url);
+          if (fav && !tab.isNewTab) {
+            iconHtml = `<img class="tab-favicon" src="${fav}" alt="" onerror="this.style.display='none'" />`;
+          } else {
+            iconHtml = `<svg class="tab-favicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>`;
+          }
+
           pill.innerHTML = `
+            ${iconHtml}
             <span class="tab-title-span">${escapeHtml(tab.title)}</span>
-            <span class="tab-close-x" title="Close">✕</span>
+            <span class="tab-close-x" title="Close (Ctrl+W)">✕</span>
           `;
           pill.addEventListener('click', () => switchTab(tab.id));
           pill.querySelector('.tab-close-x').addEventListener('click', (e) => closeTab(tab.id, e));
@@ -995,9 +1024,14 @@
         }
       });
 
-      // ─── REAL-TIME POSTMESSAGE URL & NAVIGATION SYNC ───
+      // ─── REAL-TIME POSTMESSAGE URL, NAVIGATION & SHORTCUT SYNC ───
       window.addEventListener('message', (event) => {
         if (!event.data) return;
+
+        if (event.data.type === 'STAUNT_SHORTCUT') {
+          handleGlobalShortcut(event.data);
+          return;
+        }
 
         if (event.data.type === 'STAUNT_URL_CHANGE') {
           const rawUrl = event.data.url;
@@ -1036,6 +1070,118 @@
         const v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
         return v ? v[2] : null;
       }
+
+      // ─── GLOBAL NATIVE DESKTOP KEYBOARD SHORTCUTS ENGINE ───
+      function handleGlobalShortcut(e) {
+        const isMac = (navigator.platform || '').toUpperCase().indexOf('MAC') >= 0;
+        const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+        const key = (e.key || '').toLowerCase();
+
+        // Ctrl+T: New Tab
+        if (cmdOrCtrl && key === 't') {
+          if (e.preventDefault) e.preventDefault();
+          createTab();
+          omnibox.focus();
+          return;
+        }
+
+        // Ctrl+W: Close Tab
+        if (cmdOrCtrl && key === 'w') {
+          if (e.preventDefault) e.preventDefault();
+          if (activeTabId) closeTab(activeTabId);
+          return;
+        }
+
+        // Ctrl+R or F5: Reload Active Tab
+        if ((cmdOrCtrl && key === 'r') || e.key === 'F5') {
+          if (e.preventDefault) e.preventDefault();
+          const vp = document.getElementById('viewport-' + activeTabId);
+          if (vp) {
+            const iframe = vp.querySelector('.embed-frame');
+            if (iframe && iframe.style.display !== 'none') {
+              startProgress();
+              iframe.src = iframe.src;
+            }
+          }
+          return;
+        }
+
+        // Ctrl+L or Alt+D: Focus Omnibox
+        if ((cmdOrCtrl && key === 'l') || (e.altKey && key === 'd')) {
+          if (e.preventDefault) e.preventDefault();
+          omnibox.focus();
+          omnibox.select();
+          return;
+        }
+
+        // Alt+Left: Back
+        if (e.altKey && e.key === 'ArrowLeft') {
+          if (e.preventDefault) e.preventDefault();
+          const vp = document.getElementById('viewport-' + activeTabId);
+          if (vp) {
+            const iframe = vp.querySelector('.embed-frame');
+            if (iframe && iframe.contentWindow) {
+              try { iframe.contentWindow.history.back(); } catch(err) {}
+            }
+          }
+          return;
+        }
+
+        // Alt+Right: Forward
+        if (e.altKey && e.key === 'ArrowRight') {
+          if (e.preventDefault) e.preventDefault();
+          const vp = document.getElementById('viewport-' + activeTabId);
+          if (vp) {
+            const iframe = vp.querySelector('.embed-frame');
+            if (iframe && iframe.contentWindow) {
+              try { iframe.contentWindow.history.forward(); } catch(err) {}
+            }
+          }
+          return;
+        }
+
+        // F11: Fullscreen
+        if (e.key === 'F11') {
+          if (e.preventDefault) e.preventDefault();
+          toggleFullscreen();
+          return;
+        }
+
+        // Escape: Close Modal or Blur Omnibox
+        if (e.key === 'Escape') {
+          if (downloadModal.classList.contains('open')) {
+            downloadModal.classList.remove('open');
+          } else if (document.activeElement === omnibox) {
+            omnibox.blur();
+          }
+          return;
+        }
+
+        // Ctrl+1 .. Ctrl+8: Switch to tab index
+        if (cmdOrCtrl && e.key >= '1' && e.key <= '8') {
+          const targetIndex = parseInt(e.key, 10) - 1;
+          if (tabs[targetIndex]) {
+            if (e.preventDefault) e.preventDefault();
+            switchTab(tabs[targetIndex].id);
+          }
+          return;
+        }
+
+        // Ctrl+9: Switch to last tab
+        if (cmdOrCtrl && e.key === '9') {
+          if (tabs.length > 0) {
+            if (e.preventDefault) e.preventDefault();
+            switchTab(tabs[tabs.length - 1].id);
+          }
+          return;
+        }
+      }
+
+      window.addEventListener('keydown', (e) => {
+        // If omnibox is focused and user is typing normal text, don't trigger single-key actions
+        if (document.activeElement === omnibox && e.key === 'Enter') return;
+        handleGlobalShortcut(e);
+      });
 
       // ─── OMNIBOX SUBMIT ───
       omnibox.addEventListener('keydown', (e) => {
