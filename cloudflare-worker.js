@@ -1,11 +1,3 @@
-/**
- * VASTUDA SaaS - Layer 1 Anycast Edge Load Balancer & Multi-Cloud Failover Worker
- * 
- * Routes traffic with intelligent failover:
- * 1. Primary Backend: PythonAnywhere (https://keshavs40344.pythonanywhere.com)
- * 2. Secondary Backend: Railway PaaS (https://web-production-2ac2a.up.railway.app)
- * 3. Graceful Edge Fallback: Ensures 100% SLA uptime even if all origin backends are degraded.
- */
 
 const PRIMARY_ORIGIN = "https://keshavs40344.pythonanywhere.com";
 const SECONDARY_ORIGIN = "https://web-production-2ac2a.up.railway.app";
