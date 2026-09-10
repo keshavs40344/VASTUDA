@@ -2090,11 +2090,12 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
         # Strip any existing <base> tags with zero-overhead regex
         cleaned = re.sub(rb'<base\b[^>]*>', b'', raw_html_bytes, flags=re.IGNORECASE)
 
-        # Inject interceptor and target base tag so all relative assets (images, CSS, JS) resolve accurately
+        # Inject interceptor, target base tag, and responsive viewport meta
         interceptor_bytes = interceptor_code.encode("utf-8")
         target_origin = f"{target_scheme}://{target_host}"
         base_tag_bytes = f'<base href="{target_origin}/">'.encode("utf-8")
-        payload_bytes = interceptor_bytes + base_tag_bytes
+        viewport_meta_bytes = b'<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">'
+        payload_bytes = interceptor_bytes + base_tag_bytes + viewport_meta_bytes
 
         if re.search(rb'<head\b[^>]*>', cleaned, flags=re.IGNORECASE):
             result = re.sub(rb'(<head\b[^>]*>)', rb'\1' + payload_bytes, cleaned, count=1, flags=re.IGNORECASE)
@@ -2203,8 +2204,17 @@ def handle_gateway_proxy():
     # it across redirect hops (e.g. youtu.be -> www.youtube.com).
     is_doc_nav = request.method in ("GET", "HEAD") and not request.headers.get("X-Requested-With")
 
+    client_ua = request.headers.get("User-Agent", "")
+    is_mobile_client = any(m in client_ua.lower() for m in ("android", "iphone", "ipad", "mobile"))
+
+    outbound_ua = (
+        "Mozilla/5.0 (Linux; Android 14; Pixel 8 Pro) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36"
+        if is_mobile_client else
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+    )
+
     req_headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+        "User-Agent": outbound_ua,
         "Accept-Language": request.headers.get("Accept-Language", "en-US,en;q=0.9"),
         "Accept-Encoding": "gzip, deflate",
     }
