@@ -574,6 +574,188 @@
       color: var(--text-muted);
       font-size: 16px;
     }
+  
+    /* ─── YOUTUBE HUB STYLES ─── */
+    .youtube-hub {
+      position: absolute;
+      inset: 0;
+      background: #090a0f;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 10;
+    }
+    .ythub-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .ythub-logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ythub-search-bar {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.06);
+      border: 0.5px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 4px 6px 4px 16px;
+      flex: 1;
+      max-width: 500px;
+    }
+    .ythub-search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .ythub-search-btn {
+      background: #ff453a;
+      border: none;
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 18px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .ythub-search-btn:hover {
+      background: #e0281d;
+    }
+    .ythub-popout-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 0.5px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .ythub-popout-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+    .ythub-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .ythub-chips::-webkit-scrollbar { display: none; }
+    .ythub-chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      padding: 5px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .ythub-chip:hover, .ythub-chip.active {
+      background: rgba(255, 69, 58, 0.15);
+      border-color: rgba(255, 69, 58, 0.4);
+      color: #ff6961;
+    }
+    .ythub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .yt-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 0.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .yt-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255, 69, 58, 0.5);
+      box-shadow: 0 8px 24px rgba(255, 69, 58, 0.12);
+    }
+    .yt-thumb-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      background: #000;
+    }
+    .yt-thumb-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .yt-play-badge {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .yt-card-info {
+      padding: 10px;
+    }
+    .yt-card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .yt-player-bar {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 20;
+      display: flex;
+      gap: 8px;
+    }
+    .yt-player-back-btn {
+      background: rgba(18, 20, 29, 0.85);
+      backdrop-filter: blur(8px);
+      border: 0.5px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .yt-player-back-btn:hover {
+      background: #ff453a;
+      border-color: #ff453a;
+    }
+
   </style>
 </head>
 <body>
@@ -600,6 +782,9 @@
       </button>
       <button class="btn-nav-icon" id="nav-home" title="New Tab Home">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+      <button class="btn-nav-icon" id="nav-popout" title="Open in Dedicated Window (100% Native Compatibility)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
       </button>
     </div>
 
@@ -902,6 +1087,37 @@
             </div>
           </div>
 
+          <!-- YouTube Hub View -->
+          <div class="youtube-hub" id="ythub-${tab.id}" style="display: none;">
+            <div class="ythub-header">
+              <div class="ythub-logo"><span style="color:#ff453a;">▶</span> YouTube Hub</div>
+              <div class="ythub-search-bar">
+                <input type="text" class="ythub-search-input" id="ytsearch-${tab.id}" placeholder="Search YouTube videos, songs, series..." />
+                <button class="ythub-search-btn" id="ytbtn-${tab.id}">Search</button>
+              </div>
+              <button class="ythub-popout-btn" id="ytpop-${tab.id}">Open in Dedicated Window ↗</button>
+            </div>
+            <div class="ythub-chips" id="ytchips-${tab.id}">
+              <span class="ythub-chip active" data-q="trending">🔥 Trending</span>
+              <span class="ythub-chip" data-q="popular songs 2026">🎵 Songs</span>
+              <span class="ythub-chip" data-q="TMKOC full episode">📺 TMKOC</span>
+              <span class="ythub-chip" data-q="funny comedy scenes">😂 Comedy</span>
+              <span class="ythub-chip" data-q="latest technology news">💻 Tech</span>
+              <span class="ythub-chip" data-q="gaming highlights 2026">🎮 Gaming</span>
+              <span class="ythub-chip" data-q="live world news">📰 News</span>
+            </div>
+            <div class="ythub-grid" id="ytgrid-${tab.id}">
+              <div style="color: #94a3b8; font-size: 13px; grid-column: 1/-1; padding: 20px 0;">Loading trending videos...</div>
+            </div>
+          </div>
+
+          <!-- Video Back Control Bar -->
+          <div class="yt-player-bar" id="ytbar-${tab.id}" style="display: none;">
+            <button class="yt-player-back-btn" id="ytback-${tab.id}">
+              ◀ Back to YouTube Hub
+            </button>
+          </div>
+
           <iframe 
             class="embed-frame" 
             id="frame-${tab.id}" 
@@ -989,12 +1205,26 @@
         }
         renderTabs();
 
+        // Check if user is navigating to YouTube homepage or search
+        try {
+          const checkUrl = new URL(resolved);
+          if (checkUrl.hostname.includes('youtube.com') && !resolved.includes('/embed/')) {
+            const searchQ = checkUrl.searchParams.get('search_query') || checkUrl.searchParams.get('q');
+            showYouTubeHub(tab.id, searchQ || 'trending');
+            return;
+          }
+        } catch(e) {}
+
         const vp = document.getElementById('viewport-' + tab.id);
         if (vp) {
           const wall = vp.querySelector('.newtab-wall');
+          const hub = document.getElementById('ythub-' + tab.id);
+          const bar = document.getElementById('ytbar-' + tab.id);
           const iframe = vp.querySelector('.embed-frame');
 
           if (wall) wall.style.display = 'none';
+          if (hub) hub.style.display = 'none';
+          if (bar) bar.style.display = 'none';
           if (iframe) {
             iframe.style.display = 'block';
             startProgress();
@@ -1047,6 +1277,128 @@
           }
         }
       });
+
+      document.getElementById('nav-popout').addEventListener('click', () => {
+        const tab = tabs.find(t => t.id === activeTabId);
+        const targetUrl = (tab && tab.url) ? tab.url : (omnibox.value || 'https://www.youtube.com');
+        window.open(targetUrl, '_blank', 'noopener,noreferrer');
+      });
+
+      // ─── YOUTUBE HUB SEARCH & RENDER ENGINE ───
+      async function loadYouTubeVideos(tabId, query = 'trending') {
+        const grid = document.getElementById('ytgrid-' + tabId);
+        if (!grid) return;
+        grid.innerHTML = '<div style="color:#94a3b8; font-size:13px; grid-column:1/-1; padding:20px 0;">Searching "' + escapeHtml(query) + '"...</div>';
+        try {
+          const resp = await fetch('/api/youtube/search?q=' + encodeURIComponent(query));
+          const data = await resp.json();
+          if (!data.results || data.results.length === 0) {
+            grid.innerHTML = '<div style="color:#94a3b8; font-size:13px; grid-column:1/-1; padding:20px 0;">No videos found. Try a different search!</div>';
+            return;
+          }
+          grid.innerHTML = '';
+          data.results.forEach(v => {
+            const card = document.createElement('div');
+            card.className = 'yt-card';
+            card.innerHTML = `
+              <div class="yt-thumb-wrapper">
+                <img class="yt-thumb-img" src="${v.thumbnail}" loading="lazy" alt="" />
+                <div class="yt-play-badge">▶ Play</div>
+              </div>
+              <div class="yt-card-info">
+                <div class="yt-card-title">${escapeHtml(v.title)}</div>
+              </div>
+            `;
+            card.addEventListener('click', () => {
+              playYouTubeVideo(v.embedUrl, v.title, tabId);
+            });
+            grid.appendChild(card);
+          });
+        } catch(e) {
+          grid.innerHTML = '<div style="color:#ef4444; font-size:13px; grid-column:1/-1; padding:20px 0;">Error loading videos. Please check internet connection.</div>';
+        }
+      }
+
+      function playYouTubeVideo(embedUrl, title, tabId) {
+        const vp = document.getElementById('viewport-' + tabId);
+        if (!vp) return;
+        const wall = vp.querySelector('.newtab-wall');
+        const hub = document.getElementById('ythub-' + tabId);
+        const bar = document.getElementById('ytbar-' + tabId);
+        const iframe = vp.querySelector('.embed-frame');
+
+        if (wall) wall.style.display = 'none';
+        if (hub) hub.style.display = 'none';
+        if (bar) bar.style.display = 'flex';
+        if (iframe) {
+          iframe.style.display = 'block';
+          startProgress();
+          iframe.src = embedUrl;
+          iframe.onload = () => finishProgress();
+        }
+
+        const tab = tabs.find(t => t.id === tabId);
+        if (tab) {
+          tab.url = embedUrl;
+          tab.title = title || 'YouTube Video';
+          if (tabId === activeTabId) {
+            omnibox.value = embedUrl;
+          }
+          renderTabs();
+        }
+      }
+
+      function showYouTubeHub(tabId, initialQuery = 'trending') {
+        const vp = document.getElementById('viewport-' + tabId);
+        if (!vp) return;
+        const wall = vp.querySelector('.newtab-wall');
+        const hub = document.getElementById('ythub-' + tabId);
+        const bar = document.getElementById('ytbar-' + tabId);
+        const iframe = vp.querySelector('.embed-frame');
+
+        if (wall) wall.style.display = 'none';
+        if (bar) bar.style.display = 'none';
+        if (iframe) {
+          iframe.style.display = 'none';
+          iframe.src = 'about:blank';
+        }
+        if (hub) {
+          hub.style.display = 'flex';
+          loadYouTubeVideos(tabId, initialQuery);
+        }
+
+        // Bind Hub events if not bound
+        if (!hub.dataset.bound) {
+          hub.dataset.bound = 'true';
+          const sInput = document.getElementById('ytsearch-' + tabId);
+          const sBtn = document.getElementById('ytbtn-' + tabId);
+          const popBtn = document.getElementById('ytpop-' + tabId);
+          const backBtn = document.getElementById('ytback-' + tabId);
+          const chips = document.getElementById('ytchips-' + tabId);
+
+          const triggerSearch = () => {
+            const q = sInput.value.trim();
+            if (q) loadYouTubeVideos(tabId, q);
+          };
+
+          if (sBtn) sBtn.addEventListener('click', triggerSearch);
+          if (sInput) sInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') triggerSearch(); });
+          if (popBtn) popBtn.addEventListener('click', () => window.open('https://www.youtube.com', '_blank'));
+          if (backBtn) backBtn.addEventListener('click', () => showYouTubeHub(tabId));
+
+          if (chips) {
+            chips.querySelectorAll('.ythub-chip').forEach(c => {
+              c.addEventListener('click', () => {
+                chips.querySelectorAll('.ythub-chip').forEach(x => x.classList.remove('active'));
+                c.classList.add('active');
+                const q = c.dataset.q;
+                if (sInput) sInput.value = q;
+                loadYouTubeVideos(tabId, q);
+              });
+            });
+          }
+        }
+      }
 
       document.getElementById('nav-home').addEventListener('click', () => {
         const tab = tabs.find(t => t.id === activeTabId);

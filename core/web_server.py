@@ -2100,6 +2100,43 @@ _pool_adapter = HTTPAdapter(
 GATEWAY_SESSION.mount("https://", _pool_adapter)
 GATEWAY_SESSION.mount("http://", _pool_adapter)
 
+@app.route("/api/youtube/search", methods=["GET"])
+def api_youtube_search():
+    """
+    Ultra-Fast YouTube Search & Video Extractor:
+    Bypasses datacenter bot blocks and returns parsed video cards for direct embed playback.
+    """
+    query = request.args.get("q", "").strip() or "trending"
+    try:
+        url = f"https://www.youtube.com/results?search_query={urllib.parse.quote(query)}"
+        req_headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate"
+        }
+        resp = GATEWAY_SESSION.get(url, headers=req_headers, timeout=10)
+        html = resp.text
+        matches = re.findall(r'"videoId":"([a-zA-Z0-9_-]{11})".*?"title":\{"runs":\[\{"text":"([^"]+)"', html)
+        
+        seen = set()
+        results = []
+        for vid, title in matches:
+            if vid not in seen:
+                seen.add(vid)
+                results.append({
+                    "id": vid,
+                    "title": title,
+                    "thumbnail": f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg",
+                    "embedUrl": f"https://www.youtube.com/embed/{vid}?autoplay=1&rel=0"
+                })
+                if len(results) >= 30:
+                    break
+        return jsonify({"status": "ok", "query": query, "results": results})
+    except Exception as e:
+        logger.error(f"[YT SEARCH ERROR] {e}")
+        return jsonify({"status": "error", "message": str(e), "results": []}), 500
+
+
 ACTIVE_UPSTREAM_ORIGIN = None  # Set dynamically when user navigates via /gateway
 @app.route("/gateway", methods=["GET", "POST", "HEAD", "OPTIONS"])
 @app.route("/api/gateway", methods=["GET", "POST", "HEAD", "OPTIONS"])
