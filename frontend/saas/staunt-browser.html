@@ -774,6 +774,11 @@
         <span id="fs-txt">Full Screen</span>
       </button>
 
+      <!-- Popout Button -->
+      <button class="nav-icon-btn" id="btn-popout" title="Open in External Tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </button>
+
       <!-- Get Desktop App Button -->
       <button class="btn-app-glow" id="btn-launch-modal" title="Download Desktop App for native 4K streaming & kernel adblocker">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -900,6 +905,7 @@
       const tlMax = document.getElementById('tl-max');
       const btnToggleFs = document.getElementById('btn-toggle-fs');
       const fsTxt = document.getElementById('fs-txt');
+      const btnPopout = document.getElementById('btn-popout');
 
       // Mobile Buttons
       const mobB = document.getElementById('mob-b');
@@ -931,26 +937,40 @@
 
       function syncFsUI(isFs) {
         if (fsTxt) fsTxt.textContent = isFs ? 'Exit Full' : 'Full Screen';
+        if (isFs) {
+          document.body.classList.add('is-fullscreen');
+        } else {
+          document.body.classList.remove('is-fullscreen');
+        }
       }
 
       document.addEventListener('fullscreenchange', () => {
         syncFsUI(!!document.fullscreenElement);
       });
 
-      // Auto fullscreen on first tap/click
+      // Auto fullscreen on first user interaction (click, touch, or key)
       function autoFsOnFirstTouch() {
         if (!document.fullscreenElement) {
           const el = document.documentElement;
-          const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
-          if (rfs) rfs.call(el).catch(() => {});
+          const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+          if (rfs) rfs.call(el).then(() => syncFsUI(true)).catch(() => {});
         }
       }
       window.addEventListener('click', autoFsOnFirstTouch, { once: true });
       window.addEventListener('touchstart', autoFsOnFirstTouch, { once: true });
+      window.addEventListener('keydown', autoFsOnFirstTouch, { once: true });
 
       btnToggleFs.addEventListener('click', toggleFullscreen);
       tlMax.addEventListener('click', toggleFullscreen);
       if (mobFsBtn) mobFsBtn.addEventListener('click', toggleFullscreen);
+
+      if (btnPopout) {
+        btnPopout.addEventListener('click', () => {
+          const tab = tabs.find(t => t.id === activeTabId);
+          const url = (tab && tab.url) ? tab.url : 'https://www.google.com';
+          window.open(url, '_blank');
+        });
+      }
 
       // Modal Triggers
       btnLaunchModal.addEventListener('click', () => appModal.classList.add('open'));
@@ -1175,8 +1195,7 @@
             class="embed-frame" 
             id="frame-${tab.id}" 
             style="display: none;"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-presentation allow-downloads"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+            allow="accelerometer; autoplay; clipboard-read; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen; microphone; camera; display-capture; geolocation"
             referrerpolicy="no-referrer-when-downgrade"
           ></iframe>
         `;

@@ -240,16 +240,25 @@ def enforce_global_security_firewall():
 
 @app.after_request
 def add_security_headers(response):
-    # Dynamic Frame Unblocker: Do not restrict framing for gateway routes
-    if request.path.startswith(("/gateway", "/api/gateway", "/api/browser/proxy")):
-        response.headers.pop("Content-Security-Policy", None)
+    # Dynamic Frame Unblocker: Do not restrict framing for gateway routes or proxied subresources
+    _is_gateway = request.path.startswith(("/gateway", "/api/gateway", "/api/browser/proxy"))
+    _is_proxied = bool(request.cookies.get("staunt_upstream"))
+    if _is_gateway or _is_proxied:
+        response.headers.pop("X-Frame-Options", None)
+        response.headers.pop("x-frame-options", None)
         response.headers.pop("X-Content-Security-Policy", None)
-        response.headers["X-Frame-Options"] = "ALLOWALL"
+        response.headers["Content-Security-Policy"] = "frame-ancestors *"
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, POST, PUT, DELETE, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "*"
+    elif request.path.startswith("/tools/"):
+        response.headers.pop("X-Frame-Options", None)
+        response.headers.pop("x-frame-options", None)
+        response.headers["Content-Security-Policy"] = "frame-ancestors *"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
     else:
-        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin" 
@@ -2086,7 +2095,9 @@ def handle_gateway_proxy():
         resp.headers["Access-Control-Allow-Origin"] = "*"
         resp.headers["Access-Control-Allow-Methods"] = "GET, POST, HEAD, OPTIONS"
         resp.headers["Access-Control-Allow-Headers"] = "*"
-        resp.headers["X-Frame-Options"] = "ALLOWALL"
+        resp.headers.pop("X-Frame-Options", None)
+        resp.headers.pop("x-frame-options", None)
+        resp.headers["Content-Security-Policy"] = "frame-ancestors *"
 
         # Persist active origin in a cookie so all Gunicorn workers can resolve
         # it without relying on the in-process ACTIVE_UPSTREAM_ORIGIN global
@@ -2127,7 +2138,9 @@ def handle_gateway_proxy():
         </body></html>"""
         resp = app.response_class(error_html, status=502, mimetype="text/html")
         resp.headers["Access-Control-Allow-Origin"] = "*"
-        resp.headers["X-Frame-Options"] = "ALLOWALL"
+        resp.headers.pop("X-Frame-Options", None)
+        resp.headers.pop("x-frame-options", None)
+        resp.headers["Content-Security-Policy"] = "frame-ancestors *"
         return resp
 
 
@@ -2266,7 +2279,9 @@ def serve_static(path):
             resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS"
             resp.headers["Access-Control-Allow-Headers"] = "*"
             resp.headers["Access-Control-Allow-Credentials"] = "true"
-            resp.headers["X-Frame-Options"] = "ALLOWALL"
+            resp.headers.pop("X-Frame-Options", None)
+            resp.headers.pop("x-frame-options", None)
+            resp.headers["Content-Security-Policy"] = "frame-ancestors *"
             logger.info(f"[SPA PROXY] {request.method} {upstream_url} -> {upstream_resp.status_code}")
             return resp
         except Exception as proxy_err:
@@ -2355,7 +2370,9 @@ def handle_clean_tool_address_fallback(e):
             resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
             resp.headers["Access-Control-Allow-Headers"] = "*"
             resp.headers["Access-Control-Allow-Credentials"] = "true"
-            resp.headers["X-Frame-Options"] = "ALLOWALL"
+            resp.headers.pop("X-Frame-Options", None)
+            resp.headers.pop("x-frame-options", None)
+            resp.headers["Content-Security-Policy"] = "frame-ancestors *"
             return resp
         except Exception as proxy_err:
             logger.warning(f"[CATCH-ALL SPA FALLBACK WARNING] {proxy_err}")
