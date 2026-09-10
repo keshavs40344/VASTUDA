@@ -939,21 +939,24 @@
 
       // ─── DUAL ENGINE MODE (⚡ DIRECT LOCAL GIGABIT vs 🛡️ CLOUD PROXY SHIELD) ───
       const urlParams = new URLSearchParams(window.location.search);
-      // Default to 'direct' if ?mode=direct or running inside native app, otherwise check localStorage
-      let currentEngineMode = urlParams.get('mode') === 'direct' ? 'direct' : (localStorage.getItem('staunt_engine_mode') || 'direct');
+      // Standard browsers enforce X-Frame-Options on YouTube/Google.
+      // Therefore, the Web Version MUST default to 'cloud' (proxy shield) to prevent 'refused to connect'!
+      // Only our custom Windows app setup with ?mode=direct uses direct local rendering.
+      const isNativeApp = urlParams.get('mode') === 'direct';
+      let currentEngineMode = isNativeApp ? 'direct' : (localStorage.getItem('staunt_engine_mode') || 'cloud');
       const btnToggleEngine = document.getElementById('btn-toggle-engine');
 
       function updateEngineUI() {
         if (!btnToggleEngine) return;
-        if (currentEngineMode === 'direct') {
-          btnToggleEngine.innerHTML = '⚡ Direct';
-          btnToggleEngine.title = 'Current: ⚡ Direct Gigabit Engine (Local speed, no proxy lag). Click to switch to Cloud Shield.';
+        if (currentEngineMode === 'direct' && isNativeApp) {
+          btnToggleEngine.innerHTML = '⚡ Direct (Native)';
+          btnToggleEngine.title = 'Current: ⚡ Direct Gigabit Engine (Hardware GPU, local speed).';
           btnToggleEngine.style.background = 'rgba(16, 185, 129, 0.15)';
           btnToggleEngine.style.color = '#34d399';
           btnToggleEngine.style.borderColor = 'rgba(16, 185, 129, 0.3)';
         } else {
-          btnToggleEngine.innerHTML = '🛡️ Cloud';
-          btnToggleEngine.title = 'Current: 🛡️ Cloud Proxy Shield (Anonymized via server). Click to switch to Direct Gigabit.';
+          btnToggleEngine.innerHTML = '🛡️ Cloud Shield';
+          btnToggleEngine.title = 'Current: 🛡️ Cloud Proxy Shield (Strips X-Frame-Options to allow all websites).';
           btnToggleEngine.style.background = 'rgba(139, 92, 246, 0.15)';
           btnToggleEngine.style.color = '#a78bfa';
           btnToggleEngine.style.borderColor = 'rgba(139, 92, 246, 0.3)';
@@ -1002,14 +1005,15 @@
             startProgress();
 
             let targetSrc = resolved;
-            if (currentEngineMode === 'direct') {
-              // Direct Gigabit Mode: render directly without proxy hops!
-              targetSrc = resolved;
-            } else {
-              // Cloud Shield Mode: route through persistent keep-alive streaming gateway
+            // If in cloud mode OR on standard web browser accessing sites with X-Frame-Options,
+            // route through our persistent keep-alive streaming gateway to strip frame-blocking headers!
+            if (currentEngineMode === 'cloud' || !isNativeApp) {
               if (!resolved.includes('youtube.com/embed/')) {
                 targetSrc = '/gateway?url=' + encodeURIComponent(resolved);
               }
+            } else {
+              // Only custom native Windows app with disabled web security can do true direct framing
+              targetSrc = resolved;
             }
             iframe.src = targetSrc;
             iframe.onload = () => finishProgress();
