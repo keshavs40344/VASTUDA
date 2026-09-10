@@ -537,7 +537,7 @@ def staunt_web_proxy():
             rendered_html = str(soup)
         else:
             rendered_html = html_content
-            base_injection = f'<script id="staunt-brave-surrogates">{surrogate_code}</script><base href="{final_url}"><meta name="viewport" content="width=device-width, initial-scale=1.0">'
+            base_injection = f'<script id="staunt-brave-surrogates">{surrogate_code}</script><base href="{final_url}"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style id="staunt-viewport-patch">html, body {{ min-height: 100% !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; touch-action: pan-y pinch-zoom !important; -webkit-tap-highlight-color: rgba(0,0,0,0); }}</style>'
             rendered_html = re.sub(r'(<head[^>]*>)', r'\1' + base_injection, rendered_html, flags=re.I, count=1)
             rendered_html += f'\n<script id="staunt-bridge-runtime">{bridge_code}</script>'
 

@@ -2,9 +2,9 @@
 <html lang="en" class="h-full bg-[#060911]">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Staunt Browser Ultra — Sovereign Web Operating System</title>
-  <meta name="description" content="Next-generation sovereign web browser with live proxy, AI search synthesis, distraction-free reader mode, and 4K media sniffer." />
+  <meta name="description" content="Next-generation sovereign web browser with live multi-tabbing, proxy firewall, AI search synthesis, distraction-free reader mode, and 4K media sniffer." />
   
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -43,98 +43,182 @@
       width: 100%;
       overflow: hidden;
       background-color: #060911;
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       color: #f1f5f9;
       -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+      user-select: none;
     }
-    #mainCanvasContainer {
-      touch-action: auto !important;
-      -webkit-overflow-scrolling: touch !important;
+    input, textarea, select, .reader-content, #searchResultsList, #copilotMessages {
       user-select: auto !important;
-    }
-    #proxyIframe {
-      touch-action: auto !important;
-      -webkit-overflow-scrolling: touch !important;
-      user-select: auto !important;
-      pointer-events: auto !important;
     }
     .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
       background: rgba(0,0,0,0.2);
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.15);
       border-radius: 9999px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: rgba(139,92,246,0.5);
     }
-    .tab-pill.active {
-      background: #151d30;
-      color: #ffffff;
-      border-bottom: 2px solid #8b5cf6;
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
     }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    
+    /* Chrome/Brave-style Tabs */
+    .browser-tab {
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .browser-tab.active {
+      background-color: #0e1526;
+      color: #ffffff;
+      border-top: 2px solid #8b5cf6;
+      border-left: 1px solid rgba(255,255,255,0.08);
+      border-right: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid transparent;
+    }
+    .browser-tab:not(.active):hover {
+      background-color: rgba(255,255,255,0.04);
+      color: #e2e8f0;
+    }
+
+    /* Web Viewport Touch and Scroll */
+    .tab-viewport-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #ffffff;
+      touch-action: pan-y pinch-zoom !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Reader Mode Typography */
     .reader-content p {
       margin-bottom: 1.5rem;
-      line-height: 1.8;
-      font-size: 1.125rem;
+      line-height: 1.85;
+      font-size: 1.15rem;
+      color: #e2e8f0;
     }
     .reader-content h2, .reader-content h3 {
       font-weight: 700;
-      margin-top: 2rem;
+      margin-top: 2.2rem;
       margin-bottom: 1rem;
       color: #ffffff;
+    }
+
+    /* Pulse Glow */
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    .pulse-glow {
+      animation: pulseGlow 2s infinite ease-in-out;
     }
   </style>
 </head>
 <body class="h-full w-full flex flex-col bg-[#060911] text-slate-200">
 
   <!-- ========================================================================= -->
-  <!-- 1. UNIFIED ULTRA-SLIM COMMAND BAR (Total height: 46px only!) -->
+  <!-- 1. CHROME/BRAVE-STYLE TAB STRIP (Row 1, 38px) -->
   <!-- ========================================================================= -->
-  <header class="h-[46px] bg-[#0c1222] border-b border-slate-800 flex items-center justify-between px-3 gap-2 flex-shrink-0 z-30 shadow-lg">
+  <div class="h-[38px] bg-[#070b16] border-b border-slate-800/80 flex items-center justify-between px-2 gap-1.5 flex-shrink-0 z-30 select-none">
     
-    <!-- Left: Brand Emblem & Navigation -->
-    <div class="flex items-center gap-2 flex-shrink-0">
-      <div class="flex items-center gap-1.5 pr-1 cursor-pointer" onclick="goHome()">
-        <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-violet-500/20">
-          <i data-lucide="shield" class="w-3.5 h-3.5"></i>
-        </div>
-        <span class="font-extrabold text-xs text-white tracking-wider hidden sm:inline">STAUNT</span>
+    <!-- Left: Brand Emblem & Quick Menu -->
+    <div class="flex items-center gap-1.5 pr-2 flex-shrink-0 cursor-pointer" onclick="createNewTab('staunt://newtab')">
+      <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-violet-500/20">
+        <i data-lucide="shield" class="w-3.5 h-3.5"></i>
       </div>
-
-      <!-- Controls -->
-      <div class="flex items-center gap-0.5 border-l border-slate-800 pl-2">
-        <button onclick="navigateBack()" title="Back" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-        </button>
-        <button onclick="navigateForward()" title="Forward" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-        </button>
-        <button onclick="reloadActiveTab()" title="Reload" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-          <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
-        </button>
-        <button onclick="goHome()" title="Start Page" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-          <i data-lucide="home" class="w-3.5 h-3.5"></i>
-        </button>
-      </div>
+      <span class="font-extrabold text-[11px] text-white tracking-wider hidden sm:inline">STAUNT</span>
     </div>
 
-    <!-- Center: Smart Omnibox with Autocomplete -->
-    <div class="relative flex-1 max-w-2xl mx-auto">
+    <!-- Center: Dynamic Scrollable Tab Strip -->
+    <div id="tabStripContainer" class="flex-1 flex items-center gap-1 overflow-x-auto hide-scrollbar h-full py-0.5">
+      <!-- Tabs injected dynamically by JS -->
+    </div>
+
+    <!-- New Tab Button -->
+    <button onclick="createNewTab('staunt://newtab')" title="New Tab (Ctrl+T)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center flex-shrink-0 transition-colors">
+      <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+    </button>
+
+    <!-- Right Header Controls -->
+    <div class="flex items-center gap-1 pl-1 flex-shrink-0 border-l border-slate-800/80">
+      <!-- History Drawer Toggle -->
+      <button onclick="toggleHistoryDrawer()" title="Browsing History (Ctrl+H)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+        <i data-lucide="history" class="w-3.5 h-3.5"></i>
+      </button>
+
+      <!-- Downloads Drawer Toggle -->
+      <button onclick="toggleDownloadsDrawer()" id="btnDownloadsTop" title="Downloads Manager" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors relative">
+        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+        <span id="downloadsBadge" class="hidden absolute top-1 right-1 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></span>
+      </button>
+
+      <!-- Bookmarks Drawer Toggle -->
+      <button onclick="toggleBookmarksDrawer()" title="Bookmarks Manager (Ctrl+B)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+        <i data-lucide="bookmark" class="w-3.5 h-3.5"></i>
+      </button>
+
+      <!-- Fullscreen Toggle -->
+      <button onclick="toggleFullscreen()" title="Immersive Mode" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors hidden md:flex">
+        <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+      </button>
+
+      <!-- Native Desktop App Download -->
+      <a href="/api/browser/download/windows" download title="Download Real Native Windows App (.zip)" class="ml-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-[11px] font-bold flex items-center gap-1 shadow-md shadow-violet-600/20 transition-all flex-shrink-0">
+        <i data-lucide="download-cloud" class="w-3 h-3"></i>
+        <span class="hidden lg:inline">Download Windows App</span>
+        <span class="lg:hidden">App</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. COMMAND & OMNIBOX BAR (Row 2, 44px) -->
+  <!-- ========================================================================= -->
+  <div class="h-[44px] bg-[#0c1222] border-b border-slate-800 flex items-center justify-between px-2 sm:px-3 gap-2 flex-shrink-0 z-20 shadow-md">
+    
+    <!-- Navigation Buttons -->
+    <div class="flex items-center gap-0.5 flex-shrink-0">
+      <button onclick="navigateBack()" id="btnBack" title="Back (Alt+Left)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+      </button>
+      <button onclick="navigateForward()" id="btnForward" title="Forward (Alt+Right)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+      </button>
+      <button onclick="reloadActiveTab()" title="Reload (Ctrl+R)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+        <i data-lucide="rotate-cw" class="w-3.5 h-3.5" id="reloadIcon"></i>
+      </button>
+      <button onclick="goHome()" title="Staunt Start Page" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+        <i data-lucide="home" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+
+    <!-- Center: Smart Omnibox -->
+    <div class="relative flex-1 max-w-3xl mx-auto">
       <div class="flex items-center bg-[#070a13] border border-slate-700/80 rounded-xl px-2.5 py-1 focus-within:border-violet-500 focus-within:ring-1 focus-within:ring-violet-500/30 transition-all">
         
         <!-- Brave-Style Shield Pill -->
         <button onclick="toggleShieldModal()" id="shieldPillBtn" title="Staunt Brave-Style Shield Matrix" class="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold mr-1.5 transition-colors flex-shrink-0">
           <i data-lucide="shield-check" class="w-3 h-3 text-emerald-400" id="shieldPillIcon"></i>
-          <span id="shieldPillText" class="hidden md:inline">Brave Mode: Standard</span>
+          <span id="shieldPillText" class="hidden sm:inline">Brave: Standard</span>
         </button>
 
-        <!-- Input -->
+        <!-- Security Lock Icon -->
+        <div class="text-slate-400 mr-1.5 hidden sm:block" id="securityLockIcon" title="Connection is verified & secured">
+          <i data-lucide="lock" class="w-3 h-3 text-emerald-400"></i>
+        </div>
+
+        <!-- Address / Search Input -->
         <input 
           id="omniboxInput" 
           type="text" 
@@ -148,13 +232,26 @@
           onblur="setTimeout(closeAutocomplete, 250)"
         />
 
-        <!-- Action Icons -->
+        <!-- Right Inside Omnibox Actions -->
         <div class="flex items-center gap-1 text-slate-400 flex-shrink-0">
-          <button onclick="clearOmnibox()" title="Clear" class="hover:text-white p-0.5">
+          <!-- Bookmark Current Tab -->
+          <button onclick="toggleBookmarkActiveTab()" id="btnBookmarkStar" title="Bookmark this tab (Ctrl+D)" class="hover:text-amber-400 p-1 transition-colors">
+            <i data-lucide="star" class="w-3.5 h-3.5" id="bookmarkStarIcon"></i>
+          </button>
+
+          <!-- Copy URL Button -->
+          <button onclick="copyCurrentUrl()" title="Copy Link" class="hover:text-white p-1 hidden sm:block transition-colors">
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+          </button>
+
+          <!-- Clear Omnibox -->
+          <button onclick="clearOmnibox()" title="Clear" class="hover:text-white p-1 transition-colors">
             <i data-lucide="x" class="w-3 h-3"></i>
           </button>
-          <button onclick="submitOmnibox()" title="Go / Search" class="bg-violet-600 hover:bg-violet-500 text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all">
-            <span>Browse</span>
+
+          <!-- Go Button -->
+          <button onclick="submitOmnibox()" title="Browse URL or Search AI" class="bg-violet-600 hover:bg-violet-500 text-white px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all">
+            <span>Go</span>
             <i data-lucide="arrow-right" class="w-2.5 h-2.5"></i>
           </button>
         </div>
@@ -165,53 +262,55 @@
       <div id="autocompleteDropdown" class="absolute left-0 right-0 top-full mt-1 bg-[#0c1222] border border-slate-700 rounded-xl p-1 shadow-2xl hidden z-50"></div>
     </div>
 
-    <!-- Right: Advanced Modes & Utilities -->
-    <div class="flex items-center gap-1.5 flex-shrink-0">
+    <!-- Right: Browser Modes & Intelligence Tools -->
+    <div class="flex items-center gap-1 flex-shrink-0">
       
-      <!-- Reader Mode Toggle -->
+      <!-- Reader Mode -->
       <button onclick="toggleReaderMode()" id="readerBtn" title="Distraction-Free Reader View" class="px-2 py-1 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1 transition-colors">
         <i data-lucide="book-open" class="w-3.5 h-3.5 text-amber-400"></i>
-        <span class="hidden lg:inline">Reader</span>
+        <span class="hidden xl:inline">Reader</span>
       </button>
 
       <!-- 4K Media Sniffer -->
-      <button onclick="toggleMediaDrawer()" id="snifferBtn" title="Universal Media Sniffer" class="px-2 py-1 rounded-lg bg-cyan-600/10 hover:bg-cyan-600/20 text-cyan-300 border border-cyan-500/20 text-xs font-semibold flex items-center gap-1 transition-colors">
+      <button onclick="toggleMediaDrawer()" id="snifferBtn" title="Universal 4K Media Sniffer" class="px-2 py-1 rounded-lg bg-cyan-600/10 hover:bg-cyan-600/20 text-cyan-300 border border-cyan-500/20 text-xs font-semibold flex items-center gap-1 transition-colors">
         <i data-lucide="video" class="w-3.5 h-3.5 text-cyan-400"></i>
-        <span class="hidden lg:inline">Sniffer</span>
+        <span class="hidden md:inline">Sniffer</span>
       </button>
 
       <!-- AI Copilot -->
       <button onclick="toggleCopilot()" id="copilotBtn" title="Staunt AI Neural Copilot" class="px-2 py-1 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 border border-violet-500/30 text-xs font-semibold flex items-center gap-1 transition-colors">
         <i data-lucide="sparkles" class="w-3.5 h-3.5 text-violet-400"></i>
-        <span class="hidden md:inline">Copilot</span>
+        <span class="hidden sm:inline">Copilot</span>
       </button>
-
-      <!-- 1-Click Fullscreen -->
-      <button onclick="toggleFullscreen()" title="Immersive Desktop Mode (Hide Browser Chrome)" class="w-7 h-7 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center transition-colors">
-        <i data-lucide="maximize" class="w-3.5 h-3.5" id="fsIcon"></i>
-      </button>
-
-      <!-- Download Windows App Button -->
-      <a href="/api/browser/download/windows" download title="Download Real Native Windows App (.zip)" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1 shadow-md shadow-violet-600/20 transition-all">
-        <i data-lucide="download" class="w-3.5 h-3.5"></i>
-        <span class="hidden sm:inline">Get App</span>
-      </a>
 
     </div>
 
-  </header>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. BOOKMARKS BAR (Row 3, 28px) -->
+  <!-- ========================================================================= -->
+  <div id="bookmarksBar" class="h-[28px] bg-[#090e1a] border-b border-slate-800/80 flex items-center px-3 gap-1 overflow-x-auto hide-scrollbar text-[11px] font-medium text-slate-300 flex-shrink-0 z-10">
+    <button onclick="toggleBookmarksDrawer()" class="flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white mr-1 flex-shrink-0">
+      <i data-lucide="bookmark" class="w-3 h-3 text-amber-400"></i>
+      <span class="font-bold text-[10px] uppercase tracking-wider text-slate-400">Bookmarks:</span>
+    </button>
+    <div id="bookmarksBarItems" class="flex items-center gap-1">
+      <!-- Injected by JS -->
+    </div>
+  </div>
 
   <!-- Animated Loading Progress Bar -->
   <div id="pageProgressBar" class="h-0.5 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400 w-0 transition-all duration-300 z-40"></div>
 
   <!-- ========================================================================= -->
-  <!-- 2. MAIN BROWSER VIEWPORT (100% REMAINING SCREEN) -->
+  <!-- 4. MAIN BROWSER VIEWPORT & MULTI-TAB CONTAINERS -->
   <!-- ========================================================================= -->
-  <main class="relative flex-1 w-full h-[calc(100%-46px)] overflow-hidden flex bg-[#060911]">
+  <main class="relative flex-1 w-full h-[calc(100%-110px)] overflow-hidden flex bg-[#060911]">
 
-    <!-- VIEW 1: Active Web Canvas (Start Page, Proxy Iframe, or Search Results) -->
-    <div id="mainCanvasContainer" class="relative flex-1 h-full w-full overflow-hidden">
-      <!-- Injected by JavaScript -->
+    <!-- MULTI-TAB CANVAS CONTAINER -->
+    <div id="mainCanvasContainer" class="relative flex-1 h-full w-full overflow-hidden bg-[#060911]">
+      <!-- Each tab gets its own persistent sub-container tab-canvas-{id} -->
     </div>
 
     <!-- ======================================================================= -->
@@ -220,7 +319,6 @@
     <div id="readerCanvas" class="hidden absolute inset-0 z-30 bg-[#0c101d] overflow-y-auto custom-scrollbar flex flex-col items-center p-6 sm:p-12">
       <div class="max-w-2xl w-full space-y-6">
         
-        <!-- Reader Header Controls -->
         <div class="flex items-center justify-between border-b border-slate-800 pb-4">
           <div class="flex items-center gap-2 text-xs text-slate-400">
             <span id="readerDomain" class="font-mono text-violet-400">domain.com</span>
@@ -237,17 +335,13 @@
           </div>
         </div>
 
-        <!-- Article Title -->
         <h1 id="readerTitle" class="text-2xl sm:text-4xl font-extrabold text-white leading-tight font-serif"></h1>
 
-        <!-- Featured Image -->
         <div id="readerImageContainer" class="hidden rounded-2xl overflow-hidden border border-slate-800">
           <img id="readerLeadImg" class="w-full object-cover max-h-96" src="" alt="Article feature" />
         </div>
 
-        <!-- Body Content -->
         <article id="readerBody" class="reader-content text-slate-200 font-serif text-lg leading-relaxed space-y-4"></article>
-
       </div>
     </div>
 
@@ -262,7 +356,7 @@
           </div>
           <div>
             <h3 class="font-bold text-xs text-white">Staunt AI Copilot</h3>
-            <p class="text-[9px] text-slate-400">Zero-Telemetry Page Intelligence</p>
+            <p class="text-[9px] text-slate-400">Zero-Telemetry In-Page Intelligence</p>
           </div>
         </div>
         <button onclick="toggleCopilot()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
@@ -348,10 +442,112 @@
       </div>
     </aside>
 
+    <!-- ======================================================================= -->
+    <!-- VIEW 5: BROWSING HISTORY SLIDE-OVER DRAWER -->
+    <!-- ======================================================================= -->
+    <aside id="historyDrawer" class="hidden w-80 sm:w-96 h-full bg-[#0c1222] border-l border-slate-800 flex flex-col z-40 shadow-2xl flex-shrink-0">
+      <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-[#111a30]">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-lg bg-amber-600 flex items-center justify-center text-white">
+            <i data-lucide="history" class="w-3.5 h-3.5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-xs text-white">Browsing History</h3>
+            <p class="text-[9px] text-slate-400">Local &amp; Encrypted in Browser</p>
+          </div>
+        </div>
+        <button onclick="toggleHistoryDrawer()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-2 border-b border-slate-800 bg-[#070a13] flex items-center gap-2">
+        <div class="flex items-center bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1 flex-1">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 mr-1.5"></i>
+          <input 
+            id="historySearchInput" 
+            type="text" 
+            placeholder="Search history..." 
+            class="bg-transparent text-white text-xs w-full focus:outline-none"
+            oninput="renderHistoryList(this.value)"
+          />
+        </div>
+        <button onclick="clearAllHistory()" title="Clear All History" class="p-1.5 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs border border-rose-500/30 transition-all flex items-center gap-1">
+          <i data-lucide="trash-2" class="w-3 h-3"></i>
+          <span class="text-[10px]">Clear</span>
+        </button>
+      </div>
+
+      <div id="historyListContainer" class="flex-1 overflow-y-auto p-2 space-y-1.5 custom-scrollbar text-xs">
+        <!-- Injected by JS -->
+      </div>
+    </aside>
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 6: BOOKMARKS MANAGER SLIDE-OVER DRAWER -->
+    <!-- ======================================================================= -->
+    <aside id="bookmarksDrawer" class="hidden w-80 sm:w-96 h-full bg-[#0c1222] border-l border-slate-800 flex flex-col z-40 shadow-2xl flex-shrink-0">
+      <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-[#111a30]">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-lg bg-emerald-600 flex items-center justify-center text-white">
+            <i data-lucide="bookmark" class="w-3.5 h-3.5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-xs text-white">Bookmarks Manager</h3>
+            <p class="text-[9px] text-slate-400">Quick Access Hub</p>
+          </div>
+        </div>
+        <button onclick="toggleBookmarksDrawer()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-2 border-b border-slate-800 bg-[#070a13] flex items-center justify-between">
+        <span id="bookmarksCountText" class="text-slate-400 text-xs font-mono">0 bookmarks</span>
+        <button onclick="addCustomBookmarkPrompt()" class="px-2 py-1 rounded bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold flex items-center gap-1">
+          <i data-lucide="plus" class="w-3 h-3"></i>
+          <span>Add Current</span>
+        </button>
+      </div>
+
+      <div id="bookmarksListContainer" class="flex-1 overflow-y-auto p-2 space-y-1.5 custom-scrollbar text-xs">
+        <!-- Injected by JS -->
+      </div>
+    </aside>
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 7: DOWNLOADS MANAGER SLIDE-OVER DRAWER -->
+    <!-- ======================================================================= -->
+    <aside id="downloadsDrawer" class="hidden w-80 sm:w-96 h-full bg-[#0c1222] border-l border-slate-800 flex flex-col z-40 shadow-2xl flex-shrink-0">
+      <div class="p-3 border-b border-slate-800 flex items-center justify-between bg-[#111a30]">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-lg bg-cyan-600 flex items-center justify-center text-white">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-xs text-white">Downloads Tray</h3>
+            <p class="text-[9px] text-slate-400">Files &amp; Media Captures</p>
+          </div>
+        </div>
+        <button onclick="toggleDownloadsDrawer()" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div id="downloadsListContainer" class="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar text-xs">
+        <!-- Injected by JS -->
+      </div>
+
+      <div class="p-2 border-t border-slate-800 bg-[#070a13] flex justify-between items-center text-xs text-slate-400">
+        <button onclick="clearDownloadsList()" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs">Clear List</button>
+        <span class="text-[10px] text-slate-500">Auto-saved to device</span>
+      </div>
+    </aside>
+
   </main>
 
   <!-- ========================================================================= -->
-  <!-- 3. SHIELD DEFENSE MODAL (BRAVE-STYLE CONTROL MATRIX) -->
+  <!-- 5. SHIELD DEFENSE MODAL (BRAVE-STYLE CONTROL MATRIX) -->
   <!-- ========================================================================= -->
   <div id="shieldModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-[#0f172a] border border-slate-700 rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
@@ -429,60 +625,292 @@
       </div>
 
       <button onclick="applyAndReloadShield()" class="w-full py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs transition-all shadow-lg shadow-violet-600/20">
-        Apply & Reload Tab
+        Apply &amp; Reload Tab
       </button>
     </div>
   </div>
 
   <!-- ========================================================================= -->
-  <!-- 4. JAVASCRIPT BROWSER OPERATING SYSTEM ENGINE -->
+  <!-- 6. JAVASCRIPT BROWSER OPERATING SYSTEM ENGINE -->
   <!-- ========================================================================= -->
   <script>
-    let activeUrl = "staunt://newtab";
-    let activeMode = "start"; // start | proxy | search | reader
+    // State
+    let tabs = [];
+    let activeTabId = null;
+    let nextTabCounter = 1;
+    let currentShieldMode = "standard"; // standard | aggressive | off
     let readerFontSize = 18;
-    let currentShieldMode = "standard"; // standard (Brave mode) | aggressive | off
 
-    // Initialize
+    // Local Storage Keys
+    const LS_BOOKMARKS = "staunt_bookmarks_v1";
+    const LS_HISTORY = "staunt_history_v1";
+    const LS_DOWNLOADS = "staunt_downloads_v1";
+
+    // Default Bookmarks
+    const defaultBookmarks = [
+      { id: 'b1', title: 'Hacker News', url: 'https://news.ycombinator.com', icon: 'orange' },
+      { id: 'b2', title: 'Wikipedia', url: 'https://en.wikipedia.org', icon: 'slate' },
+      { id: 'b3', title: 'GitHub', url: 'https://github.com', icon: 'black' },
+      { id: 'b4', title: 'BBC News', url: 'https://www.bbc.com/news', icon: 'red' },
+      { id: 'b5', title: 'arXiv Research', url: 'https://arxiv.org', icon: 'rose' },
+      { id: 'b6', title: 'HuggingFace', url: 'https://huggingface.co', icon: 'amber' },
+      { id: 'b7', title: 'Reddit', url: 'https://reddit.com', icon: 'orange' }
+    ];
+
+    function getStoredBookmarks() {
+      try {
+        const d = localStorage.getItem(LS_BOOKMARKS);
+        if (d) return JSON.parse(d);
+      } catch(e) {}
+      localStorage.setItem(LS_BOOKMARKS, JSON.stringify(defaultBookmarks));
+      return defaultBookmarks;
+    }
+
+    function saveStoredBookmarks(bms) {
+      localStorage.setItem(LS_BOOKMARKS, JSON.stringify(bms));
+      renderBookmarksBar();
+      renderBookmarksDrawer();
+    }
+
+    function getStoredHistory() {
+      try {
+        const d = localStorage.getItem(LS_HISTORY);
+        if (d) return JSON.parse(d);
+      } catch(e) {}
+      return [];
+    }
+
+    function addHistoryEntry(url, title) {
+      if (!url || url.startsWith('staunt://') || url.startsWith('about:')) return;
+      try {
+        let history = getStoredHistory();
+        // Remove duplicate of the same URL in top 5
+        history = history.filter(h => h.url !== url);
+        history.unshift({
+          url: url,
+          title: title || url,
+          timestamp: Date.now()
+        });
+        if (history.length > 200) history = history.slice(0, 200);
+        localStorage.setItem(LS_HISTORY, JSON.stringify(history));
+      } catch(e) {}
+    }
+
+    function getStoredDownloads() {
+      try {
+        const d = localStorage.getItem(LS_DOWNLOADS);
+        if (d) return JSON.parse(d);
+      } catch(e) {}
+      return [];
+    }
+
+    function addDownloadEntry(title, url, format, size) {
+      try {
+        let list = getStoredDownloads();
+        list.unshift({
+          id: 'dl_' + Date.now(),
+          title: title,
+          url: url,
+          format: format || 'Direct',
+          size: size || 'Complete',
+          timestamp: Date.now()
+        });
+        if (list.length > 50) list = list.slice(0, 50);
+        localStorage.setItem(LS_DOWNLOADS, JSON.stringify(list));
+        renderDownloadsDrawer();
+        // Flash badge
+        const badge = document.getElementById("downloadsBadge");
+        if (badge) {
+          badge.classList.remove("hidden");
+          setTimeout(() => badge.classList.add("hidden"), 4000);
+        }
+      } catch(e) {}
+    }
+
+    // =========================================================================
+    // INITIALIZATION & EVENT LISTENERS
+    // =========================================================================
     function initBrowser() {
-      renderStartPage();
-      updateClock();
-      setInterval(updateClock, 1000);
+      renderBookmarksBar();
+      createNewTab('staunt://newtab');
+      setupKeyboardShortcuts();
       lucide.createIcons();
     }
 
-    function updateClock() {
-      const el = document.getElementById("startClock");
-      const dt = document.getElementById("startDate");
-      if (el) {
-        const now = new Date();
-        el.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        if (dt) dt.textContent = now.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
+    // =========================================================================
+    // MULTI-TAB ENGINE CORE
+    // =========================================================================
+    function createNewTab(initialUrl = 'staunt://newtab') {
+      const tabId = 'tab_' + (nextTabCounter++);
+      const newTabObj = {
+        id: tabId,
+        url: initialUrl,
+        title: initialUrl === 'staunt://newtab' ? 'New Tab' : initialUrl,
+        favicon: '',
+        mode: initialUrl === 'staunt://newtab' ? 'start' : 'proxy',
+        history: [initialUrl],
+        historyIndex: 0,
+        domElement: null
+      };
+
+      tabs.push(newTabObj);
+
+      // Create DOM Container for this tab inside #mainCanvasContainer
+      const container = document.getElementById('mainCanvasContainer');
+      const tabCanvas = document.createElement('div');
+      tabCanvas.id = `canvas_${tabId}`;
+      tabCanvas.className = 'w-full h-full relative';
+      container.appendChild(tabCanvas);
+
+      newTabObj.domElement = tabCanvas;
+
+      // Switch to new tab
+      switchToTab(tabId);
+
+      // Render content
+      if (initialUrl === 'staunt://newtab') {
+        renderStartPageContent(tabId);
+      } else {
+        renderProxyContent(tabId, initialUrl);
+      }
+
+      renderTabStrip();
+      return tabId;
+    }
+
+    function switchToTab(tabId) {
+      const targetTab = tabs.find(t => t.id === tabId);
+      if (!targetTab) return;
+
+      activeTabId = tabId;
+
+      // Hide all other canvas divs, display this tab's canvas div
+      tabs.forEach(t => {
+        const c = document.getElementById(`canvas_${t.id}`);
+        if (c) {
+          if (t.id === tabId) {
+            c.style.display = 'block';
+          } else {
+            c.style.display = 'none';
+          }
+        }
+      });
+
+      // Synchronize Omnibox
+      const omnibox = document.getElementById('omniboxInput');
+      if (targetTab.url === 'staunt://newtab') {
+        omnibox.value = '';
+        omnibox.placeholder = "Search with AI, enter any URL, or paste video link to sniff...";
+      } else {
+        omnibox.value = targetTab.url;
+      }
+
+      // Update Bookmark Star state
+      updateBookmarkStarState(targetTab.url);
+
+      // Update Nav Buttons
+      updateNavButtonsState();
+
+      renderTabStrip();
+      closeReaderMode();
+    }
+
+    function closeTab(tabId, event) {
+      if (event) event.stopPropagation();
+
+      if (tabs.length === 1) {
+        // If closing last tab, reset it to New Tab
+        const singleTab = tabs[0];
+        singleTab.url = 'staunt://newtab';
+        singleTab.title = 'New Tab';
+        singleTab.history = ['staunt://newtab'];
+        singleTab.historyIndex = 0;
+        renderStartPageContent(singleTab.id);
+        switchToTab(singleTab.id);
+        return;
+      }
+
+      const index = tabs.findIndex(t => t.id === tabId);
+      if (index === -1) return;
+
+      // Remove Canvas DOM element
+      const c = document.getElementById(`canvas_${tabId}`);
+      if (c && c.parentNode) c.parentNode.removeChild(c);
+
+      tabs.splice(index, 1);
+
+      // If closed tab was active, switch to adjacent tab
+      if (activeTabId === tabId) {
+        const nextIndex = Math.max(0, index - 1);
+        switchToTab(tabs[nextIndex].id);
+      } else {
+        renderTabStrip();
       }
     }
 
-    // =========================================================================
-    // START PAGE RENDERER
-    // =========================================================================
-    function renderStartPage() {
-      activeMode = "start";
-      activeUrl = "staunt://newtab";
-      document.getElementById("omniboxInput").value = "";
-      document.getElementById("omniboxInput").placeholder = "Search with AI, enter any URL, or paste video link to sniff...";
+    function renderTabStrip() {
+      const container = document.getElementById('tabStripContainer');
+      container.innerHTML = tabs.map(t => {
+        const isActive = t.id === activeTabId;
+        const faviconSrc = t.favicon || (t.url.startsWith('http') ? `https://www.google.com/s2/favicons?domain=${new URL(t.url).hostname}&sz=32` : '');
+        
+        return `
+          <div 
+            onclick="switchToTab('${t.id}')"
+            class="browser-tab ${isActive ? 'active' : ''} group flex items-center gap-1.5 px-3 py-1 rounded-t-lg text-xs cursor-pointer max-w-[200px] min-w-[120px] h-[34px] border-b-0"
+            title="${escapeHtml(t.title)}"
+          >
+            ${faviconSrc ? `<img src="${faviconSrc}" class="w-3.5 h-3.5 rounded flex-shrink-0" onerror="this.style.display='none'" />` : `<i data-lucide="${t.url === 'staunt://newtab' ? 'compass' : 'globe'}" class="w-3.5 h-3.5 text-slate-400 flex-shrink-0"></i>`}
+            <span class="truncate font-medium text-[11px] flex-1 select-none">${escapeHtml(t.title || 'Untitled')}</span>
+            <button 
+              onclick="closeTab('${t.id}', event)" 
+              title="Close Tab (Ctrl+W)" 
+              class="w-4 h-4 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700/60 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+            >
+              <i data-lucide="x" class="w-2.5 h-2.5"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
 
-      const container = document.getElementById("mainCanvasContainer");
-      container.innerHTML = `
+      lucide.createIcons();
+    }
+
+    function updateNavButtonsState() {
+      const tab = tabs.find(t => t.id === activeTabId);
+      if (!tab) return;
+      const btnBack = document.getElementById('btnBack');
+      const btnForward = document.getElementById('btnForward');
+      if (btnBack) btnBack.style.opacity = tab.historyIndex > 0 ? "1" : "0.4";
+      if (btnForward) btnForward.style.opacity = tab.historyIndex < (tab.history.length - 1) ? "1" : "0.4";
+    }
+
+    // =========================================================================
+    // START PAGE CONTENT
+    // =========================================================================
+    function renderStartPageContent(tabId) {
+      const canvas = document.getElementById(`canvas_${tabId}`);
+      if (!canvas) return;
+
+      const tab = tabs.find(t => t.id === tabId);
+      if (tab) {
+        tab.url = "staunt://newtab";
+        tab.title = "New Tab";
+        tab.mode = "start";
+      }
+
+      canvas.innerHTML = `
         <div class="w-full h-full overflow-y-auto custom-scrollbar flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#060911] via-[#0b1020] to-[#060911]">
           <div class="max-w-2xl w-full text-center space-y-6 -mt-8">
             
             <div class="space-y-1">
-              <div id="startClock" class="text-4xl sm:text-5xl font-black text-white tracking-tight font-mono">12:00</div>
-              <div id="startDate" class="text-xs text-slate-400 font-medium">Staunt Sovereign Engine Active</div>
+              <div class="clock-display text-4xl sm:text-5xl font-black text-white tracking-tight font-mono">12:00</div>
+              <div class="text-xs text-slate-400 font-medium">Staunt Sovereign Engine Active • Chromium 130 Core</div>
             </div>
 
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-mono">
               <span class="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></span>
-              <span>STAUNT ULTRA CORE • DUAL-ENGINE AI BROWSING</span>
+              <span>STAUNT ULTRA CORE • MULTI-TAB SOVEREIGN WORKSPACE</span>
             </div>
 
             <div class="relative max-w-xl mx-auto">
@@ -493,9 +921,9 @@
                   placeholder="Search live web with AI or enter any website..." 
                   class="bg-transparent text-white placeholder-slate-500 text-sm font-medium w-full focus:outline-none"
                   onkeydown="if(event.key==='Enter') executeSmartSearch(this.value)"
-                  id="startInput"
+                  id="startInput_${tabId}"
                 />
-                <button onclick="executeSmartSearch(document.getElementById('startInput').value)" class="bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex-shrink-0">
+                <button onclick="executeSmartSearch(document.getElementById('startInput_${tabId}').value)" class="bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex-shrink-0">
                   Search
                 </button>
               </div>
@@ -520,7 +948,7 @@
                 <span class="text-[11px] text-slate-300 mt-2 font-medium">BBC News</span>
               </button>
               <button onclick="browseTo('https://arxiv.org')" class="flex flex-col items-center p-3 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 hover:border-violet-500/50 transition-all group">
-                <div class="w-9 h-9 rounded-xl bg-red-700 flex items-center justify-center text-white font-bold text-[10px] shadow-md group-hover:scale-110 transition-transform">arXiv</div>
+                <div class="w-9 h-9 rounded-xl bg-rose-700 flex items-center justify-center text-white font-bold text-[10px] shadow-md group-hover:scale-110 transition-transform">arXiv</div>
                 <span class="text-[11px] text-slate-300 mt-2 font-medium">Research</span>
               </button>
               <button onclick="browseTo('https://huggingface.co')" class="flex flex-col items-center p-3 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 hover:border-violet-500/50 transition-all group">
@@ -529,14 +957,14 @@
               </button>
             </div>
 
-            <!-- Native Desktop App Download Feature Card -->
+            <!-- Windows Native App Feature Card -->
             <div class="p-4 rounded-2xl bg-gradient-to-r from-violet-900/30 via-indigo-900/20 to-cyan-900/30 border border-violet-500/30 flex items-center justify-between text-left max-w-xl mx-auto shadow-xl">
               <div>
                 <div class="text-xs font-bold text-white flex items-center gap-1.5">
                   <i data-lucide="monitor" class="w-4 h-4 text-violet-400"></i>
                   <span>Staunt Browser Ultra for Windows</span>
                 </div>
-                <p class="text-[11px] text-slate-300 mt-1">Native Chromium 130 • Socket Ad-Firewall • 4K Media Sniffer • RAM Hibernation</p>
+                <p class="text-[11px] text-slate-300 mt-1">Stand-alone Chromium 130 • Socket Ad-Firewall • 4K Media Sniffer • Zero Telemetry</p>
               </div>
               <a href="/api/browser/download/windows" download class="px-3 py-1.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold flex items-center gap-1 flex-shrink-0 transition-all shadow-md shadow-violet-600/30">
                 <i data-lucide="download" class="w-3.5 h-3.5"></i>
@@ -547,23 +975,151 @@
           </div>
         </div>
       `;
+
+      updateClocks();
+      renderTabStrip();
       lucide.createIcons();
     }
 
+    function updateClocks() {
+      const now = new Date();
+      const str = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      document.querySelectorAll('.clock-display').forEach(el => { el.textContent = str; });
+    }
+    setInterval(updateClocks, 1000);
+
     // =========================================================================
-    // INTELLIGENT ROUTER & SMART SEARCH EXECUTION
+    // NAVIGATION & PROXY ENGINE
+    // =========================================================================
+    function browseTo(targetUrl) {
+      const tab = tabs.find(t => t.id === activeTabId);
+      if (!tab) return;
+
+      if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
+        targetUrl = "https://" + targetUrl;
+      }
+
+      tab.url = targetUrl;
+      tab.mode = "proxy";
+      tab.title = targetUrl.replace(/^https?:\/\//, '').split('/')[0];
+      
+      // History record
+      tab.historyIndex++;
+      tab.history = tab.history.slice(0, tab.historyIndex);
+      tab.history.push(targetUrl);
+
+      addHistoryEntry(targetUrl, tab.title);
+
+      document.getElementById("omniboxInput").value = targetUrl;
+      updateBookmarkStarState(targetUrl);
+      updateNavButtonsState();
+
+      renderProxyContent(tab.id, targetUrl);
+      renderTabStrip();
+    }
+
+    function renderProxyContent(tabId, url) {
+      const canvas = document.getElementById(`canvas_${tabId}`);
+      if (!canvas) return;
+
+      startProgress();
+
+      canvas.innerHTML = `
+        <iframe 
+          id="iframe_${tabId}" 
+          src="/api/browser/proxy?url=${encodeURIComponent(url)}&shield=${encodeURIComponent(currentShieldMode)}" 
+          class="tab-viewport-frame"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+          allowfullscreen="true"
+          onload="endProgress()"
+        ></iframe>
+      `;
+    }
+
+    function reloadActiveTab() {
+      const tab = tabs.find(t => t.id === activeTabId);
+      if (!tab) return;
+
+      startProgress();
+      const rot = document.getElementById("reloadIcon");
+      if (rot) rot.classList.add("animate-spin");
+
+      if (tab.mode === 'proxy') {
+        const iframe = document.getElementById(`iframe_${tab.id}`);
+        if (iframe) iframe.src = iframe.src;
+      } else if (tab.mode === 'search') {
+        executeSmartSearch(tab.url.replace("staunt://search?q=", ""));
+      } else {
+        renderStartPageContent(tab.id);
+        endProgress();
+      }
+
+      setTimeout(() => {
+        if (rot) rot.classList.remove("animate-spin");
+      }, 800);
+    }
+
+    function navigateBack() {
+      const tab = tabs.find(t => t.id === activeTabId);
+      if (!tab || tab.historyIndex <= 0) return;
+
+      tab.historyIndex--;
+      const prevUrl = tab.history[tab.historyIndex];
+      tab.url = prevUrl;
+
+      if (prevUrl === 'staunt://newtab') {
+        renderStartPageContent(tab.id);
+      } else {
+        renderProxyContent(tab.id, prevUrl);
+      }
+
+      document.getElementById("omniboxInput").value = prevUrl === 'staunt://newtab' ? '' : prevUrl;
+      updateNavButtonsState();
+      renderTabStrip();
+    }
+
+    function navigateForward() {
+      const tab = tabs.find(t => t.id === activeTabId);
+      if (!tab || tab.historyIndex >= tab.history.length - 1) return;
+
+      tab.historyIndex++;
+      const nextUrl = tab.history[tab.historyIndex];
+      tab.url = nextUrl;
+
+      if (nextUrl === 'staunt://newtab') {
+        renderStartPageContent(tab.id);
+      } else {
+        renderProxyContent(tab.id, nextUrl);
+      }
+
+      document.getElementById("omniboxInput").value = nextUrl === 'staunt://newtab' ? '' : nextUrl;
+      updateNavButtonsState();
+      renderTabStrip();
+    }
+
+    function goHome() {
+      const tab = tabs.find(t => t.id === activeTabId);
+      if (!tab) return;
+      closeReaderMode();
+      renderStartPageContent(tab.id);
+    }
+
+    // =========================================================================
+    // OMNIBOX ROUTER
     // =========================================================================
     function submitOmnibox() {
       const val = document.getElementById("omniboxInput").value.trim();
       if (!val) return;
 
-      // 1. Detect if it's a media URL (YouTube, Vimeo, TikTok, Twitter, Instagram)
+      closeAutocomplete();
+
+      // 1. Detect media URL
       if (isMediaUrl(val)) {
         sniffVideoUrl(val);
         return;
       }
 
-      // 2. Detect if it's a URL or search query
+      // 2. Detect URL vs Search
       if (val.startsWith("http://") || val.startsWith("https://") || (val.includes(".") && !val.includes(" "))) {
         browseTo(val);
       } else {
@@ -580,21 +1136,77 @@
       else if (e.key === "Escape") closeAutocomplete();
     }
 
+    function clearOmnibox() {
+      const el = document.getElementById("omniboxInput");
+      el.value = "";
+      el.focus();
+      closeAutocomplete();
+    }
+
+    function copyCurrentUrl() {
+      const tab = tabs.find(t => t.id === activeTabId);
+      if (!tab) return;
+      navigator.clipboard.writeText(tab.url).then(() => {
+        alert("Link copied to clipboard: " + tab.url);
+      });
+    }
+
+    let suggestTimer = null;
+    function handleOmniboxInput(e) {
+      const q = e.target.value.trim();
+      clearTimeout(suggestTimer);
+      if (q.length < 2) {
+        closeAutocomplete();
+        return;
+      }
+      suggestTimer = setTimeout(() => {
+        fetch("/api/browser/suggest?q=" + encodeURIComponent(q))
+          .then(res => res.json())
+          .then(data => {
+            if (data.suggestions && data.suggestions.length > 0) {
+              const dd = document.getElementById("autocompleteDropdown");
+              dd.innerHTML = data.suggestions.map(s => `
+                <div onmousedown="executeSmartSearch('${escapeHtml(s)}'); closeAutocomplete();" class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white cursor-pointer text-xs transition-colors">
+                  <i data-lucide="search" class="w-3 h-3 text-violet-400"></i>
+                  <span>${escapeHtml(s)}</span>
+                </div>
+              `).join("");
+              dd.classList.remove("hidden");
+              lucide.createIcons();
+            }
+          })
+          .catch(() => closeAutocomplete());
+      }, 180);
+    }
+
+    function closeAutocomplete() {
+      document.getElementById("autocompleteDropdown").classList.add("hidden");
+    }
+
     // =========================================================================
-    // SOVEREIGN AI SEARCH ENGINE CANVAS (Better than Bing & Perplexity)
+    // SOVEREIGN AI SEARCH ENGINE
     // =========================================================================
     function executeSmartSearch(query) {
       if (!query || !query.trim()) return;
       query = query.trim();
 
-      activeMode = "search";
-      activeUrl = "staunt://search?q=" + encodeURIComponent(query);
+      const tab = tabs.find(t => t.id === activeTabId);
+      if (!tab) return;
+
+      tab.mode = "search";
+      tab.url = "staunt://search?q=" + encodeURIComponent(query);
+      tab.title = query + " — Staunt Search";
+      tab.historyIndex++;
+      tab.history.push(tab.url);
+
       document.getElementById("omniboxInput").value = query;
+      updateNavButtonsState();
+      renderTabStrip();
 
       startProgress();
 
-      const container = document.getElementById("mainCanvasContainer");
-      container.innerHTML = `
+      const canvas = document.getElementById(`canvas_${tab.id}`);
+      canvas.innerHTML = `
         <div class="w-full h-full overflow-y-auto custom-scrollbar p-4 sm:p-8 bg-[#060911]">
           <div class="max-w-3xl mx-auto space-y-6">
             
@@ -606,7 +1218,7 @@
             </div>
 
             <!-- AI Insight Box -->
-            <div id="searchAiBox" class="p-4 sm:p-6 rounded-2xl bg-[#0c1222] border border-violet-500/30 shadow-2xl space-y-3">
+            <div id="searchAiBox_${tab.id}" class="p-4 sm:p-6 rounded-2xl bg-[#0c1222] border border-violet-500/30 shadow-2xl space-y-3">
               <div class="flex items-center justify-between">
                 <h3 class="text-base font-bold text-white flex items-center gap-2">
                   <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
@@ -614,7 +1226,7 @@
                 </h3>
                 <span class="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20 font-mono">Zero Telemetry</span>
               </div>
-              <div id="searchAiContent" class="space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
+              <div id="searchAiContent_${tab.id}" class="space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
                 <div class="animate-pulse space-y-2 py-2">
                   <div class="h-3 bg-slate-800 rounded w-3/4"></div>
                   <div class="h-3 bg-slate-800 rounded w-5/6"></div>
@@ -623,14 +1235,12 @@
               </div>
             </div>
 
-            <!-- Web Results Header -->
             <div class="flex items-center justify-between pt-2">
               <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Verified Web Sources</h4>
-              <span id="sourcesCount" class="text-xs text-slate-500 font-mono">Scanning...</span>
+              <span id="sourcesCount_${tab.id}" class="text-xs text-slate-500 font-mono">Scanning...</span>
             </div>
 
-            <!-- Results Cards Container -->
-            <div id="searchResultsList" class="space-y-3"></div>
+            <div id="searchResultsList_${tab.id}" class="space-y-3"></div>
 
           </div>
         </div>
@@ -641,39 +1251,41 @@
         .then(res => res.json())
         .then(data => {
           endProgress();
-          renderSearchResults(data);
+          renderSearchResults(tab.id, data);
         })
         .catch(err => {
           endProgress();
-          document.getElementById("searchAiContent").innerHTML = `<p class="text-rose-400">Search error: ${err.message}</p>`;
+          const box = document.getElementById(`searchAiContent_${tab.id}`);
+          if (box) box.innerHTML = `<p class="text-rose-400">Search error: ${err.message}</p>`;
         });
     }
 
-    function renderSearchResults(data) {
-      // 1. Render AI Summary
-      const aiContent = document.getElementById("searchAiContent");
-      if (data.ai_summary && data.ai_summary.points) {
+    function renderSearchResults(tabId, data) {
+      const aiContent = document.getElementById(`searchAiContent_${tabId}`);
+      if (aiContent && data.ai_summary && data.ai_summary.points) {
         aiContent.innerHTML = data.ai_summary.points.map(p => `
           <div class="flex items-start gap-2">
             <span class="text-violet-400 font-bold">•</span>
-            <span>${p}</span>
+            <span>${escapeHtml(p)}</span>
           </div>
         `).join("");
       }
 
-      document.getElementById("sourcesCount").textContent = `${data.results.length} sources found`;
+      const sourcesCount = document.getElementById(`sourcesCount_${tabId}`);
+      if (sourcesCount) sourcesCount.textContent = `${data.results ? data.results.length : 0} sources found`;
 
-      // 2. Render Result Cards
-      const list = document.getElementById("searchResultsList");
+      const list = document.getElementById(`searchResultsList_${tabId}`);
+      if (!list) return;
+
       if (!data.results || data.results.length === 0) {
         list.innerHTML = `<div class="p-4 rounded-xl bg-slate-800/40 text-xs text-slate-400">No web results returned for this query.</div>`;
         return;
       }
 
-      list.innerHTML = data.results.map((r, i) => `
+      list.innerHTML = data.results.map(r => `
         <div class="p-4 rounded-xl bg-[#0c1222]/80 hover:bg-[#0c1222] border border-slate-800 hover:border-slate-700 transition-all space-y-2 group">
           <div class="flex items-center justify-between text-xs">
-            <span class="font-mono text-violet-400 text-[11px]">${r.domain}</span>
+            <span class="font-mono text-violet-400 text-[11px]">${escapeHtml(r.domain)}</span>
             <div class="flex items-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
               <button onclick="openReaderMode('${r.url}')" class="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 text-[10px] font-semibold flex items-center gap-1">
                 <i data-lucide="book-open" class="w-3 h-3"></i>
@@ -686,9 +1298,9 @@
             </div>
           </div>
           <h3 onclick="browseTo('${r.url}')" class="text-sm sm:text-base font-bold text-white hover:text-violet-300 cursor-pointer transition-colors leading-snug">
-            ${r.title}
+            ${escapeHtml(r.title)}
           </h3>
-          <p class="text-xs text-slate-300 leading-relaxed">${r.snippet}</p>
+          <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(r.snippet)}</p>
         </div>
       `).join("");
 
@@ -696,40 +1308,315 @@
     }
 
     // =========================================================================
-    // LIVE PROXY VIEW
+    // BOOKMARKS MANAGER
     // =========================================================================
-    function browseTo(targetUrl) {
-      if (!targetUrl.startsWith("http://") && !targetUrl.startsWith("https://")) {
-        targetUrl = "https://" + targetUrl;
+    function renderBookmarksBar() {
+      const bms = getStoredBookmarks();
+      const container = document.getElementById("bookmarksBarItems");
+      if (!container) return;
+
+      container.innerHTML = bms.map(b => `
+        <button 
+          onclick="browseTo('${b.url}')" 
+          class="flex items-center gap-1.5 px-2 py-0.5 rounded hover:bg-slate-800 text-slate-300 hover:text-white transition-colors flex-shrink-0"
+          title="${escapeHtml(b.url)}"
+        >
+          <img src="https://www.google.com/s2/favicons?domain=${new URL(b.url).hostname}&sz=16" class="w-3 h-3 rounded" onerror="this.style.display='none'" />
+          <span class="truncate max-w-[100px]">${escapeHtml(b.title)}</span>
+        </button>
+      `).join("");
+    }
+
+    function toggleBookmarksDrawer() {
+      const drawer = document.getElementById("bookmarksDrawer");
+      drawer.classList.toggle("hidden");
+      if (!drawer.classList.contains("hidden")) {
+        renderBookmarksDrawer();
+      }
+    }
+
+    function renderBookmarksDrawer() {
+      const bms = getStoredBookmarks();
+      const countEl = document.getElementById("bookmarksCountText");
+      if (countEl) countEl.textContent = `${bms.length} saved bookmarks`;
+
+      const list = document.getElementById("bookmarksListContainer");
+      if (!list) return;
+
+      if (bms.length === 0) {
+        list.innerHTML = `<div class="text-center py-8 text-slate-500">No bookmarks saved yet. Click the Star (★) in the address bar to bookmark any page!</div>`;
+        return;
       }
 
-      activeMode = "proxy";
-      activeUrl = targetUrl;
-      document.getElementById("omniboxInput").value = targetUrl;
+      list.innerHTML = bms.map((b, i) => `
+        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 transition-all group">
+          <div onclick="browseTo('${b.url}'); toggleBookmarksDrawer();" class="flex items-center gap-2 overflow-hidden flex-1 cursor-pointer">
+            <img src="https://www.google.com/s2/favicons?domain=${new URL(b.url).hostname}&sz=32" class="w-4 h-4 rounded flex-shrink-0" onerror="this.style.display='none'" />
+            <div class="truncate">
+              <div class="font-bold text-white text-xs truncate">${escapeHtml(b.title)}</div>
+              <div class="text-[10px] text-slate-400 font-mono truncate">${escapeHtml(b.url)}</div>
+            </div>
+          </div>
+          <button onclick="deleteBookmark('${b.id}')" title="Delete Bookmark" class="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-slate-700 flex-shrink-0">
+            <i data-lucide="trash-2" class="w-3 h-3"></i>
+          </button>
+        </div>
+      `).join("");
 
-      startProgress();
+      lucide.createIcons();
+    }
 
-      const container = document.getElementById("mainCanvasContainer");
+    function toggleBookmarkActiveTab() {
+      const tab = tabs.find(t => t.id === activeTabId);
+      if (!tab || !tab.url || tab.url.startsWith("staunt://")) {
+        alert("Cannot bookmark an internal start page.");
+        return;
+      }
+
+      let bms = getStoredBookmarks();
+      const existingIndex = bms.findIndex(b => b.url === tab.url);
+
+      if (existingIndex >= 0) {
+        // Remove bookmark
+        bms.splice(existingIndex, 1);
+        saveStoredBookmarks(bms);
+        updateBookmarkStarState(tab.url);
+      } else {
+        // Add bookmark
+        bms.push({
+          id: 'b_' + Date.now(),
+          title: tab.title || tab.url,
+          url: tab.url,
+          icon: 'default'
+        });
+        saveStoredBookmarks(bms);
+        updateBookmarkStarState(tab.url);
+      }
+    }
+
+    function deleteBookmark(id) {
+      let bms = getStoredBookmarks().filter(b => b.id !== id);
+      saveStoredBookmarks(bms);
+    }
+
+    function addCustomBookmarkPrompt() {
+      const tab = tabs.find(t => t.id === activeTabId);
+      if (tab && tab.url && !tab.url.startsWith('staunt://')) {
+        toggleBookmarkActiveTab();
+      } else {
+        const u = prompt("Enter bookmark URL:");
+        if (u) {
+          const t = prompt("Enter bookmark Title:", u);
+          let bms = getStoredBookmarks();
+          bms.push({ id: 'b_' + Date.now(), title: t || u, url: u });
+          saveStoredBookmarks(bms);
+        }
+      }
+    }
+
+    function updateBookmarkStarState(url) {
+      const star = document.getElementById("bookmarkStarIcon");
+      if (!star) return;
+      const bms = getStoredBookmarks();
+      const isSaved = bms.some(b => b.url === url);
+      if (isSaved) {
+        star.classList.add("fill-amber-400", "text-amber-400");
+      } else {
+        star.classList.remove("fill-amber-400", "text-amber-400");
+      }
+    }
+
+    // =========================================================================
+    // BROWSING HISTORY MANAGER
+    // =========================================================================
+    function toggleHistoryDrawer() {
+      const drawer = document.getElementById("historyDrawer");
+      drawer.classList.toggle("hidden");
+      if (!drawer.classList.contains("hidden")) {
+        renderHistoryList();
+      }
+    }
+
+    function renderHistoryList(filterQuery = "") {
+      let history = getStoredHistory();
+      if (filterQuery) {
+        const q = filterQuery.toLowerCase();
+        history = history.filter(h => h.title.toLowerCase().includes(q) || h.url.toLowerCase().includes(q));
+      }
+
+      const list = document.getElementById("historyListContainer");
+      if (!list) return;
+
+      if (history.length === 0) {
+        list.innerHTML = `<div class="text-center py-8 text-slate-500">No browsing history matches.</div>`;
+        return;
+      }
+
+      list.innerHTML = history.map((h, i) => {
+        const timeStr = new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `
+          <div class="flex items-center justify-between p-2 rounded-xl bg-slate-800/40 hover:bg-slate-800 border border-slate-700/60 transition-all group">
+            <div onclick="browseTo('${h.url}'); toggleHistoryDrawer();" class="flex items-center gap-2 overflow-hidden flex-1 cursor-pointer">
+              <span class="text-[10px] text-slate-500 font-mono flex-shrink-0">${timeStr}</span>
+              <div class="truncate">
+                <div class="font-bold text-white text-xs truncate">${escapeHtml(h.title)}</div>
+                <div class="text-[10px] text-slate-400 font-mono truncate">${escapeHtml(h.url)}</div>
+              </div>
+            </div>
+            <button onclick="deleteHistoryItem(${i})" title="Remove item" class="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-slate-700 flex-shrink-0">
+              <i data-lucide="x" class="w-3 h-3"></i>
+            </button>
+          </div>
+        `;
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    function deleteHistoryItem(index) {
+      let history = getStoredHistory();
+      history.splice(index, 1);
+      localStorage.setItem(LS_HISTORY, JSON.stringify(history));
+      renderHistoryList(document.getElementById("historySearchInput").value);
+    }
+
+    function clearAllHistory() {
+      if (confirm("Are you sure you want to clear all browsing history?")) {
+        localStorage.removeItem(LS_HISTORY);
+        renderHistoryList();
+      }
+    }
+
+    // =========================================================================
+    // DOWNLOADS TRAY MANAGER
+    // =========================================================================
+    function toggleDownloadsDrawer() {
+      const drawer = document.getElementById("downloadsDrawer");
+      drawer.classList.toggle("hidden");
+      if (!drawer.classList.contains("hidden")) {
+        renderDownloadsDrawer();
+      }
+    }
+
+    function renderDownloadsDrawer() {
+      const dls = getStoredDownloads();
+      const list = document.getElementById("downloadsListContainer");
+      if (!list) return;
+
+      if (dls.length === 0) {
+        list.innerHTML = `<div class="text-center py-8 text-slate-500">No downloads yet. Media sniffed or downloaded files will appear here.</div>`;
+        return;
+      }
+
+      list.innerHTML = dls.map(d => `
+        <div class="p-2.5 rounded-xl bg-slate-800/40 border border-slate-700/60 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-bold text-white truncate max-w-[200px]">${escapeHtml(d.title)}</div>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">${escapeHtml(d.format)}</span>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-400">
+            <span>Status: Complete (${escapeHtml(d.size)})</span>
+            <a href="${d.url}" target="_blank" download class="text-cyan-400 hover:underline font-bold flex items-center gap-1">
+              <i data-lucide="download" class="w-3 h-3"></i>
+              <span>Save File</span>
+            </a>
+          </div>
+        </div>
+      `).join("");
+
+      lucide.createIcons();
+    }
+
+    function clearDownloadsList() {
+      localStorage.removeItem(LS_DOWNLOADS);
+      renderDownloadsDrawer();
+    }
+
+    // =========================================================================
+    // 4K MEDIA SNIFFER
+    // =========================================================================
+    function sniffVideoUrl(url) {
+      toggleMediaDrawer(true);
+      const container = document.getElementById("mediaListContainer");
       container.innerHTML = `
-        <iframe 
-          id="proxyIframe" 
-          src="/api/browser/proxy?url=${encodeURIComponent(targetUrl)}&shield=${encodeURIComponent(currentShieldMode)}" 
-          class="w-full h-full border-none block bg-white"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
-          allowfullscreen="true"
-          style="touch-action: auto !important; -webkit-overflow-scrolling: touch !important;"
-          onload="endProgress()"
-        ></iframe>
+        <div class="p-4 rounded-xl bg-slate-800/60 text-center space-y-2 animate-pulse">
+          <i data-lucide="loader" class="w-6 h-6 animate-spin mx-auto text-cyan-400"></i>
+          <p class="text-xs text-slate-300">Sniffing video & audio streams from URL...</p>
+        </div>
       `;
+      lucide.createIcons();
+
+      fetch("/api/browser/sniff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: url })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          container.innerHTML = `<div class="p-3 rounded-lg bg-rose-500/10 text-rose-300 text-xs">${escapeHtml(data.error)}</div>`;
+          return;
+        }
+
+        document.getElementById("mediaCountText").textContent = `${data.formats.length} formats available`;
+
+        container.innerHTML = `
+          <div class="p-3 rounded-xl bg-[#070a13] border border-cyan-500/30 space-y-3">
+            <div class="text-xs font-bold text-white leading-snug">${escapeHtml(data.title)}</div>
+            ${data.thumbnail ? `<img src="${data.thumbnail}" class="w-full rounded-lg object-cover max-h-40" />` : ''}
+            <div class="text-[11px] text-slate-400">Duration: ${escapeHtml(data.duration)}</div>
+            
+            <div class="space-y-1.5 pt-1">
+              <div class="text-[10px] uppercase font-bold text-slate-500">Available Direct Downloads</div>
+              ${data.formats.map(f => {
+                const downloadLink = `${data.download_route}&resolution=${f.resolution.replace('p','')}`;
+                return `
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/80 text-xs">
+                    <span class="font-bold text-cyan-300">${f.resolution} (${f.ext})</span>
+                    <span class="text-slate-400 text-[10px]">${f.filesize_mb > 0 ? f.filesize_mb + ' MB' : 'Direct'}</span>
+                    <a 
+                      href="${downloadLink}" 
+                      target="_blank" 
+                      onclick="addDownloadEntry('${escapeHtml(data.title).replace(/'/g, "\'")}', '${downloadLink}', '${f.resolution}', '${f.filesize_mb > 0 ? f.filesize_mb + ' MB' : 'Stream'}')"
+                      class="px-2 py-0.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px]"
+                    >
+                      Download
+                    </a>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+        lucide.createIcons();
+      })
+      .catch(err => {
+        container.innerHTML = `<div class="p-3 rounded-lg bg-rose-500/10 text-rose-300 text-xs">Error: ${err.message}</div>`;
+      });
+    }
+
+    function toggleMediaDrawer(forceOpen = false) {
+      const drawer = document.getElementById("mediaDrawer");
+      if (forceOpen) drawer.classList.remove("hidden");
+      else drawer.classList.toggle("hidden");
+    }
+
+    function rescanMedia() {
+      const tab = tabs.find(t => t.id === activeTabId);
+      if (tab && tab.url && tab.url.startsWith("http")) {
+        sniffVideoUrl(tab.url);
+      }
     }
 
     // =========================================================================
     // DISTRACTION-FREE READER MODE CANVAS
     // =========================================================================
     function toggleReaderMode() {
-      if (document.getElementById("readerCanvas").classList.contains("hidden")) {
-        if (activeUrl && activeUrl.startsWith("http")) {
-          openReaderMode(activeUrl);
+      const canvas = document.getElementById("readerCanvas");
+      if (canvas.classList.contains("hidden")) {
+        const tab = tabs.find(t => t.id === activeTabId);
+        if (tab && tab.url && tab.url.startsWith("http")) {
+          openReaderMode(tab.url);
         } else {
           alert("Open any webpage first to view it in Reader Mode.");
         }
@@ -763,8 +1650,8 @@
 
           const body = document.getElementById("readerBody");
           body.innerHTML = data.content.map(item => {
-            if (item.type === "heading") return `<h2>${item.text}</h2>`;
-            return `<p>${item.text}</p>`;
+            if (item.type === "heading") return `<h2>${escapeHtml(item.text)}</h2>`;
+            return `<p>${escapeHtml(item.text)}</p>`;
           }).join("");
 
           document.getElementById("readerCanvas").classList.remove("hidden");
@@ -789,73 +1676,6 @@
     }
 
     // =========================================================================
-    // IN-ENGINE 4K MEDIA SNIFFER
-    // =========================================================================
-    function sniffVideoUrl(url) {
-      toggleMediaDrawer(true);
-      const container = document.getElementById("mediaListContainer");
-      container.innerHTML = `
-        <div class="p-4 rounded-xl bg-slate-800/60 text-center space-y-2 animate-pulse">
-          <i data-lucide="loader" class="w-6 h-6 animate-spin mx-auto text-cyan-400"></i>
-          <p class="text-xs text-slate-300">Sniffing video & audio streams from URL...</p>
-        </div>
-      `;
-      lucide.createIcons();
-
-      fetch("/api/browser/sniff", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          container.innerHTML = `<div class="p-3 rounded-lg bg-rose-500/10 text-rose-300 text-xs">${data.error}</div>`;
-          return;
-        }
-
-        document.getElementById("mediaCountText").textContent = `${data.formats.length} formats available`;
-
-        container.innerHTML = `
-          <div class="p-3 rounded-xl bg-[#070a13] border border-cyan-500/30 space-y-3">
-            <div class="text-xs font-bold text-white leading-snug">${data.title}</div>
-            ${data.thumbnail ? `<img src="${data.thumbnail}" class="w-full rounded-lg object-cover max-h-40" />` : ''}
-            <div class="text-[11px] text-slate-400">Duration: ${data.duration}</div>
-            
-            <div class="space-y-1.5 pt-1">
-              <div class="text-[10px] uppercase font-bold text-slate-500">Available Direct Downloads</div>
-              ${data.formats.map(f => `
-                <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/80 text-xs">
-                  <span class="font-bold text-cyan-300">${f.resolution} (${f.ext})</span>
-                  <span class="text-slate-400 text-[10px]">${f.filesize_mb > 0 ? f.filesize_mb + ' MB' : 'Direct'}</span>
-                  <a href="${data.download_route}&resolution=${f.resolution.replace('p','')}" target="_blank" class="px-2 py-0.5 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-[10px]">
-                    Download
-                  </a>
-                </div>
-              `).join("")}
-            </div>
-          </div>
-        `;
-        lucide.createIcons();
-      })
-      .catch(err => {
-        container.innerHTML = `<div class="p-3 rounded-lg bg-rose-500/10 text-rose-300 text-xs">Error: ${err.message}</div>`;
-      });
-    }
-
-    function toggleMediaDrawer(forceOpen = false) {
-      const drawer = document.getElementById("mediaDrawer");
-      if (forceOpen) drawer.classList.remove("hidden");
-      else drawer.classList.toggle("hidden");
-    }
-
-    function rescanMedia() {
-      if (activeUrl && activeUrl.startsWith("http")) {
-        sniffVideoUrl(activeUrl);
-      }
-    }
-
-    // =========================================================================
     // AI COPILOT LOGIC
     // =========================================================================
     function toggleCopilot() {
@@ -864,6 +1684,9 @@
     }
 
     function askCopilot(mode) {
+      const tab = tabs.find(t => t.id === activeTabId);
+      const url = tab ? tab.url : "Active Tab";
+
       appendCopilotMessage("user", `Action: ${mode.toUpperCase()}`);
       appendCopilotMessage("bot", `Analyzing... <span class="animate-pulse">⚡ Thinking</span>`);
 
@@ -872,8 +1695,8 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           mode: mode,
-          page_url: activeUrl,
-          page_text: activeUrl
+          page_url: url,
+          page_text: url
         })
       })
       .then(res => res.json())
@@ -890,6 +1713,9 @@
       const prompt = input.value.trim();
       if (!prompt) return;
 
+      const tab = tabs.find(t => t.id === activeTabId);
+      const url = tab ? tab.url : "Active Tab";
+
       input.value = "";
       appendCopilotMessage("user", prompt);
       appendCopilotMessage("bot", `Analyzing... <span class="animate-pulse">⚡ Thinking</span>`);
@@ -900,8 +1726,8 @@
         body: JSON.stringify({
           mode: "chat",
           prompt: prompt,
-          page_url: activeUrl,
-          page_text: activeUrl
+          page_url: url,
+          page_text: url
         })
       })
       .then(res => res.json())
@@ -943,72 +1769,8 @@
     }
 
     // =========================================================================
-    // GENERAL UTILITIES
+    // SHIELD MODAL & PROTECTION LEVELS
     // =========================================================================
-    function navigateBack() {
-      const iframe = document.getElementById("proxyIframe");
-      if (iframe && iframe.contentWindow) {
-        try { iframe.contentWindow.history.back(); } catch(e) {}
-      }
-    }
-
-    function navigateForward() {
-      const iframe = document.getElementById("proxyIframe");
-      if (iframe && iframe.contentWindow) {
-        try { iframe.contentWindow.history.forward(); } catch(e) {}
-      }
-    }
-
-    function reloadActiveTab() {
-      startProgress();
-      const iframe = document.getElementById("proxyIframe");
-      if (iframe) iframe.src = iframe.src;
-    }
-
-    function goHome() {
-      closeReaderMode();
-      renderStartPage();
-    }
-
-    function clearOmnibox() {
-      const el = document.getElementById("omniboxInput");
-      el.value = "";
-      el.focus();
-      closeAutocomplete();
-    }
-
-    let suggestTimer = null;
-    function handleOmniboxInput(e) {
-      const q = e.target.value.trim();
-      clearTimeout(suggestTimer);
-      if (q.length < 2) {
-        closeAutocomplete();
-        return;
-      }
-      suggestTimer = setTimeout(() => {
-        fetch("/api/browser/suggest?q=" + encodeURIComponent(q))
-          .then(res => res.json())
-          .then(data => {
-            if (data.suggestions && data.suggestions.length > 0) {
-              const dd = document.getElementById("autocompleteDropdown");
-              dd.innerHTML = data.suggestions.map(s => `
-                <div onmousedown="executeSmartSearch('${s.replace(/'/g, "\\'")}'); closeAutocomplete();" class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-white cursor-pointer text-xs transition-colors">
-                  <i data-lucide="search" class="w-3 h-3 text-violet-400"></i>
-                  <span>${s}</span>
-                </div>
-              `).join("");
-              dd.classList.remove("hidden");
-              lucide.createIcons();
-            }
-          })
-          .catch(() => closeAutocomplete());
-      }, 200);
-    }
-
-    function closeAutocomplete() {
-      document.getElementById("autocompleteDropdown").classList.add("hidden");
-    }
-
     function toggleShieldModal() {
       document.getElementById("shieldModal").classList.toggle("hidden");
     }
@@ -1032,7 +1794,6 @@
       const subTitle = document.getElementById("shieldStatusSubtitle");
       const compatScore = document.getElementById("modalCompatScore");
 
-      // Reset
       [standardOpt, aggressiveOpt, offOpt].forEach(el => {
         el.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-slate-700 bg-slate-800/40 text-left transition-all hover:bg-slate-800/70";
       });
@@ -1042,7 +1803,7 @@
         standardOpt.className = "flex items-start gap-2.5 p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-left transition-all";
         rStd.className = "w-2 h-2 rounded-full bg-emerald-400";
         pillBtn.className = "flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold mr-1.5 transition-colors flex-shrink-0";
-        pillText.textContent = "Brave Mode: Standard";
+        pillText.textContent = "Brave: Standard";
         subTitle.textContent = "Brave Protection Active (100% Site Fidelity)";
         subTitle.className = "text-[11px] text-emerald-400";
         compatScore.textContent = "100% (Brave)";
@@ -1070,19 +1831,12 @@
 
     function applyAndReloadShield() {
       toggleShieldModal();
-      if (activeMode === "proxy" && activeUrl && activeUrl.startsWith("http")) {
-        browseTo(activeUrl);
-      }
+      reloadActiveTab();
     }
 
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
-      }
-    }
-
+    // =========================================================================
+    // PROGRESS & HELPERS
+    // =========================================================================
     let progTimer = null;
     function startProgress() {
       const bar = document.getElementById("pageProgressBar");
@@ -1101,15 +1855,113 @@
       setTimeout(() => { bar.style.width = "0%"; }, 300);
     }
 
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // =========================================================================
+    // POWER-USER KEYBOARD SHORTCUTS
+    // =========================================================================
+    function setupKeyboardShortcuts() {
+      window.addEventListener('keydown', (e) => {
+        const isCtrl = e.ctrlKey || e.metaKey;
+        
+        // Ctrl+T: New Tab
+        if (isCtrl && e.key.toLowerCase() === 't') {
+          e.preventDefault();
+          createNewTab('staunt://newtab');
+          return;
+        }
+
+        // Ctrl+W: Close Tab
+        if (isCtrl && e.key.toLowerCase() === 'w') {
+          e.preventDefault();
+          if (activeTabId) closeTab(activeTabId);
+          return;
+        }
+
+        // Ctrl+L: Focus Omnibox
+        if (isCtrl && e.key.toLowerCase() === 'l') {
+          e.preventDefault();
+          const omni = document.getElementById("omniboxInput");
+          if (omni) {
+            omni.focus();
+            omni.select();
+          }
+          return;
+        }
+
+        // Ctrl+R or F5: Reload Tab
+        if ((isCtrl && e.key.toLowerCase() === 'r') || e.key === 'F5') {
+          e.preventDefault();
+          reloadActiveTab();
+          return;
+        }
+
+        // Ctrl+H: History Drawer
+        if (isCtrl && e.key.toLowerCase() === 'h') {
+          e.preventDefault();
+          toggleHistoryDrawer();
+          return;
+        }
+
+        // Ctrl+D: Bookmark Tab
+        if (isCtrl && e.key.toLowerCase() === 'd') {
+          e.preventDefault();
+          toggleBookmarkActiveTab();
+          return;
+        }
+
+        // Ctrl+B: Toggle Bookmarks Bar
+        if (isCtrl && e.key.toLowerCase() === 'b') {
+          e.preventDefault();
+          const bb = document.getElementById("bookmarksBar");
+          if (bb) bb.classList.toggle("hidden");
+          return;
+        }
+
+        // Alt+Left / Alt+Right
+        if (e.altKey && e.key === 'ArrowLeft') {
+          e.preventDefault();
+          navigateBack();
+        } else if (e.altKey && e.key === 'ArrowRight') {
+          e.preventDefault();
+          navigateForward();
+        }
+      });
+    }
+
+    // Listen for cross-origin navigation messages from proxy iframe
     window.addEventListener("message", function(evt) {
       if (!evt.data || !evt.data.type) return;
       if (evt.data.type === "STAUNT_NAVIGATED") {
-        if (evt.data.url && activeMode === "proxy") {
-          activeUrl = evt.data.url;
+        const tab = tabs.find(t => t.id === activeTabId);
+        if (tab && evt.data.url) {
+          tab.url = evt.data.url;
+          if (evt.data.title) tab.title = evt.data.title;
+          
+          addHistoryEntry(tab.url, tab.title);
+
           const input = document.getElementById("omniboxInput");
           if (input && document.activeElement !== input) {
-            input.value = activeUrl;
+            input.value = tab.url;
           }
+          updateBookmarkStarState(tab.url);
+          renderTabStrip();
         }
       }
     });
