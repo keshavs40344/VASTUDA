@@ -1480,8 +1480,12 @@
             iframe.style.display = 'block';
             startProgress();
 
-            const proxyTarget = PROXY_ENDPOINT + encodeURIComponent(resolved);
-            iframe.src = proxyTarget;
+            // YouTube embed URLs load natively in iframe with zero proxy latency/black screen
+            let targetSrc = resolved;
+            if (!resolved.includes('youtube.com/embed/')) {
+              targetSrc = PROXY_ENDPOINT + encodeURIComponent(resolved);
+            }
+            iframe.src = targetSrc;
 
             iframe.onload = () => finishProgress();
           }

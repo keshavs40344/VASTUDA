@@ -2087,6 +2087,7 @@ def handle_gateway_proxy():
     req_headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
         "Accept-Language": request.headers.get("Accept-Language", "en-US,en;q=0.9"),
+        "Accept-Encoding": "gzip, deflate",
     }
 
     if is_doc_nav:
@@ -2302,8 +2303,11 @@ def serve_static(path):
 
             for hk, hv in request.headers.items():
                 hk_lower = hk.lower()
-                if hk_lower not in ("host", "origin", "referer", "content-length", "cookie"):
+                if hk_lower not in ("host", "origin", "referer", "content-length", "cookie", "accept-encoding"):
                     fwd_headers[hk] = hv
+
+            # Force standard gzip/deflate so upstream never returns Brotli (br) or zstd which requests cannot decode
+            fwd_headers["Accept-Encoding"] = "gzip, deflate"
 
             if request.headers.get("Cookie"):
                 fwd_headers["Cookie"] = request.headers["Cookie"]
