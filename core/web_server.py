@@ -1846,6 +1846,7 @@ def serve_tool_site(tool_id):
 # ==============================================================================
 # DYNAMIC FRAME-UNBLOCKER REVERSE-PROXY GATEWAY (/gateway & /api/gateway)
 # ==============================================================================
+ACTIVE_UPSTREAM_ORIGIN = None  # Set dynamically when user navigates via /gateway
 @app.route("/gateway", methods=["GET", "POST", "HEAD", "OPTIONS"])
 @app.route("/api/gateway", methods=["GET", "POST", "HEAD", "OPTIONS"])
 def handle_gateway_proxy():
@@ -1863,6 +1864,7 @@ def handle_gateway_proxy():
         resp.headers["Access-Control-Allow-Headers"] = "*"
         return resp
 
+    global ACTIVE_UPSTREAM_ORIGIN
     target_param = request.args.get("url") or request.args.get("target")
     if not target_param:
         return jsonify({
@@ -1877,12 +1879,18 @@ def handle_gateway_proxy():
 
     parsed_target = urllib.parse.urlparse(target_url)
     target_origin = f"{parsed_target.scheme}://{parsed_target.netloc}"
+    ACTIVE_UPSTREAM_ORIGIN = target_origin
 
-    # Prepare outbound request headers
+    # Prepare outbound request headers with full Origin and Referer spoofing
     req_headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        "Host": parsed_target.netloc,
+        "Origin": target_origin,
+        "Referer": target_origin + "/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
         "Accept": request.headers.get("Accept", "*/*"),
         "Accept-Language": request.headers.get("Accept-Language", "en-US,en;q=0.9"),
+        "sec-fetch-site": "same-origin",
+        "sec-fetch-mode": "cors",
     }
 
     try:
@@ -2035,6 +2043,70 @@ def serve_static(path):
     except Exception as e:
         logger.error(f"[STATIC SERVE ERROR] {e}")
 
+    # ─── Catch-All Reverse Proxy Fallback ─────────────────────────────────────
+    # If ACTIVE_UPSTREAM_ORIGIN is set (i.e. a site is loaded in the browser),
+    # forward all unmatched subresource requests (e.g. /youtubei/v1/browse,
+    # /s/desktop/*, JS/CSS bundles) directly to the upstream origin so the SPA
+    # hydrates correctly instead of returning JSON 404.
+    global ACTIVE_UPSTREAM_ORIGIN
+    if ACTIVE_UPSTREAM_ORIGIN and not any(clean_path.startswith(p) for p in ("api/", "assets/", "static/")):
+        try:
+            upstream_url = (
+                f"{ACTIVE_UPSTREAM_ORIGIN}"
+                f"{request.full_path if request.query_string else request.path}"
+            )
+            parsed_up = urllib.parse.urlparse(ACTIVE_UPSTREAM_ORIGIN)
+            fwd_headers = {
+                "Host": parsed_up.netloc,
+                "Origin": ACTIVE_UPSTREAM_ORIGIN,
+                "Referer": ACTIVE_UPSTREAM_ORIGIN + "/",
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/130.0.0.0 Safari/537.36"
+                ),
+                "Accept": request.headers.get("Accept", "*/*"),
+                "Accept-Language": request.headers.get("Accept-Language", "en-US,en;q=0.9"),
+                "sec-fetch-site": "same-origin",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-dest": request.headers.get("sec-fetch-dest", "empty"),
+            }
+            body_data = request.get_data() if request.method in ("POST", "PUT", "PATCH") else None
+            upstream_resp = requests.request(
+                method=request.method,
+                url=upstream_url,
+                headers=fwd_headers,
+                data=body_data,
+                timeout=15,
+                allow_redirects=True,
+                verify=False,
+            )
+            c_type = upstream_resp.headers.get("Content-Type", "").lower()
+            resp = app.response_class(
+                response=upstream_resp.content,
+                status=upstream_resp.status_code,
+                mimetype=c_type.split(";")[0].strip() if c_type else "application/octet-stream",
+            )
+            _EXCLUDED = {
+                "x-frame-options", "content-security-policy",
+                "content-security-policy-report-only", "frame-options",
+                "content-encoding", "transfer-encoding", "content-length",
+                "cross-origin-opener-policy", "cross-origin-embedder-policy",
+                "cross-origin-resource-policy",
+            }
+            for hk, hv in upstream_resp.headers.items():
+                if hk.lower() not in _EXCLUDED:
+                    resp.headers[hk] = hv
+            resp.headers["Access-Control-Allow-Origin"] = "*"
+            resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+            resp.headers["Access-Control-Allow-Headers"] = "*"
+            resp.headers["Access-Control-Allow-Credentials"] = "true"
+            resp.headers["X-Frame-Options"] = "ALLOWALL"
+            logger.info(f"[SPA PROXY] {request.method} {upstream_url} -> {upstream_resp.status_code}")
+            return resp
+        except Exception as proxy_err:
+            logger.warning(f"[SPA PROXY FALLBACK ERROR] {path} -> {proxy_err}")
+
     return jsonify({"error": "Not Found", "path": path}), 404
 
 @app.errorhandler(404)
@@ -2073,6 +2145,55 @@ def handle_clean_tool_address_fallback(e):
         cand_path = os.path.join(FRONTEND_DIR, cand)
         if os.path.isfile(cand_path):
             return send_from_directory(FRONTEND_DIR, cand)
+
+    # Catch-All Reverse Proxy Fallback for dynamic SPA subresources (/youtubei/v1/..., /s/desktop/..., etc.)
+    global ACTIVE_UPSTREAM_ORIGIN
+    if ACTIVE_UPSTREAM_ORIGIN and not any(raw_path.startswith(p) for p in ("api/", "assets/", "static/")):
+        try:
+            upstream_url = f"{ACTIVE_UPSTREAM_ORIGIN}{request.full_path if request.query_string else request.path}"
+            parsed_up = urllib.parse.urlparse(ACTIVE_UPSTREAM_ORIGIN)
+            fwd_headers = {
+                "Host": parsed_up.netloc,
+                "Origin": ACTIVE_UPSTREAM_ORIGIN,
+                "Referer": ACTIVE_UPSTREAM_ORIGIN + "/",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+                "Accept": request.headers.get("Accept", "*/*"),
+                "Accept-Language": request.headers.get("Accept-Language", "en-US,en;q=0.9"),
+                "sec-fetch-site": "same-origin",
+                "sec-fetch-mode": "cors",
+            }
+            body_data = request.get_data() if request.method in ("POST", "PUT", "PATCH") else None
+            upstream_resp = requests.request(
+                method=request.method,
+                url=upstream_url,
+                headers=fwd_headers,
+                data=body_data,
+                timeout=15,
+                allow_redirects=True,
+                verify=False
+            )
+            c_type = upstream_resp.headers.get("Content-Type", "").lower()
+            resp = app.response_class(
+                response=upstream_resp.content,
+                status=upstream_resp.status_code,
+                mimetype=c_type.split(";")[0] if c_type else "application/octet-stream"
+            )
+            EXCLUDED_HEADERS = {
+                "x-frame-options", "content-security-policy", "content-security-policy-report-only",
+                "frame-options", "content-encoding", "transfer-encoding", "content-length",
+                "cross-origin-opener-policy", "cross-origin-embedder-policy", "cross-origin-resource-policy"
+            }
+            for hk, hv in upstream_resp.headers.items():
+                if hk.lower() not in EXCLUDED_HEADERS:
+                    resp.headers[hk] = hv
+            resp.headers["Access-Control-Allow-Origin"] = "*"
+            resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+            resp.headers["Access-Control-Allow-Headers"] = "*"
+            resp.headers["Access-Control-Allow-Credentials"] = "true"
+            resp.headers["X-Frame-Options"] = "ALLOWALL"
+            return resp
+        except Exception as proxy_err:
+            logger.warning(f"[CATCH-ALL SPA FALLBACK WARNING] {proxy_err}")
 
     return e
 
