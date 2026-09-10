@@ -1967,6 +1967,17 @@ def handle_gateway_proxy():
         resp.headers["Access-Control-Allow-Headers"] = "*"
         resp.headers["X-Frame-Options"] = "ALLOWALL"
 
+        # Persist active origin in a cookie so all Gunicorn workers can resolve
+        # it without relying on the in-process ACTIVE_UPSTREAM_ORIGIN global
+        resp.set_cookie(
+            "staunt_upstream",
+            target_origin,
+            max_age=3600,
+            samesite="None",
+            secure=True,
+            httponly=False,  # JS needs to read it for SPA navigation
+        )
+
         return resp
 
     except requests.exceptions.RequestException as req_err:
@@ -2049,17 +2060,21 @@ def serve_static(path):
     # /s/desktop/*, JS/CSS bundles) directly to the upstream origin so the SPA
     # hydrates correctly instead of returning JSON 404.
     global ACTIVE_UPSTREAM_ORIGIN
-    if ACTIVE_UPSTREAM_ORIGIN and not any(clean_path.startswith(p) for p in ("api/", "assets/", "static/")):
+    # Cookie fallback: works across all Gunicorn worker processes
+    effective_origin = ACTIVE_UPSTREAM_ORIGIN or request.cookies.get("staunt_upstream")
+    if effective_origin and re.match(r"^https?://", effective_origin) and not any(
+        clean_path.startswith(p) for p in ("api/", "assets/", "static/")
+    ):
         try:
             upstream_url = (
-                f"{ACTIVE_UPSTREAM_ORIGIN}"
+                f"{effective_origin}"
                 f"{request.full_path if request.query_string else request.path}"
             )
-            parsed_up = urllib.parse.urlparse(ACTIVE_UPSTREAM_ORIGIN)
+            parsed_up = urllib.parse.urlparse(effective_origin)
             fwd_headers = {
                 "Host": parsed_up.netloc,
-                "Origin": ACTIVE_UPSTREAM_ORIGIN,
-                "Referer": ACTIVE_UPSTREAM_ORIGIN + "/",
+                "Origin": effective_origin,
+                "Referer": effective_origin + "/",
                 "User-Agent": (
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                     "AppleWebKit/537.36 (KHTML, like Gecko) "
