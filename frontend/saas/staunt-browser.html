@@ -939,24 +939,24 @@
 
       // ─── DUAL ENGINE MODE (⚡ DIRECT LOCAL GIGABIT vs 🛡️ CLOUD PROXY SHIELD) ───
       const urlParams = new URLSearchParams(window.location.search);
-      // Standard browsers enforce X-Frame-Options on YouTube/Google.
-      // Therefore, the Web Version MUST default to 'cloud' (proxy shield) to prevent 'refused to connect'!
-      // Only our custom Windows app setup with ?mode=direct uses direct local rendering.
+      // Standard web browsers enforce X-Frame-Options (YouTube/Google block iframes).
+      // Therefore, Web Version ALWAYS runs on Cloud Shield to strip X-Frame-Options.
+      // Direct Gigabit Mode is enabled automatically inside the compiled Windows Desktop App (?mode=direct).
       const isNativeApp = urlParams.get('mode') === 'direct';
-      let currentEngineMode = isNativeApp ? 'direct' : (localStorage.getItem('staunt_engine_mode') || 'cloud');
+      let currentEngineMode = isNativeApp ? 'direct' : 'cloud';
       const btnToggleEngine = document.getElementById('btn-toggle-engine');
 
       function updateEngineUI() {
         if (!btnToggleEngine) return;
-        if (currentEngineMode === 'direct' && isNativeApp) {
+        if (isNativeApp) {
           btnToggleEngine.innerHTML = '⚡ Direct (Native)';
-          btnToggleEngine.title = 'Current: ⚡ Direct Gigabit Engine (Hardware GPU, local speed).';
+          btnToggleEngine.title = 'Running in Native Desktop Mode: Hardware GPU & direct local speed.';
           btnToggleEngine.style.background = 'rgba(16, 185, 129, 0.15)';
           btnToggleEngine.style.color = '#34d399';
           btnToggleEngine.style.borderColor = 'rgba(16, 185, 129, 0.3)';
         } else {
           btnToggleEngine.innerHTML = '🛡️ Cloud Shield';
-          btnToggleEngine.title = 'Current: 🛡️ Cloud Proxy Shield (Strips X-Frame-Options to allow all websites).';
+          btnToggleEngine.title = 'Web Mode: Cloud Shield strips X-Frame-Options to allow YouTube, Google & all websites. (Click for Native App)';
           btnToggleEngine.style.background = 'rgba(139, 92, 246, 0.15)';
           btnToggleEngine.style.color = '#a78bfa';
           btnToggleEngine.style.borderColor = 'rgba(139, 92, 246, 0.3)';
@@ -966,13 +966,8 @@
       if (btnToggleEngine) {
         updateEngineUI();
         btnToggleEngine.addEventListener('click', () => {
-          currentEngineMode = currentEngineMode === 'direct' ? 'cloud' : 'direct';
-          localStorage.setItem('staunt_engine_mode', currentEngineMode);
-          updateEngineUI();
-          // Reload active tab with new engine mode
-          const tab = tabs.find(t => t.id === activeTabId);
-          if (tab && tab.url && !tab.isNewTab) {
-            navigateTo(tab.url, tab.id);
+          if (!isNativeApp) {
+            downloadModal.classList.add('open');
           }
         });
       }
