@@ -624,6 +624,48 @@ function setupWebContentsEvents(tabObj) {
     broadcastUrlSync(tabObj);
   });
 
+  // Actionable Network Error Recovery Card (Zero Blank Screen)
+  wc.on('did-fail-load', (event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+    if (errorCode === -3 || !isMainFrame) return; // Ignore intentional user aborts/redirects
+    console.warn(`[NAVIGATION ERROR] Code: ${errorCode} (${errorDescription}) for ${validatedURL}`);
+    
+    const errorHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Connection Error • Staunt Browser</title>
+        <style>
+          body { margin: 0; background: #0c0e14; color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; }
+          .card { text-align: center; max-width: 480px; padding: 32px; }
+          .icon { font-size: 48px; margin-bottom: 16px; }
+          h1 { font-size: 20px; margin: 0 0 10px; font-weight: 700; }
+          p { color: #94a3b8; font-size: 13px; line-height: 1.5; margin: 0 0 20px; }
+          .code { font-family: monospace; font-size: 11px; background: rgba(255,255,255,0.06); padding: 6px 12px; border-radius: 6px; margin-bottom: 24px; color: #cbd5e1; }
+          .btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+          button { background: #3b82f6; color: #fff; border: none; padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+          button:hover { background: #2563eb; }
+          button.sec { background: rgba(255,255,255,0.08); color: #cbd5e1; }
+          button.sec:hover { background: rgba(255,255,255,0.14); }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <div class="icon">🌐</div>
+          <h1>This site can't be reached</h1>
+          <p>The server could not be reached, or the connection timed out.</p>
+          <div class="code">${errorDescription} (${errorCode})</div>
+          <div class="btn-group">
+            <button onclick="location.reload()">🔄 Try Again</button>
+            <button class="sec" onclick="location.href='https://duckduckgo.com/?q=${encodeURIComponent(validatedURL)}'">🔍 Search on DuckDuckGo</button>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    wc.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(errorHtml)}`);
+  });
+
   // Audio Indicators
   wc.on('media-started-playing', () => {
     tabObj.isAudioPlaying = true;
