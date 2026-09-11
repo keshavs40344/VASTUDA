@@ -445,44 +445,224 @@ def staunt_web_proxy():
 
         bridge_code = f"""
         (function() {{
+            var _realParent = null;
+            try {{
+                if (window.parent && window.parent !== window) _realParent = window.parent;
+            }} catch(e) {{}}
+
             window.__STAUNT_ACTIVE_URL__ = {json.dumps(final_url)};
             window.__STAUNT_PAGE_TITLE__ = document.title || {json.dumps(final_url)};
             window.__STAUNT_SHIELD_MODE__ = {json.dumps(shield_mode)};
 
-            try {{
-                if (window.parent && window.parent !== window) {{
-                    window.parent.postMessage({{
-                        type: 'STAUNT_NAVIGATED',
-                        url: window.__STAUNT_ACTIVE_URL__,
-                        title: window.__STAUNT_PAGE_TITLE__,
-                        blocked: 12,
-                        shield: window.__STAUNT_SHIELD_MODE__
-                    }}, '*');
+            var PROXY_BASE = '/gateway?url=';
+            var UPSTREAM_ORIGIN = {json.dumps(final_url.split('/')[0] + '//' + final_url.split('/')[2] if '://' in final_url else '')};
+
+            /* ── URL Rewriter: route absolute upstream URLs through /gateway?url= ── */
+            function rewriteUrl(url) {{
+                if (!url || typeof url !== 'string') return url;
+                var trimmed = url.trim();
+                if (trimmed.startsWith('data:') || trimmed.startsWith('blob:') ||
+                    trimmed.startsWith('#') || trimmed.startsWith('javascript:') ||
+                    trimmed.startsWith('mailto:') || trimmed.startsWith('tel:') ||
+                    trimmed.indexOf('/gateway?url=') !== -1 ||
+                    trimmed.indexOf('/api/browser/proxy?url=') !== -1) {{
+                    return url;
                 }}
+                if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {{
+                    return PROXY_BASE + encodeURIComponent(trimmed);
+                }}
+                return url;
+            }}
+
+            /* ── Fetch Interceptor ── */
+            var _origFetch = window.fetch;
+            window.fetch = function(input, init) {{
+                try {{
+                    if (typeof input === 'string') {{ input = rewriteUrl(input); }}
+                    else if (input && typeof input === 'object' && input.url) {{
+                        var nu = rewriteUrl(input.url);
+                        if (nu !== input.url) input = new Request(nu, input);
+                    }}
+                }} catch(e) {{}}
+                return _origFetch.call(this, input, init);
+            }};
+
+            /* ── XMLHttpRequest Interceptor ── */
+            var _origOpen = XMLHttpRequest.prototype.open;
+            XMLHttpRequest.prototype.open = function(method, url) {{
+                try {{ url = rewriteUrl(url); }} catch(e) {{}}
+                var args = Array.prototype.slice.call(arguments);
+                args[1] = url;
+                return _origOpen.apply(this, args);
+            }};
+
+            /* ── sendBeacon Interceptor ── */
+            if (navigator.sendBeacon) {{
+                var _origBeacon = navigator.sendBeacon.bind(navigator);
+                navigator.sendBeacon = function(url, data) {{
+                    try {{ url = rewriteUrl(url); }} catch(e) {{}}
+                    return _origBeacon(url, data);
+                }};
+            }}
+
+            /* ── Dynamic Script src Interceptor ── */
+            try {{
+                var _origCreateEl = document.createElement.bind(document);
+                document.createElement = function(tag) {{
+                    var el = _origCreateEl(tag);
+                    if (typeof tag === 'string' && tag.toLowerCase() === 'script') {{
+                        var _origSrcDesc = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, 'src');
+                        if (_origSrcDesc && _origSrcDesc.set) {{
+                            var _realSrcSet = _origSrcDesc.set;
+                            Object.defineProperty(el, 'src', {{
+                                get: function() {{ return _origSrcDesc.get ? _origSrcDesc.get.call(this) : ''; }},
+                                set: function(v) {{ _realSrcSet.call(this, rewriteUrl(v)); }},
+                                configurable: true
+                            }});
+                        }}
+                    }}
+                    return el;
+                }};
             }} catch(e) {{}}
 
-            // Intercept user navigation clicks without interfering with buttons, inputs, dropdowns or touch handlers
+            /* ── setAttribute Interceptor ── */
+            var _origSetAttribute = Element.prototype.setAttribute;
+            Element.prototype.setAttribute = function(name, value) {{
+                try {{
+                    if ((name === 'src' || name === 'action') && typeof value === 'string') {{
+                        value = rewriteUrl(value);
+                    }}
+                }} catch(e) {{}}
+                return _origSetAttribute.call(this, name, value);
+            }};
+
+            /* ── window.open Interceptor ── */
+            var _origWindowOpen = window.open;
+            window.open = function(url, target, features) {{
+                if (url && _realParent) {{
+                    _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: url }}, '*');
+                    return null;
+                }}
+                return _origWindowOpen.apply(this, arguments);
+            }};
+
+            /* ── Link Click Interceptor ── */
             document.addEventListener('click', function(e) {{
-                // If the clicked element is inside a button or form control, let it handle naturally
-                if (e.target.closest('button, input, select, textarea, [role="button"]')) {{
+                if (e.target.closest && e.target.closest('button, input, select, textarea, [role="button"]')) {{
                     return;
                 }}
-
-                var link = e.target.closest('a');
+                var link = e.target.closest ? e.target.closest('a') : null;
                 if (!link || !link.href) return;
-
                 var rawHref = link.getAttribute('href');
                 if (!rawHref || rawHref.startsWith('#') || rawHref.startsWith('javascript:') || rawHref.startsWith('mailto:') || rawHref.startsWith('tel:') || rawHref.startsWith('data:')) {{
                     return;
                 }}
-
+                try {{
+                    var parsedUrl = new URL(link.href, window.location.href);
+                    if (parsedUrl.pathname === '/watch' && parsedUrl.searchParams.get('v')) {{
+                        var vId = parsedUrl.searchParams.get('v');
+                        e.preventDefault();
+                        var embedTarget = 'https://www.youtube.com/embed/' + vId + '?autoplay=1&rel=0';
+                        if (_realParent) {{
+                            _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: embedTarget, rawUrl: link.href }}, '*');
+                        }} else {{
+                            window.location.href = PROXY_BASE + encodeURIComponent(embedTarget);
+                        }}
+                        return;
+                    }}
+                }} catch(err) {{}}
                 var fullUrl = link.href;
                 if (fullUrl.startsWith('http://') || fullUrl.startsWith('https://')) {{
                     e.preventDefault();
-                    window.location.href = '/api/browser/proxy?url=' + encodeURIComponent(fullUrl) + '&shield=' + encodeURIComponent(window.__STAUNT_SHIELD_MODE__);
+                    if (_realParent) {{
+                        _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: fullUrl }}, '*');
+                    }} else {{
+                        window.location.href = PROXY_BASE + encodeURIComponent(fullUrl);
+                    }}
                 }}
-            }}, false);
+            }}, true);
 
+            /* ── Form Submit Interceptor ── */
+            document.addEventListener('submit', function(e) {{
+                var form = e.target;
+                if (form && form.action && (form.method || 'GET').toUpperCase() === 'GET') {{
+                    e.preventDefault();
+                    try {{
+                        var actionUrl = new URL(form.action, window.location.href);
+                        var searchParams = new URLSearchParams(new FormData(form));
+                        var sep = actionUrl.search ? '&' : '?';
+                        var fullTarget = actionUrl.origin + actionUrl.pathname + actionUrl.search + sep + searchParams.toString();
+                        window.location.href = PROXY_BASE + encodeURIComponent(fullTarget);
+                    }} catch(err) {{ form.submit(); }}
+                }}
+            }}, true);
+
+            /* ── History State Patching (SecurityError Defense) ── */
+            function _safePushOrReplace(origFn, state, title, url) {{
+                try {{
+                    if (url) {{
+                        var parsed = new URL(url, window.location.href);
+                        if (parsed.origin !== window.location.origin) {{
+                            url = PROXY_BASE + encodeURIComponent(parsed.href);
+                        }}
+                    }}
+                    return origFn.call(history, state, title, url);
+                }} catch(histErr) {{
+                    try {{ return origFn.call(history, state, title, null); }} catch(e2) {{}}
+                }}
+            }}
+            var _origPush = history.pushState;
+            history.pushState = function(state, title, url) {{
+                var r = _safePushOrReplace(_origPush, state, title, url);
+                syncUrlToParent();
+                return r;
+            }};
+            var _origReplace = history.replaceState;
+            history.replaceState = function(state, title, url) {{
+                var r = _safePushOrReplace(_origReplace, state, title, url);
+                syncUrlToParent();
+                return r;
+            }};
+
+            /* ── URL Sync Bridge ── */
+            function syncUrlToParent() {{
+                try {{
+                    if (_realParent) {{
+                        var displayUrl = window.__STAUNT_ACTIVE_URL__;
+                        var currentHref = window.location.href;
+                        if (currentHref.indexOf('/gateway?url=') !== -1) {{
+                            try {{ displayUrl = decodeURIComponent(currentHref.split('/gateway?url=')[1]); }} catch(e) {{}}
+                        }} else if (currentHref.indexOf('/api/browser/proxy?url=') !== -1) {{
+                            try {{ displayUrl = decodeURIComponent(currentHref.split('/api/browser/proxy?url=')[1].split('&')[0]); }} catch(e) {{}}
+                        }}
+                        _realParent.postMessage({{
+                            type: 'STAUNT_URL_CHANGE',
+                            url: displayUrl,
+                            title: document.title || ''
+                        }}, '*');
+                    }}
+                }} catch(e) {{}}
+            }}
+
+            /* ── Keyboard Shortcut Bridge ── */
+            window.addEventListener('keydown', function(e) {{
+                var cmdOrCtrl = e.metaKey || e.ctrlKey;
+                var k = (e.key || '').toLowerCase();
+                if ((cmdOrCtrl && (k === 't' || k === 'w' || k === 'r' || k === 'l')) || e.key === 'F11' || e.key === 'F5' || (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || k === 'd'))) {{
+                    if (_realParent) {{
+                        _realParent.postMessage({{
+                            type: 'STAUNT_SHORTCUT',
+                            key: e.key,
+                            ctrlKey: e.ctrlKey,
+                            metaKey: e.metaKey,
+                            altKey: e.altKey,
+                            shiftKey: e.shiftKey
+                        }}, '*');
+                    }}
+                }}
+            }}, true);
+
+            /* ── Message Listener (Reader Mode text extraction) ── */
             window.addEventListener('message', function(evt) {{
                 if (!evt.data || !evt.data.type) return;
                 if (evt.data.type === 'STAUNT_REQUEST_TEXT') {{
@@ -495,6 +675,11 @@ def staunt_web_proxy():
                     }}, '*');
                 }}
             }});
+
+            window.addEventListener('popstate', syncUrlToParent);
+            window.addEventListener('load', syncUrlToParent);
+            setInterval(syncUrlToParent, 1500);
+            syncUrlToParent();
         }})();
         """
 
