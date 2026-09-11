@@ -1894,6 +1894,8 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
     Ultra-Fast, Zero-Latency HTML Transformer:
     - Removes <base> tags in 0.5ms using C-speed regex.
     - Injects client-side API/SPA interceptor and real-time parent navigation sync bridge.
+    - Routes ALL upstream fetch/XHR/script requests through /gateway?url= to eliminate CORS.
+    - Patches history.pushState/replaceState with SecurityError defense.
     - Eliminates slow BeautifulSoup DOM parsing for 50x faster page delivery.
     """
     try:
@@ -1915,10 +1917,11 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
         ]))
         dyn_origins_json = json.dumps(dyn_origins)
 
-        interceptor_code = f"""<script>
+        interceptor_code = f"""<script id="staunt-brave-surrogates">
 (function() {{
   'use strict';
   var UPSTREAM_ORIGINS = {dyn_origins_json};
+  var PROXY_BASE = '/gateway?url=';
   var _realParent = null;
   try {{
     if (window.parent && window.parent !== window) _realParent = window.parent;
@@ -1932,9 +1935,15 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
 
   function rewriteUrl(url) {{
     if (!url || typeof url !== 'string') return url;
+    var trimmed = url.trim();
+    if (trimmed.startsWith('data:') || trimmed.startsWith('blob:') ||
+        trimmed.startsWith('#') || trimmed.startsWith('javascript:') ||
+        trimmed.indexOf('/gateway?url=') !== -1 || trimmed.startsWith('about:')) {{
+      return url;
+    }}
     for (var i = 0; i < UPSTREAM_ORIGINS.length; i++) {{
-      if (url.indexOf(UPSTREAM_ORIGINS[i]) === 0) {{
-        return url.slice(UPSTREAM_ORIGINS[i].length) || '/';
+      if (trimmed.indexOf(UPSTREAM_ORIGINS[i]) === 0) {{
+        return PROXY_BASE + encodeURIComponent(trimmed);
       }}
     }}
     return url;
@@ -1969,6 +1978,35 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
     }};
   }}
 
+  try {{
+    var _origCreateEl = document.createElement.bind(document);
+    document.createElement = function(tag) {{
+      var el = _origCreateEl(tag);
+      if (typeof tag === 'string' && tag.toLowerCase() === 'script') {{
+        var _origSrcDesc = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, 'src');
+        if (_origSrcDesc && _origSrcDesc.set) {{
+          var _realSrcSet = _origSrcDesc.set;
+          Object.defineProperty(el, 'src', {{
+            get: function() {{ return _origSrcDesc.get ? _origSrcDesc.get.call(this) : ''; }},
+            set: function(v) {{ _realSrcSet.call(this, rewriteUrl(v)); }},
+            configurable: true
+          }});
+        }}
+      }}
+      return el;
+    }};
+  }} catch(e) {{}}
+
+  var _origSetAttribute = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value) {{
+    try {{
+      if ((name === 'src' || name === 'action') && typeof value === 'string') {{
+        value = rewriteUrl(value);
+      }}
+    }} catch(e) {{}}
+    return _origSetAttribute.call(this, name, value);
+  }};
+
   var _origWindowOpen = window.open;
   window.open = function(url, target, features) {{
     if (url && _realParent) {{
@@ -1978,18 +2016,9 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
     return _origWindowOpen.apply(this, arguments);
   }};
 
-  var _origSetAttribute = Element.prototype.setAttribute;
-  Element.prototype.setAttribute = function(name, value) {{
-    if ((name === 'src' || name === 'href' || name === 'action') && typeof value === 'string') {{
-      value = rewriteUrl(value);
-    }}
-    return _origSetAttribute.call(this, name, value);
-  }};
-
   document.addEventListener('click', function(e) {{
     var a = e.target && e.target.closest ? e.target.closest('a') : null;
     if (a && a.href && !a.href.startsWith('javascript:') && !a.href.startsWith('#')) {{
-      // YouTube Video Watch Click Handler: Route directly to Google's embed player to avoid datacenter 429 and playback freezes
       try {{
         var parsedUrl = new URL(a.href, window.location.href);
         if (parsedUrl.pathname === '/watch' && parsedUrl.searchParams.get('v')) {{
@@ -1999,26 +2028,27 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
           if (_realParent) {{
             _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: embedTarget, rawUrl: a.href }}, '*');
           }} else {{
-            window.location.href = embedTarget;
+            window.location.href = PROXY_BASE + encodeURIComponent(embedTarget);
           }}
           return;
         }}
       }} catch(err) {{}}
 
-      // 1. If link is already routed through our gateway proxy, let it proceed!
-      if (a.hostname === window.location.hostname && a.pathname.indexOf('/gateway') === 0) {{
+      if (a.pathname && a.pathname.indexOf('/gateway') === 0) {{
         return;
       }}
 
-      // 2. Route ALL external HTTP/HTTPS links through the gateway proxy to guarantee X-Frame-Options is stripped
       if (a.href.startsWith('http://') || a.href.startsWith('https://')) {{
         e.preventDefault();
-        window.location.href = '/gateway?url=' + encodeURIComponent(a.href);
+        if (_realParent) {{
+          _realParent.postMessage({{ type: 'STAUNT_NAVIGATE', url: a.href }}, '*');
+        }} else {{
+          window.location.href = rewriteUrl(a.href);
+        }}
       }}
     }}
   }}, true);
 
-  // Form Submissions Interceptor (for searches, forms on Wikipedia, DuckDuckGo, etc.)
   document.addEventListener('submit', function(e) {{
     var form = e.target;
     if (form && form.action) {{
@@ -2031,7 +2061,7 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
           var searchParams = new URLSearchParams(formData);
           var sep = actionUrl.search ? '&' : '?';
           var fullTarget = actionUrl.origin + actionUrl.pathname + actionUrl.search + sep + searchParams.toString();
-          window.location.href = '/gateway?url=' + encodeURIComponent(fullTarget);
+          window.location.href = PROXY_BASE + encodeURIComponent(fullTarget);
         }} catch(err) {{
           form.submit();
         }}
@@ -2039,31 +2069,48 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
     }}
   }}, true);
 
-  // Real-Time URL Sync Bridge: Updates parent Omnibox on search, video clicks, and SPA state updates
+  function _safePushOrReplace(origFn, state, title, url) {{
+    try {{
+      if (url) {{
+        var parsed = new URL(url, window.location.href);
+        if (parsed.origin !== window.location.origin) {{
+          url = PROXY_BASE + encodeURIComponent(parsed.href);
+        }}
+      }}
+      return origFn.call(history, state, title, url);
+    }} catch(histErr) {{
+      try {{ return origFn.call(history, state, title, null); }} catch(e2) {{}}
+    }}
+  }}
+  var _origPush = history.pushState;
+  history.pushState = function(state, title, url) {{
+    var r = _safePushOrReplace(_origPush, state, title, url);
+    syncUrlToParent();
+    return r;
+  }};
+  var _origReplace = history.replaceState;
+  history.replaceState = function(state, title, url) {{
+    var r = _safePushOrReplace(_origReplace, state, title, url);
+    syncUrlToParent();
+    return r;
+  }};
+
   function syncUrlToParent() {{
     try {{
       if (_realParent) {{
+        var displayUrl = window.location.href;
+        if (displayUrl.indexOf('/gateway?url=') !== -1) {{
+          try {{ displayUrl = decodeURIComponent(displayUrl.split('/gateway?url=')[1]); }} catch(e) {{}}
+        }}
         _realParent.postMessage({{
           type: 'STAUNT_URL_CHANGE',
-          url: window.location.href,
+          url: displayUrl,
           title: document.title || ''
         }}, '*');
       }}
     }} catch(e) {{}}
   }}
 
-  var _origPush = history.pushState;
-  history.pushState = function() {{
-    var r = _origPush.apply(this, arguments);
-    syncUrlToParent();
-    return r;
-  }};
-  var _origReplace = history.replaceState;
-  history.replaceState = function() {{
-    var r = _origReplace.apply(this, arguments);
-    syncUrlToParent();
-    return r;
-  }};
   window.addEventListener('keydown', function(e) {{
     var cmdOrCtrl = e.metaKey || e.ctrlKey;
     var k = (e.key || '').toLowerCase();
@@ -2082,7 +2129,7 @@ def transform_proxied_html(raw_html_bytes, parsed_target):
   }}, true);
   window.addEventListener('popstate', syncUrlToParent);
   window.addEventListener('load', syncUrlToParent);
-  setInterval(syncUrlToParent, 1200);
+  setInterval(syncUrlToParent, 1500);
 
 }})();
 </script>"""
