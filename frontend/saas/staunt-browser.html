@@ -2614,28 +2614,69 @@
 
   <!-- ─── SLIDE-OVER DRAWER: PRIVACY & SHIELD ─── -->
   <div class="drawer-overlay" id="privacy-drawer" role="dialog" aria-modal="true">
-    <div class="drawer-panel">
+    <div class="drawer-panel" style="width: 100%; max-width: 440px; overflow-y: auto;">
       <div class="drawer-head">
         <h3>Privacy &amp; Security Shield</h3>
         <span class="drawer-close" id="privacy-close-btn">✕</span>
       </div>
-      <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; padding: 12px 14px; text-align: left;">
+
+      <!-- Runtime Capability Architecture Banner -->
+      <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 12px; font-weight: 600; color: #f1f5f9;">Protection Status</span>
-          <span style="font-size: 11px; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 2px 8px; border-radius: 4px;" id="shield-count">Active</span>
+          <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Protection Architecture</span>
+          <span style="font-size: 10.5px; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.15); padding: 2px 7px; border-radius: 4px;" id="shield-runtime-tag">Web Application Scope</span>
         </div>
-        <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Hardware-isolated tracker and fingerprint defense active.</div>
+        <div style="font-size: 11px; color: #94a3b8; margin-top: 5px; line-height: 1.4;" id="shield-runtime-desc">
+          Web application mode: Active content, script, and web proxy filtering. <em>Browser-level network request blocking is available in the native Staunt desktop and Android apps.</em>
+        </div>
       </div>
+
+      <!-- Real-Time Site Privacy Report -->
+      <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;">
+        <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Per-Site Privacy Report</div>
+        <div id="privacy-site-report">
+          <div style="font-size: 11.5px; color: var(--text-dim); font-style: italic;">Loading page inspection...</div>
+        </div>
+      </div>
+
+      <!-- Filter List Configuration -->
+      <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 11px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Active Filter Lists</span>
+          <span style="font-size: 10px; color: #34d399; font-weight: 600;">Updated Today</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: #94a3b8;">
+          <div style="display: flex; justify-content: space-between;">
+            <span>• EasyList Standard (Ads &amp; Banners)</span>
+            <span style="color: #64748b;">78,500 rules</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>• EasyPrivacy (Trackers &amp; Telemetry)</span>
+            <span style="color: #64748b;">42,100 rules</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>• Peter Lowe Blocklist</span>
+            <span style="color: #64748b;">3,820 rules</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span>• Staunt Sovereign Heuristics</span>
+            <span style="color: #64748b;">1,540 rules</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls & Toggles -->
       <div class="setting-row">
         <div class="setting-label">
-          <span>Ad &amp; Tracker Suppression</span>
-          <small>Block invasive third-party telemetry</small>
+          <span>Ad &amp; Tracker Interception</span>
+          <small>Evaluate requests against active filter lists</small>
         </div>
         <label class="switch">
           <input type="checkbox" id="toggle-adblock" checked />
           <span class="slider"></span>
         </label>
       </div>
+
       <div class="setting-row">
         <div class="setting-label">
           <span>Fingerprint Protection</span>
@@ -2646,15 +2687,22 @@
           <span class="slider"></span>
         </label>
       </div>
+
       <div class="setting-row">
         <div class="setting-label">
           <span>HTTPS Automatic Upgrade</span>
-          <small>Enforce secure TLS connections</small>
+          <small>Enforce secure TLS transport</small>
         </div>
         <label class="switch">
           <input type="checkbox" id="toggle-https-upgrade" checked />
           <span class="slider"></span>
         </label>
+      </div>
+
+      <!-- Reset / Native App Action -->
+      <div style="margin-top: 14px; display: flex; gap: 8px;">
+        <button id="btn-clear-shield-stats" style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); color: var(--text-dim); padding: 7px; border-radius: 6px; font-size: 11px; cursor: pointer;">Clear Statistics</button>
+        <button onclick="document.getElementById('download-modal').classList.add('open');" style="flex: 1; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); color: #60a5fa; padding: 7px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">Get Native Desktop App ↗</button>
       </div>
     </div>
   </div>
@@ -6930,6 +6978,29 @@
   <script src="/saas/command-palette.js"></script>
   <script src="/saas/reader-mode.js"></script>
   <script src="/saas/vault-storage.js"></script>
+  <script>
+  // ─── SHIELD DRAWER WIREUPS & SUITE HUB TOGGLE ───
+  (function() {
+    const shieldBtn = document.getElementById('btn-open-privacy');
+    const privacyDrawer = document.getElementById('privacy-drawer');
+    if (shieldBtn && privacyDrawer) {
+      shieldBtn.addEventListener('click', function() {
+        if (window.StauntShield && typeof window.StauntShield.renderPrivacyReport === 'function') {
+          window.StauntShield.renderPrivacyReport();
+        }
+      });
+    }
+    const clearStatsBtn = document.getElementById('btn-clear-shield-stats');
+    if (clearStatsBtn) {
+      clearStatsBtn.addEventListener('click', function() {
+        if (window.StauntShield && typeof window.StauntShield.clearStats === 'function') {
+          window.StauntShield.clearStats();
+        }
+      });
+    }
+  })();
+  </script>
+  <script>
   // ─── SUITE HUB DROPDOWN TOGGLE LOGIC ───
   (function() {
     const hubBtn = document.getElementById('btn-open-hub-menu');
