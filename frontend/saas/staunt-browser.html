@@ -3642,12 +3642,15 @@
     (function initPhase3Runtime() {
       // 1. Custom Protocol Registration & Hook
       window.handleStauntProtocol = function(action) {
+        const sDrawer = document.getElementById('settings-drawer');
+        const hDrawer = document.getElementById('history-drawer');
+        const dDrawer = document.getElementById('downloads-drawer');
         if (action === 'settings') {
-          if (settingsDrawer) settingsDrawer.classList.add('open');
+          if (sDrawer) sDrawer.classList.add('open');
         } else if (action === 'history') {
-          if (historyDrawer) historyDrawer.classList.add('open');
+          if (hDrawer) hDrawer.classList.add('open');
         } else if (action === 'downloads') {
-          if (downloadsDrawer) downloadsDrawer.classList.add('open');
+          if (dDrawer) dDrawer.classList.add('open');
         }
         return true;
       };
@@ -3849,9 +3852,11 @@
       // 10. Synchronous State Serialization on Process Exit
       window.addEventListener('beforeunload', () => {
         try {
-          saveSessionTabs();
+          if (window.saveSessionTabs) window.saveSessionTabs();
           localStorage.setItem('staunt_last_exit_ts', String(Date.now()));
-        } catch(e) {}
+        } catch(e) {
+          localStorage.setItem('staunt_last_exit_ts', String(Date.now()));
+        }
       });
 
       // Export Phase 3 APIs onto window
