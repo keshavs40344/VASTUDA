@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "puppeteer": "^25.10.0"
+  },
+  "scripts": {
+    "test": "node test-staunt-browser-master.js",
+    "test:phase1": "node test-staunt-browser.js",
+    "test:phase2": "node test-staunt-browser-phase2.js",
+    "test:master": "node test-staunt-browser-master.js",
+    "test:phase3": "node test-staunt-browser-phase3.js",
+    "test:phase4": "node test-staunt-browser-phase4.js",
+    "test:phase5": "node test-staunt-browser-phase5.js"
+  }
+}
