@@ -3806,6 +3806,7 @@
       });
 
       // ─── NAVIGATION ENGINE ───
+      window.navigateTo = navigateTo;
       function navigateTo(target, tabId = activeTabId) {
         const tab = tabs.find(t => t.id === tabId);
         if (!tab) return;
