@@ -658,13 +658,13 @@
       align-items: center;
       gap: 4px;
       height: 24px;
-      padding: 0 8px;
-      background: rgba(139, 92, 246, 0.18);
-      border: 0.5px solid rgba(139, 92, 246, 0.4);
-      color: #c4b5fd;
-      border-radius: 12px;
-      font-size: 10.5px;
-      font-weight: 600;
+      padding: 0 6px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-dim);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.15s ease;
       white-space: nowrap;
@@ -672,7 +672,7 @@
     }
 
     .omnibox-action-btn:hover {
-      background: rgba(139, 92, 246, 0.35);
+      background: rgba(255, 255, 255, 0.08);
       color: #fff;
     }
 
@@ -2506,9 +2506,54 @@
       padding: 2px 6px;
       border-radius: 4px;
     }
-    .update-dismiss:hover {
-      opacity: 1;
-      background: rgba(0, 0, 0, 0.15);
+    .suite-dropdown-wrap {
+      position: relative;
+    }
+    .suite-dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 6px;
+      width: 230px;
+      background: #141721;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+      padding: 6px 0;
+      display: none;
+      flex-direction: column;
+      z-index: 10001;
+    }
+    .suite-dropdown-menu.open {
+      display: flex;
+    }
+    .suite-menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 14px;
+      font-size: 12.5px;
+      color: #cbd5e1;
+      background: transparent;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+    .suite-menu-item:hover,
+    .suite-menu-item:focus-visible {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      outline: none;
+    }
+    .suite-shortcut {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: inherit;
+    }
+    .suite-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 5px 0;
     }
 
 </style>
@@ -2567,16 +2612,15 @@
         <span id="security-label">Secure</span>
       </div>
       <span class="engine-badge" id="engine-badge" title="Click to cycle search engine" role="button" aria-label="Search Engine Selector" tabindex="0">G</span>
-      <input type="text" class="omnibox-input" id="omnibox-input" placeholder="Search Google or enter web address..." spellcheck="false" autocomplete="off" role="searchbox" aria-label="Address and search bar">
+      <input type="text" class="omnibox-input" id="omnibox-input" placeholder="Search or enter address" spellcheck="false" autocomplete="off" role="searchbox" aria-label="Address and search bar">
       
       <!-- Autocomplete Dropdown -->
       <div class="autocomplete-dropdown" id="autocomplete-dropdown"></div>
 
       <div class="omnibox-calc-chip" id="omnibox-calc-chip" title="Calculated result (Click to use)"><span style="opacity: 0.8;">=</span> <span id="omnibox-calc-val"></span></div>
       <button class="omnibox-action-star" id="omnibox-star" title="Bookmark Page" aria-label="Bookmark Page">★</button>
-      <button class="omnibox-action-btn" id="nav-popout" title="Open Page in Dedicated Window (100% Native Engine - Zero Iframe Restrictions)" aria-label="Open in Native Engine">
+      <button class="omnibox-action-btn" id="nav-popout" title="Open in new window" aria-label="Open in new window">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        <span>Native ↗</span>
       </button>
     </div>
 
@@ -2621,8 +2665,6 @@
           <div class="suite-divider"></div>
           <div class="suite-menu-item" id="btn-open-taskmgr"><span>Task Manager</span> <span class="suite-shortcut">Shift+Esc</span></div>
           <div class="suite-menu-item" id="btn-open-devtools"><span>Developer Tools</span> <span class="suite-shortcut">F12</span></div>
-          <div class="suite-menu-item" id="btn-open-specs"><span>Feature Specifications</span> <span class="suite-badge">300+</span></div>
-          <div class="suite-menu-item" id="btn-open-download-modal"><span>Native Applications</span></div>
           <div class="suite-divider"></div>
           <div class="suite-menu-item" id="btn-open-settings"><span>Settings</span></div>
           <div class="suite-menu-item" id="btn-menu-about" onclick="navigateTo('staunt://about')"><span>About Staunt</span></div>
