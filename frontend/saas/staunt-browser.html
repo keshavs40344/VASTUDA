@@ -3200,8 +3200,6 @@
         if (/^(staunt|chrome):\/\//i.test(trimmed) || /^(about:(?!blank))/i.test(trimmed)) {
           return trimmed.toLowerCase();
         }
-        if (!raw) return '';
-        let trimmed = raw.trim();
         // File protocol safety restriction
         if (/^file:\/\//i.test(trimmed)) {
           return 'about:blank#blocked-protocol';
