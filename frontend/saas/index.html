@@ -58,6 +58,11 @@
 
     <!-- Action Utility Bar -->
     <div class="staunt-action-cluster">
+      <button class="staunt-action-btn" id="staunt-btn-palette" title="Command Palette (Ctrl+K)">⚡ Actions</button>
+      <button class="staunt-action-btn" id="staunt-btn-reader" title="Safari Reader Mode (Alt+R)">📖 Reader</button>
+      <button class="staunt-action-btn" id="staunt-btn-shield" title="Brave Ad & Tracker Shield">
+        🛡️ Shield <span id="staunt-shield-badge" style="display: none; background: #ef4444; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 8px; margin-left: 2px;">0</span>
+      </button>
       <button class="staunt-action-btn" id="staunt-btn-history" title="History (Ctrl+H)">🕒 History</button>
       <button class="staunt-action-btn" id="staunt-btn-bookmarks" title="Bookmarks">★ Bookmarks</button>
       <button class="staunt-action-btn" id="staunt-btn-downloads" title="Downloader">⬇ Downloader</button>
@@ -744,7 +749,36 @@
       renderShortcuts();
       updateClock();
 
+      // V3 Enterprise Feature Wire-ups
+      document.getElementById('staunt-btn-palette').addEventListener('click', () => {
+        if (window.StauntCommandPalette) window.StauntCommandPalette.toggle();
+      });
+
+      document.getElementById('staunt-btn-reader').addEventListener('click', () => {
+        if (window.StauntReader) window.StauntReader.toggleReaderMode();
+      });
+
+      document.getElementById('staunt-btn-shield').addEventListener('click', () => {
+        if (window.StauntShield) {
+          const state = window.StauntShield.toggleShield();
+          alert(`Brave-Grade Shield is now: ${state ? 'ENABLED (Aggressive)' : 'DISABLED'}`);
+        }
+      });
+
+      // Expose globally for command palette actions
+      window.createNewTab = createNewTab;
+      window.switchTab = switchTab;
+      window.closeTab = closeTab;
+      window.navigateToUrl = navigateToUrl;
+      window.tabs = tabs;
+
     })();
   </script>
+
+  <!-- V3 Enterprise Modular Engines -->
+  <script src="shield-engine.js"></script>
+  <script src="command-palette.js"></script>
+  <script src="reader-mode.js"></script>
+  <script src="vault-storage.js"></script>
 </body>
 </html>
