@@ -332,6 +332,7 @@ def sniff_media_engine():
 # ==============================================================================
 # 5. HIGH-SPEED LIVE PROXY WITH PERSISTENT HYDRATION
 # ==============================================================================
+@browser_bp.route("/gateway", methods=["GET", "POST"])
 @browser_bp.route("/api/browser/proxy", methods=["GET", "POST"])
 def staunt_web_proxy():
     """
@@ -348,6 +349,34 @@ def staunt_web_proxy():
         )
 
     target_url = raw_url.strip()
+
+    # SSRF Guardrail: Block access to private IPs, loopback, and cloud metadata endpoints
+    try:
+        parsed = urllib.parse.urlparse(target_url if "://" in target_url else "http://" + target_url)
+        hostname = (parsed.hostname or "").lower()
+        is_ssrf = False
+        if hostname in ["127.0.0.1", "localhost", "0.0.0.0", "169.254.169.254", "::1"]:
+            is_ssrf = True
+        elif re.match(r"^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$", hostname) or \
+             re.match(r"^192\.168\.\d{1,3}\.\d{1,3}$", hostname) or \
+             re.match(r"^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$", hostname) or \
+             re.match(r"^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$", hostname):
+            is_ssrf = True
+
+        if is_ssrf:
+            return jsonify({
+                "status": "forbidden",
+                "error": "SSRF Guardrail: Access to loopback, private subnets (RFC 1918), or cloud metadata services is strictly forbidden."
+            }), 403
+    except Exception:
+        pass
+
+    # HTTPS Protocol Encasement option
+    if request.args.get("upgrade_https") == "1" and target_url.startswith("http://"):
+        target_url = "https://" + target_url[7:]
+    elif request.args.get("enforce_https") == "1" and target_url.startswith("http://"):
+        return jsonify({"error": "HTTPS Protocol Encasement: Insecure raw HTTP transport is rejected."}), 400
+
     if not target_url.startswith(("http://", "https://")):
         if " " in target_url or ("." not in target_url and not target_url.startswith("localhost")):
             return jsonify({"redirect_search": target_url}), 200

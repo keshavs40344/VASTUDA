@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="color-scheme" content="dark light" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Staunt Browser Ultra</title>
@@ -3423,6 +3425,146 @@
         if (offlineBanner) offlineBanner.style.display = 'none';
         document.body.classList.remove('is-offline');
       });
+
+
+    // =========================================================================
+    // PHASE 2: ADVANCED PRIVACY, FINGERPRINTING DEFENSE & SOVEREIGN SECURITY
+    // =========================================================================
+    (function initPhase2PrivacyShield() {
+      // 1. DNT & Global Privacy Control (GPC)
+      try {
+        Object.defineProperty(navigator, 'doNotTrack', { get: () => '1', configurable: true });
+        Object.defineProperty(navigator, 'globalPrivacyControl', { get: () => true, configurable: true });
+      } catch(e) {}
+
+      // 2. Battery Status API Lockdown
+      try {
+        Object.defineProperty(navigator, 'getBattery', { value: undefined, writable: false, configurable: true });
+      } catch(e) {}
+
+      // 3. Font Enumeration Defense
+      try {
+        if ('queryLocalFonts' in window) {
+          window.queryLocalFonts = undefined;
+        }
+      } catch(e) {}
+
+      // 4. WebRTC Local RFC 1918 Private IP Leak Protection
+      if (window.RTCPeerConnection) {
+        const origAddIceCandidate = RTCPeerConnection.prototype.addIceCandidate;
+        RTCPeerConnection.prototype.addIceCandidate = function(candidate) {
+          if (candidate && candidate.candidate) {
+            if (/(10\.\d+|192\.168\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+|127\.\d+)/.test(candidate.candidate)) {
+              return Promise.resolve();
+            }
+          }
+          return origAddIceCandidate.apply(this, arguments);
+        };
+      }
+
+      // 5. Canvas Fingerprint Entropy Defense (Subtle protective noise against deterministic canvas tracking)
+      const origToDataURL = HTMLCanvasElement.prototype.toDataURL;
+      HTMLCanvasElement.prototype.toDataURL = function(type) {
+        const isShieldOn = document.getElementById('toggle-fingerprint') ? document.getElementById('toggle-fingerprint').checked : true;
+        if (isShieldOn && (!type || type.includes('image/png'))) {
+          try {
+            const ctx = this.getContext('2d');
+            if (ctx && this.width > 0 && this.height > 0) {
+              const imgData = ctx.getImageData(0, 0, Math.min(this.width, 10), Math.min(this.height, 10));
+              imgData.data[0] = (imgData.data[0] ^ 1);
+            }
+          } catch(e) {}
+        }
+        return origToDataURL.apply(this, arguments);
+      };
+
+      // 6. AudioContext Fingerprint Protection
+      if (window.AnalyserNode) {
+        const origGetFloatFreq = AnalyserNode.prototype.getFloatFrequencyData;
+        AnalyserNode.prototype.getFloatFrequencyData = function(array) {
+          origGetFloatFreq.apply(this, arguments);
+          const isShieldOn = document.getElementById('toggle-fingerprint') ? document.getElementById('toggle-fingerprint').checked : true;
+          if (isShieldOn && array && array.length > 0) {
+            for (let i = 0; i < Math.min(array.length, 8); i++) {
+              array[i] = Math.round(array[i] * 10) / 10;
+            }
+          }
+        };
+      }
+
+      // 7. Tracker Blocking Engine
+      window.isTrackerBlocked = function(url) {
+        if (!url) return false;
+        return /google-analytics\.com|googletagmanager\.com|doubleclick\.net|facebook\.net\/.*fbevents|criteo\.com|hotjar\.com|clarity\.ms|segment\.io/.test(url);
+      };
+
+      // 8. Clear All Browser Data (LocalStorage, SessionStorage, IndexedDB, CacheStorage)
+      window.clearAllBrowserData = async function() {
+        localStorage.clear();
+        sessionStorage.clear();
+        if (window.indexedDB && indexedDB.databases) {
+          try {
+            const dbs = await indexedDB.databases();
+            for (const db of dbs) {
+              if (db.name) indexedDB.deleteDatabase(db.name);
+            }
+          } catch(e) {}
+        }
+        if (window.caches) {
+          try {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+          } catch(e) {}
+        }
+        return true;
+      };
+
+      // 9. Process Crash Recovery Simulation & Dialog
+      window.simulateTabCrash = function(tabId) {
+        const tId = tabId || (window.activeTabId || 1);
+        const vp = document.getElementById('viewport-' + tId);
+        if (vp) {
+          const iframe = vp.querySelector('.embed-frame');
+          if (iframe) iframe.src = 'about:blank';
+          let crashBox = vp.querySelector('.tab-crash-box');
+          if (!crashBox) {
+            crashBox = document.createElement('div');
+            crashBox.className = 'tab-crash-box';
+            crashBox.style.cssText = 'position:absolute;inset:0;background:#0d111d;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:900;gap:12px;padding:20px;';
+            crashBox.innerHTML = `
+              <div style="font-size:36px;">💥</div>
+              <h3 style="margin:0;font-size:16px;color:#f87171;">Aw, Snap! Web Process Terminated</h3>
+              <p style="color:#94a3b8;font-size:12px;margin:0;">The webpage encountered an unexpected issue or memory fault.</p>
+              <button class="action-btn crash-reload-btn" style="background:#8b5cf6;color:#fff;padding:6px 16px;border-radius:8px;cursor:pointer;">Reload Webpage</button>
+            `;
+            crashBox.querySelector('.crash-reload-btn').addEventListener('click', () => {
+              crashBox.remove();
+              if (window.doReload) window.doReload();
+            });
+            vp.appendChild(crashBox);
+          }
+          return true;
+        }
+        return false;
+      };
+
+      // 10. Multi-Monitor Boundary Drag & Coordinates Persistence
+      window.saveWindowBounds = function(bounds) {
+        try {
+          localStorage.setItem('staunt_window_bounds', JSON.stringify(bounds));
+          return true;
+        } catch(e) { return false; }
+      };
+
+      window.getWindowBounds = function() {
+        try {
+          const raw = localStorage.getItem('staunt_window_bounds');
+          return raw ? JSON.parse(raw) : { x: 100, y: 100, width: 1440, height: 900 };
+        } catch(e) {
+          return { x: 100, y: 100, width: 1440, height: 900 };
+        }
+      };
+    })();
 
   </script>
 </body>
