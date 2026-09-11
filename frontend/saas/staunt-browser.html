@@ -3324,7 +3324,7 @@
         tabs.push(tab);
 
         buildTabViewport(tab);
-        renderTabs();
+        if(typeof renderTabs === 'function') renderTabs(); else if(window.renderTabs) window.renderTabs();
         switchTab(id);
 
         if (initialUrl) {
@@ -3346,7 +3346,7 @@
           vp.classList.toggle('active', String(vp.dataset.id) === String(id));
         });
 
-        renderTabs();
+        if(typeof renderTabs === 'function') renderTabs(); else if(window.renderTabs) window.renderTabs();
         saveSessionTabs();
       }
 
@@ -3374,7 +3374,7 @@
           const newIdx = Math.min(idx, tabs.length - 1);
           switchTab(tabs[newIdx].id);
         } else {
-          renderTabs();
+          if(typeof renderTabs === 'function') renderTabs(); else if(window.renderTabs) window.renderTabs();
         }
         saveSessionTabs();
       }
@@ -3431,7 +3431,7 @@
           pill.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             tab.isPinned = !tab.isPinned;
-            renderTabs();
+            if(typeof renderTabs === 'function') renderTabs(); else if(window.renderTabs) window.renderTabs();
           });
 
           tabsRail.appendChild(pill);
@@ -3442,6 +3442,17 @@
         }
       }
 
+      
+      // Export shared primitives to global window for internal page renderers
+      window.tabs = tabs;
+      window.renderTabs = renderTabs;
+      window.getStoredHistory = getStoredHistory;
+      window.getStoredBookmarks = getStoredBookmarks;
+      window.closeTab = closeTab;
+      window.createTab = createTab;
+      window.switchTab = switchTab;
+      window.navigateTo = navigateTo;
+    
       function saveSessionTabs() {
         try {
           const data = tabs.map(t => ({ url: t.url, title: t.title, isNewTab: t.isNewTab }));
@@ -3821,7 +3832,7 @@
           updateSecurityBadge(resolved);
           updateBookmarkStarState(resolved);
         }
-        renderTabs();
+        if(typeof renderTabs === 'function') renderTabs(); else if(window.renderTabs) window.renderTabs();
         addHistoryEntry(resolved, tab.title);
 
         const vp = document.getElementById('viewport-' + tab.id);
@@ -3838,7 +3849,7 @@
             if (webContainer) webContainer.style.display = 'none';
             if (internalContainer) {
               internalContainer.style.display = 'block';
-              renderInternalPage(resolved, tab.id, internalContainer);
+              if (window.renderInternalPage) { window.renderInternalPage(resolved, tab.id, internalContainer); }
             }
             return;
           } else {
@@ -3912,7 +3923,7 @@
         omnibox.value = '';
         updateSecurityBadge('');
         updateBookmarkStarState('');
-        renderTabs();
+        if(typeof renderTabs === 'function') renderTabs(); else if(window.renderTabs) window.renderTabs();
 
         const vp = document.getElementById('viewport-' + tab.id);
         if (vp) {
@@ -4288,7 +4299,7 @@
             if (document.activeElement !== omnibox) {
               omnibox.value = cleanUrl;
             }
-            renderTabs();
+            if(typeof renderTabs === 'function') renderTabs(); else if(window.renderTabs) window.renderTabs();
             addHistoryEntry(cleanUrl, tab.title);
           }
         }
@@ -4568,7 +4579,7 @@
                   if (webContainer) webContainer.style.display = 'flex';
                   if (iframe) iframe.srcdoc = typeof content === 'string' ? content : '';
                 }
-                renderTabs();
+                if(typeof renderTabs === 'function') renderTabs(); else if(window.renderTabs) window.renderTabs();
                 omnibox.value = curTab.url;
               }
             };
@@ -5195,7 +5206,7 @@
       const specsModal = document.getElementById('specifications-modal');
       const specsTbody = document.getElementById('specs-table-tbody');
 
-      const MASTER_SPECS_DATA = [
+      const MASTER_SPECS_DATA = window.MASTER_SPECS_DATA = [
         // 61 - 100: Additional Features
         { id: 61, cat: 'additional', name: 'Tab sleeping / memory saver', status: 'implemented', target: 'Chrome Memory Saver Parity' },
         { id: 62, cat: 'additional', name: 'Battery saver throttling', status: 'implemented', target: 'Edge Efficiency Mode' },
@@ -5319,7 +5330,7 @@
         if (category === 'all') {
           renderSpecsTable(MASTER_SPECS_DATA);
         } else {
-          renderSpecsTable(MASTER_SPECS_DATA.filter(item => item.cat === category));
+          renderSpecsTable((window.MASTER_SPECS_DATA || []).filter(item => item.cat === category));
         }
       };
 
@@ -5329,7 +5340,7 @@
           renderSpecsTable(MASTER_SPECS_DATA);
           return;
         }
-        renderSpecsTable(MASTER_SPECS_DATA.filter(item => 
+        renderSpecsTable((window.MASTER_SPECS_DATA || []).filter(item => 
           item.name.toLowerCase().includes(q) || 
           item.cat.toLowerCase().includes(q) || 
           item.target.toLowerCase().includes(q) ||
@@ -5356,6 +5367,660 @@
           window.openWorkspaces();
         }
       });
+
+    
+
+      /* ══════════════════════════════════════════════════════════════════════
+         STAUNT BROWSER INTERNAL APPLICATION PAGES (staunt://)
+         ══════════════════════════════════════════════════════════════════════ */
+      window.renderInternalPage = function renderInternalPage(url, tabId, container) {
+        const pageSlug = url.replace(/^(staunt|chrome):\/\//i, '').replace(/^about:/i, '').split('/')[0].split('?')[0];
+        const tab = tabs.find(t => t.id === tabId);
+        
+        switch (pageSlug) {
+          case 'home':
+          case 'newtab':
+            const wall = document.getElementById('wall-' + tabId);
+            if (wall) wall.style.display = 'flex';
+            container.style.display = 'none';
+            if (tab) { tab.title = 'New Tab'; tab.isNewTab = true; }
+            omnibox.value = '';
+            if(typeof renderTabs === 'function') renderTabs(); else if(window.renderTabs) window.renderTabs();
+            break;
+
+          case 'downloads':
+            if (tab) tab.title = 'Downloads';
+            renderDownloadsPage(container);
+            break;
+
+          case 'history':
+            if (tab) tab.title = 'History';
+            renderHistoryPage(container);
+            break;
+
+          case 'bookmarks':
+            if (tab) tab.title = 'Bookmarks';
+            renderBookmarksPage(container);
+            break;
+
+          case 'passwords':
+            if (tab) tab.title = 'Password Vault';
+            renderPasswordsPage(container);
+            break;
+
+          case 'autofill':
+            if (tab) tab.title = 'Autofill Profiles';
+            renderAutofillPage(container);
+            break;
+
+          case 'extensions':
+            if (tab) tab.title = 'Extensions';
+            renderExtensionsPage(container);
+            break;
+
+          case 'privacy':
+            if (tab) tab.title = 'Privacy Dashboard';
+            renderPrivacyPage(container);
+            break;
+
+          case 'security':
+            if (tab) tab.title = 'Security Center';
+            renderSecurityPage(container);
+            break;
+
+          case 'permissions':
+            if (tab) tab.title = 'Site Permissions';
+            renderPermissionsPage(container);
+            break;
+
+          case 'profiles':
+            if (tab) tab.title = 'Profiles';
+            renderProfilesPage(container);
+            break;
+
+          case 'sync':
+            if (tab) tab.title = 'Sync & Devices';
+            renderSyncPage(container);
+            break;
+
+          case 'settings':
+            if (tab) tab.title = 'Settings';
+            renderSettingsPage(container);
+            break;
+
+          case 'task-manager':
+          case 'tasks':
+            if (tab) tab.title = 'Task Manager';
+            renderTaskManagerPage(container);
+            break;
+
+          case 'devtools':
+            if (tab) tab.title = 'Developer Tools';
+            renderDevToolsPage(container);
+            break;
+
+          case 'ai':
+          case 'copilot':
+            if (tab) tab.title = 'Sovereign AI';
+            renderAiAssistantPage(container);
+            break;
+
+          case 'workspaces':
+            if (tab) tab.title = 'Workspaces';
+            renderWorkspacesPage(container);
+            break;
+
+          case 'media':
+          case 'downloader':
+            if (tab) tab.title = 'Media Tools';
+            renderMediaToolsPage(container);
+            break;
+
+          case 'about':
+            if (tab) tab.title = 'About Staunt';
+            renderAboutPage(container);
+            break;
+
+          case 'whats-new':
+          case 'specs':
+          default:
+            if (tab) tab.title = "What's New (300+ Specs)";
+            renderWhatsNewPage(container);
+            break;
+        }
+        if(typeof renderTabs === 'function') renderTabs(); else if(window.renderTabs) window.renderTabs();
+      }
+
+      function renderInternalPageHeader(icon, title, subtitle) {
+        return `
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px; margin-bottom: 24px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="font-size: 28px; width: 44px; height: 44px; border-radius: 12px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(59,130,246,0.3);">${icon}</div>
+              <div>
+                <h1 style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.3px;">${title}</h1>
+                <p style="font-size: 13px; color: var(--text-dim); margin-top: 3px;">${subtitle}</p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="action-btn" onclick="navigateTo('staunt://settings')" style="font-size: 12px;">⚙️ Settings</button>
+              <button class="action-btn" onclick="navigateTo('staunt://whats-new')" style="font-size: 12px;">📋 All Features</button>
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 1. DOWNLOADS PAGE ───
+      function renderDownloadsPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('📥', 'Downloads Manager', 'Manage active transfers, saved packages, and file rules')}
+          <div style="display: flex; flex-direction: column; gap: 12px; max-width: 800px;">
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 24px;">🪟</span>
+                <div>
+                  <div style="font-weight: 700; color: #fff; font-size: 14px;">Staunt-Browser-Setup.exe</div>
+                  <div style="font-size: 12px; color: var(--text-dim);">11.7 KB • Windows x64 Native Core • Complete</div>
+                </div>
+              </div>
+              <a href="/assets/Staunt-Browser-Setup.exe" download class="action-btn" style="background: #3b82f6; color: #fff;">Open File</a>
+            </div>
+
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 24px;">📱</span>
+                <div>
+                  <div style="font-weight: 700; color: #fff; font-size: 14px;">Staunt-Browser-Mobile.apk</div>
+                  <div style="font-size: 12px; color: var(--text-dim);">5.19 MB • Android 8.0+ Universal • Complete</div>
+                </div>
+              </div>
+              <a href="/assets/Staunt-Browser-Mobile.apk" download class="action-btn" style="background: #10b981; color: #fff;">Open File</a>
+            </div>
+
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 24px;">🗜️</span>
+                <div>
+                  <div style="font-weight: 700; color: #fff; font-size: 14px;">Staunt-Browser-Windows-Setup.zip</div>
+                  <div style="font-size: 12px; color: var(--text-dim);">5.4 KB • Compressed Package • Complete</div>
+                </div>
+              </div>
+              <a href="/assets/Staunt-Browser-Windows-Setup.zip" download class="action-btn" style="background: #6366f1; color: #fff;">Open File</a>
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 2. HISTORY PAGE ───
+      function renderHistoryPage(container) {
+        const historyData = window.getStoredHistory ? window.getStoredHistory() : [];
+        container.innerHTML = `
+          ${renderInternalPageHeader('🕒', 'Browsing History', 'Chronological audit of visited websites with zero external tracking')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="internal-hist-search" placeholder="Search browsing history..." style="flex: 1; background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; padding: 8px 14px; font-size: 13px;" />
+              <button class="btn-clear-history" onclick="if(window.clearAllHistory) window.clearAllHistory(); else localStorage.removeItem('staunt_history');; renderHistoryPage(document.querySelector('.internal-page-container'))" style="margin: 0;">Clear All History</button>
+            </div>
+            <div id="internal-hist-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+              ${historyData.length ? historyData.map(h => `
+                <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
+                  <div>
+                    <a href="javascript:void(0)" onclick="navigateTo('${h.url}')" style="color: #60a5fa; font-weight: 600; font-size: 14px; text-decoration: none;">${h.title || h.url}</a>
+                    <div style="color: var(--text-dim); font-size: 12px; margin-top: 2px;">${h.url}</div>
+                  </div>
+                  <div style="color: var(--text-muted); font-size: 11px;">${new Date(h.timestamp).toLocaleTimeString()}</div>
+                </div>
+              `).join('') : '<div style="color: var(--text-dim); padding: 24px; text-align: center;">No browsing history found.</div>'}
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 3. BOOKMARKS PAGE ───
+      function renderBookmarksPage(container) {
+        const bookmarks = window.getStoredBookmarks ? window.getStoredBookmarks() : [];
+        container.innerHTML = `
+          ${renderInternalPageHeader('★', 'Bookmarks Manager', 'Organize favorite links, folders, and speed dial destinations')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 12px;">
+            ${bookmarks.map(b => `
+              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div style="color: #fff; font-weight: 700; font-size: 14px;">${b.name}</div>
+                  <div style="color: #60a5fa; font-size: 12px; margin-top: 2px;">${b.url}</div>
+                </div>
+                <button class="action-btn" onclick="navigateTo('${b.url}')" style="background: rgba(59,130,246,0.2); color: #60a5fa;">Launch</button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // ─── 4. PASSWORDS PAGE ───
+      function renderPasswordsPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('🔐', 'Password & Credentials Vault', 'Zero-knowledge AES-256 encrypted credential sandbox with breach detection')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 16px;">
+              <h3 style="color: #34d399; font-size: 15px; font-weight: 700;">Zero-Leakage Local Encryption Active</h3>
+              <p style="font-size: 12.5px; color: var(--text-dim); margin-top: 4px;">Credentials never touch remote cloud servers. Passkeys and WebAuthn hardware keys mediated on-device.</p>
+            </div>
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
+              <h4 style="color: #fff; font-size: 14px;">CSPRNG High-Entropy Password Generator</h4>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="internal-gen-pwd" readonly style="flex: 1; background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; padding: 8px 14px; font-family: monospace; font-size: 13px;" />
+                <button class="action-btn" onclick="const p = generateHighEntropyPwd(); document.getElementById('internal-gen-pwd').value = p;" style="background: #3b82f6; color: #fff;">Generate</button>
+              </div>
+            </div>
+          </div>
+        `;
+        const pInput = container.querySelector('#internal-gen-pwd');
+        if (pInput) pInput.value = generateHighEntropyPwd();
+      }
+
+      function generateHighEntropyPwd() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+        let pwd = '';
+        const arr = new Uint32Array(20);
+        window.crypto.getRandomValues(arr);
+        for (let i = 0; i < 20; i++) pwd += chars[arr[i] % chars.length];
+        return pwd;
+      }
+
+      // ─── 5. AUTOFILL PAGE ───
+      function renderAutofillPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('📝', 'Autofill & Identity Profiles', 'Secure local storage for addresses, billing cards, and form autofill')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
+              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Default Identity Profile</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div><label style="font-size: 11px; color: var(--text-dim);">Full Name</label><input type="text" class="modal-input" value="Sovereign User" /></div>
+                <div><label style="font-size: 11px; color: var(--text-dim);">Email Address</label><input type="text" class="modal-input" value="user@staunt.sovereign" /></div>
+                <div><label style="font-size: 11px; color: var(--text-dim);">Country / Region</label><input type="text" class="modal-input" value="Global" /></div>
+                <div><label style="font-size: 11px; color: var(--text-dim);">Phone</label><input type="text" class="modal-input" value="+1 (555) 019-2834" /></div>
+              </div>
+              <button class="action-btn" style="margin-top: 14px; background: #3b82f6; color: #fff;">Save Identity Profile</button>
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 6. EXTENSIONS PAGE ───
+      function renderExtensionsPage(container) {
+        const extList = [
+          { name: 'Staunt Brave Shields', desc: 'Invasive telemetry and advertisement blocker with EasyList/Peter Lowe rules', icon: '🛡️', ver: '3.4.0', on: true },
+          { name: 'Dark Reader Ultra', desc: 'High-contrast AMOLED inverted dark theme for every webpage', icon: '🌙', ver: '4.9.8', on: true },
+          { name: 'Bitwarden Vault Bridge', desc: 'Secure credential autofill integration with zero cloud dependency', icon: '🔐', ver: '2024.1', on: true },
+          { name: 'Safari Distraction-Free Reader', desc: 'Extract clean typography and eliminate cluttered sidebars', icon: '📖', ver: '2.1.0', on: true }
+        ];
+        container.innerHTML = `
+          ${renderInternalPageHeader('🧩', 'Extensions & Add-Ons Manager', 'Manage sandboxed plugins, permissions, and Chrome Web Store add-ons')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 12px;">
+            ${extList.map(e => `
+              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                  <span style="font-size: 26px;">${e.icon}</span>
+                  <div>
+                    <div style="font-weight: 700; color: #fff; font-size: 14px;">${e.name} <span class="badge-process">v${e.ver}</span></div>
+                    <div style="font-size: 12px; color: var(--text-dim); margin-top: 3px;">${e.desc}</div>
+                  </div>
+                </div>
+                <label class="switch"><input type="checkbox" ${e.on ? 'checked' : ''}><span class="slider"></span></label>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // ─── 7. PRIVACY DASHBOARD PAGE ───
+      function renderPrivacyPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('🛡️', 'Privacy & Shield Dashboard', 'Global telemetry protection, canvas fingerprint randomization, and GPC')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+              <div style="background: #0f1422; border: 1px solid rgba(139,92,246,0.3); border-radius: 12px; padding: 18px; text-align: center;">
+                <div style="font-size: 28px; font-weight: 800; color: #a78bfa;" id="priv-trackers">142</div>
+                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Trackers Blocked</div>
+              </div>
+              <div style="background: #0f1422; border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 18px; text-align: center;">
+                <div style="font-size: 28px; font-weight: 800; color: #34d399;" id="priv-cookies">89</div>
+                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Cookies Partitioned</div>
+              </div>
+              <div style="background: #0f1422; border: 1px solid rgba(59,130,246,0.3); border-radius: 12px; padding: 18px; text-align: center;">
+                <div style="font-size: 28px; font-weight: 800; color: #60a5fa;" id="priv-fingerprint">A+</div>
+                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Privacy Score</div>
+              </div>
+            </div>
+
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px;">
+              <div class="setting-row">
+                <div class="setting-label"><span>Global Privacy Control (Sec-GPC)</span><small>Enforce legal do-not-sell signals across all outbound HTTP requests</small></div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div class="setting-label"><span>Canvas &amp; Audio Randomizer</span><small>Inject micro-noise to defeat commercial browser fingerprinting</small></div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div class="setting-label"><span>WebRTC Local IP Leakage Shield</span><small>Mask internal private subnets behind mDNS hostnames</small></div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 8. SECURITY CENTER PAGE ───
+      function renderSecurityPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('🔒', 'Security Center', 'Google Safe Browsing v4, TLS 1.3 certificate audit, and process sandboxing')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 16px;">
+              <div style="font-size: 16px; font-weight: 700; color: #34d399;">Safe Browsing Protection Active</div>
+              <p style="font-size: 12.5px; color: var(--text-dim); margin-top: 4px;">All outbound URLs screened in real-time against phishing and malicious download databases.</p>
+            </div>
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px;">
+              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Active TLS / SSL Certificate</h3>
+              <div style="font-size: 12.5px; color: var(--text-dim); line-height: 1.8;">
+                <div>Cipher Suite: <strong style="color: #60a5fa;">TLS_AES_256_GCM_SHA384 (256-bit keys)</strong></div>
+                <div>Protocol Version: <strong style="color: #34d399;">TLSv1.3 (Strict Transport Security)</strong></div>
+                <div>Certificate Issuer: <strong>Let's Encrypt Authority X3 / DigiCert Global</strong></div>
+                <div>Mixed Content Defense: <strong style="color: #34d399;">Blocked (Passive &amp; Active)</strong></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 9. PERMISSIONS PAGE ───
+      function renderPermissionsPage(container) {
+        const perms = ['Camera Access', 'Microphone Access', 'Geolocation Positioning', 'Push Notifications', 'Clipboard Read/Write', 'Sensors & Motion'];
+        container.innerHTML = `
+          ${renderInternalPageHeader('🔑', 'Site Permissions Manager', 'Control fine-grained hardware and OS capability access per website')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 12px;">
+            ${perms.map(p => `
+              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div style="font-weight: 700; color: #fff; font-size: 14px;">${p}</div>
+                  <div style="font-size: 12px; color: var(--text-dim);">Default: Prompt user before granting access</div>
+                </div>
+                <select style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle); border-radius: 6px; color: #fff; padding: 6px 12px; font-size: 12px;">
+                  <option>Ask (Default)</option>
+                  <option>Allow</option>
+                  <option>Block</option>
+                </select>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // ─── 10. PROFILES PAGE ───
+      function renderProfilesPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('👥', 'Profile Sandbox Manager', 'Isolate cookies, history, and storage between Personal, Work, and Guest sessions')}
+          <div style="max-width: 800px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+            <div style="background: #0f1422; border: 2px solid #3b82f6; border-radius: 14px; padding: 20px; text-align: center;">
+              <div style="font-size: 36px; margin-bottom: 8px;">👤</div>
+              <div style="font-size: 16px; font-weight: 700; color: #fff;">Personal (Active)</div>
+              <div style="font-size: 12px; color: var(--text-dim); margin: 6px 0 14px;">Default isolated sandbox</div>
+              <button class="action-btn" style="background: #3b82f6; color: #fff; width: 100%; justify-content: center;">Current</button>
+            </div>
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 14px; padding: 20px; text-align: center;">
+              <div style="font-size: 36px; margin-bottom: 8px;">💼</div>
+              <div style="font-size: 16px; font-weight: 700; color: #fff;">Work</div>
+              <div style="font-size: 12px; color: var(--text-dim); margin: 6px 0 14px;">Corporate container</div>
+              <button class="action-btn" onclick="alert('Switched to Work profile.')" style="width: 100%; justify-content: center;">Switch</button>
+            </div>
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 14px; padding: 20px; text-align: center;">
+              <div style="font-size: 36px; margin-bottom: 8px;">🕵️</div>
+              <div style="font-size: 16px; font-weight: 700; color: #fff;">Guest Sandbox</div>
+              <div style="font-size: 12px; color: var(--text-dim); margin: 6px 0 14px;">Ephemeral RAM storage</div>
+              <button class="action-btn" onclick="alert('Switched to Ephemeral Guest profile.')" style="width: 100%; justify-content: center;">Switch</button>
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 11. SYNC PAGE ───
+      function renderSyncPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('🔄', 'Encrypted Cloud Sync & Devices', 'End-to-end encrypted continuation between Windows, macOS, Android, and Linux')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
+              <h3 style="color: #fff; font-size: 15px; font-weight: 700;">Paired Sovereign Devices</h3>
+              <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <div><strong>Windows Desktop (Current Device)</strong><div style="font-size: 12px; color: #34d399;">Active • Native Engine v3.4.0</div></div>
+                  <span class="badge-process">Primary</span>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <div><strong>Android Smartphone (Mobile APK)</strong><div style="font-size: 12px; color: var(--text-dim);">Last synced: 2 minutes ago</div></div>
+                  <button class="btn-end-process" onclick="alert('Device disconnected.')">Unpair</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 12. SETTINGS PAGE ───
+      function renderSettingsPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('⚙️', 'Browser Settings', 'Configure default search engine, display mode, zoom scaling, and cache')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
+              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Search &amp; Omnibox</h3>
+              <div class="setting-row">
+                <div class="setting-label"><span>Default Search Engine</span><small>Select default query resolution provider</small></div>
+                <select id="internal-engine-sel" onchange="localStorage.setItem('staunt_engine', this.value)" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 6px 12px; font-size: 12px;">
+                  <option value="google">Google</option>
+                  <option value="duckduckgo">DuckDuckGo</option>
+                  <option value="bing">Bing</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
+              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Performance &amp; Battery</h3>
+              <div class="setting-row">
+                <div class="setting-label"><span>Memory Saver (Tab Sleeping)</span><small>Automatically suspend background tabs inactive for over 5 minutes</small></div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+              </div>
+              <div class="setting-row">
+                <div class="setting-label"><span>Hardware GPU Acceleration</span><small>Utilize discrete GPU for 60fps compositor and WebGL2 rendering</small></div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+              </div>
+            </div>
+          </div>
+        `;
+        const engSel = container.querySelector('#internal-engine-sel');
+        if (engSel) engSel.value = localStorage.getItem('staunt_engine') || 'google';
+      }
+
+      // ─── 13. TASK MANAGER PAGE ───
+      function renderTaskManagerPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('📊', 'Browser Task Manager', 'Real-time CPU, RAM, and Network consumption across all active processes')}
+          <div style="max-width: 900px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden;">
+              <table class="task-table">
+                <thead>
+                  <tr><th>Process / Tab Name</th><th>Type</th><th>PID</th><th>CPU</th><th>RAM</th><th>Net</th><th>Action</th></tr>
+                </thead>
+                <tbody id="page-taskmgr-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        const tbody = container.querySelector('#page-taskmgr-tbody');
+        if (tbody) {
+          tbody.innerHTML = `
+            <tr><td><strong>Browser Core Engine</strong></td><td><span class="badge-process">Core</span></td><td>1001</td><td>0.4%</td><td>34 MB</td><td>0.2 KB/s</td><td>Protected</td></tr>
+            <tr><td><strong>GPU Hardware Compositor</strong></td><td><span class="badge-process">GPU</span></td><td>1002</td><td>0.3%</td><td>28 MB</td><td>0.0 KB/s</td><td>Protected</td></tr>
+            <tr><td><strong>Sovereign Network Gateway</strong></td><td><span class="badge-process">Proxy</span></td><td>1003</td><td>0.1%</td><td>16 MB</td><td>1.4 KB/s</td><td>Protected</td></tr>
+          ` + tabs.map((t, i) => `
+            <tr>
+              <td><strong>${t.title || 'Tab'}</strong></td>
+              <td><span class="badge-process" style="background: rgba(59,130,246,0.2); color: #60a5fa;">Renderer</span></td>
+              <td>${2000 + t.id}</td>
+              <td>0.8%</td>
+              <td>${22 + i * 4} MB</td>
+              <td>0.4 KB/s</td>
+              <td><button class="btn-end-process" onclick="(window.closeTab || closeTab)(${t.id}); renderTaskManagerPage(document.querySelector('.internal-page-container'))">End Task</button></td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      // ─── 14. DEVTOOLS PAGE ───
+      function renderDevToolsPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('🛠️', 'Developer Tools Studio', 'Full interactive Console REPL, DOM Elements tree, and Network Waterfall')}
+          <div style="max-width: 900px; background: #090d16; border: 1px solid var(--border-highlight); border-radius: 12px; overflow: hidden; height: 500px; display: flex; flex-direction: column;">
+            <div style="background: #0f1422; border-bottom: 1px solid var(--border-subtle); padding: 10px 16px; display: flex; gap: 14px; font-size: 13px; font-weight: 600;">
+              <span style="color: #60a5fa; cursor: pointer;">Console</span>
+              <span style="color: var(--text-dim); cursor: pointer;" onclick="alert('Elements view active.')">Elements</span>
+              <span style="color: var(--text-dim); cursor: pointer;" onclick="alert('Network waterfall active.')">Network</span>
+              <span style="color: var(--text-dim); cursor: pointer;" onclick="alert('Storage inspector active.')">Storage</span>
+            </div>
+            <div style="flex: 1; padding: 14px; font-family: monospace; font-size: 12px; color: #34d399; overflow-y: auto;">
+              [Staunt DevTools Core v3.4.0]\n&gt; Navigator userAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\n&gt; Active origin: https://web-production-2ac2a.up.railway.app\n&gt; Reverse proxy: Connected (/gateway)\n&gt; Type expressions below to evaluate:
+            </div>
+            <div style="display: flex; padding: 10px 14px; background: #0f1422; border-top: 1px solid var(--border-subtle);">
+              <span style="color: #60a5fa; margin-right: 8px;">&gt;</span>
+              <input type="text" placeholder="Evaluate JavaScript..." style="flex: 1; background: transparent; border: none; color: #fff; outline: none; font-family: monospace;" onkeydown="if(event.key==='Enter'){alert('Result: ' + eval(this.value)); this.value='';}" />
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 15. AI COPILOT PAGE ───
+      function renderAiAssistantPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('🤖', 'Sovereign AI Copilot Studio', 'Private on-device web synthesis, smart summarizer, and multi-tab analyzer')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px; cursor: pointer;" onclick="window.runAiAction('summarize'); window.openAiCopilot();">
+                <div style="font-size: 24px;">📝</div>
+                <div style="font-weight: 700; color: #fff; margin-top: 8px;">Summarize Current Page</div>
+                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Extract core takeaways into bullet points</div>
+              </div>
+              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px; cursor: pointer;" onclick="window.runAiAction('facts'); window.openAiCopilot();">
+                <div style="font-size: 24px;">📊</div>
+                <div style="font-weight: 700; color: #fff; margin-top: 8px;">Extract Facts &amp; Tables</div>
+                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Parse structured data and comparison metrics</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 16. WORKSPACES PAGE ───
+      function renderWorkspacesPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('🗂️', 'Arc Workspaces Manager', 'Organize distinct browsing workflows into isolated tab environments')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
+            <div class="workspaces-grid">
+              <div class="workspace-card active"><div class="workspace-icon">🌐</div><div class="workspace-name">General</div><div class="workspace-count">Active</div></div>
+              <div class="workspace-card" onclick="alert('Work workspace active.')"><div class="workspace-icon">💼</div><div class="workspace-name">Work</div><div class="workspace-count">Switch</div></div>
+              <div class="workspace-card" onclick="alert('Research workspace active.')"><div class="workspace-icon">🔬</div><div class="workspace-name">Research</div><div class="workspace-count">Switch</div></div>
+              <div class="workspace-card" onclick="alert('Personal workspace active.')"><div class="workspace-icon">☕</div><div class="workspace-name">Personal</div><div class="workspace-count">Switch</div></div>
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 17. MEDIA TOOLS PAGE ───
+      function renderMediaToolsPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('▶️', 'Universal Media Downloader', 'Sniff and download 4K/1080p MP4 video and MP3 audio streams from any webpage')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
+              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Sniff Media URL</h3>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="internal-media-input" placeholder="Paste YouTube, Reels, TikTok or video URL..." style="flex: 1; background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; padding: 8px 14px; font-size: 13px;" />
+                <button class="action-btn" onclick="const url = document.getElementById('internal-media-input').value; if(url) window.fetchYtMedia(url);" style="background: #ef4444; color: #fff;">Sniff Stream</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 18. ABOUT PAGE ───
+      function renderAboutPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('ℹ️', 'About Staunt Browser Ultra', 'Sovereign Chromium Core Browser • Zero Telemetry')}
+          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px;">
+              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: #8b5cf6; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #fff;">S</div>
+                <div>
+                  <h2 style="font-size: 18px; font-weight: 800; color: #fff;">Staunt Browser Ultra</h2>
+                  <p style="font-size: 12px; color: var(--text-dim);">Version 3.4.0 (Official Build) • 64-bit</p>
+                </div>
+              </div>
+              <div style="font-size: 12.5px; color: var(--text-dim); line-height: 1.8;">
+                <div>Core Engine: <strong style="color: #60a5fa;">Chromium 130.0.6723.116</strong></div>
+                <div>Build Target: <strong>Windows x64 / Android Universal APK / Sovereign Web</strong></div>
+                <div>Release Date: <strong>September 11, 2026</strong></div>
+                <div>License: <strong>MIT Open Source &amp; Sovereign Zero-Telemetry License</strong></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // ─── 19. WHAT'S NEW (300+ FEATURES MATRIX) PAGE ───
+      function renderWhatsNewPage(container) {
+        container.innerHTML = `
+          ${renderInternalPageHeader('📋', "What's New: 300+ Feature Industrial Parity", 'Parameters 61 through 360 Certified Parity across all 10 Browser Categories')}
+          <div style="max-width: 900px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; gap: 8px;">
+              <input type="text" placeholder="Search across 300 industrial parameters..." style="flex: 1; background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; padding: 8px 14px; font-size: 13px;" oninput="window.filterPageSpecs(this.value)" />
+            </div>
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden;">
+              <table class="task-table">
+                <thead>
+                  <tr><th>Index</th><th>Category</th><th>Feature Specification</th><th>Status</th><th>Parity Standard</th></tr>
+                </thead>
+                <tbody id="page-specs-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        const tbody = container.querySelector('#page-specs-tbody');
+        if (tbody) {
+          tbody.innerHTML = (window.MASTER_SPECS_DATA || []).map(item => `
+            <tr>
+              <td><strong>#${String(item.id).padStart(3, '0')}</strong></td>
+              <td><span class="badge-process">${item.cat.toUpperCase()}</span></td>
+              <td>${item.name}</td>
+              <td><span class="status-badge ${item.status}">${item.status === 'implemented' ? '✅ Implemented' : '🟡 Partial'}</span></td>
+              <td style="color: var(--text-dim);">${item.target}</td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      window.filterPageSpecs = function(query) {
+        const q = query.toLowerCase().trim();
+        const tbody = document.getElementById('page-specs-tbody');
+        if (!tbody) return;
+        const filtered = (window.MASTER_SPECS_DATA || []).filter(item => 
+          item.name.toLowerCase().includes(q) || 
+          item.cat.toLowerCase().includes(q) || 
+          item.target.toLowerCase().includes(q)
+        );
+        tbody.innerHTML = filtered.map(item => `
+          <tr>
+            <td><strong>#${String(item.id).padStart(3, '0')}</strong></td>
+            <td><span class="badge-process">${item.cat.toUpperCase()}</span></td>
+            <td>${item.name}</td>
+            <td><span class="status-badge ${item.status}">${item.status === 'implemented' ? '✅ Implemented' : '🟡 Partial'}</span></td>
+            <td style="color: var(--text-dim);">${item.target}</td>
+          </tr>
+        `).join('');
+      };
 
     })();
     </script>
@@ -6035,660 +6700,7 @@
   <script src="/saas/shield-engine.js"></script>
   <script src="/saas/command-palette.js"></script>
   <script src="/saas/reader-mode.js"></script>
-  <script src="/saas/vault-storage.js">
-      /* ══════════════════════════════════════════════════════════════════════
-         STAUNT BROWSER INTERNAL APPLICATION PAGES (staunt://)
-         ══════════════════════════════════════════════════════════════════════ */
-      function renderInternalPage(url, tabId, container) {
-        const pageSlug = url.replace(/^(staunt|chrome):\/\//i, '').replace(/^about:/i, '').split('/')[0].split('?')[0];
-        const tab = tabs.find(t => t.id === tabId);
-        
-        switch (pageSlug) {
-          case 'home':
-          case 'newtab':
-            const wall = document.getElementById('wall-' + tabId);
-            if (wall) wall.style.display = 'flex';
-            container.style.display = 'none';
-            if (tab) { tab.title = 'New Tab'; tab.isNewTab = true; }
-            omnibox.value = '';
-            renderTabs();
-            break;
-
-          case 'downloads':
-            if (tab) tab.title = 'Downloads';
-            renderDownloadsPage(container);
-            break;
-
-          case 'history':
-            if (tab) tab.title = 'History';
-            renderHistoryPage(container);
-            break;
-
-          case 'bookmarks':
-            if (tab) tab.title = 'Bookmarks';
-            renderBookmarksPage(container);
-            break;
-
-          case 'passwords':
-            if (tab) tab.title = 'Password Vault';
-            renderPasswordsPage(container);
-            break;
-
-          case 'autofill':
-            if (tab) tab.title = 'Autofill Profiles';
-            renderAutofillPage(container);
-            break;
-
-          case 'extensions':
-            if (tab) tab.title = 'Extensions';
-            renderExtensionsPage(container);
-            break;
-
-          case 'privacy':
-            if (tab) tab.title = 'Privacy Dashboard';
-            renderPrivacyPage(container);
-            break;
-
-          case 'security':
-            if (tab) tab.title = 'Security Center';
-            renderSecurityPage(container);
-            break;
-
-          case 'permissions':
-            if (tab) tab.title = 'Site Permissions';
-            renderPermissionsPage(container);
-            break;
-
-          case 'profiles':
-            if (tab) tab.title = 'Profiles';
-            renderProfilesPage(container);
-            break;
-
-          case 'sync':
-            if (tab) tab.title = 'Sync & Devices';
-            renderSyncPage(container);
-            break;
-
-          case 'settings':
-            if (tab) tab.title = 'Settings';
-            renderSettingsPage(container);
-            break;
-
-          case 'task-manager':
-          case 'tasks':
-            if (tab) tab.title = 'Task Manager';
-            renderTaskManagerPage(container);
-            break;
-
-          case 'devtools':
-            if (tab) tab.title = 'Developer Tools';
-            renderDevToolsPage(container);
-            break;
-
-          case 'ai':
-          case 'copilot':
-            if (tab) tab.title = 'Sovereign AI';
-            renderAiAssistantPage(container);
-            break;
-
-          case 'workspaces':
-            if (tab) tab.title = 'Workspaces';
-            renderWorkspacesPage(container);
-            break;
-
-          case 'media':
-          case 'downloader':
-            if (tab) tab.title = 'Media Tools';
-            renderMediaToolsPage(container);
-            break;
-
-          case 'about':
-            if (tab) tab.title = 'About Staunt';
-            renderAboutPage(container);
-            break;
-
-          case 'whats-new':
-          case 'specs':
-          default:
-            if (tab) tab.title = "What's New (300+ Specs)";
-            renderWhatsNewPage(container);
-            break;
-        }
-        renderTabs();
-      }
-
-      function renderInternalPageHeader(icon, title, subtitle) {
-        return `
-          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px; margin-bottom: 24px;">
-            <div style="display: flex; align-items: center; gap: 14px;">
-              <div style="font-size: 28px; width: 44px; height: 44px; border-radius: 12px; background: rgba(59,130,246,0.15); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(59,130,246,0.3);">${icon}</div>
-              <div>
-                <h1 style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.3px;">${title}</h1>
-                <p style="font-size: 13px; color: var(--text-dim); margin-top: 3px;">${subtitle}</p>
-              </div>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <button class="action-btn" onclick="navigateTo('staunt://settings')" style="font-size: 12px;">⚙️ Settings</button>
-              <button class="action-btn" onclick="navigateTo('staunt://whats-new')" style="font-size: 12px;">📋 All Features</button>
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 1. DOWNLOADS PAGE ───
-      function renderDownloadsPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('📥', 'Downloads Manager', 'Manage active transfers, saved packages, and file rules')}
-          <div style="display: flex; flex-direction: column; gap: 12px; max-width: 800px;">
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 24px;">🪟</span>
-                <div>
-                  <div style="font-weight: 700; color: #fff; font-size: 14px;">Staunt-Browser-Setup.exe</div>
-                  <div style="font-size: 12px; color: var(--text-dim);">11.7 KB • Windows x64 Native Core • Complete</div>
-                </div>
-              </div>
-              <a href="/assets/Staunt-Browser-Setup.exe" download class="action-btn" style="background: #3b82f6; color: #fff;">Open File</a>
-            </div>
-
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 24px;">📱</span>
-                <div>
-                  <div style="font-weight: 700; color: #fff; font-size: 14px;">Staunt-Browser-Mobile.apk</div>
-                  <div style="font-size: 12px; color: var(--text-dim);">5.19 MB • Android 8.0+ Universal • Complete</div>
-                </div>
-              </div>
-              <a href="/assets/Staunt-Browser-Mobile.apk" download class="action-btn" style="background: #10b981; color: #fff;">Open File</a>
-            </div>
-
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 24px;">🗜️</span>
-                <div>
-                  <div style="font-weight: 700; color: #fff; font-size: 14px;">Staunt-Browser-Windows-Setup.zip</div>
-                  <div style="font-size: 12px; color: var(--text-dim);">5.4 KB • Compressed Package • Complete</div>
-                </div>
-              </div>
-              <a href="/assets/Staunt-Browser-Windows-Setup.zip" download class="action-btn" style="background: #6366f1; color: #fff;">Open File</a>
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 2. HISTORY PAGE ───
-      function renderHistoryPage(container) {
-        const historyData = getHistoryEntries();
-        container.innerHTML = `
-          ${renderInternalPageHeader('🕒', 'Browsing History', 'Chronological audit of visited websites with zero external tracking')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 12px;">
-            <div style="display: flex; gap: 8px;">
-              <input type="text" id="internal-hist-search" placeholder="Search browsing history..." style="flex: 1; background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; padding: 8px 14px; font-size: 13px;" />
-              <button class="btn-clear-history" onclick="clearAllHistory(); renderHistoryPage(document.querySelector('.internal-page-container'))" style="margin: 0;">Clear All History</button>
-            </div>
-            <div id="internal-hist-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
-              ${historyData.length ? historyData.map(h => `
-                <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
-                  <div>
-                    <a href="javascript:void(0)" onclick="navigateTo('${h.url}')" style="color: #60a5fa; font-weight: 600; font-size: 14px; text-decoration: none;">${h.title || h.url}</a>
-                    <div style="color: var(--text-dim); font-size: 12px; margin-top: 2px;">${h.url}</div>
-                  </div>
-                  <div style="color: var(--text-muted); font-size: 11px;">${new Date(h.timestamp).toLocaleTimeString()}</div>
-                </div>
-              `).join('') : '<div style="color: var(--text-dim); padding: 24px; text-align: center;">No browsing history found.</div>'}
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 3. BOOKMARKS PAGE ───
-      function renderBookmarksPage(container) {
-        const bookmarks = getSavedBookmarks();
-        container.innerHTML = `
-          ${renderInternalPageHeader('★', 'Bookmarks Manager', 'Organize favorite links, folders, and speed dial destinations')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 12px;">
-            ${bookmarks.map(b => `
-              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between;">
-                <div>
-                  <div style="color: #fff; font-weight: 700; font-size: 14px;">${b.name}</div>
-                  <div style="color: #60a5fa; font-size: 12px; margin-top: 2px;">${b.url}</div>
-                </div>
-                <button class="action-btn" onclick="navigateTo('${b.url}')" style="background: rgba(59,130,246,0.2); color: #60a5fa;">Launch</button>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }
-
-      // ─── 4. PASSWORDS PAGE ───
-      function renderPasswordsPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('🔐', 'Password & Credentials Vault', 'Zero-knowledge AES-256 encrypted credential sandbox with breach detection')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
-            <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 16px;">
-              <h3 style="color: #34d399; font-size: 15px; font-weight: 700;">Zero-Leakage Local Encryption Active</h3>
-              <p style="font-size: 12.5px; color: var(--text-dim); margin-top: 4px;">Credentials never touch remote cloud servers. Passkeys and WebAuthn hardware keys mediated on-device.</p>
-            </div>
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
-              <h4 style="color: #fff; font-size: 14px;">CSPRNG High-Entropy Password Generator</h4>
-              <div style="display: flex; gap: 8px;">
-                <input type="text" id="internal-gen-pwd" readonly style="flex: 1; background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; padding: 8px 14px; font-family: monospace; font-size: 13px;" />
-                <button class="action-btn" onclick="const p = generateHighEntropyPwd(); document.getElementById('internal-gen-pwd').value = p;" style="background: #3b82f6; color: #fff;">Generate</button>
-              </div>
-            </div>
-          </div>
-        `;
-        const pInput = container.querySelector('#internal-gen-pwd');
-        if (pInput) pInput.value = generateHighEntropyPwd();
-      }
-
-      function generateHighEntropyPwd() {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
-        let pwd = '';
-        const arr = new Uint32Array(20);
-        window.crypto.getRandomValues(arr);
-        for (let i = 0; i < 20; i++) pwd += chars[arr[i] % chars.length];
-        return pwd;
-      }
-
-      // ─── 5. AUTOFILL PAGE ───
-      function renderAutofillPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('📝', 'Autofill & Identity Profiles', 'Secure local storage for addresses, billing cards, and form autofill')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
-              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Default Identity Profile</h3>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                <div><label style="font-size: 11px; color: var(--text-dim);">Full Name</label><input type="text" class="modal-input" value="Sovereign User" /></div>
-                <div><label style="font-size: 11px; color: var(--text-dim);">Email Address</label><input type="text" class="modal-input" value="user@staunt.sovereign" /></div>
-                <div><label style="font-size: 11px; color: var(--text-dim);">Country / Region</label><input type="text" class="modal-input" value="Global" /></div>
-                <div><label style="font-size: 11px; color: var(--text-dim);">Phone</label><input type="text" class="modal-input" value="+1 (555) 019-2834" /></div>
-              </div>
-              <button class="action-btn" style="margin-top: 14px; background: #3b82f6; color: #fff;">Save Identity Profile</button>
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 6. EXTENSIONS PAGE ───
-      function renderExtensionsPage(container) {
-        const extList = [
-          { name: 'Staunt Brave Shields', desc: 'Invasive telemetry and advertisement blocker with EasyList/Peter Lowe rules', icon: '🛡️', ver: '3.4.0', on: true },
-          { name: 'Dark Reader Ultra', desc: 'High-contrast AMOLED inverted dark theme for every webpage', icon: '🌙', ver: '4.9.8', on: true },
-          { name: 'Bitwarden Vault Bridge', desc: 'Secure credential autofill integration with zero cloud dependency', icon: '🔐', ver: '2024.1', on: true },
-          { name: 'Safari Distraction-Free Reader', desc: 'Extract clean typography and eliminate cluttered sidebars', icon: '📖', ver: '2.1.0', on: true }
-        ];
-        container.innerHTML = `
-          ${renderInternalPageHeader('🧩', 'Extensions & Add-Ons Manager', 'Manage sandboxed plugins, permissions, and Chrome Web Store add-ons')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 12px;">
-            ${extList.map(e => `
-              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 14px;">
-                  <span style="font-size: 26px;">${e.icon}</span>
-                  <div>
-                    <div style="font-weight: 700; color: #fff; font-size: 14px;">${e.name} <span class="badge-process">v${e.ver}</span></div>
-                    <div style="font-size: 12px; color: var(--text-dim); margin-top: 3px;">${e.desc}</div>
-                  </div>
-                </div>
-                <label class="switch"><input type="checkbox" ${e.on ? 'checked' : ''}><span class="slider"></span></label>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }
-
-      // ─── 7. PRIVACY DASHBOARD PAGE ───
-      function renderPrivacyPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('🛡️', 'Privacy & Shield Dashboard', 'Global telemetry protection, canvas fingerprint randomization, and GPC')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-              <div style="background: #0f1422; border: 1px solid rgba(139,92,246,0.3); border-radius: 12px; padding: 18px; text-align: center;">
-                <div style="font-size: 28px; font-weight: 800; color: #a78bfa;" id="priv-trackers">142</div>
-                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Trackers Blocked</div>
-              </div>
-              <div style="background: #0f1422; border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 18px; text-align: center;">
-                <div style="font-size: 28px; font-weight: 800; color: #34d399;" id="priv-cookies">89</div>
-                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Cookies Partitioned</div>
-              </div>
-              <div style="background: #0f1422; border: 1px solid rgba(59,130,246,0.3); border-radius: 12px; padding: 18px; text-align: center;">
-                <div style="font-size: 28px; font-weight: 800; color: #60a5fa;" id="priv-fingerprint">A+</div>
-                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Privacy Score</div>
-              </div>
-            </div>
-
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px;">
-              <div class="setting-row">
-                <div class="setting-label"><span>Global Privacy Control (Sec-GPC)</span><small>Enforce legal do-not-sell signals across all outbound HTTP requests</small></div>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
-              </div>
-              <div class="setting-row">
-                <div class="setting-label"><span>Canvas &amp; Audio Randomizer</span><small>Inject micro-noise to defeat commercial browser fingerprinting</small></div>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
-              </div>
-              <div class="setting-row">
-                <div class="setting-label"><span>WebRTC Local IP Leakage Shield</span><small>Mask internal private subnets behind mDNS hostnames</small></div>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 8. SECURITY CENTER PAGE ───
-      function renderSecurityPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('🔒', 'Security Center', 'Google Safe Browsing v4, TLS 1.3 certificate audit, and process sandboxing')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
-            <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 16px;">
-              <div style="font-size: 16px; font-weight: 700; color: #34d399;">Safe Browsing Protection Active</div>
-              <p style="font-size: 12.5px; color: var(--text-dim); margin-top: 4px;">All outbound URLs screened in real-time against phishing and malicious download databases.</p>
-            </div>
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px;">
-              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Active TLS / SSL Certificate</h3>
-              <div style="font-size: 12.5px; color: var(--text-dim); line-height: 1.8;">
-                <div>Cipher Suite: <strong style="color: #60a5fa;">TLS_AES_256_GCM_SHA384 (256-bit keys)</strong></div>
-                <div>Protocol Version: <strong style="color: #34d399;">TLSv1.3 (Strict Transport Security)</strong></div>
-                <div>Certificate Issuer: <strong>Let's Encrypt Authority X3 / DigiCert Global</strong></div>
-                <div>Mixed Content Defense: <strong style="color: #34d399;">Blocked (Passive &amp; Active)</strong></div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 9. PERMISSIONS PAGE ───
-      function renderPermissionsPage(container) {
-        const perms = ['Camera Access', 'Microphone Access', 'Geolocation Positioning', 'Push Notifications', 'Clipboard Read/Write', 'Sensors & Motion'];
-        container.innerHTML = `
-          ${renderInternalPageHeader('🔑', 'Site Permissions Manager', 'Control fine-grained hardware and OS capability access per website')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 12px;">
-            ${perms.map(p => `
-              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
-                <div>
-                  <div style="font-weight: 700; color: #fff; font-size: 14px;">${p}</div>
-                  <div style="font-size: 12px; color: var(--text-dim);">Default: Prompt user before granting access</div>
-                </div>
-                <select style="background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle); border-radius: 6px; color: #fff; padding: 6px 12px; font-size: 12px;">
-                  <option>Ask (Default)</option>
-                  <option>Allow</option>
-                  <option>Block</option>
-                </select>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }
-
-      // ─── 10. PROFILES PAGE ───
-      function renderProfilesPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('👥', 'Profile Sandbox Manager', 'Isolate cookies, history, and storage between Personal, Work, and Guest sessions')}
-          <div style="max-width: 800px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-            <div style="background: #0f1422; border: 2px solid #3b82f6; border-radius: 14px; padding: 20px; text-align: center;">
-              <div style="font-size: 36px; margin-bottom: 8px;">👤</div>
-              <div style="font-size: 16px; font-weight: 700; color: #fff;">Personal (Active)</div>
-              <div style="font-size: 12px; color: var(--text-dim); margin: 6px 0 14px;">Default isolated sandbox</div>
-              <button class="action-btn" style="background: #3b82f6; color: #fff; width: 100%; justify-content: center;">Current</button>
-            </div>
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 14px; padding: 20px; text-align: center;">
-              <div style="font-size: 36px; margin-bottom: 8px;">💼</div>
-              <div style="font-size: 16px; font-weight: 700; color: #fff;">Work</div>
-              <div style="font-size: 12px; color: var(--text-dim); margin: 6px 0 14px;">Corporate container</div>
-              <button class="action-btn" onclick="alert('Switched to Work profile.')" style="width: 100%; justify-content: center;">Switch</button>
-            </div>
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 14px; padding: 20px; text-align: center;">
-              <div style="font-size: 36px; margin-bottom: 8px;">🕵️</div>
-              <div style="font-size: 16px; font-weight: 700; color: #fff;">Guest Sandbox</div>
-              <div style="font-size: 12px; color: var(--text-dim); margin: 6px 0 14px;">Ephemeral RAM storage</div>
-              <button class="action-btn" onclick="alert('Switched to Ephemeral Guest profile.')" style="width: 100%; justify-content: center;">Switch</button>
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 11. SYNC PAGE ───
-      function renderSyncPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('🔄', 'Encrypted Cloud Sync & Devices', 'End-to-end encrypted continuation between Windows, macOS, Android, and Linux')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
-              <h3 style="color: #fff; font-size: 15px; font-weight: 700;">Paired Sovereign Devices</h3>
-              <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <div><strong>Windows Desktop (Current Device)</strong><div style="font-size: 12px; color: #34d399;">Active • Native Engine v3.4.0</div></div>
-                  <span class="badge-process">Primary</span>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <div><strong>Android Smartphone (Mobile APK)</strong><div style="font-size: 12px; color: var(--text-dim);">Last synced: 2 minutes ago</div></div>
-                  <button class="btn-end-process" onclick="alert('Device disconnected.')">Unpair</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 12. SETTINGS PAGE ───
-      function renderSettingsPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('⚙️', 'Browser Settings', 'Configure default search engine, display mode, zoom scaling, and cache')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
-              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Search &amp; Omnibox</h3>
-              <div class="setting-row">
-                <div class="setting-label"><span>Default Search Engine</span><small>Select default query resolution provider</small></div>
-                <select id="internal-engine-sel" onchange="localStorage.setItem('staunt_engine', this.value)" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 6px 12px; font-size: 12px;">
-                  <option value="google">Google</option>
-                  <option value="duckduckgo">DuckDuckGo</option>
-                  <option value="bing">Bing</option>
-                </select>
-              </div>
-            </div>
-
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
-              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Performance &amp; Battery</h3>
-              <div class="setting-row">
-                <div class="setting-label"><span>Memory Saver (Tab Sleeping)</span><small>Automatically suspend background tabs inactive for over 5 minutes</small></div>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
-              </div>
-              <div class="setting-row">
-                <div class="setting-label"><span>Hardware GPU Acceleration</span><small>Utilize discrete GPU for 60fps compositor and WebGL2 rendering</small></div>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
-              </div>
-            </div>
-          </div>
-        `;
-        const engSel = container.querySelector('#internal-engine-sel');
-        if (engSel) engSel.value = localStorage.getItem('staunt_engine') || 'google';
-      }
-
-      // ─── 13. TASK MANAGER PAGE ───
-      function renderTaskManagerPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('📊', 'Browser Task Manager', 'Real-time CPU, RAM, and Network consumption across all active processes')}
-          <div style="max-width: 900px; display: flex; flex-direction: column; gap: 14px;">
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden;">
-              <table class="task-table">
-                <thead>
-                  <tr><th>Process / Tab Name</th><th>Type</th><th>PID</th><th>CPU</th><th>RAM</th><th>Net</th><th>Action</th></tr>
-                </thead>
-                <tbody id="page-taskmgr-tbody"></tbody>
-              </table>
-            </div>
-          </div>
-        `;
-        const tbody = container.querySelector('#page-taskmgr-tbody');
-        if (tbody) {
-          tbody.innerHTML = `
-            <tr><td><strong>Browser Core Engine</strong></td><td><span class="badge-process">Core</span></td><td>1001</td><td>0.4%</td><td>34 MB</td><td>0.2 KB/s</td><td>Protected</td></tr>
-            <tr><td><strong>GPU Hardware Compositor</strong></td><td><span class="badge-process">GPU</span></td><td>1002</td><td>0.3%</td><td>28 MB</td><td>0.0 KB/s</td><td>Protected</td></tr>
-            <tr><td><strong>Sovereign Network Gateway</strong></td><td><span class="badge-process">Proxy</span></td><td>1003</td><td>0.1%</td><td>16 MB</td><td>1.4 KB/s</td><td>Protected</td></tr>
-          ` + tabs.map((t, i) => `
-            <tr>
-              <td><strong>${t.title || 'Tab'}</strong></td>
-              <td><span class="badge-process" style="background: rgba(59,130,246,0.2); color: #60a5fa;">Renderer</span></td>
-              <td>${2000 + t.id}</td>
-              <td>0.8%</td>
-              <td>${22 + i * 4} MB</td>
-              <td>0.4 KB/s</td>
-              <td><button class="btn-end-process" onclick="closeTab(${t.id}); renderTaskManagerPage(document.querySelector('.internal-page-container'))">End Task</button></td>
-            </tr>
-          `).join('');
-        }
-      }
-
-      // ─── 14. DEVTOOLS PAGE ───
-      function renderDevToolsPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('🛠️', 'Developer Tools Studio', 'Full interactive Console REPL, DOM Elements tree, and Network Waterfall')}
-          <div style="max-width: 900px; background: #090d16; border: 1px solid var(--border-highlight); border-radius: 12px; overflow: hidden; height: 500px; display: flex; flex-direction: column;">
-            <div style="background: #0f1422; border-bottom: 1px solid var(--border-subtle); padding: 10px 16px; display: flex; gap: 14px; font-size: 13px; font-weight: 600;">
-              <span style="color: #60a5fa; cursor: pointer;">Console</span>
-              <span style="color: var(--text-dim); cursor: pointer;" onclick="alert('Elements view active.')">Elements</span>
-              <span style="color: var(--text-dim); cursor: pointer;" onclick="alert('Network waterfall active.')">Network</span>
-              <span style="color: var(--text-dim); cursor: pointer;" onclick="alert('Storage inspector active.')">Storage</span>
-            </div>
-            <div style="flex: 1; padding: 14px; font-family: monospace; font-size: 12px; color: #34d399; overflow-y: auto;">
-              [Staunt DevTools Core v3.4.0]\n&gt; Navigator userAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\n&gt; Active origin: https://web-production-2ac2a.up.railway.app\n&gt; Reverse proxy: Connected (/gateway)\n&gt; Type expressions below to evaluate:
-            </div>
-            <div style="display: flex; padding: 10px 14px; background: #0f1422; border-top: 1px solid var(--border-subtle);">
-              <span style="color: #60a5fa; margin-right: 8px;">&gt;</span>
-              <input type="text" placeholder="Evaluate JavaScript..." style="flex: 1; background: transparent; border: none; color: #fff; outline: none; font-family: monospace;" onkeydown="if(event.key==='Enter'){alert('Result: ' + eval(this.value)); this.value='';}" />
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 15. AI COPILOT PAGE ───
-      function renderAiAssistantPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('🤖', 'Sovereign AI Copilot Studio', 'Private on-device web synthesis, smart summarizer, and multi-tab analyzer')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
-              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px; cursor: pointer;" onclick="window.runAiAction('summarize'); window.openAiCopilot();">
-                <div style="font-size: 24px;">📝</div>
-                <div style="font-weight: 700; color: #fff; margin-top: 8px;">Summarize Current Page</div>
-                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Extract core takeaways into bullet points</div>
-              </div>
-              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px; cursor: pointer;" onclick="window.runAiAction('facts'); window.openAiCopilot();">
-                <div style="font-size: 24px;">📊</div>
-                <div style="font-weight: 700; color: #fff; margin-top: 8px;">Extract Facts &amp; Tables</div>
-                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Parse structured data and comparison metrics</div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 16. WORKSPACES PAGE ───
-      function renderWorkspacesPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('🗂️', 'Arc Workspaces Manager', 'Organize distinct browsing workflows into isolated tab environments')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
-            <div class="workspaces-grid">
-              <div class="workspace-card active"><div class="workspace-icon">🌐</div><div class="workspace-name">General</div><div class="workspace-count">Active</div></div>
-              <div class="workspace-card" onclick="alert('Work workspace active.')"><div class="workspace-icon">💼</div><div class="workspace-name">Work</div><div class="workspace-count">Switch</div></div>
-              <div class="workspace-card" onclick="alert('Research workspace active.')"><div class="workspace-icon">🔬</div><div class="workspace-name">Research</div><div class="workspace-count">Switch</div></div>
-              <div class="workspace-card" onclick="alert('Personal workspace active.')"><div class="workspace-icon">☕</div><div class="workspace-name">Personal</div><div class="workspace-count">Switch</div></div>
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 17. MEDIA TOOLS PAGE ───
-      function renderMediaToolsPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('▶️', 'Universal Media Downloader', 'Sniff and download 4K/1080p MP4 video and MP3 audio streams from any webpage')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
-              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Sniff Media URL</h3>
-              <div style="display: flex; gap: 8px;">
-                <input type="text" id="internal-media-input" placeholder="Paste YouTube, Reels, TikTok or video URL..." style="flex: 1; background: rgba(255,255,255,0.06); border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; padding: 8px 14px; font-size: 13px;" />
-                <button class="action-btn" onclick="const url = document.getElementById('internal-media-input').value; if(url) window.fetchYtMedia(url);" style="background: #ef4444; color: #fff;">Sniff Stream</button>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 18. ABOUT PAGE ───
-      function renderAboutPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('ℹ️', 'About Staunt Browser Ultra', 'Sovereign Chromium Core Browser • Zero Telemetry')}
-          <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px;">
-              <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-                <div style="width: 48px; height: 48px; border-radius: 12px; background: #8b5cf6; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #fff;">S</div>
-                <div>
-                  <h2 style="font-size: 18px; font-weight: 800; color: #fff;">Staunt Browser Ultra</h2>
-                  <p style="font-size: 12px; color: var(--text-dim);">Version 3.4.0 (Official Build) • 64-bit</p>
-                </div>
-              </div>
-              <div style="font-size: 12.5px; color: var(--text-dim); line-height: 1.8;">
-                <div>Core Engine: <strong style="color: #60a5fa;">Chromium 130.0.6723.116</strong></div>
-                <div>Build Target: <strong>Windows x64 / Android Universal APK / Sovereign Web</strong></div>
-                <div>Release Date: <strong>September 11, 2026</strong></div>
-                <div>License: <strong>MIT Open Source &amp; Sovereign Zero-Telemetry License</strong></div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      // ─── 19. WHAT'S NEW (300+ FEATURES MATRIX) PAGE ───
-      function renderWhatsNewPage(container) {
-        container.innerHTML = `
-          ${renderInternalPageHeader('📋', "What's New: 300+ Feature Industrial Parity", 'Parameters 61 through 360 Certified Parity across all 10 Browser Categories')}
-          <div style="max-width: 900px; display: flex; flex-direction: column; gap: 14px;">
-            <div style="display: flex; gap: 8px;">
-              <input type="text" placeholder="Search across 300 industrial parameters..." style="flex: 1; background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 8px; color: #fff; padding: 8px 14px; font-size: 13px;" oninput="window.filterPageSpecs(this.value)" />
-            </div>
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; overflow: hidden;">
-              <table class="task-table">
-                <thead>
-                  <tr><th>Index</th><th>Category</th><th>Feature Specification</th><th>Status</th><th>Parity Standard</th></tr>
-                </thead>
-                <tbody id="page-specs-tbody"></tbody>
-              </table>
-            </div>
-          </div>
-        `;
-        const tbody = container.querySelector('#page-specs-tbody');
-        if (tbody) {
-          tbody.innerHTML = MASTER_SPECS_DATA.map(item => `
-            <tr>
-              <td><strong>#${String(item.id).padStart(3, '0')}</strong></td>
-              <td><span class="badge-process">${item.cat.toUpperCase()}</span></td>
-              <td>${item.name}</td>
-              <td><span class="status-badge ${item.status}">${item.status === 'implemented' ? '✅ Implemented' : '🟡 Partial'}</span></td>
-              <td style="color: var(--text-dim);">${item.target}</td>
-            </tr>
-          `).join('');
-        }
-      }
-
-      window.filterPageSpecs = function(query) {
-        const q = query.toLowerCase().trim();
-        const tbody = document.getElementById('page-specs-tbody');
-        if (!tbody) return;
-        const filtered = MASTER_SPECS_DATA.filter(item => 
-          item.name.toLowerCase().includes(q) || 
-          item.cat.toLowerCase().includes(q) || 
-          item.target.toLowerCase().includes(q)
-        );
-        tbody.innerHTML = filtered.map(item => `
-          <tr>
-            <td><strong>#${String(item.id).padStart(3, '0')}</strong></td>
-            <td><span class="badge-process">${item.cat.toUpperCase()}</span></td>
-            <td>${item.name}</td>
-            <td><span class="status-badge ${item.status}">${item.status === 'implemented' ? '✅ Implemented' : '🟡 Partial'}</span></td>
-            <td style="color: var(--text-dim);">${item.target}</td>
-          </tr>
-        `).join('');
-      };
-
-</script>
+  <script src="/saas/vault-storage.js"></script>
 
 </body>
 </html>
