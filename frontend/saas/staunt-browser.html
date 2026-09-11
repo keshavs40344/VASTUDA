@@ -6760,16 +6760,16 @@
           <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
               <div style="background: #0f1422; border: 1px solid rgba(139,92,246,0.3); border-radius: 12px; padding: 18px; text-align: center;">
-                <div style="font-size: 28px; font-weight: 800; color: #a78bfa;" id="priv-trackers">142</div>
+                <div style="font-size: 28px; font-weight: 800; color: #a78bfa;" id="priv-trackers">${parseInt(localStorage.getItem('staunt_trackers_blocked_total') || '0', 10)}</div>
                 <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Trackers Blocked</div>
               </div>
               <div style="background: #0f1422; border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 18px; text-align: center;">
-                <div style="font-size: 28px; font-weight: 800; color: #34d399;" id="priv-cookies">89</div>
-                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Cookies Partitioned</div>
+                <div style="font-size: 28px; font-weight: 800; color: #34d399;" id="priv-cookies">${(document.cookie ? document.cookie.split(';').filter(c => c.trim()).length : 0)}</div>
+                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Origin Cookies Active</div>
               </div>
               <div style="background: #0f1422; border: 1px solid rgba(59,130,246,0.3); border-radius: 12px; padding: 18px; text-align: center;">
-                <div style="font-size: 28px; font-weight: 800; color: #60a5fa;" id="priv-fingerprint">A+</div>
-                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Privacy Score</div>
+                <div style="font-size: 28px; font-weight: 800; color: #60a5fa;" id="priv-fingerprint">Active</div>
+                <div style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Privacy Shield</div>
               </div>
             </div>
 
@@ -6793,21 +6793,21 @@
 
       // ─── 8. SECURITY CENTER PAGE ───
       function renderSecurityPage(container) {
+        const isSecure = window.location.protocol === 'https:';
         container.innerHTML = `
-          ${renderInternalPageHeader('🔒', 'Security Center', 'Google Safe Browsing v4, TLS 1.3 certificate audit, and process sandboxing')}
+          ${renderInternalPageHeader('🔒', 'Security Center', 'Connection security audit and content sandbox boundaries')}
           <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
-            <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 16px;">
-              <div style="font-size: 16px; font-weight: 700; color: #34d399;">Safe Browsing Protection Active</div>
-              <p style="font-size: 12.5px; color: var(--text-dim); margin-top: 4px;">All outbound URLs screened in real-time against phishing and malicious download databases.</p>
+            <div style="background: ${isSecure ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; border: 1px solid ${isSecure ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}; border-radius: 12px; padding: 16px;">
+              <div style="font-size: 16px; font-weight: 700; color: ${isSecure ? '#34d399' : '#f87171'};">${isSecure ? 'Secure HTTPS Connection Active' : 'Non-Encrypted Connection (HTTP)'}</div>
+              <p style="font-size: 12.5px; color: var(--text-dim); margin-top: 4px;">Host Origin: <strong>${escapeHtml(window.location.origin)}</strong></p>
             </div>
             <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px;">
-              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Active TLS / SSL Certificate</h3>
+              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Active Origin Security State</h3>
               <div style="font-size: 12.5px; color: var(--text-dim); line-height: 1.8;">
-                <div>Cipher Suite: <strong style="color: #60a5fa;">TLS_AES_256_GCM_SHA384 (256-bit keys)</strong></div>
-                <div>Protocol Version: <strong style="color: #34d399;">TLSv1.3 (Strict Transport Security)</strong></div>
-                <div>Certificate Trust: <strong style="color: #34d399;">Verified via OS &amp; System CA Trust Store</strong></div>
-                <div>Origin Attestation: <strong>Strict Transport Security (HSTS) Enforced</strong></div>
-                <div>Mixed Content Defense: <strong style="color: #34d399;">Blocked (Passive &amp; Active)</strong></div>
+                <div>Protocol: <strong style="color: ${isSecure ? '#34d399' : '#f87171'};">${window.location.protocol.toUpperCase()}</strong></div>
+                <div>Certificate Trust: <strong>${isSecure ? 'Validated by Host Browser System Root' : 'Unencrypted Transmission'}</strong></div>
+                <div>Mixed Content Defense: <strong style="color: #34d399;">Active (Browser Sandbox)</strong></div>
+                <div>Sandbox Isolation: <strong style="color: #60a5fa;">Iframe allow-scripts / allow-same-origin</strong></div>
               </div>
             </div>
           </div>
@@ -6868,21 +6868,21 @@
 
       // ─── 11. SYNC PAGE ───
       function renderSyncPage(container) {
+        const platform = window.__STAUNT_PLATFORM === 'web' ? 'Web Edition' : (window.__STAUNT_PLATFORM || 'Desktop');
         container.innerHTML = `
-          ${renderInternalPageHeader('🔄', 'Encrypted Cloud Sync & Devices', 'End-to-end encrypted continuation between Windows, macOS, Android, and Linux')}
+          ${renderInternalPageHeader('🔄', 'Encrypted Cloud Sync & Devices', 'Profile data and session synchronization status')}
           <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
             <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
-              <h3 style="color: #fff; font-size: 15px; font-weight: 700;">Paired Sovereign Devices</h3>
+              <h3 style="color: #fff; font-size: 15px; font-weight: 700;">Current Instance Status</h3>
               <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <div><strong>Windows Desktop (Current Device)</strong><div style="font-size: 12px; color: #34d399;">Active • Native Engine v3.4.0</div></div>
-                  <span class="badge-process">Primary</span>
-                </div>
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <div><strong>Android Smartphone (Mobile APK)</strong><div style="font-size: 12px; color: var(--text-dim);">Last synced: 2 minutes ago</div></div>
-                  <button class="btn-end-process" onclick="window.unpairDevice(this)">Unpair</button>
+                  <div><strong>Local Device Instance</strong><div style="font-size: 12px; color: #34d399;">Active • ${platform}</div></div>
+                  <span class="badge-process">Standalone</span>
                 </div>
               </div>
+              <p style="font-size: 12px; color: var(--text-dim); margin-top: 16px; line-height: 1.6;">
+                Cloud sync across devices is an enterprise feature. Local session export/import is available via <strong>Workspaces &gt; Export Session</strong>.
+              </p>
             </div>
           </div>
         `;
