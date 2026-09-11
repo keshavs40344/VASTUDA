@@ -20,28 +20,31 @@
 
   <style>
     :root {
-      --bg-canvas: #090d16;
-      --bg-tabstrip: #0d121f;
-      --bg-toolbar: #131826;
-      --bg-tab-active: #131826;
-      --bg-tab-inactive: rgba(255, 255, 255, 0.035);
-      --bg-surface: rgba(255, 255, 255, 0.04);
-      --bg-surface-hover: rgba(255, 255, 255, 0.08);
-      --bg-omnibox: rgba(0, 0, 0, 0.38);
-      --bg-omnibox-hover: rgba(0, 0, 0, 0.55);
-      --bg-omnibox-focus: rgba(0, 0, 0, 0.75);
-      --accent: #8b5cf6;
-      --accent-hover: #7c3aed;
-      --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-focus: rgba(139, 92, 246, 0.6);
-      --text-white: #ffffff;
+      --bg-canvas: #07090e;
+      --bg-tabstrip: #0a0e17;
+      --bg-toolbar: #0f1422;
+      --bg-tab-active: #0f1422;
+      --bg-tab-inactive: rgba(255, 255, 255, 0.03);
+      --bg-surface: rgba(15, 22, 35, 0.65);
+      --bg-surface-hover: rgba(22, 32, 50, 0.75);
+      --bg-omnibox: rgba(0, 0, 0, 0.45);
+      --bg-omnibox-hover: rgba(0, 0, 0, 0.65);
+      --bg-omnibox-focus: rgba(0, 0, 0, 0.85);
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
+      --border-highlight: 1px solid rgba(255, 255, 255, 0.16);
+      --border-focus: 1px solid rgba(59, 130, 246, 0.55);
+      --primary-focus-glow: rgba(59, 130, 246, 0.35);
+      --text-white: #f8fafc;
       --text-dim: #94a3b8;
       --text-muted: #64748b;
       --tabs-h: 38px;
-      --header-h: 42px;
+      --header-h: 44px;
       --bookmarks-h: 32px;
       --bottom-nav-h: 52px;
+      -webkit-app-region: no-drag;
     }
 
     * {
@@ -71,13 +74,17 @@
       right: 0;
       height: var(--tabs-h);
       background: var(--bg-tabstrip);
-      border-bottom: 0.5px solid rgba(0, 0, 0, 0.5);
+      border-bottom: var(--border-subtle);
       display: flex;
       align-items: flex-end;
-      padding: 0 8px;
-      gap: 4px;
+      padding: 0 10px;
+      gap: 6px;
       z-index: 10001;
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      -webkit-app-region: drag;
+    }
+    .tabs-strip * {
+      -webkit-app-region: no-drag;
     }
 
     body.immersive-mode .tabs-strip {
@@ -242,11 +249,17 @@
     .tab-strip-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       margin-left: auto;
       padding-bottom: 3px;
       padding-right: 6px;
       flex-shrink: 0;
+    }
+    .tab-strip-actions .action-btn {
+      height: 30px;
+      gap: 6px;
+      border: var(--border-subtle);
+      backdrop-filter: blur(12px);
     }
 
     /* ─── ROW 2: NAVIGATION & OMNIBOX HEADER ─── */
@@ -257,13 +270,14 @@
       right: 0;
       height: var(--header-h);
       background: var(--bg-toolbar);
-      border-bottom: 1px solid var(--border-subtle);
+      border-bottom: var(--border-subtle);
       display: flex;
       align-items: center;
-      padding: 0 10px;
-      gap: 8px;
+      padding: 0 12px;
+      gap: 10px;
       z-index: 10000;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(16px);
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -667,14 +681,15 @@
 
     .launch-clock {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 64px;
+      font-size: 68px;
       font-weight: 800;
       letter-spacing: -1.5px;
-      background: linear-gradient(180deg, #ffffff 40%, rgba(255, 255, 255, 0.6) 100%);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(180deg, #ffffff 40%, rgba(255, 255, 255, 0.65) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      line-height: 1;
-      text-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      text-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
     }
 
     .launch-date {
@@ -771,25 +786,33 @@
     }
 
     .speed-tile {
-      background: rgba(255, 255, 255, 0.035);
-      border: 1px solid rgba(255, 255, 255, 0.07);
+      background: var(--bg-surface);
+      border: var(--border-subtle);
       border-radius: 16px;
-      padding: 16px 8px 12px;
+      padding: 18px 10px 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       cursor: pointer;
       position: relative;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(16px);
+      transition: 
+        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .speed-tile:hover {
-      transform: translateY(-4px);
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(139, 92, 246, 0.3);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      transform: translateY(-3px);
+      background: var(--bg-surface-hover);
+      border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55), 0 0 16px rgba(59, 130, 246, 0.2);
+    }
+    
+    .speed-tile:active {
+      transform: translateY(-1px);
     }
 
     .tile-icon-box {
