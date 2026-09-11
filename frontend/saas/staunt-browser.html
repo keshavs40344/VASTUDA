@@ -1690,6 +1690,52 @@
       flex-shrink: 0;
     }
 
+  
+    /* ─── PHASE 3: CSS ENHANCEMENTS (PRINT, A11Y, RTL, REDUCED MOTION) ─── */
+    @media print {
+      .tabs-strip, .app-header, .bookmarks-bar, .mobile-bottom-bar,
+      .drawer-overlay, .modal-overlay, .yt-downloader-overlay, .offline-banner,
+      .progress-bar-strip, #shortcuts-section {
+        display: none !important;
+      }
+      .viewport-canvas, .webpage-container, .embed-frame {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        background: #fff !important;
+        color: #000 !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
+    html[dir="rtl"] body {
+      direction: rtl;
+    }
+    html[dir="rtl"] .tabs-strip,
+    html[dir="rtl"] .app-header,
+    html[dir="rtl"] .mobile-bottom-bar {
+      direction: rtl;
+    }
+    html[dir="rtl"] .tab-strip-actions {
+      margin-left: 0;
+      margin-right: auto;
+    }
+    html[dir="rtl"] .drawer-panel {
+      right: auto;
+      left: 0;
+      transform: translateX(-100%);
+    }
+    html[dir="rtl"] .drawer-overlay.open .drawer-panel {
+      transform: translateX(0);
+    }
+    
   </style>
 </head>
 <body>
@@ -1701,7 +1747,7 @@
       <div class="brand-tab-icon">S</div>
       <span>STAUNT ULTRA</span>
     </div>
-    <div class="tabs-rail" id="tabs-rail"></div>
+    <div class="tabs-rail" id="tabs-rail" role="tablist" aria-label="Browser tabs"></div>
     <button class="btn-new-tab" id="btn-add-tab" title="New Tab (Ctrl+T)">+</button>
     <div class="tab-strip-actions">
       <button class="action-btn" id="btn-open-history" title="History (Ctrl+H)">
@@ -1753,7 +1799,7 @@
         <span id="security-label">Secure</span>
       </div>
       <span class="engine-badge" id="engine-badge" title="Click to cycle search engine">G</span>
-      <input type="text" class="omnibox-input" id="omnibox-input" placeholder="Search Google or enter web address..." spellcheck="false" autocomplete="off" />
+      <input type="text" class="omnibox-input" id="omnibox-input" placeholder="Search Google or enter web address..." spellcheck="false" autocomplete="off" / role="searchbox" aria-label="Address and search bar">
       
       <!-- Autocomplete Dropdown -->
       <div class="autocomplete-dropdown" id="autocomplete-dropdown"></div>
@@ -1804,7 +1850,7 @@
   </nav>
 
   <!-- ─── SLIDE-OVER DRAWER: HISTORY ─── -->
-  <div class="drawer-overlay" id="history-drawer">
+  <div class="drawer-overlay" id="history-drawer" role="dialog" aria-modal="true">
     <div class="drawer-panel">
       <div class="drawer-head">
         <h3>Browsing History</h3>
@@ -1817,7 +1863,7 @@
   </div>
 
   <!-- ─── SLIDE-OVER DRAWER: DOWNLOADS ─── -->
-  <div class="drawer-overlay" id="downloads-drawer">
+  <div class="drawer-overlay" id="downloads-drawer" role="dialog" aria-modal="true">
     <div class="drawer-panel">
       <div class="drawer-head">
         <h3>Downloads Manager</h3>
@@ -1831,7 +1877,7 @@
   </div>
 
   <!-- ─── SLIDE-OVER DRAWER: PRIVACY & SHIELD ─── -->
-  <div class="drawer-overlay" id="privacy-drawer">
+  <div class="drawer-overlay" id="privacy-drawer" role="dialog" aria-modal="true">
     <div class="drawer-panel">
       <div class="drawer-head">
         <h3>Privacy &amp; Security Shield</h3>
@@ -1875,7 +1921,7 @@
   </div>
 
   <!-- ─── SLIDE-OVER DRAWER: SETTINGS ─── -->
-  <div class="drawer-overlay" id="settings-drawer">
+  <div class="drawer-overlay" id="settings-drawer" role="dialog" aria-modal="true">
     <div class="drawer-panel">
       <div class="drawer-head">
         <h3>Browser Settings</h3>
@@ -1920,7 +1966,7 @@
   </div>
 
   <!-- ─── MODAL: SECURITY INFO ─── -->
-  <div class="modal-overlay" id="security-modal">
+  <div class="modal-overlay" id="security-modal" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div class="modal-head">
         <h2>Connection Security</h2>
@@ -1934,7 +1980,7 @@
   </div>
 
   <!-- ─── MODAL: ADD / EDIT SHORTCUT ─── -->
-  <div class="modal-overlay" id="shortcut-modal">
+  <div class="modal-overlay" id="shortcut-modal" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div class="modal-head">
         <h2 id="shortcut-modal-title">Add Shortcut</h2>
@@ -1956,7 +2002,7 @@
   </div>
 
   <!-- ─── MODAL: GET APP FLYOUT (CONSOLIDATED) ─── -->
-  <div class="modal-overlay" id="download-modal">
+  <div class="modal-overlay" id="download-modal" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div class="modal-head">
         <h2>Staunt Browser Native Apps</h2>
@@ -1988,7 +2034,7 @@
   </div>
 
   <!-- ─── MODAL: YOUTUBE & UNIVERSAL VIDEO DOWNLOADER ─── -->
-  <div class="yt-downloader-overlay" id="yt-downloader-modal">
+  <div class="yt-downloader-overlay" id="yt-downloader-modal" role="dialog" aria-modal="true">
     <div class="yt-modal-card">
       <div class="yt-modal-header">
         <div class="yt-modal-title">
@@ -2320,6 +2366,20 @@
           return 'about:blank#blocked-protocol';
         }
 
+        // JavaScript URI Execution Block (XSS Defense)
+        if (/^javascript:/i.test(trimmed)) {
+          return 'about:blank#blocked-javascript';
+        }
+
+        // Custom URL Scheme Registration (web+staunt://)
+        if (/^web\+staunt:\/\//i.test(trimmed)) {
+          const action = trimmed.replace(/^web\+staunt:\/\//i, '');
+          if (window.handleStauntProtocol) {
+            window.handleStauntProtocol(action);
+          }
+          return 'about:blank#staunt-protocol';
+        }
+
 
         // 1. Math calculation check
         const mathResult = evaluateMathExpression(trimmed);
@@ -2493,6 +2553,9 @@
         tabs.forEach(tab => {
           const pill = document.createElement('div');
           pill.className = 'tab-pill' + (tab.id === activeTabId ? ' active' : '') + (tab.isPinned ? ' pinned' : '');
+          pill.setAttribute('role', 'tab');
+          pill.setAttribute('aria-selected', tab.id === activeTabId ? 'true' : 'false');
+          pill.style.transform = 'translate3d(0, 0, 0)';
           pill.dataset.id = tab.id;
 
           const fav = getFaviconUrl(tab.url);
@@ -3572,5 +3635,234 @@
     })();
 
   </script>
+<script>
+    // =========================================================================
+    // PHASE 3: INDUSTRIAL NETWORKING, NATIVE INTEGRATIONS & RESILIENCE RUNTIME
+    // =========================================================================
+    (function initPhase3Runtime() {
+      // 1. Custom Protocol Registration & Hook
+      window.handleStauntProtocol = function(action) {
+        if (action === 'settings') {
+          if (settingsDrawer) settingsDrawer.classList.add('open');
+        } else if (action === 'history') {
+          if (historyDrawer) historyDrawer.classList.add('open');
+        } else if (action === 'downloads') {
+          if (downloadsDrawer) downloadsDrawer.classList.add('open');
+        }
+        return true;
+      };
+
+      // 2. Preconnect & Prefetch Logic for Fast Navigation
+      window.injectPreconnect = function(originUrl) {
+        try {
+          const origin = new URL(originUrl).origin;
+          if (!document.querySelector(`link[rel="preconnect"][href="${origin}"]`)) {
+            const link = document.createElement('link');
+            link.rel = 'preconnect';
+            link.href = origin;
+            document.head.appendChild(link);
+            return true;
+          }
+        } catch(e) {}
+        return false;
+      };
+
+      // Preconnect on hovering speed dial tiles and shortcuts
+      document.addEventListener('mouseover', (e) => {
+        const tile = e.target.closest('.speed-tile, .bookmark-chip');
+        if (tile && tile.dataset && tile.dataset.url) {
+          window.injectPreconnect(tile.dataset.url);
+        }
+      });
+
+      // 3. Native File Drag-and-Drop Handler into Canvas
+      const dropZone = document.getElementById('viewport-canvas');
+      if (dropZone) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+          const dt = e.dataTransfer;
+          const files = dt ? dt.files : null;
+          if (files && files.length > 0) {
+            const file = files[0];
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+              const content = evt.target.result;
+              const curTab = tabs.find(t => t.id === activeTabId);
+              if (curTab) {
+                curTab.title = file.name;
+                curTab.url = 'file://' + file.name;
+                curTab.isNewTab = false;
+                const vp = document.getElementById('viewport-' + curTab.id);
+                if (vp) {
+                  const wall = vp.querySelector('.newtab-wall');
+                  const webContainer = vp.querySelector('#web-container-' + curTab.id);
+                  const iframe = vp.querySelector('#frame-' + curTab.id);
+                  if (wall) wall.style.display = 'none';
+                  if (webContainer) webContainer.style.display = 'flex';
+                  if (iframe) iframe.srcdoc = typeof content === 'string' ? content : '';
+                }
+                renderTabs();
+                omnibox.value = curTab.url;
+              }
+            };
+            if (file.type.includes('text') || file.type.includes('html') || file.name.endsWith('.txt') || file.name.endsWith('.html')) {
+              reader.readAsText(file);
+            }
+          }
+        });
+      }
+
+      // 4. Custom Context Menu Native Override
+      window.customContextMenu = null;
+      document.addEventListener('contextmenu', (e) => {
+        // Only override if not inside an input or editable field
+        if (e.target.closest('input, textarea')) return;
+        e.preventDefault();
+
+        if (!window.customContextMenu) {
+          const menu = document.createElement('div');
+          menu.id = 'staunt-custom-context-menu';
+          menu.style.cssText = 'position:fixed;background:#0f1322;border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:6px;z-index:999999;box-shadow:0 10px 30px rgba(0,0,0,0.8);min-width:180px;display:none;';
+          menu.innerHTML = `
+            <div class="ctx-item" data-act="back" style="padding:6px 12px;font-size:12px;cursor:pointer;border-radius:6px;color:#fff;">⮌ Back</div>
+            <div class="ctx-item" data-act="forward" style="padding:6px 12px;font-size:12px;cursor:pointer;border-radius:6px;color:#fff;">⮎ Forward</div>
+            <div class="ctx-item" data-act="reload" style="padding:6px 12px;font-size:12px;cursor:pointer;border-radius:6px;color:#fff;">↻ Reload</div>
+            <div style="height:1px;background:rgba(255,255,255,0.1);margin:4px 0;"></div>
+            <div class="ctx-item" data-act="bookmark" style="padding:6px 12px;font-size:12px;cursor:pointer;border-radius:6px;color:#fff;">★ Bookmark Page</div>
+            <div class="ctx-item" data-act="inspect" style="padding:6px 12px;font-size:12px;cursor:pointer;border-radius:6px;color:#fff;">🔍 Inspect Enclave</div>
+          `;
+          menu.addEventListener('click', (ev) => {
+            const item = ev.target.closest('.ctx-item');
+            if (item) {
+              const act = item.dataset.act;
+              if (act === 'back') doBack();
+              if (act === 'forward') doForward();
+              if (act === 'reload') doReload();
+              if (act === 'bookmark') omniboxStar.click();
+              menu.style.display = 'none';
+            }
+          });
+          document.body.appendChild(menu);
+          window.customContextMenu = menu;
+        }
+
+        window.customContextMenu.style.left = Math.min(e.clientX, window.innerWidth - 200) + 'px';
+        window.customContextMenu.style.top = Math.min(e.clientY, window.innerHeight - 180) + 'px';
+        window.customContextMenu.style.display = 'block';
+      });
+
+      document.addEventListener('click', () => {
+        if (window.customContextMenu) window.customContextMenu.style.display = 'none';
+      });
+
+      // 5. Dynamic Taskbar / Title Unread Badge Alerts
+      window.setBadgeCount = function(count) {
+        window.unreadBadgeCount = count;
+        const curTab = tabs.find(t => t.id === activeTabId);
+        const baseTitle = (curTab ? curTab.title : 'Staunt Browser Ultra');
+        if (count > 0) {
+          document.title = `(${count}) ${baseTitle}`;
+        } else {
+          document.title = `${baseTitle}`;
+        }
+        if (navigator.setAppBadge) {
+          try {
+            if (count > 0) navigator.setAppBadge(count);
+            else navigator.clearAppBadge();
+          } catch(e) {}
+        }
+        return document.title;
+      };
+
+      // 6. Client-Side Telemetry & Log Scrubbing (Pills, Tokens, PII Filter)
+      window.scrubTelemetryData = function(payload) {
+        if (!payload) return payload;
+        let str = typeof payload === 'string' ? payload : JSON.stringify(payload);
+        // Scrub email addresses
+        str = str.replace(/[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/g, '[EMAIL_REDACTED]');
+        // Scrub auth tokens / passwords / bearer tokens
+        str = str.replace(/(bearer|token|password|auth|secret)\s*[:=]\s*["']?[^"'\s,}]+/gi, '$1=[REDACTED]');
+        // Scrub sensitive query parameters
+        str = str.replace(/([?&](password|token|api_key|access_token)=)[^&#]*/gi, '$1[REDACTED]');
+        try {
+          return typeof payload === 'string' ? str : JSON.parse(str);
+        } catch(e) {
+          return str;
+        }
+      };
+
+      // 7. Multi-Locale RTL / LTR Mirroring
+      window.setLocaleDirection = function(dir) {
+        document.documentElement.dir = dir;
+        return document.documentElement.dir;
+      };
+
+      // 8. Keyboard Focus Trapping in Modals
+      window.trapFocusInModal = function(modalEl) {
+        if (!modalEl) return;
+        const focusable = modalEl.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        const keyHandler = function(e) {
+          if (e.key === 'Tab') {
+            if (e.shiftKey) {
+              if (document.activeElement === first) {
+                last.focus();
+                e.preventDefault();
+              }
+            } else {
+              if (document.activeElement === last) {
+                first.focus();
+                e.preventDefault();
+              }
+            }
+          }
+        };
+        modalEl._focusTrapHandler = keyHandler;
+        modalEl.addEventListener('keydown', keyHandler);
+        first.focus();
+      };
+
+      window.releaseFocusTrap = function(modalEl) {
+        if (modalEl && modalEl._focusTrapHandler) {
+          modalEl.removeEventListener('keydown', modalEl._focusTrapHandler);
+          modalEl._focusTrapHandler = null;
+        }
+      };
+
+      // 9. Battery Saver Throttling Mode
+      window.isBatterySaverActive = false;
+      window.setBatterySaver = function(active) {
+        window.isBatterySaverActive = !!active;
+        document.body.classList.toggle('battery-saver-active', window.isBatterySaverActive);
+        return window.isBatterySaverActive;
+      };
+
+      // 10. Synchronous State Serialization on Process Exit
+      window.addEventListener('beforeunload', () => {
+        try {
+          saveSessionTabs();
+          localStorage.setItem('staunt_last_exit_ts', String(Date.now()));
+        } catch(e) {}
+      });
+
+      // Export Phase 3 APIs onto window
+      window.injectPreconnect = injectPreconnect;
+      window.setBadgeCount = setBadgeCount;
+      window.scrubTelemetryData = scrubTelemetryData;
+      window.setLocaleDirection = setLocaleDirection;
+      window.trapFocusInModal = trapFocusInModal;
+      window.releaseFocusTrap = releaseFocusTrap;
+      window.setBatterySaver = setBatterySaver;
+    })();
+    </script>
 </body>
 </html>

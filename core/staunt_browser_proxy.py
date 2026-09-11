@@ -399,6 +399,7 @@ def staunt_web_proxy():
             response = Response(resp.content, status=resp.status_code, mimetype=content_type.split(";")[0])
             response.headers["Access-Control-Allow-Origin"] = "*"
             response.headers["Cache-Control"] = "public, max-age=86400"
+            response.headers["X-Content-Type-Options"] = "nosniff"
             return response
 
         # HTML Content
@@ -574,6 +575,7 @@ def staunt_web_proxy():
         response.headers["X-Frame-Options"] = "SAMEORIGIN"
         response.headers["Content-Security-Policy"] = "frame-ancestors 'self' *"
         response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["X-Content-Type-Options"] = "nosniff"
         return response
 
     except requests.exceptions.Timeout:
