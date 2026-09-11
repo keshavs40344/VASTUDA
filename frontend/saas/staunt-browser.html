@@ -20,30 +20,31 @@
 
   <style>
     :root {
-      --bg-canvas: #07090e;
-      --bg-tabstrip: #0a0e17;
-      --bg-toolbar: #0f1422;
-      --bg-tab-active: #0f1422;
-      --bg-tab-inactive: rgba(255, 255, 255, 0.03);
-      --bg-surface: rgba(15, 22, 35, 0.65);
-      --bg-surface-hover: rgba(22, 32, 50, 0.75);
-      --bg-omnibox: rgba(0, 0, 0, 0.45);
-      --bg-omnibox-hover: rgba(0, 0, 0, 0.65);
-      --bg-omnibox-focus: rgba(0, 0, 0, 0.85);
+      --bg-canvas: #101216;
+      --bg-tabstrip: #12141a;
+      --bg-toolbar: #1a1d24;
+      --bg-tab-active: #1a1d24;
+      --bg-tab-inactive: transparent;
+      --bg-tab-hover: rgba(255, 255, 255, 0.06);
+      --bg-surface: #1e222d;
+      --bg-surface-hover: #262b38;
+      --bg-omnibox: #222632;
+      --bg-omnibox-hover: #282d3b;
+      --bg-omnibox-focus: #282d3b;
       --accent: #3b82f6;
       --accent-hover: #2563eb;
-      --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      --accent-gradient: #3b82f6;
       --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
-      --border-highlight: 1px solid rgba(255, 255, 255, 0.16);
-      --border-focus: 1px solid rgba(59, 130, 246, 0.55);
-      --primary-focus-glow: rgba(59, 130, 246, 0.35);
-      --text-white: #f8fafc;
+      --border-highlight: 1px solid rgba(255, 255, 255, 0.14);
+      --border-focus: 1px solid #3b82f6;
+      --primary-focus-glow: rgba(59, 130, 246, 0.25);
+      --text-white: #e2e8f0;
       --text-dim: #94a3b8;
       --text-muted: #64748b;
-      --tabs-h: 38px;
-      --header-h: 44px;
-      --bookmarks-h: 32px;
-      --bottom-nav-h: 52px;
+      --tabs-h: 36px;
+      --header-h: 42px;
+      --bookmarks-h: 30px;
+      --bottom-nav-h: 50px;
       -webkit-app-region: no-drag;
     }
 
@@ -92,31 +93,29 @@
     }
 
     .brand-tab-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.8px;
-      color: #c4b5fd;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-dim);
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 0 10px 8px 4px;
+      padding: 0 10px 6px 6px;
       flex-shrink: 0;
       cursor: pointer;
     }
 
     .brand-tab-icon {
-      width: 18px;
-      height: 18px;
-      border-radius: 5px;
-      background: var(--accent-gradient);
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      background: var(--accent);
       display: flex;
       align-items: center;
       justify-content: center;
       color: #fff;
       font-size: 10px;
-      font-weight: 900;
-      box-shadow: 0 2px 6px rgba(139, 92, 246, 0.4);
+      font-weight: 800;
     }
 
     .tabs-rail {
@@ -161,11 +160,11 @@
 
     .tab-pill.active {
       background: var(--bg-tab-active);
-      border-color: var(--border-subtle);
-      border-top: 2px solid var(--accent);
+      border-color: rgba(255, 255, 255, 0.08);
+      border-bottom: none;
       color: #fff;
-      font-weight: 600;
-      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+      font-weight: 500;
+      box-shadow: none;
     }
 
     .tab-pill.pinned {
@@ -321,18 +320,16 @@
     .suite-dropdown-menu {
       display: none;
       position: absolute;
-      top: calc(100% + 6px);
+      top: calc(100% + 4px);
       right: 0;
-      width: 240px;
-      background: rgba(18, 18, 26, 0.96);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      width: 260px;
+      background: #181b22;
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
       padding: 6px;
       z-index: 99999;
-      animation: menuFadeIn 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: menuFadeIn 0.12s ease-out;
     }
     .suite-dropdown-menu.show {
       display: block;
@@ -395,20 +392,20 @@
     .window-controls {
       display: flex;
       align-items: center;
-      gap: 4px;
-      margin-left: 6px;
+      margin-left: auto;
+      height: 100%;
+      flex-shrink: 0;
     }
     .win-btn {
-      width: 24px;
-      height: 24px;
-      border-radius: 5px;
+      width: 44px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-dim);
       cursor: pointer;
-      transition: all 0.12s;
+      transition: background 0.12s, color 0.12s;
     }
     .win-btn:hover {
       background: rgba(255, 255, 255, 0.12);
@@ -805,13 +802,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px;
-      background: radial-gradient(circle at top center, rgba(139, 92, 246, 0.1) 0%, transparent 70%),
-                  radial-gradient(circle at bottom, rgba(99, 102, 241, 0.05) 0%, transparent 60%),
-                  var(--bg-canvas);
+      padding: 30px 20px;
+      background: var(--bg-canvas);
       overflow-y: auto;
-      background-size: cover;
-      background-position: center;
     }
 
     /* Weather chip */
@@ -838,16 +831,12 @@
     }
 
     .launch-clock {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 68px;
-      font-weight: 800;
-      letter-spacing: -1.5px;
-      line-height: 1;
+      font-size: 38px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
       font-variant-numeric: tabular-nums;
-      background: linear-gradient(180deg, #ffffff 40%, rgba(255, 255, 255, 0.65) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+      color: var(--text-white);
     }
 
     .launch-date {
@@ -875,16 +864,15 @@
 
     .home-search-box {
       width: 100%;
-      height: 48px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
+      height: 42px;
+      background: var(--bg-omnibox);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 21px;
       display: flex;
       align-items: center;
       padding: 0 16px;
-      gap: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-      transition: all 0.2s ease;
+      gap: 10px;
+      transition: border-color 0.15s, background-color 0.15s;
     }
 
     .home-search-box:hover {
@@ -946,20 +934,15 @@
     .speed-tile {
       background: var(--bg-surface);
       border: var(--border-subtle);
-      border-radius: 16px;
-      padding: 18px 10px 14px;
+      border-radius: 12px;
+      padding: 14px 10px 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       cursor: pointer;
       position: relative;
-      backdrop-filter: blur(16px);
-      transition: 
-        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-        background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-        border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-        box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background-color 0.15s, border-color 0.15s;
     }
 
     .speed-tile:hover {
@@ -2467,65 +2450,16 @@
 
   <!-- ROW 1: DESKTOP TAB STRIP -->
   <nav class="tabs-strip desktop-only" id="tabs-strip">
-    <div class="brand-tab-title" id="brand-logo-btn" title="Staunt Browser Ultra">
+    <div class="brand-tab-title" id="brand-logo-btn" title="Staunt Browser">
       <div class="brand-tab-icon">S</div>
-      <span>STAUNT ULTRA</span>
+      <span>STAUNT</span>
     </div>
     <div class="tabs-rail" id="tabs-rail" role="tablist" aria-label="Browser tabs"></div>
     <button class="btn-new-tab" id="btn-add-tab" title="New Tab (Ctrl+T)">+</button>
-    <div class="tab-strip-actions">
-      <!-- High-Frequency Quick Access -->
-      <button class="action-btn action-btn-ai" id="btn-open-ai" title="Staunt Sovereign AI Copilot (Alt+A)">
-        <span class="ai-sparkle">✨</span> <span>AI Copilot</span>
-      </button>
-
-      <button class="action-btn" id="btn-open-workspaces" title="Arc Workspaces (Alt+W)">
-        🗂️ Spaces
-      </button>
-
-      <button class="action-btn" id="btn-open-privacy" title="Privacy & Security Shield">
-        🛡️ <span id="staunt-shield-badge" class="shield-badge-count">12</span>
-      </button>
-
-      <button class="action-btn" id="btn-open-palette" title="Command Palette (Ctrl+K)">
-        ⚡ Palette
-      </button>
-
-      <!-- Consolidated Suite Menu Button -->
-      <div class="suite-dropdown-wrap">
-        <button class="action-btn suite-menu-trigger" id="btn-open-hub-menu" title="All Sovereign Tools & Master Hubs">
-          <span>≡ Hub</span>
-        </button>
-        <div class="suite-dropdown-menu" id="suite-dropdown-menu">
-          <div class="suite-menu-group-label">SYSTEM TOOLS</div>
-          <div class="suite-menu-item" id="btn-open-taskmgr"><span>📊 Browser Task Manager</span> <span class="suite-shortcut">Shift+Esc</span></div>
-          <div class="suite-menu-item" id="btn-open-devtools"><span>🛠️ Developer Tools Core</span> <span class="suite-shortcut">F12</span></div>
-          <div class="suite-menu-item" id="btn-open-specs"><span>📋 300+ Parameter Specs</span> <span class="suite-badge">All 300</span></div>
-          
-          <div class="suite-menu-group-label">BROWSING HUBS</div>
-          <div class="suite-menu-item" id="btn-open-reader"><span>📖 Safari Reader Mode</span> <span class="suite-shortcut">Alt+R</span></div>
-          <div class="suite-menu-item" id="btn-open-history"><span>🕒 Browsing History</span> <span class="suite-shortcut">Ctrl+H</span></div>
-          <div class="suite-menu-item" id="btn-toggle-bookmarks"><span>★ Bookmarks Bar</span> <span class="suite-shortcut">Ctrl+B</span></div>
-          <div class="suite-menu-item" id="btn-open-downloads"><span>📥 Downloads Manager</span> <span class="suite-shortcut">Ctrl+J</span></div>
-          <div class="suite-menu-item" id="btn-open-yt-downloader"><span>▶️ 4K Video Downloader</span></div>
-          <div class="suite-menu-item" id="btn-open-qr"><span>📱 Share to Mobile QR</span></div>
-          
-          <div class="suite-divider"></div>
-          <div class="suite-menu-item" id="btn-open-settings"><span>⚙️ Browser Settings</span></div>
-          <div class="suite-menu-item" id="btn-menu-about"><span>ℹ️ About Staunt Ultra</span></div>
-        </div>
-      </div>
-
-      <button class="action-btn btn-download-app" id="btn-open-download-modal" title="Download Desktop & Mobile Apps">
-        ⚡ Get App
-      </button>
-
-      <!-- Native Windows Window Controls -->
-      <div class="window-controls desktop-only">
-        <div class="win-btn win-min" title="Minimize" onclick="if(window.chrome && window.chrome.webview){window.chrome.webview.postMessage('MINIMIZE');} else {alert('Minimize window');}">─</div>
-        <div class="win-btn win-max" title="Maximize" onclick="if(window.chrome && window.chrome.webview){window.chrome.webview.postMessage('MAXIMIZE');} else {document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();}">□</div>
-        <div class="win-btn win-close" title="Close" onclick="if(window.chrome && window.chrome.webview){window.chrome.webview.postMessage('CLOSE');} else {window.close();}">✕</div>
-      </div>
+    <div class="window-controls desktop-only">
+      <div class="win-btn win-min" title="Minimize" onclick="if(window.chrome && window.chrome.webview){window.chrome.webview.postMessage('MINIMIZE');} else {alert('Minimize window');}">─</div>
+      <div class="win-btn win-max" title="Maximize" onclick="if(window.chrome && window.chrome.webview){window.chrome.webview.postMessage('MAXIMIZE');} else {document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();}">□</div>
+      <div class="win-btn win-close" title="Close" onclick="if(window.chrome && window.chrome.webview){window.chrome.webview.postMessage('CLOSE');} else {window.close();}">✕</div>
     </div>
   </nav>
 
@@ -2533,37 +2467,82 @@
   <header class="app-header" id="main-header">
     <div class="nav-controls desktop-only">
       <button class="btn-nav-icon" id="nav-back" title="Back (Alt+Left)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
       <button class="btn-nav-icon" id="nav-forward" title="Forward (Alt+Right)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
       </button>
       <button class="btn-nav-icon" id="nav-reload" title="Reload (Ctrl+R)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
       </button>
       <button class="btn-nav-icon" id="nav-home" title="New Tab Home">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       </button>
     </div>
 
-    <!-- Smart Omnibox -->
+    <!-- Clean Omnibox -->
     <div class="omnibox-wrapper">
       <div class="security-badge" id="security-badge" title="Connection Security Info">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span id="security-label">Secure</span>
       </div>
       <span class="engine-badge" id="engine-badge" title="Click to cycle search engine">G</span>
-      <input type="text" class="omnibox-input" id="omnibox-input" placeholder="Search Google or enter web address..." spellcheck="false" autocomplete="off" / role="searchbox" aria-label="Address and search bar">
+      <input type="text" class="omnibox-input" id="omnibox-input" placeholder="Search Google or enter web address..." spellcheck="false" autocomplete="off" role="searchbox" aria-label="Address and search bar">
       
       <!-- Autocomplete Dropdown -->
       <div class="autocomplete-dropdown" id="autocomplete-dropdown"></div>
 
       <div class="omnibox-calc-chip" id="omnibox-calc-chip" title="Calculated result (Click to use)"><span style="opacity: 0.8;">=</span> <span id="omnibox-calc-val"></span></div>
       <button class="omnibox-action-star" id="omnibox-star" title="Bookmark Page">★</button>
-      <button class="omnibox-action-btn" id="nav-popout" title="Open Page in Dedicated Window (100% Native 60fps - Zero Restrictions)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      <button class="omnibox-action-btn" id="nav-popout" title="Open Page in Dedicated Window (100% Native Engine - Zero Iframe Restrictions)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         <span>Native ↗</span>
       </button>
+    </div>
+
+    <!-- Browser Action Toolbar (Chrome/Brave style) -->
+    <div class="header-actions desktop-only">
+      <!-- Privacy Shield Button -->
+      <button class="btn-nav-icon" id="btn-open-privacy" title="Privacy & Security Shield">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span id="staunt-shield-badge" class="shield-badge-count">12</span>
+      </button>
+
+      <!-- Extensions Button -->
+      <button class="btn-nav-icon" id="btn-open-extensions" title="Extensions (staunt://extensions)" onclick="navigateTo('staunt://extensions')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/></svg>
+      </button>
+
+      <!-- 3-Dots Browser Menu Dropdown -->
+      <div class="suite-dropdown-wrap">
+        <button class="btn-nav-icon" id="btn-open-hub-menu" title="Customize and control Staunt Browser">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+        </button>
+        <div class="suite-dropdown-menu" id="suite-dropdown-menu">
+          <div class="suite-menu-item" onclick="createTab();"><span>📄 New Tab</span> <span class="suite-shortcut">Ctrl+T</span></div>
+          <div class="suite-menu-item" onclick="window.open('/', '_blank');"><span>🪟 New Window</span> <span class="suite-shortcut">Ctrl+N</span></div>
+          <div class="suite-divider"></div>
+          <div class="suite-menu-item" id="btn-open-history"><span>🕒 History</span> <span class="suite-shortcut">Ctrl+H</span></div>
+          <div class="suite-menu-item" id="btn-open-downloads"><span>📥 Downloads</span> <span class="suite-shortcut">Ctrl+J</span></div>
+          <div class="suite-menu-item" id="btn-toggle-bookmarks"><span>★ Bookmarks Bar</span> <span class="suite-shortcut">Ctrl+B</span></div>
+          <div class="suite-menu-item" onclick="navigateTo('staunt://passwords')"><span>🔐 Password Manager</span></div>
+          <div class="suite-divider"></div>
+          <div class="suite-menu-item" id="btn-open-ai"><span>🤖 Staunt AI Assistant</span> <span class="suite-shortcut">Alt+A</span></div>
+          <div class="suite-menu-item" id="btn-open-workspaces"><span>🗂️ Workspaces</span> <span class="suite-shortcut">Alt+W</span></div>
+          <div class="suite-menu-item" id="btn-open-palette"><span>⚡ Command Palette</span> <span class="suite-shortcut">Ctrl+K</span></div>
+          <div class="suite-menu-item" id="btn-open-reader"><span>📖 Reader Mode</span> <span class="suite-shortcut">Alt+R</span></div>
+          <div class="suite-menu-item" id="btn-open-yt-downloader"><span>▶️ Video Downloader</span></div>
+          <div class="suite-menu-item" id="btn-open-qr"><span>📱 Share via QR</span></div>
+          <div class="suite-divider"></div>
+          <div class="suite-menu-item" id="btn-open-taskmgr"><span>📊 Task Manager</span> <span class="suite-shortcut">Shift+Esc</span></div>
+          <div class="suite-menu-item" id="btn-open-devtools"><span>🛠️ Developer Tools</span> <span class="suite-shortcut">F12</span></div>
+          <div class="suite-menu-item" id="btn-open-specs"><span>📋 Feature Specifications</span> <span class="suite-badge">300+</span></div>
+          <div class="suite-menu-item" id="btn-open-download-modal"><span>⚡ Native Desktop App</span></div>
+          <div class="suite-divider"></div>
+          <div class="suite-menu-item" id="btn-open-settings"><span>⚙️ Settings</span></div>
+          <div class="suite-menu-item" id="btn-menu-about" onclick="navigateTo('staunt://about')"><span>ℹ️ About Staunt</span></div>
+        </div>
+      </div>
     </div>
 
     <!-- Mobile Tab Switcher Button -->
@@ -2763,7 +2742,7 @@
         <span class="modal-close" id="download-close-btn">✕</span>
       </div>
       <p style="font-size: 12.5px; color: var(--text-dim); line-height: 1.5;">
-        Install Staunt Browser on your devices for native 60fps hardware acceleration, independent profile storage, and zero web iframe limitations.
+        Install Staunt Browser on your devices for native Chromium rendering with direct OS cookie/cache management and zero iframe limitations.
       </p>
       
       <!-- Structured Download Cards -->
@@ -3877,25 +3856,16 @@
         vp.innerHTML = `
           <!-- New Tab Homepage -->
           <div class="newtab-wall" id="wall-${tab.id}">
-            <!-- Weather Chip -->
-            <div class="weather-chip">
-              <span>⛅</span>
-              <span id="weather-temp-${tab.id}">28°C Sunny</span>
-              <span>•</span>
-              <span id="weather-city-${tab.id}">Local Weather</span>
-            </div>
-
             <div class="launch-clock-wrap" id="clock-wrap-${tab.id}" title="Click to toggle 12h/24h">
-              <div class="launch-clock" id="clock-${tab.id}">--:--:--</div>
+              <div class="launch-clock" id="clock-${tab.id}">--:--</div>
               <div class="launch-date" id="date-${tab.id}">------</div>
             </div>
-            <div class="launch-greeting" id="greeting-${tab.id}">Good day</div>
 
             <!-- Home Search -->
             <div class="home-search-wrap">
               <div class="home-search-box">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color: var(--text-dim);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" class="home-search-input" id="home-search-${tab.id}" placeholder="Search the web..." />
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-dim); flex-shrink: 0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" class="home-search-input" id="home-search-${tab.id}" placeholder="Search Google or enter web address..." />
                 <button class="home-search-btn" id="home-search-btn-${tab.id}">➔</button>
               </div>
             </div>
@@ -6202,7 +6172,7 @@
       // ─── 18. ABOUT PAGE ───
       function renderAboutPage(container) {
         container.innerHTML = `
-          ${renderInternalPageHeader('ℹ️', 'About Staunt Browser Ultra', 'Sovereign Chromium Core Browser • Zero Telemetry')}
+          ${renderInternalPageHeader('ℹ️', 'About Staunt Browser Ultra', 'Independent Multi-Tab Browser Architecture • Windows Native & Web Edition')}
           <div style="max-width: 800px; display: flex; flex-direction: column; gap: 16px;">
             <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px;">
               <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
@@ -6213,7 +6183,7 @@
                 </div>
               </div>
               <div style="font-size: 12.5px; color: var(--text-dim); line-height: 1.8;">
-                <div>Core Engine: <strong style="color: #60a5fa;">Chromium 130.0.6723.116</strong></div>
+                <div>Core Engine: <strong style="color: #60a5fa;">Native OS Chromium (Desktop) / Sandboxed Reverse-Proxy Engine (Web)</strong></div>
                 <div>Build Target: <strong>Windows x64 / Android Universal APK / Sovereign Web</strong></div>
                 <div>Release Date: <strong>September 11, 2026</strong></div>
                 <div>License: <strong>MIT Open Source &amp; Sovereign Zero-Telemetry License</strong></div>
