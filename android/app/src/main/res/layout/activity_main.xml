@@ -139,4 +139,17 @@
             android:src="@drawable/ic_menu" />
     </LinearLayout>
 
+    <include
+        android:id="@+id/findInPageBar"
+        layout="@layout/dialog_find_in_page"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <include
+        android:id="@+id/tabSwitcherOverlay"
+        layout="@layout/tab_switcher"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

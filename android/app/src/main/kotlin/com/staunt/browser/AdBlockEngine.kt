@@ -1,4 +1,4 @@
-package com.staunt.browser
+﻿package com.staunt.browser
 
 import android.content.Context
 import android.util.Log
@@ -8,6 +8,8 @@ class AdBlockEngine(private val context: Context) {
     var isEnabled = true
 
     fun init() {
+        val prefs = context.getSharedPreferences("staunt_settings", Context.MODE_PRIVATE)
+        isEnabled = prefs.getBoolean("ad_block_enabled", true)
         try {
             val inputStream = context.assets.open("adblock/easylist-mini.txt")
             inputStream.bufferedReader().useLines { lines ->
@@ -24,7 +26,8 @@ class AdBlockEngine(private val context: Context) {
     }
 
     fun shouldBlock(url: String): Boolean {
-        if (!isEnabled) return false
+        val prefs = context.getSharedPreferences("staunt_settings", Context.MODE_PRIVATE)
+        if (!prefs.getBoolean("ad_block_enabled", isEnabled)) return false
         try {
             val uri = android.net.Uri.parse(url)
             val host = uri.host ?: return false
