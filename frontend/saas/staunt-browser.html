@@ -3362,6 +3362,48 @@
       });
 
       // Initialize
+
+      // ─── EXPOSE INDUSTRIAL ENGINE API FOR AUTOMATION & EXTENSIONS ───
+      window.staunt = {
+        resolveTargetUrl,
+        createTab,
+        switchTab,
+        closeTab,
+        reopenClosedTab,
+        updateSecurityBadge,
+        addHistoryEntry,
+        renderHistoryList,
+        saveBookmarks,
+        saveShortcuts,
+        closeYtDownloader,
+        openYtDownloader,
+        doPopout,
+        tabs,
+        get activeTabId() { return activeTabId; },
+        set activeTabId(v) { activeTabId = v; }
+      };
+
+      // Top-level direct window bindings
+      window.resolveTargetUrl = resolveTargetUrl;
+      window.createTab = createTab;
+      window.switchTab = switchTab;
+      window.closeTab = closeTab;
+      window.reopenClosedTab = reopenClosedTab;
+      window.updateSecurityBadge = updateSecurityBadge;
+      window.addHistoryEntry = addHistoryEntry;
+      window.renderHistoryList = renderHistoryList;
+      window.saveBookmarks = saveBookmarks;
+      window.saveShortcuts = saveShortcuts;
+      window.closeYtDownloader = closeYtDownloader;
+      window.openYtDownloader = openYtDownloader;
+      window.doPopout = doPopout;
+      window.tabs = tabs;
+      Object.defineProperty(window, 'activeTabId', {
+        get: () => activeTabId,
+        set: (v) => { activeTabId = v; },
+        configurable: true
+      });
+
       renderBookmarksBar();
       restoreSessionTabs();
     })();
