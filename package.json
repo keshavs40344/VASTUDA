@@ -9,6 +9,7 @@
     "test:master": "node test-staunt-browser-master.js",
     "test:phase3": "node test-staunt-browser-phase3.js",
     "test:phase4": "node test-staunt-browser-phase4.js",
-    "test:phase5": "node test-staunt-browser-phase5.js"
+    "test:phase5": "node test-staunt-browser-phase5.js",
+    "test:phase6": "node test-staunt-browser-phase6.js"
   }
 }
