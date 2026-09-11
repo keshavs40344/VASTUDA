@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Favorites</title>
+  <style>
+    :root {
+      --bg: #101012;
+      --text-main: rgba(255, 255, 255, 0.92);
+      --text-muted: rgba(255, 255, 255, 0.45);
+      --system-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Inter, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: radial-gradient(ellipse at 50% 25%, #1b1b22 0%, #0d0d0f 100%);
+      min-height: 100vh;
+      font-family: var(--system-font);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+
+    /* Subtle Dynamic Time & Contextual Date */
+    .greeting-container {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .greeting-time {
+      font-size: 54px;
+      font-weight: 200;
+      letter-spacing: -0.03em;
+      color: rgba(255, 255, 255, 0.90);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .greeting-text {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-muted);
+      letter-spacing: -0.01em;
+    }
+
+    /* Favorites Section */
+    .favorites-section {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    .favorites-header {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      padding-left: 10px;
+    }
+
+    /* 6-Tile Pristine Grid */
+    .favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 20px 14px;
+      justify-items: center;
+    }
+
+    @media (max-width: 640px) {
+      .favorites-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px 12px;
+      }
+      .greeting-time {
+        font-size: 44px;
+      }
+    }
+
+    .favorite-tile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      cursor: pointer;
+      width: 76px;
+    }
+
+    /* Authentic 56x56 Squircle */
+    .squircle {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
+      position: relative;
+    }
+
+    .favorite-tile:hover .squircle {
+      transform: scale(1.08);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .favorite-tile:active .squircle {
+      transform: scale(0.96);
+    }
+
+    .tile-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-main);
+      opacity: 0.85;
+      margin-top: 8px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 76px;
+    }
+
+    .favorite-tile:hover .tile-label {
+      opacity: 1;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: -4px;
+      right: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(44, 44, 46, 0.9);
+      border: 0.5px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      cursor: pointer;
+    }
+
+    .favorite-tile:hover .delete-btn {
+      opacity: 1;
+    }
+
+    .delete-btn:hover {
+      background: #ff453a;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dynamic Greeting & Time -->
+  <div class="greeting-container">
+    <div class="greeting-time" id="greetingTime">09:41</div>
+    <div class="greeting-text" id="greetingText">Good Morning</div>
+  </div>
+
+  <!-- 6 Authentic Favorites -->
+  <section class="favorites-section">
+    <div class="favorites-header">Favorites</div>
+    
+    <div class="favorites-grid" id="favoritesGrid">
+      
+      <!-- 1. YouTube -->
+      <a href="https://www.youtube.com" class="favorite-tile" data-id="youtube">
+        <button class="delete-btn" onclick="removeFav(event, 'youtube')">&times;</button>
+        <div class="squircle" style="background: #ff0000;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </div>
+        <span class="tile-label">YouTube</span>
+      </a>
+
+      <!-- 2. GitHub -->
+      <a href="https://github.com" class="favorite-tile" data-id="github">
+        <button class="delete-btn" onclick="removeFav(event, 'github')">&times;</button>
+        <div class="squircle" style="background: #24292e; border: 0.5px solid rgba(255,255,255,0.15);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </div>
+        <span class="tile-label">GitHub</span>
+      </a>
+
+      <!-- 3. Bing -->
+      <a href="https://www.bing.com" class="favorite-tile" data-id="bing">
+        <button class="delete-btn" onclick="removeFav(event, 'bing')">&times;</button>
+        <div class="squircle" style="background: #008373;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="#ffffff"><path d="M5 3v18l5-3 6 3 3-5-6-3V7l-8-4z"/></svg>
+        </div>
+        <span class="tile-label">Bing</span>
+      </a>
+
+      <!-- 4. ChatGPT -->
+      <a href="https://chatgpt.com" class="favorite-tile" data-id="chatgpt">
+        <button class="delete-btn" onclick="removeFav(event, 'chatgpt')">&times;</button>
+        <div class="squircle" style="background: #10a37f;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 4a6 6 0 1 0 0 12A6 6 0 0 0 12 6z"/></svg>
+        </div>
+        <span class="tile-label">ChatGPT</span>
+      </a>
+
+      <!-- 5. Wikipedia -->
+      <a href="https://en.wikipedia.org" class="favorite-tile" data-id="wikipedia">
+        <button class="delete-btn" onclick="removeFav(event, 'wikipedia')">&times;</button>
+        <div class="squircle" style="background: #ffffff;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="#000000"><path d="M12.09 13.124l2.678-6.044h1.724l-3.524 7.646 2.062 4.417c.307.653.64 1.05 1 .194l4.97-12.257h1.699L17.18 19.143c-.496 1.09-1.288 1.6-2.378 1.531-1.09-.07-1.802-.638-2.14-1.706l-1.99-4.708-2.02 4.708c-.337 1.068-1.05 1.636-2.139 1.706-1.09.07-1.882-.442-2.378-1.531L-.001 7.08h1.7l4.97 12.257c.36.856.693.459 1-.194l2.062-4.417-3.524-7.646h1.724l2.679 6.044 1.48-3.486 1.48 3.486z"/></svg>
+        </div>
+        <span class="tile-label">Wikipedia</span>
+      </a>
+
+      <!-- 6. X -->
+      <a href="https://x.com" class="favorite-tile" data-id="x">
+        <button class="delete-btn" onclick="removeFav(event, 'x')">&times;</button>
+        <div class="squircle" style="background: #000000; border: 0.5px solid rgba(255,255,255,0.2);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </div>
+        <span class="tile-label">X</span>
+      </a>
+
+    </div>
+  </section>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('greetingTime').textContent = \`\${hours % 12 || 12}:\${minutes}\`;
+
+      let greet = 'Good Evening';
+      if (hours < 12) greet = 'Good Morning';
+      else if (hours < 18) greet = 'Good Afternoon';
+      
+      const options = { weekday: 'long', month: 'short', day: 'numeric' };
+      document.getElementById('greetingText').textContent = \`\${greet} • \${now.toLocaleDateString(undefined, options)}\`;
+    }
+
+    updateClock();
+    setInterval(updateClock, 10000);
+
+    function removeFav(e, id) {
+      e.preventDefault();
+      e.stopPropagation();
+      const tile = document.querySelector(\`[data-id="\${id}"]\`);
+      if (tile) {
+        tile.style.opacity = '0';
+        tile.style.transform = 'scale(0.8)';
+        setTimeout(() => tile.remove(), 200);
+      }
+    }
+  </script>
+</body>
+</html>

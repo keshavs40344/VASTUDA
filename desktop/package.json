@@ -1,0 +1,57 @@
+{
+  "name": "staunt-browser",
+  "version": "2.0.0",
+  "description": "Staunt Browser Ultra — Desktop Browser",
+  "main": "main.js",
+  "author": "VASTUDA Sovereign Systems",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "serve": "node server.js",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win --x64"
+  },
+  "dependencies": {
+    "@ghostery/adblocker-electron": "^2.18.2",
+    "cors": "^2.8.5",
+    "cross-fetch": "^4.1.0",
+    "express": "^4.19.2",
+    "http-proxy-middleware": "^3.0.0"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.vastuda.stauntbrowser",
+    "productName": "Staunt Browser Ultra",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "server.js",
+      "src/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Staunt Browser"
+    }
+  }
+}

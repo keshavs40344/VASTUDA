@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.StauntBrowser" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/staunt_accent</item>
+        <item name="colorPrimaryDark">@color/staunt_bg_canvas</item>
+        <item name="colorAccent">@color/staunt_accent</item>
+        <item name="android:windowBackground">@color/staunt_bg_canvas</item>
+        <item name="android:statusBarColor">@color/staunt_bg_toolbar</item>
+        <item name="android:navigationBarColor">@color/staunt_bg_canvas</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/staunt_bg_toolbar"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical">
+
+    <EditText
+        android:id="@+id/etFind"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:hint="@string/find_in_page"
+        android:textColor="@color/staunt_text_white"
+        android:textColorHint="@color/staunt_text_dim"
+        android:backgroundTint="@color/staunt_accent"
+        android:inputType="text" />
+        
+    <TextView
+        android:id="@+id/tvMatchCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/staunt_text_dim"
+        android:layout_marginHorizontal="8dp"
+        android:text="0/0" />
+
+    <ImageButton
+        android:id="@+id/btnFindPrev"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_back" />
+
+    <ImageButton
+        android:id="@+id/btnFindNext"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_forward" />
+
+    <ImageButton
+        android:id="@+id/btnFindClose"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_close" />
+</LinearLayout>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 80">
+  <circle cx="40" cy="40" r="32" fill="#12141a" stroke="#3b82f6" stroke-width="4"/>
+  <path fill="#3b82f6" d="M40 10c-16.6 0-30 13.4-30 30s13.4 30 30 30 30-13.4 30-30S56.6 10 40 10zm-2 56c-10.6-1.3-18.8-10.3-18.8-21.3 0-1.7.2-3.2.6-4.8L28 46v2.7c0 2.9 2.4 5.4 5.4 5.4V66zm18.5-6.8c-.7-2.2-2.7-3.7-5.1-3.7h-2.7v-8c0-1.5-1.2-2.7-2.7-2.7H32.5v-5.4h5.4c1.5 0 2.7-1.2 2.7-2.7V31.3h5.4c2.9 0 5.4-2.4 5.4-5.4v-1.1c7.9 3.2 13.4 10.9 13.4 19.9 0 5.6-2.1 10.7-5.6 14.5z"/>
+  <text x="90" y="55" font-family="Plus Jakarta Sans, Inter, sans-serif" font-weight="700" font-size="42" fill="#f1f5f9">Staunt</text>
+  <text x="286" y="55" font-family="Inter, sans-serif" font-weight="400" font-size="42" fill="#94a3b8">Browser</text>
+</svg>

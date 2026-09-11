@@ -1,0 +1,119 @@
+! Staunt Browser — Curated Ad/Tracker Block List
+! Based on EasyList and EasyPrivacy
+! Format: one domain per line (EasyList-style)
+! Last updated: 2026-09-11
+
+! === Advertising Networks ===
+||doubleclick.net^
+||googlesyndication.com^
+||googleadservices.com^
+||pagead2.googlesyndication.com^
+||adservice.google.com^
+||ads.yahoo.com^
+||advertising.com^
+||adnxs.com^
+||adsrvr.org^
+||amazon-adsystem.com^
+||2mdn.net^
+||33across.com^
+||3lift.com^
+||adform.net^
+||admob.com^
+||adroll.com^
+||bidswitch.net^
+||casalemedia.com^
+||contextweb.com^
+||criteo.com^
+||criteo.net^
+||dotomi.com^
+||indexexchange.com^
+||mathtag.com^
+||mediamath.com^
+||nativo.com^
+||openx.net^
+||pubmatic.com^
+||rubiconproject.com^
+||sharethrough.com^
+||simpli.fi^
+||sitescout.com^
+||smartadserver.com^
+||spotxchange.com^
+||teads.tv^
+||tremorhub.com^
+||tribalfusion.com^
+||tubemogul.com^
+||turn.com^
+||undertone.com^
+||yieldmanager.com^
+||yieldmo.com^
+||zedo.com^
+||pubmine.com^
+||postrelease.com^
+
+! === Analytics & Tracking ===
+||google-analytics.com^
+||googletagmanager.com^
+||googletagservices.com^
+||analytics.google.com^
+||facebook.net/tr^
+||facebook.com/tr^
+||pixel.facebook.com^
+||scorecardresearch.com^
+||quantserve.com^
+||comscore.com^
+||chartbeat.com^
+||hotjar.com^
+||mixpanel.com^
+||segment.com^
+||segment.io^
+||optimizely.com^
+||tealiumiq.com^
+||nr-data.net^
+||omtrdc.net^
+||demdex.net^
+
+! === Data Brokers & Audience Targeting ===
+||bluekai.com^
+||bounceexchange.com^
+||cdn.krxd.net^
+||krux.net^
+||exelator.com^
+||eyeota.net^
+||liadm.com^
+||lijit.com^
+||lotame.com^
+||mookie1.com^
+||myvisualiq.net^
+||nexac.com^
+||onaudience.com^
+||pippio.com^
+||rfihub.com^
+||rlcdn.com^
+||speedcurve.com^
+||tapad.com^
+||tidaltv.com^
+||truoptik.com^
+||zemanta.com^
+||zqtk.net^
+
+! === Content Recommendation (often intrusive) ===
+||outbrain.com^
+||taboola.com^
+||addthis.com^
+
+! === Error Tracking (optional, privacy) ===
+||cdn.mxpnl.com^
+||sentry.io^
+||bugsnag.com^
+||trackjs.com^
+||clicktale.net^
+
+! === Social Tracking ===
+||snapchat.com/p^
+||branch.io^
+||pardot.com^
+
+! === Ad Verification ===
+||moatads.com^
+||adsafeprotected.com^
+||aps.amazon.com^

@@ -1,0 +1,56 @@
+{
+  "brand": {
+    "name": "Staunt Browser",
+    "version": "2.0.0",
+    "author": "VASTUDA Sovereign Systems"
+  },
+  "colors": {
+    "bg-canvas": "#12141a",
+    "bg-tabstrip": "#16181f",
+    "bg-toolbar": "#1a1c24",
+    "bg-tab-active": "#20232d",
+    "bg-tab-inactive": "transparent",
+    "bg-tab-hover": "rgba(255, 255, 255, 0.05)",
+    "bg-surface": "#1b1e27",
+    "bg-surface-hover": "#222632",
+    "bg-omnibox": "#222530",
+    "bg-omnibox-hover": "#272b37",
+    "bg-omnibox-focus": "#2a2e3a",
+    "accent": "#3b82f6",
+    "accent-hover": "#2563eb",
+    "text-white": "#f1f5f9",
+    "text-dim": "#94a3b8",
+    "text-muted": "#64748b",
+    "error": "#ef4444",
+    "success": "#22c55e",
+    "warning": "#f59e0b",
+    "incognito-bg": "#0d0f14"
+  },
+  "typography": {
+    "font-primary": "Inter",
+    "font-display": "Plus Jakarta Sans",
+    "weights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700,
+      "extrabold": 800
+    }
+  },
+  "spacing": {
+    "toolbar-height": 44,
+    "tabstrip-height": 36,
+    "bookmarks-bar-height": 30,
+    "bottom-nav-height": 50,
+    "border-radius-sm": 6,
+    "border-radius-md": 8,
+    "border-radius-lg": 12,
+    "border-radius-xl": 16
+  },
+  "borders": {
+    "subtle": "1px solid rgba(255, 255, 255, 0.07)",
+    "highlight": "1px solid rgba(255, 255, 255, 0.12)",
+    "focus": "1px solid #3b82f6"
+  }
+}

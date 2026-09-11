@@ -1,0 +1,28 @@
+appId: com.vastuda.stauntbrowser
+productName: Staunt Browser Ultra
+directories:
+  output: dist
+files:
+  - main.js
+  - preload.js
+  - server.js
+  - src/**/*
+  - node_modules/**/*
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: assets/icon.ico
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  installerIcon: assets/icon.ico
+  uninstallerIcon: assets/icon.ico
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Staunt Browser
+publish:
+  provider: github
+  owner: keshavs40344
+  repo: VASTUDA

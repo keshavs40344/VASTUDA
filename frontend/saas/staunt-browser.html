@@ -3327,6 +3327,81 @@
     (function() {
       'use strict';
 
+      // ─── PLATFORM DETECTION ───
+      // Set by native builds; default to 'web' for the browser-hosted version
+      window.__STAUNT_PLATFORM = window.__STAUNT_PLATFORM || 'web';
+
+      // ─── PWA INSTALL PROMPT ───
+      let deferredInstallPrompt = null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        // Show install banner after short delay
+        setTimeout(() => {
+          if (deferredInstallPrompt && typeof window.showToast === 'function') {
+            window.showToast('Install Staunt Browser as a desktop app for a better experience', 'info', 6000);
+          }
+        }, 3000);
+      });
+      window.stauntInstallPWA = function() {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          deferredInstallPrompt.userChoice.then((choice) => {
+            if (choice.outcome === 'accepted' && typeof window.showToast === 'function') {
+              window.showToast('Staunt Browser installed successfully!', 'success');
+            }
+            deferredInstallPrompt = null;
+          });
+        }
+      };
+
+      // ─── KEYBOARD SHORTCUTS ───
+      document.addEventListener('keydown', (e) => {
+        const isMeta = e.ctrlKey || e.metaKey;
+
+        // Ctrl+T — New Tab
+        if (isMeta && !e.shiftKey && e.key === 't') {
+          e.preventDefault();
+          if (typeof window.createNewTab === 'function') window.createNewTab();
+        }
+        // Ctrl+W — Close Active Tab
+        if (isMeta && !e.shiftKey && e.key === 'w') {
+          e.preventDefault();
+          if (typeof window.closeActiveTab === 'function') window.closeActiveTab();
+        }
+        // Ctrl+L — Focus Omnibox
+        if (isMeta && !e.shiftKey && e.key === 'l') {
+          e.preventDefault();
+          const omni = document.getElementById('omnibox-input');
+          if (omni) { omni.focus(); omni.select(); }
+        }
+        // Ctrl+Shift+N — New Incognito Tab
+        if (isMeta && e.shiftKey && e.key === 'N') {
+          e.preventDefault();
+          if (typeof window.createNewTab === 'function') window.createNewTab({ isIncognito: true });
+        }
+        // Ctrl+Shift+T — Reopen Closed Tab
+        if (isMeta && e.shiftKey && e.key === 'T') {
+          e.preventDefault();
+          if (typeof window.reopenClosedTab === 'function') window.reopenClosedTab();
+        }
+        // F5 — Reload
+        if (e.key === 'F5' && !isMeta) {
+          e.preventDefault();
+          if (typeof window.reloadActiveTab === 'function') window.reloadActiveTab();
+        }
+        // Ctrl+Tab — Next Tab
+        if (isMeta && !e.shiftKey && e.key === 'Tab') {
+          e.preventDefault();
+          if (typeof window.switchToNextTab === 'function') window.switchToNextTab();
+        }
+        // Ctrl+Shift+Tab — Previous Tab
+        if (isMeta && e.shiftKey && e.key === 'Tab') {
+          e.preventDefault();
+          if (typeof window.switchToPrevTab === 'function') window.switchToPrevTab();
+        }
+      });
+
       // ─── SEARCH ENGINES ───
       const SEARCH_ENGINES = {
         google: { name: 'Google', badge: 'G', url: 'https://www.google.com/search?q=' },
@@ -3767,6 +3842,43 @@
           wakeTabViewport(tab);
           switchTab(tabId);
         }
+      };
+
+      window.createNewTab = function(opts = {}) {
+        createTab(opts.url || '');
+      };
+
+      window.closeActiveTab = function() {
+        if (activeTabId !== null) {
+          closeTab(activeTabId);
+        }
+      };
+
+      window.reloadActiveTab = function() {
+        if (activeTabId !== null) {
+          const tab = tabs.find(t => t.id === activeTabId);
+          if (tab && tab.url) {
+            navigateTo(tab.url, tab.id);
+          }
+        }
+      };
+
+      window.reopenClosedTab = function() {
+        reopenClosedTab();
+      };
+
+      window.switchToNextTab = function() {
+        if (tabs.length <= 1) return;
+        const curIdx = tabs.findIndex(t => t.id === activeTabId);
+        const nextIdx = (curIdx + 1) % tabs.length;
+        switchTab(tabs[nextIdx].id);
+      };
+
+      window.switchToPrevTab = function() {
+        if (tabs.length <= 1) return;
+        const curIdx = tabs.findIndex(t => t.id === activeTabId);
+        const prevIdx = (curIdx - 1 + tabs.length) % tabs.length;
+        switchTab(tabs[prevIdx].id);
       };
 
       function switchTab(id) {
@@ -6561,6 +6673,30 @@
                 <button class="action-btn" onclick="window.clearSiteDataOnly(); renderSettingsPage(document.querySelector('.internal-page-container'))" style="background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25);">Clear Site Data</button>
                 <button class="action-btn" onclick="window.clearDownloadsList(); renderSettingsPage(document.querySelector('.internal-page-container'))" style="background: rgba(255,255,255,0.06); color: #cbd5e1; border: 1px solid var(--border-subtle);">Clear Downloads List</button>
                 <button class="action-btn" onclick="window.clearAllBrowsingData()" style="background: rgba(239,68,68,0.25); color: #fca5a5; border: 1px solid rgba(239,68,68,0.4); font-weight: 700;">Clear All Browsing Data</button>
+              </div>
+            </div>
+
+            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 18px;">
+              <h3 style="color: #fff; font-size: 14px; margin-bottom: 12px;">Platform Edition &amp; Architecture</h3>
+              <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12px; color: var(--text-dim); line-height: 1.6;">
+                <div style="padding: 10px 14px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px;">
+                  <strong style="color: #60a5fa;">Active Platform:</strong> <span id="settings-active-platform">${window.__STAUNT_PLATFORM === 'web' ? 'Web Edition (Host Browser Sandbox)' : window.__STAUNT_PLATFORM}</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                  <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px;">
+                    <div style="font-weight: 600; color: #f1f5f9; margin-bottom: 4px;">Web Edition Scope</div>
+                    <div style="font-size: 11px;">Runs securely inside host browser sandbox. Ad blocking operates at origin request layer. Real-time DOM devtools and tab management active.</div>
+                  </div>
+                  <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px;">
+                    <div style="font-weight: 600; color: #f1f5f9; margin-bottom: 4px;">Native Builds (Win / APK)</div>
+                    <div style="font-size: 11px;">Network-layer request interception (EasyList), OS process control, native file system downloads, multi-profile user data separation.</div>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 6px;">
+                  <button class="action-btn" onclick="window.stauntInstallPWA && window.stauntInstallPWA()" style="background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); font-size: 11px;">📥 Install PWA</button>
+                  <a href="/assets/Staunt-Browser-Mobile.apk" download style="text-decoration: none;"><button class="action-btn" style="background: rgba(255,255,255,0.06); color: #cbd5e1; border: 1px solid var(--border-subtle); font-size: 11px;">📱 Android APK</button></a>
+                  <a href="/assets/Staunt-Browser-Setup.exe" download style="text-decoration: none;"><button class="action-btn" style="background: rgba(255,255,255,0.06); color: #cbd5e1; border: 1px solid var(--border-subtle); font-size: 11px;">💻 Windows EXE</button></a>
+                </div>
               </div>
             </div>
           </div>
