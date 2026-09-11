@@ -2315,6 +2315,11 @@
       function resolveTargetUrl(raw) {
         if (!raw) return '';
         let trimmed = raw.trim();
+        // File protocol safety restriction
+        if (/^file:\/\//i.test(trimmed)) {
+          return 'about:blank#blocked-protocol';
+        }
+
 
         // 1. Math calculation check
         const mathResult = evaluateMathExpression(trimmed);
