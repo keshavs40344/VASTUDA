@@ -6,21 +6,30 @@
   <title>Staunt Browser Ultra</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%238b5cf6'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z'/></svg>" />
   <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#090a0f" />
+  <meta name="theme-color" content="#090d16" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
   <style>
     :root {
-      --bg-tabstrip: #12141c;
-      --bg-toolbar: #1a1d28;
-      --bg-tab-active: #1a1d28;
-      --bg-tab-inactive: rgba(255, 255, 255, 0.04);
-      --bg-omnibox: rgba(0, 0, 0, 0.35);
-      --bg-omnibox-hover: rgba(0, 0, 0, 0.5);
-      --bg-omnibox-focus: rgba(0, 0, 0, 0.7);
+      --bg-canvas: #090d16;
+      --bg-tabstrip: #0d121f;
+      --bg-toolbar: #131826;
+      --bg-tab-active: #131826;
+      --bg-tab-inactive: rgba(255, 255, 255, 0.035);
+      --bg-surface: rgba(255, 255, 255, 0.04);
+      --bg-surface-hover: rgba(255, 255, 255, 0.08);
+      --bg-omnibox: rgba(0, 0, 0, 0.38);
+      --bg-omnibox-hover: rgba(0, 0, 0, 0.55);
+      --bg-omnibox-focus: rgba(0, 0, 0, 0.75);
       --accent: #8b5cf6;
-      --accent-gradient: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+      --accent-hover: #7c3aed;
+      --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-focus: rgba(139, 92, 246, 0.6);
       --text-white: #ffffff;
@@ -28,6 +37,7 @@
       --text-muted: #64748b;
       --tabs-h: 38px;
       --header-h: 42px;
+      --bookmarks-h: 32px;
       --bottom-nav-h: 52px;
     }
 
@@ -42,13 +52,172 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #090a0f;
+      background: var(--bg-canvas);
       color: var(--text-white);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
     }
 
-    /* ─── APP HEADER ─── */
+    /* ─── ROW 1: DESKTOP TAB STRIP ─── */
+    .tabs-strip {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--tabs-h);
+      background: var(--bg-tabstrip);
+      border-bottom: 0.5px solid rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: flex-end;
+      padding: 0 8px;
+      gap: 4px;
+      z-index: 10001;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body.immersive-mode .tabs-strip {
+      transform: translateY(-100%);
+    }
+
+    .brand-tab-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #c4b5fd;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 10px 8px 4px;
+      flex-shrink: 0;
+    }
+
+    .brand-tab-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 900;
+      box-shadow: 0 2px 6px rgba(139, 92, 246, 0.4);
+    }
+
+    .tabs-rail {
+      display: flex;
+      gap: 4px;
+      align-items: flex-end;
+      flex: 1;
+      overflow-x: auto;
+      scrollbar-width: none;
+      height: 100%;
+    }
+
+    .tabs-rail::-webkit-scrollbar { display: none; }
+
+    .tab-pill {
+      height: 32px;
+      min-width: 140px;
+      max-width: 220px;
+      background: var(--bg-tab-inactive);
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      border: 1px solid transparent;
+      border-bottom: none;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      color: var(--text-dim);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .tab-pill:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-white);
+    }
+
+    .tab-pill.active {
+      background: var(--bg-tab-active);
+      border-color: var(--border-subtle);
+      border-top: 2px solid var(--accent);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .tab-favicon {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+
+    .tab-title-span {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tab-close-x {
+      font-size: 12px;
+      color: var(--text-muted);
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .tab-close-x:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    .btn-new-tab {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-bottom: 2px;
+      flex-shrink: 0;
+    }
+
+    .btn-new-tab:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .tab-strip-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      padding-bottom: 3px;
+      padding-right: 6px;
+      flex-shrink: 0;
+    }
+
+    /* ─── ROW 2: NAVIGATION & OMNIBOX HEADER ─── */
     .app-header {
       position: fixed;
       top: var(--tabs-h);
@@ -62,15 +231,14 @@
       padding: 0 10px;
       gap: 8px;
       z-index: 10000;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     body.immersive-mode .app-header {
-      transform: translateY(-100%);
+      transform: translateY(-200%);
     }
 
-    /* Navigation Controls (Desktop) */
     .nav-controls {
       display: flex;
       align-items: center;
@@ -78,9 +246,9 @@
     }
 
     .btn-nav-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
       background: transparent;
       border: none;
       color: var(--text-dim);
@@ -105,6 +273,14 @@
       height: 16px;
     }
 
+    .btn-nav-icon.spinning svg {
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
     /* Omnibox Floating Bar */
     .omnibox-wrapper {
       flex: 1;
@@ -114,9 +290,10 @@
       border-radius: 18px;
       display: flex;
       align-items: center;
-      padding: 0 12px;
+      padding: 0 10px;
       gap: 8px;
       transition: all 0.2s ease;
+      position: relative;
     }
 
     .omnibox-wrapper:hover {
@@ -130,6 +307,33 @@
       box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
     }
 
+    .security-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: background 0.15s;
+    }
+
+    .security-badge:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .security-badge.insecure {
+      color: #f87171;
+    }
+
+    .security-badge svg {
+      width: 13px;
+      height: 13px;
+    }
+
     .engine-badge {
       font-size: 11px;
       font-weight: 700;
@@ -138,13 +342,6 @@
       border-radius: 5px;
       background: rgba(139, 92, 246, 0.16);
       cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    .ssl-lock {
-      width: 13px;
-      height: 13px;
-      color: #34d399;
       flex-shrink: 0;
     }
 
@@ -162,7 +359,52 @@
       color: var(--text-muted);
     }
 
-    /* Header Actions (Desktop) */
+    .omnibox-action-star {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 15px;
+      padding: 2px 4px;
+      transition: color 0.15s;
+    }
+
+    .omnibox-action-star:hover {
+      color: #fbbf24;
+    }
+
+    .omnibox-action-star.active {
+      color: #fbbf24;
+    }
+
+    .omnibox-action-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 24px;
+      padding: 0 8px;
+      background: rgba(139, 92, 246, 0.18);
+      border: 0.5px solid rgba(139, 92, 246, 0.4);
+      color: #c4b5fd;
+      border-radius: 12px;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .omnibox-action-btn:hover {
+      background: rgba(139, 92, 246, 0.35);
+      color: #fff;
+    }
+
+    .omnibox-action-btn svg {
+      width: 12px;
+      height: 12px;
+    }
+
     .header-actions {
       display: flex;
       align-items: center;
@@ -191,157 +433,95 @@
       color: var(--text-white);
     }
 
+    .btn-header-yt {
+      background: rgba(239, 68, 68, 0.14) !important;
+      color: #f87171 !important;
+      border: 0.5px solid rgba(239, 68, 68, 0.3) !important;
+      font-weight: 600 !important;
+    }
+
+    .btn-header-yt:hover {
+      background: rgba(239, 68, 68, 0.25) !important;
+      color: #fff !important;
+    }
+
     .btn-download-app {
       background: var(--accent-gradient);
       color: #fff !important;
       border: none;
       font-weight: 600;
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
     }
 
-    /* Mobile Tab Counter Pill in Header */
-    .mobile-tab-btn {
-      display: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      border: 1.5px solid var(--text-dim);
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text-white);
-      font-size: 11.5px;
-      font-weight: 700;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-
-    /* ─── DESKTOP TABS STRIP ─── */
-    .tabs-strip {
+    /* ─── ROW 3: COLLAPSIBLE BOOKMARKS BAR ─── */
+    .bookmarks-bar {
       position: fixed;
-      top: 0;
+      top: calc(var(--tabs-h) + var(--header-h));
       left: 0;
       right: 0;
-      height: var(--tabs-h);
-      background: var(--bg-tabstrip);
-      border-bottom: 0.5px solid rgba(0, 0, 0, 0.4);
+      height: var(--bookmarks-h);
+      background: #0f131f;
+      border-bottom: 0.5px solid var(--border-subtle);
       display: flex;
-      align-items: flex-end;
-      padding: 0 8px;
-      gap: 5px;
-      z-index: 10001;
+      align-items: center;
+      padding: 0 12px;
+      gap: 6px;
+      z-index: 9999;
       overflow-x: auto;
       scrollbar-width: none;
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.2s ease;
     }
 
-    .tabs-strip::-webkit-scrollbar { display: none; }
-
-    body.immersive-mode .tabs-strip {
-      transform: translateY(-200%);
+    .bookmarks-bar.hidden {
+      display: none !important;
     }
 
-    .tab-pill {
-      height: 32px;
-      min-width: 140px;
-      max-width: 240px;
-      background: var(--bg-tab-inactive);
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      border: 1px solid transparent;
-      border-bottom: none;
-      padding: 0 10px;
+    .bookmark-chip {
       display: flex;
       align-items: center;
-      gap: 7px;
-      font-size: 11.5px;
+      gap: 6px;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 11px;
       color: var(--text-dim);
       cursor: pointer;
-      user-select: none;
-      transition: all 0.15s ease;
-      position: relative;
-    }
-
-    .tab-pill:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-white);
-    }
-
-    .tab-pill.active {
-      background: var(--bg-tab-active);
-      border-color: rgba(255, 255, 255, 0.08);
-      border-top: 2px solid var(--accent);
-      color: #fff;
-      font-weight: 500;
-    }
-
-    .tab-favicon {
-      width: 14px;
-      height: 14px;
-      border-radius: 3px;
-      flex-shrink: 0;
-      object-fit: contain;
-    }
-
-    .tab-title-span {
-      flex: 1;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      transition: all 0.15s;
     }
 
-    .tab-close-x {
-      font-size: 12px;
-      color: var(--text-muted);
-      border-radius: 50%;
-      width: 16px;
-      height: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .tab-close-x:hover {
-      background: rgba(255, 255, 255, 0.2);
-      color: #fff;
-    }
-
-    .btn-new-tab {
-      width: 26px;
-      height: 26px;
-      border-radius: 7px;
-      background: transparent;
-      border: 0.5px solid transparent;
-      color: var(--text-dim);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      flex-shrink: 0;
-    }
-
-    .btn-new-tab:hover {
+    .bookmark-chip:hover {
       background: rgba(255, 255, 255, 0.08);
       color: #fff;
+    }
+
+    .bookmark-chip img {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
     }
 
     /* Progress Strip */
     .progress-bar-strip {
       position: fixed;
-      top: calc(var(--header-h) + var(--tabs-h));
+      top: calc(var(--tabs-h) + var(--header-h));
       left: 0;
       width: 0%;
       height: 2.5px;
       background: linear-gradient(90deg, #8b5cf6, #ec4899, #3b82f6);
-      z-index: 10001;
+      z-index: 10002;
       transition: width 0.15s ease, opacity 0.25s ease;
+    }
+
+    .bookmarks-bar:not(.hidden) ~ .progress-bar-strip {
+      top: calc(var(--tabs-h) + var(--header-h) + var(--bookmarks-h));
     }
 
     /* ─── VIEWPORT CANVAS ─── */
     .viewport-canvas {
       position: fixed;
-      top: calc(var(--header-h) + var(--tabs-h));
+      top: calc(var(--tabs-h) + var(--header-h));
       left: 0;
       right: 0;
       bottom: 0;
@@ -350,227 +530,319 @@
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    .bookmarks-bar:not(.hidden) ~ .viewport-canvas {
+      top: calc(var(--tabs-h) + var(--header-h) + var(--bookmarks-h));
+    }
+
     body.immersive-mode .viewport-canvas {
-      top: 0;
-      bottom: 0;
+      top: 0 !important;
+      bottom: 0 !important;
     }
 
     .tab-viewport {
       position: absolute;
       inset: 0;
       display: none;
-      width: 100%;
-      height: 100%;
-      background: #090a0f;
+      flex-direction: column;
+      background: var(--bg-canvas);
     }
 
     .tab-viewport.active {
-      display: block;
+      display: flex;
     }
 
-    .embed-frame {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #fff;
-      display: block;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    /* ─── NEW TAB LUXURY LAUNCHPAD ─── */
+    /* ─── NEW TAB LUXURY HOMEPAGE ─── */
     .newtab-wall {
-      position: absolute;
-      inset: 0;
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at 50% 30%, #151828 0%, #08090e 100%);
-      padding: 30px 20px;
+      padding: 40px 20px;
+      background: radial-gradient(circle at top center, rgba(139, 92, 246, 0.1) 0%, transparent 70%),
+                  radial-gradient(circle at bottom, rgba(99, 102, 241, 0.05) 0%, transparent 60%),
+                  var(--bg-canvas);
       overflow-y: auto;
-      text-align: center;
+    }
+
+    .launch-clock-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+      cursor: pointer;
     }
 
     .launch-clock {
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 64px;
-      font-weight: 200;
-      color: rgba(255, 255, 255, 0.95);
+      font-weight: 800;
       letter-spacing: -1.5px;
-      margin-bottom: 4px;
-      font-variant-numeric: tabular-nums;
+      background: linear-gradient(180deg, #ffffff 40%, rgba(255, 255, 255, 0.6) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      text-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .launch-date {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dim);
+      margin-top: 6px;
+      letter-spacing: 0.3px;
     }
 
     .launch-greeting {
       font-size: 14px;
-      color: var(--text-dim);
-      margin-bottom: 30px;
+      font-weight: 600;
+      color: #a78bfa;
+      margin-bottom: 24px;
       letter-spacing: 0.5px;
+    }
+
+    /* Center Search Bar */
+    .home-search-wrap {
+      width: 100%;
+      max-width: 580px;
+      margin-bottom: 34px;
+    }
+
+    .home-search-box {
+      width: 100%;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .home-search-box:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .home-search-box:focus-within {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--border-focus);
+      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.25);
+    }
+
+    .home-search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 15px;
+      font-family: inherit;
+    }
+
+    .home-search-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      border: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .home-search-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Customizable Shortcuts Grid */
+    .shortcuts-section {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
     }
 
     .speed-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 16px;
-      max-width: 580px;
       width: 100%;
-      margin-bottom: 36px;
     }
 
     .speed-tile {
-      background: rgba(255, 255, 255, 0.04);
-      border: 0.5px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 18px 10px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 16px;
+      padding: 16px 8px 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
       cursor: pointer;
+      position: relative;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(10px);
     }
 
     .speed-tile:hover {
-      background: rgba(255, 255, 255, 0.09);
-      border-color: rgba(139, 92, 246, 0.4);
-      transform: translateY(-3px);
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(139, 92, 246, 0.3);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     }
 
-    .tile-icon {
+    .tile-icon-box {
       width: 44px;
       height: 44px;
       border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      overflow: hidden;
+    }
+
+    .tile-icon-img {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      object-fit: contain;
+    }
+
+    .tile-icon-letter {
+      font-size: 18px;
       font-weight: 700;
+      color: #c4b5fd;
     }
 
     .tile-label {
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 500;
-      color: rgba(255, 255, 255, 0.85);
+      color: var(--text-dim);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90px;
     }
 
-    .app-badge-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .app-badge-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 0.5px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 12px 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: inherit;
-      transition: all 0.15s ease;
-    }
-
-    .app-badge-card:hover {
-      background: rgba(255, 255, 255, 0.07);
-      border-color: rgba(255, 255, 255, 0.16);
-      transform: translateY(-2px);
-    }
-
-    .badge-btn {
-      background: var(--accent-gradient);
-      color: #fff;
+    .tile-delete-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      color: var(--text-dim);
       font-size: 11px;
-      font-weight: 600;
-      padding: 5px 12px;
-      border-radius: 6px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
     }
 
-    /* ─── MOBILE BOTTOM BAR ─── */
-    .mobile-bottom-bar {
-      display: none;
-      position: fixed;
-      bottom: 0;
+    .speed-tile:hover .tile-delete-btn {
+      display: flex;
+    }
+
+    .tile-delete-btn:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .speed-tile-add {
+      border: 1.5px dashed rgba(255, 255, 255, 0.15);
+      background: transparent;
+    }
+
+    .speed-tile-add:hover {
+      border-color: var(--accent);
+      background: rgba(139, 92, 246, 0.08);
+    }
+
+    /* Webpage Frame Container */
+    .webpage-container {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .embed-frame {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #fff;
+    }
+
+    .fallback-banner {
+      position: absolute;
+      top: 0;
       left: 0;
       right: 0;
-      height: var(--bottom-nav-h);
-      background: rgba(13, 15, 23, 0.95);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border-top: 0.5px solid var(--border-subtle);
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 16px;
+      display: none;
       align-items: center;
-      justify-content: space-around;
-      padding: 0 10px;
-      z-index: 10000;
-      transition: transform 0.25s ease;
-    }
-
-    body.immersive-mode .mobile-bottom-bar {
-      transform: translateY(100%);
-    }
-
-    .m-nav-btn {
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
+      justify-content: space-between;
+      z-index: 100;
+      font-size: 12px;
       color: var(--text-dim);
-      cursor: pointer;
-      border-radius: 10px;
-      transition: all 0.15s ease;
     }
 
-    .m-nav-btn:active {
-      background: rgba(255, 255, 255, 0.1);
-      color: #fff;
-      transform: scale(0.92);
+    .fallback-banner.show {
+      display: flex;
     }
 
-    .m-nav-btn svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    /* ─── MOBILE TABS DRAWER SHEET ─── */
-    .mobile-drawer-overlay {
+    /* ─── SLIDE-OVER PANELS & MODALS ─── */
+    .drawer-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.65);
       backdrop-filter: blur(8px);
       z-index: 25000;
       display: none;
-      align-items: flex-end;
+      align-items: center;
+      justify-content: flex-end;
     }
 
-    .mobile-drawer-overlay.open {
+    .drawer-overlay.open {
       display: flex;
     }
 
-    .mobile-drawer-sheet {
+    .drawer-panel {
       width: 100%;
-      max-height: 80vh;
-      background: #10121d;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-      border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+      max-width: 380px;
+      height: 100%;
+      background: #0d111d;
+      border-left: 1px solid var(--border-subtle);
       padding: 20px;
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.8);
+      animation: slideInRight 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .drawer-handle {
-      width: 36px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 2px;
-      margin: -6px auto 4px;
+    @keyframes slideInRight {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
     }
 
     .drawer-head {
@@ -580,162 +852,128 @@
     }
 
     .drawer-head h3 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
     }
 
-    .drawer-list {
+    .drawer-close {
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 18px;
+      padding: 4px;
+    }
+
+    .drawer-close:hover {
+      color: #fff;
+    }
+
+    .history-search-input {
+      width: 100%;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0 12px;
+      color: #fff;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .history-list {
+      flex: 1;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 8px;
-      overflow-y: auto;
-      max-height: 50vh;
     }
 
-    .drawer-tab-item {
+    .history-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(255, 255, 255, 0.05);
-      border: 0.5px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 8px 10px;
+      gap: 8px;
       cursor: pointer;
+      transition: background 0.15s;
     }
 
-    .drawer-tab-item.active {
-      border-color: var(--accent);
-      background: rgba(139, 92, 246, 0.12);
+    .history-item:hover {
+      background: rgba(255, 255, 255, 0.08);
     }
 
-    .drawer-tab-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .history-info {
       flex: 1;
-      overflow: hidden;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    .drawer-tab-title {
-      font-size: 13px;
+    .history-title {
+      font-size: 12px;
       color: #fff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .drawer-new-tab-btn {
-      background: var(--accent-gradient);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      height: 42px;
-      font-size: 14px;
+    .history-url {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-time {
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .btn-clear-history {
+      width: 100%;
+      height: 36px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      border-radius: 8px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      transition: all 0.15s;
     }
 
-    /* ─── RESPONSIVE BREAKPOINT FOR SMARTPHONES ─── */
-    @media (max-width: 768px) {
-      :root {
-        --header-h: 52px;
-      }
-
-      /* Hide desktop elements on mobile */
-      .desktop-only {
-        display: none !important;
-      }
-
-      /* Show mobile elements */
-      .mobile-only, .mobile-bottom-bar, .mobile-tab-btn {
-        display: flex !important;
-      }
-
-      .tabs-strip {
-        display: none !important;
-      }
-
-      .app-header {
-        top: 0 !important;
-        padding: 0 10px;
-        gap: 8px;
-      }
-
-      .omnibox-wrapper {
-        height: 38px;
-        border-radius: 12px;
-      }
-
-      .omnibox-input {
-        font-size: 14px;
-      }
-
-      .progress-bar-strip {
-        top: var(--header-h);
-      }
-
-      .viewport-canvas {
-        top: var(--header-h) !important;
-        bottom: var(--bottom-nav-h) !important;
-      }
-
-      .speed-grid {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 10px !important;
-      }
-
-      .speed-tile {
-        padding: 10px 4px !important;
-        border-radius: 12px;
-      }
-
-      .tile-icon {
-        width: 40px !important;
-        height: 40px !important;
-        font-size: 18px !important;
-        border-radius: 10px !important;
-      }
-
-      .tile-label {
-        font-size: 10.5px !important;
-      }
-
-      .launch-clock {
-        font-size: 48px !important;
-      }
-
-      .launch-greeting {
-        font-size: 12px !important;
-        margin-bottom: 20px !important;
-      }
+    .btn-clear-history:hover {
+      background: #ef4444;
+      color: #fff;
     }
 
-    /* Download Modal */
-    .download-modal-overlay {
+    /* Modal dialog */
+    .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(12px);
+      z-index: 30000;
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 30000;
-      padding: 20px;
+      padding: 16px;
     }
 
-    .download-modal-overlay.open {
+    .modal-overlay.open {
       display: flex;
     }
 
     .modal-box {
-      background: #10121d;
-      border: 0.5px solid rgba(255, 255, 255, 0.15);
+      background: #0f131f;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 16px;
-      max-width: 440px;
+      max-width: 460px;
       width: 100%;
       padding: 24px;
       display: flex;
@@ -758,26 +996,139 @@
     .modal-close {
       cursor: pointer;
       color: var(--text-muted);
-      font-size: 16px;
+      font-size: 18px;
     }
 
-    /* ─── NATIVE VIDEO & YT DOWNLOADER MODAL / MOBILE SHEET ─── */
+    .modal-close:hover {
+      color: #fff;
+    }
+
+    .modal-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .modal-input-group label {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    .modal-input {
+      height: 38px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0 12px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .modal-input:focus {
+      border-color: var(--accent);
+    }
+
+    .modal-btn-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .modal-btn-sec {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-dim);
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .modal-btn-pri {
+      height: 36px;
+      padding: 0 18px;
+      border-radius: 8px;
+      background: var(--accent-gradient);
+      border: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Structured App Download Cards */
+    .app-download-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+    }
+
+    .app-download-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(139, 92, 246, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .app-card-icon {
+      font-size: 26px;
+    }
+
+    .app-card-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .app-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .app-card-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .app-card-btn {
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+
+    /* ─── NATIVE VIDEO & YT DOWNLOADER MODAL ─── */
     .yt-downloader-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
       z-index: 35000;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 16px;
-      transition: opacity 0.2s ease;
     }
+
     .yt-downloader-overlay.open {
       display: flex;
     }
+
     .yt-modal-card {
       background: #0f121d;
       border: 1px solid rgba(139, 92, 246, 0.35);
@@ -786,118 +1137,113 @@
       max-width: 680px;
       max-height: 88vh;
       overflow-y: auto;
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9);
       display: flex;
       flex-direction: column;
-      color: #fff;
     }
+
     .yt-modal-header {
-      padding: 14px 18px;
+      padding: 16px 20px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(18, 22, 36, 0.96);
-      position: sticky;
-      top: 0;
-      z-index: 10;
     }
+
     .yt-modal-title {
       display: flex;
       align-items: center;
       gap: 10px;
       font-size: 15px;
       font-weight: 700;
+      color: #fff;
     }
-    .yt-modal-title .yt-logo-icon {
+
+    .yt-logo-icon {
       width: 28px;
       height: 28px;
       border-radius: 8px;
-      background: linear-gradient(135deg, #ef4444, #dc2626);
+      background: #ef4444;
       display: flex;
       align-items: center;
       justify-content: center;
+      color: #fff;
       font-size: 14px;
     }
+
     .yt-modal-body {
-      padding: 18px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
     }
+
     .yt-search-box {
       display: flex;
       gap: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
-      padding: 6px 8px;
-      transition: border-color 0.2s;
     }
-    .yt-search-box:focus-within {
-      border-color: #8b5cf6;
-      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
-    }
+
     .yt-search-input {
       flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 0 14px;
       color: #fff;
       font-size: 13px;
-      padding: 6px 8px;
+      outline: none;
     }
-    .yt-btn-fetch {
-      background: linear-gradient(135deg, #8b5cf6, #6366f1);
-      border: none;
-      color: #fff;
-      font-size: 12px;
-      font-weight: 600;
-      border-radius: 8px;
-      padding: 0 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: opacity 0.15s;
+
+    .yt-search-input:focus {
+      border-color: var(--accent);
     }
-    .yt-btn-fetch:active { transform: scale(0.97); }
+
     .yt-btn-paste {
       background: rgba(255, 255, 255, 0.08);
-      border: none;
-      color: #94a3b8;
-      font-size: 11px;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-dim);
+      border-radius: 10px;
+      padding: 0 14px;
+      font-size: 12px;
       font-weight: 600;
-      border-radius: 6px;
-      padding: 0 10px;
       cursor: pointer;
     }
-    .yt-btn-paste:hover {
+
+    .yt-btn-fetch {
+      background: var(--accent-gradient);
+      border: none;
       color: #fff;
-      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 0 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
     }
+
     .yt-quick-actions {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-wrap: wrap;
       font-size: 11px;
-      color: #94a3b8;
+      color: var(--text-muted);
+      flex-wrap: wrap;
     }
+
     .yt-chip {
       background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      padding: 4px 10px;
+      border: 0.5px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 4px 8px;
       cursor: pointer;
-      color: #cbd5e1;
-      transition: all 0.15s;
+      color: var(--text-dim);
     }
+
     .yt-chip:hover {
-      background: rgba(139, 92, 246, 0.2);
-      border-color: rgba(139, 92, 246, 0.4);
+      background: rgba(255, 255, 255, 0.12);
       color: #fff;
     }
+
     .yt-result-card {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -907,10 +1253,12 @@
       flex-direction: column;
       gap: 14px;
     }
+
     .yt-media-info {
       display: flex;
       gap: 14px;
     }
+
     .yt-thumb-wrap {
       width: 140px;
       height: 82px;
@@ -920,11 +1268,13 @@
       position: relative;
       flex-shrink: 0;
     }
+
     .yt-thumb-wrap img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
+
     .yt-thumb-dur {
       position: absolute;
       bottom: 4px;
@@ -935,6 +1285,7 @@
       font-size: 10px;
       font-weight: 600;
     }
+
     .yt-meta-col {
       flex: 1;
       min-width: 0;
@@ -942,6 +1293,7 @@
       flex-direction: column;
       gap: 4px;
     }
+
     .yt-meta-title {
       font-size: 13px;
       font-weight: 600;
@@ -951,16 +1303,19 @@
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+
     .yt-meta-sub {
       font-size: 11px;
       color: #94a3b8;
     }
+
     .yt-tabs-nav {
       display: flex;
       gap: 6px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       padding-bottom: 8px;
     }
+
     .yt-tab-btn {
       background: transparent;
       border: none;
@@ -972,10 +1327,12 @@
       cursor: pointer;
       transition: all 0.15s;
     }
+
     .yt-tab-btn.active {
       background: rgba(139, 92, 246, 0.2);
       color: #c4b5fd;
     }
+
     .yt-format-list {
       display: flex;
       flex-direction: column;
@@ -983,6 +1340,7 @@
       max-height: 240px;
       overflow-y: auto;
     }
+
     .yt-format-row {
       display: flex;
       align-items: center;
@@ -992,11 +1350,12 @@
       border-radius: 8px;
       padding: 8px 12px;
       font-size: 12px;
-      transition: background 0.15s;
     }
+
     .yt-format-row:hover {
       background: rgba(255, 255, 255, 0.08);
     }
+
     .yt-fmt-tag {
       font-weight: 700;
       padding: 2px 8px;
@@ -1005,10 +1364,12 @@
       background: rgba(139, 92, 246, 0.15);
       color: #c4b5fd;
     }
+
     .yt-fmt-tag.audio {
       background: rgba(16, 185, 129, 0.15);
       color: #6ee7b7;
     }
+
     .yt-btn-dl {
       background: #8b5cf6;
       color: #fff;
@@ -1018,149 +1379,148 @@
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
       text-decoration: none;
     }
+
     .yt-btn-dl:hover { background: #7c3aed; }
     .yt-btn-dl.audio { background: #10b981; }
-    .yt-btn-dl.audio:hover { background: #059669; }
 
-    .btn-header-yt {
-      background: rgba(239, 68, 68, 0.14) !important;
-      color: #f87171 !important;
-      border: 0.5px solid rgba(239, 68, 68, 0.3) !important;
-      font-weight: 600 !important;
-    }
-    .btn-header-yt:hover {
-      background: rgba(239, 68, 68, 0.25) !important;
-      color: #fff !important;
-    }
-
-    @media (max-width: 768px) {
-      .yt-downloader-overlay {
-        align-items: flex-end !important;
-        padding: 0 !important;
-      }
-      .yt-modal-card {
-        max-height: 86vh !important;
-        border-bottom-left-radius: 0 !important;
-        border-bottom-right-radius: 0 !important;
-      }
-      .yt-thumb-wrap {
-        width: 105px !important;
-        height: 62px !important;
-      }
-      .mobile-bottom-bar {
-        height: 56px !important;
-        padding-bottom: env(safe-area-inset-bottom, 6px);
-      }
-      .m-nav-btn {
-        width: 48px !important;
-        height: 48px !important;
-      }
-      .m-nav-btn.active-tool {
-        background: rgba(239, 68, 68, 0.2) !important;
-        color: #ef4444 !important;
-      }
-    }
-    
-  
-    .omnibox-action-btn {
-      display: flex;
+    /* ─── MOBILE BOTTOM BAR & MEDIA QUERIES ─── */
+    .mobile-bottom-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: var(--bottom-nav-h);
+      background: #0b0f19;
+      border-top: 1px solid var(--border-subtle);
       align-items: center;
-      gap: 4px;
-      height: 24px;
-      padding: 0 8px;
-      background: rgba(139, 92, 246, 0.18);
-      border: 0.5px solid rgba(139, 92, 246, 0.4);
-      color: #c4b5fd;
-      border-radius: 12px;
-      font-size: 10.5px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-      flex-shrink: 0;
+      justify-content: space-around;
+      z-index: 10000;
     }
-    .omnibox-action-btn:hover {
-      background: rgba(139, 92, 246, 0.35);
-      color: #fff;
-    }
-    .omnibox-action-btn svg {
-      width: 12px;
-      height: 12px;
-    }
-    .omnibox-action-star {
+
+    .m-nav-btn {
       background: transparent;
       border: none;
-      color: #64748b;
-      cursor: pointer;
-      font-size: 14px;
-      padding: 2px 4px;
-      transition: color 0.15s;
-    }
-    .omnibox-action-star:hover {
-      color: #fbbf24;
-    }
-    .omnibox-action-star.active {
-      color: #fbbf24;
-    }
-    .brand-tab-title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: #a78bfa;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 0 6px 6px 6px;
-    }
-    .brand-tab-icon {
-      width: 16px;
-      height: 16px;
-      border-radius: 4px;
-      background: var(--accent-gradient);
+      color: var(--text-dim);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #fff;
-      font-size: 10px;
-      font-weight: 900;
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      cursor: pointer;
     }
-    
-</style>
+
+    .m-nav-btn:active {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .m-nav-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .mobile-tab-btn {
+      display: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1.5px solid var(--text-dim);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-white);
+      font-size: 11.5px;
+      font-weight: 700;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --tabs-h: 0px;
+        --header-h: 52px;
+      }
+
+      .desktop-only {
+        display: none !important;
+      }
+
+      .mobile-only, .mobile-bottom-bar, .mobile-tab-btn {
+        display: flex !important;
+      }
+
+      .tabs-strip {
+        display: none !important;
+      }
+
+      .app-header {
+        top: 0 !important;
+        height: var(--header-h) !important;
+        padding: 0 10px;
+      }
+
+      .bookmarks-bar {
+        display: none !important;
+      }
+
+      .progress-bar-strip {
+        top: var(--header-h) !important;
+      }
+
+      .viewport-canvas {
+        top: var(--header-h) !important;
+        bottom: var(--bottom-nav-h) !important;
+      }
+
+      .speed-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 10px !important;
+      }
+
+      .launch-clock {
+        font-size: 48px !important;
+      }
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Desktop Tabs Strip (Top Row 1) -->
+  <!-- ROW 1: DESKTOP TAB STRIP -->
   <nav class="tabs-strip desktop-only" id="tabs-strip">
     <div class="brand-tab-title">
       <div class="brand-tab-icon">S</div>
-      <span>STAUNT</span>
+      <span>STAUNT ULTRA</span>
     </div>
-    <div id="tabs-rail" style="display: flex; gap: 4px; align-items: flex-end; flex: 1; overflow-x: auto; scrollbar-width: none;"></div>
+    <div class="tabs-rail" id="tabs-rail"></div>
     <button class="btn-new-tab" id="btn-add-tab" title="New Tab (Ctrl+T)">+</button>
-    <div style="display: flex; align-items: center; gap: 6px; margin-left: auto; padding-right: 8px;">
-      <button class="action-btn btn-header-yt" id="btn-tab-yt-downloader" title="Video & Audio Downloader">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-        YT Downloader
+    <div class="tab-strip-actions">
+      <button class="action-btn" id="btn-open-history" title="History (Ctrl+H)">
+        🕒 History
       </button>
-      <button class="action-btn btn-download-app" id="btn-tab-download-app" title="Download Native Windows App (.EXE)">
-        🪟 Windows App
+      <button class="action-btn" id="btn-toggle-bookmarks" title="Bookmarks Bar (Ctrl+B)">
+        ★ Bookmarks
+      </button>
+      <button class="action-btn btn-header-yt" id="btn-open-yt-downloader" title="Video & Audio Downloader">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+        Downloader
+      </button>
+      <button class="action-btn btn-download-app" id="btn-open-download-modal" title="Download Desktop & Mobile Apps">
+        ⚡ Get App
       </button>
     </div>
   </nav>
 
-  <!-- Top App Navigation & Omnibox Header (Row 2) -->
+  <!-- ROW 2: NAVIGATION & OMNIBOX HEADER -->
   <header class="app-header" id="main-header">
-    <!-- Desktop Navigation Controls -->
     <div class="nav-controls desktop-only">
-      <button class="btn-nav-icon" id="nav-back" title="Back (Alt+Left)">
+      <button class="btn-nav-icon" id="nav-back" title="Back">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
-      <button class="btn-nav-icon" id="nav-forward" title="Forward (Alt+Right)">
+      <button class="btn-nav-icon" id="nav-forward" title="Forward">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
       </button>
       <button class="btn-nav-icon" id="nav-reload" title="Reload (Ctrl+R)">
@@ -1171,30 +1531,18 @@
       </button>
     </div>
 
-    <!-- Universal Omnibox -->
+    <!-- Smart Omnibox -->
     <div class="omnibox-wrapper">
+      <div class="security-badge" id="security-badge" title="Connection Security Info">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span id="security-label">Secure</span>
+      </div>
       <span class="engine-badge" id="engine-badge" title="Click to cycle search engine">G</span>
-      <svg class="ssl-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <input type="text" class="omnibox-input" id="omnibox-input" placeholder="Search Google or type a web address" spellcheck="false" autocomplete="off" />
-      <button class="omnibox-action-star" id="omnibox-star" title="Bookmark This Page">★</button>
+      <input type="text" class="omnibox-input" id="omnibox-input" placeholder="Search Google or enter web address..." spellcheck="false" autocomplete="off" />
+      <button class="omnibox-action-star" id="omnibox-star" title="Bookmark Page">★</button>
       <button class="omnibox-action-btn" id="nav-popout" title="Open Page in Dedicated Window (100% Native 60fps - Zero Restrictions)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         <span>Native ↗</span>
-      </button>
-    </div>
-
-    <!-- Desktop Header Actions -->
-    <div class="header-actions desktop-only">
-      <button class="action-btn btn-header-yt" id="btn-open-yt-downloader" title="Video & Audio Downloader">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-        Downloader
-      </button>
-
-      <button class="action-btn" id="btn-toggle-immersive" title="Toggle Fullscreen (F11)">
-        ▲ Fullscreen
-      </button>
-      <button class="action-btn btn-download-app" id="btn-open-download-modal" title="Download Desktop App">
-        Get EXE / APK
       </button>
     </div>
 
@@ -1203,6 +1551,9 @@
       <span id="mobile-tab-count">1</span>
     </button>
   </header>
+
+  <!-- ROW 3: COLLAPSIBLE BOOKMARKS BAR -->
+  <div class="bookmarks-bar hidden" id="bookmarks-bar"></div>
 
   <!-- Progress Bar Strip -->
   <div class="progress-bar-strip" id="progress-strip"></div>
@@ -1218,8 +1569,8 @@
     <button class="m-nav-btn" id="m-nav-forward" title="Forward">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
     </button>
-    <button class="m-nav-btn" id="m-nav-ytdl" title="Video Downloader" style="color: #f87171;">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+    <button class="m-nav-btn" id="m-nav-ytdl" title="Downloader" style="color: #f87171;">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
     </button>
     <button class="m-nav-btn" id="m-nav-home" title="Home">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -1232,37 +1583,102 @@
     </button>
   </nav>
 
-  <!-- Mobile Tabs Drawer Bottom Sheet -->
-  <div class="mobile-drawer-overlay" id="mobile-tabs-drawer">
-    <div class="mobile-drawer-sheet">
-      <div class="drawer-handle"></div>
+  <!-- ─── SLIDE-OVER DRAWER: HISTORY ─── -->
+  <div class="drawer-overlay" id="history-drawer">
+    <div class="drawer-panel">
       <div class="drawer-head">
-        <h3>Open Tabs</h3>
-        <span class="modal-close" id="drawer-close-btn" style="padding: 6px;">✕</span>
+        <h3>Browsing History</h3>
+        <span class="drawer-close" id="history-close-btn">✕</span>
       </div>
-      <div class="drawer-list" id="drawer-tabs-list"></div>
-      <button class="drawer-new-tab-btn" id="drawer-btn-new-tab">
-        + New Tab
-      </button>
+      <input type="text" class="history-search-input" id="history-search-input" placeholder="Search history..." />
+      <div class="history-list" id="history-list"></div>
+      <button class="btn-clear-history" id="btn-clear-history">Clear All History</button>
     </div>
   </div>
 
-  <!-- YT Video Downloader Modal / Mobile Drawer -->
+  <!-- ─── MODAL: SECURITY INFO ─── -->
+  <div class="modal-overlay" id="security-modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>Connection Security</h2>
+        <span class="modal-close" id="security-close-btn">✕</span>
+      </div>
+      <div id="security-modal-body" style="font-size: 13px; color: var(--text-dim); line-height: 1.6;"></div>
+      <div class="modal-btn-row">
+        <button class="modal-btn-pri" id="security-ok-btn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MODAL: ADD / EDIT SHORTCUT ─── -->
+  <div class="modal-overlay" id="shortcut-modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2 id="shortcut-modal-title">Add Shortcut</h2>
+        <span class="modal-close" id="shortcut-close-btn">✕</span>
+      </div>
+      <div class="modal-input-group">
+        <label for="shortcut-name-input">Shortcut Name</label>
+        <input type="text" class="modal-input" id="shortcut-name-input" placeholder="e.g. GitHub" />
+      </div>
+      <div class="modal-input-group">
+        <label for="shortcut-url-input">Target URL</label>
+        <input type="text" class="modal-input" id="shortcut-url-input" placeholder="e.g. https://github.com" />
+      </div>
+      <div class="modal-btn-row">
+        <button class="modal-btn-sec" id="shortcut-cancel-btn">Cancel</button>
+        <button class="modal-btn-pri" id="shortcut-save-btn">Save Shortcut</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MODAL: GET APP FLYOUT (CONSOLIDATED) ─── -->
+  <div class="modal-overlay" id="download-modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>Staunt Browser Native Apps</h2>
+        <span class="modal-close" id="download-close-btn">✕</span>
+      </div>
+      <p style="font-size: 12.5px; color: var(--text-dim); line-height: 1.5;">
+        Install Staunt Browser on your devices for native 60fps hardware acceleration, independent profile storage, and zero web iframe limitations.
+      </p>
+      
+      <!-- Structured Download Cards -->
+      <a href="/assets/Staunt-Browser-Setup.exe" download="Staunt-Browser-Setup.exe" class="app-download-card">
+        <span class="app-card-icon">🪟</span>
+        <div class="app-card-info">
+          <div class="app-card-title">Windows Desktop (.EXE)</div>
+          <div class="app-card-sub">Native Chromium Core • Hardware Acceleration • 64-bit</div>
+        </div>
+        <div class="app-card-btn">Download</div>
+      </a>
+
+      <a href="/assets/Staunt-Browser-Mobile.apk" download="Staunt-Browser-Mobile.apk" class="app-download-card">
+        <span class="app-card-icon">📱</span>
+        <div class="app-card-info">
+          <div class="app-card-title">Android Mobile (.APK)</div>
+          <div class="app-card-sub">Universal Build (Android 8.0+) • 5.19 MB</div>
+        </div>
+        <div class="app-card-btn" style="background: #10b981;">Download</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ─── MODAL: YOUTUBE & UNIVERSAL VIDEO DOWNLOADER ─── -->
   <div class="yt-downloader-overlay" id="yt-downloader-modal">
     <div class="yt-modal-card">
       <div class="yt-modal-header">
         <div class="yt-modal-title">
           <div class="yt-logo-icon">▶</div>
           <div>
-            <div>VASTUDA Video &amp; Audio Downloader</div>
-            <div style="font-size: 11px; font-weight: normal; color: var(--text-dim);">YouTube, Shorts, Reels &amp; TikTok • 4K/1080p/MP3</div>
+            <div>Video &amp; Audio Downloader</div>
+            <div style="font-size: 11px; font-weight: normal; color: var(--text-dim);">YouTube, Shorts, Reels &amp; Media • 4K/1080p/MP3</div>
           </div>
         </div>
         <span class="modal-close" id="yt-modal-close-btn" style="cursor: pointer; padding: 4px 8px; font-size: 18px;">✕</span>
       </div>
 
       <div class="yt-modal-body">
-        <!-- Input row -->
         <div class="yt-search-box">
           <input type="text" class="yt-search-input" id="yt-url-input" placeholder="Paste YouTube, Shorts, Reel or video URL here..." autocomplete="off" />
           <button class="yt-btn-paste" id="yt-btn-paste">Paste</button>
@@ -1272,20 +1688,17 @@
         <div class="yt-quick-actions">
           <span>Quick Samples:</span>
           <span class="yt-chip" onclick="window.loadYtSample('https://www.youtube.com/watch?v=aqz-KE-bpKQ')">🎵 Rick Astley</span>
-          <span class="yt-chip" onclick="window.loadYtSample('https://www.youtube.com/shorts/aqz-KE-bpKQ')">📱 YouTube Shorts</span>
+          <span class="yt-chip" onclick="window.loadYtSample('https://www.youtube.com/shorts/aqz-KE-bpKQ')">📱 Shorts</span>
           <button class="yt-chip" id="yt-btn-use-current" style="border-color: rgba(139,92,246,0.4); color: #a78bfa;">🔗 Use Current Tab</button>
         </div>
 
-        <!-- Skeleton Loading -->
         <div id="yt-loading" style="display: none; padding: 30px; text-align: center; color: #a78bfa;">
           <div style="width: 32px; height: 32px; border: 3px solid #8b5cf6; border-top-color: transparent; border-radius: 50%; margin: 0 auto 12px; animation: spin 0.8s linear infinite;"></div>
-          <p style="font-size: 13px; font-weight: 600;">Analyzing Video &amp; Extracting HD Formats...</p>
+          <p style="font-size: 13px; font-weight: 600;">Analyzing Video &amp; Extracting Formats...</p>
         </div>
 
-        <!-- Error Msg -->
         <div id="yt-error" style="display: none; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); padding: 12px; border-radius: 10px; font-size: 12px; color: #fca5a5;"></div>
 
-        <!-- Result Card -->
         <div id="yt-result" class="yt-result-card" style="display: none;">
           <div class="yt-media-info">
             <div class="yt-thumb-wrap">
@@ -1310,61 +1723,186 @@
     </div>
   </div>
 
-  <!-- Download Modal -->
-  <div class="download-modal-overlay" id="download-modal">
-    <div class="modal-box">
-      <div class="modal-head">
-        <h2>Staunt Browser Native Apps</h2>
-        <span class="modal-close" id="modal-close-btn">✕</span>
-      </div>
-      <p style="font-size: 13px; color: var(--text-dim); line-height: 1.5;">
-        Experience Staunt Browser with native hardware acceleration, local gigabit Wi-Fi speed, and zero web iframe restrictions.
-      </p>
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <a href="/assets/Staunt-Browser-Setup.exe" download="Staunt-Browser-Setup.exe" class="action-btn" style="height: 38px; justify-content: center; background: #8b5cf6; color: #fff; font-size: 13px; text-decoration: none;">
-          🪟 Download Windows .EXE (Hardware Accelerated)
-        </a>
-        <a href="/assets/Staunt-Browser-Mobile.apk" download="Staunt-Browser-Mobile.apk" class="action-btn" style="height: 38px; justify-content: center; background: #10b981; color: #fff; font-size: 13px; text-decoration: none;">
-          📱 Download Android .APK (Universal 5.19 MB)
-        </a>
-      </div>
-    </div>
-  </div>
-
   <script>
     (function() {
       'use strict';
 
+      // ─── SEARCH ENGINES ───
       const SEARCH_ENGINES = {
-        google: { name: 'G', url: 'https://www.google.com/search?q=' },
-        duckduckgo: { name: '🦆', url: 'https://html.duckduckgo.com/html/?q=' },
-        bing: { name: 'b', url: 'https://www.bing.com/search?q=' }
+        google: { name: 'Google', badge: 'G', url: 'https://www.google.com/search?q=' },
+        duckduckgo: { name: 'DuckDuckGo', badge: '🦆', url: 'https://html.duckduckgo.com/html/?q=' },
+        bing: { name: 'Bing', badge: 'b', url: 'https://www.bing.com/search?q=' }
       };
-      let currentEngineKey = 'google';
+      let currentEngineKey = localStorage.getItem('staunt_engine') || 'google';
 
+      // ─── STATE MANAGEMENT ───
       let tabs = [];
       let activeTabId = null;
       let nextTabId = 1;
+      let is24Hour = localStorage.getItem('staunt_clock_24h') === 'true';
 
+      // DOM Elements
       const omnibox = document.getElementById('omnibox-input');
       const engineBadge = document.getElementById('engine-badge');
+      const securityBadge = document.getElementById('security-badge');
+      const securityLabel = document.getElementById('security-label');
+      const omniboxStar = document.getElementById('omnibox-star');
       const tabsRail = document.getElementById('tabs-rail');
       const canvas = document.getElementById('viewport-canvas');
       const progressStrip = document.getElementById('progress-strip');
-      const btnImmersive = document.getElementById('btn-toggle-immersive');
+      const bookmarksBar = document.getElementById('bookmarks-bar');
+      const historyDrawer = document.getElementById('history-drawer');
+      const historyList = document.getElementById('history-list');
+      const historySearchInput = document.getElementById('history-search-input');
+      const securityModal = document.getElementById('security-modal');
+      const shortcutModal = document.getElementById('shortcut-modal');
       const downloadModal = document.getElementById('download-modal');
-      const mobileTabsBtn = document.getElementById('btn-mobile-tabs');
       const mobileTabCount = document.getElementById('mobile-tab-count');
-      const mobileDrawer = document.getElementById('mobile-tabs-drawer');
-      const drawerList = document.getElementById('drawer-tabs-list');
 
-      // ─── ENGINE SWITCHER ───
+      // ─── PERSISTENT SHORTCUTS ───
+      const DEFAULT_SHORTCUTS = [
+        { name: 'Google', url: 'https://www.google.com' },
+        { name: 'YouTube', url: 'https://www.youtube.com' },
+        { name: 'GitHub', url: 'https://github.com' },
+        { name: 'Wikipedia', url: 'https://www.wikipedia.org' },
+        { name: 'Reddit', url: 'https://www.reddit.com' },
+        { name: 'HN News', url: 'https://news.ycombinator.com' },
+        { name: 'BBC News', url: 'https://www.bbc.com/news' },
+        { name: 'DuckDuckGo', url: 'https://duckduckgo.com' }
+      ];
+
+      function getStoredShortcuts() {
+        try {
+          const raw = localStorage.getItem('staunt_shortcuts');
+          return raw ? JSON.parse(raw) : DEFAULT_SHORTCUTS;
+        } catch(e) {
+          return DEFAULT_SHORTCUTS;
+        }
+      }
+
+      function saveShortcuts(list) {
+        localStorage.setItem('staunt_shortcuts', JSON.stringify(list));
+      }
+
+      // ─── PERSISTENT BOOKMARKS ───
+      function getStoredBookmarks() {
+        try {
+          const raw = localStorage.getItem('staunt_bookmarks');
+          return raw ? JSON.parse(raw) : [
+            { name: 'Google', url: 'https://www.google.com' },
+            { name: 'GitHub', url: 'https://github.com' },
+            { name: 'YouTube', url: 'https://www.youtube.com' }
+          ];
+        } catch(e) {
+          return [];
+        }
+      }
+
+      function saveBookmarks(list) {
+        localStorage.setItem('staunt_bookmarks', JSON.stringify(list));
+        renderBookmarksBar();
+      }
+
+      function renderBookmarksBar() {
+        if (!bookmarksBar) return;
+        bookmarksBar.innerHTML = '';
+        const list = getStoredBookmarks();
+        list.forEach((b, idx) => {
+          const chip = document.createElement('div');
+          chip.className = 'bookmark-chip';
+          chip.innerHTML = `
+            <img src="${getFaviconUrl(b.url)}" alt="" onerror="this.style.display='none'" />
+            <span>${escapeHtml(b.name)}</span>
+          `;
+          chip.addEventListener('click', () => navigateTo(b.url));
+          chip.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            if (confirm(`Delete bookmark "${b.name}"?`)) {
+              list.splice(idx, 1);
+              saveBookmarks(list);
+            }
+          });
+          bookmarksBar.appendChild(chip);
+        });
+      }
+
+      // ─── PERSISTENT HISTORY ───
+      function getStoredHistory() {
+        try {
+          const raw = localStorage.getItem('staunt_history');
+          return raw ? JSON.parse(raw) : [];
+        } catch(e) {
+          return [];
+        }
+      }
+
+      function addHistoryEntry(url, title) {
+        if (!url || url.startsWith('about:')) return;
+        let hist = getStoredHistory();
+        hist = hist.filter(h => h.url !== url);
+        hist.unshift({
+          url: url,
+          title: title || getDomain(url),
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          date: new Date().toLocaleDateString()
+        });
+        if (hist.length > 200) hist = hist.slice(0, 200);
+        localStorage.setItem('staunt_history', JSON.stringify(hist));
+        renderHistoryList();
+      }
+
+      function renderHistoryList(filterText = '') {
+        if (!historyList) return;
+        historyList.innerHTML = '';
+        const hist = getStoredHistory();
+        const filtered = filterText 
+          ? hist.filter(h => h.title.toLowerCase().includes(filterText.toLowerCase()) || h.url.toLowerCase().includes(filterText.toLowerCase()))
+          : hist;
+
+        if (filtered.length === 0) {
+          historyList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">No browsing history found</div>';
+          return;
+        }
+
+        filtered.forEach((item, idx) => {
+          const el = document.createElement('div');
+          el.className = 'history-item';
+          el.innerHTML = `
+            <div class="history-info">
+              <div class="history-title">${escapeHtml(item.title)}</div>
+              <div class="history-url">${escapeHtml(item.url)}</div>
+            </div>
+            <div class="history-time">${item.time}</div>
+            <span style="color: var(--text-muted); font-size: 13px; padding: 2px 4px;">✕</span>
+          `;
+          el.querySelector('.history-info').addEventListener('click', () => {
+            navigateTo(item.url);
+            historyDrawer.classList.remove('open');
+          });
+          el.querySelector('span').addEventListener('click', (e) => {
+            e.stopPropagation();
+            hist.splice(idx, 1);
+            localStorage.setItem('staunt_history', JSON.stringify(hist));
+            renderHistoryList(filterText);
+          });
+          historyList.appendChild(el);
+        });
+      }
+
+      // ─── SEARCH ENGINE SWITCHER ───
       const engineKeys = Object.keys(SEARCH_ENGINES);
+      function updateEngineUI() {
+        const eng = SEARCH_ENGINES[currentEngineKey] || SEARCH_ENGINES.google;
+        engineBadge.textContent = eng.badge;
+        omnibox.placeholder = `Search ${eng.name} or type web address...`;
+        localStorage.setItem('staunt_engine', currentEngineKey);
+      }
+      updateEngineUI();
+
       engineBadge.addEventListener('click', () => {
         const nextIdx = (engineKeys.indexOf(currentEngineKey) + 1) % engineKeys.length;
         currentEngineKey = engineKeys[nextIdx];
-        engineBadge.textContent = SEARCH_ENGINES[currentEngineKey].name;
-        omnibox.placeholder = 'Search ' + currentEngineKey.toUpperCase() + ' or enter address';
+        updateEngineUI();
       });
 
       // ─── PROGRESS BAR ───
@@ -1372,7 +1910,7 @@
       function startProgress() {
         clearInterval(progressTimer);
         progressStrip.style.width = '20%';
-        progressStrip.classList.add('loading');
+        progressStrip.style.opacity = '1';
         let p = 20;
         progressTimer = setInterval(() => {
           if (p < 85) {
@@ -1386,7 +1924,7 @@
         clearInterval(progressTimer);
         progressStrip.style.width = '100%';
         setTimeout(() => {
-          progressStrip.classList.remove('loading');
+          progressStrip.style.opacity = '0';
           setTimeout(() => { progressStrip.style.width = '0%'; }, 200);
         }, 250);
       }
@@ -1396,24 +1934,21 @@
         if (!raw) return '';
         let trimmed = raw.trim();
 
-        // 1. Full protocol
         if (/^https?:\/\//i.test(trimmed)) {
           return optimizeUrl(trimmed);
         }
 
-        // 2. Domain name (e.g. youtube.com, google.com, en.wikipedia.org)
         if (/^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(trimmed) && !trimmed.includes(' ')) {
           return optimizeUrl('https://' + trimmed);
         }
 
-        // 3. Search query
         return SEARCH_ENGINES[currentEngineKey].url + encodeURIComponent(trimmed);
       }
 
       function optimizeUrl(url) {
         try {
           const u = new URL(url);
-          // YouTube official responsive embed players: 100% permitted by Google!
+          // YouTube official responsive embed players: 100% permitted
           if (u.hostname.includes('youtube.com')) {
             const listId = u.searchParams.get('list');
             if (u.pathname === '/playlist' && listId) {
@@ -1447,10 +1982,14 @@
         if (!url) return '';
         try {
           const u = new URL(url);
-          return 'https://www.google.com/s2/favicons?domain=' + u.hostname + '&sz=32';
+          return 'https://www.google.com/s2/favicons?domain=' + u.hostname + '&sz=64';
         } catch(e) {
           return '';
         }
+      }
+
+      function escapeHtml(str) {
+        return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       }
 
       // ─── TABS MANAGEMENT ───
@@ -1471,6 +2010,7 @@
         if (initialUrl) {
           navigateTo(initialUrl, id);
         }
+        saveSessionTabs();
       }
 
       function switchTab(id) {
@@ -1479,12 +2019,15 @@
         if (!tab) return;
 
         omnibox.value = tab.isNewTab ? '' : tab.url;
+        updateSecurityBadge(tab.url);
+        updateBookmarkStarState(tab.url);
 
         document.querySelectorAll('.tab-viewport').forEach(vp => {
           vp.classList.toggle('active', String(vp.dataset.id) === String(id));
         });
 
         renderTabs();
+        saveSessionTabs();
       }
 
       function closeTab(id, e) {
@@ -1508,78 +2051,127 @@
         } else {
           renderTabs();
         }
+        saveSessionTabs();
       }
 
       function renderTabs() {
-        // 1. Update Desktop Tabs Strip
-        if (tabsRail) {
-          tabsRail.innerHTML = '';
-          tabs.forEach(tab => {
-            const pill = document.createElement('div');
-            pill.className = 'tab-pill' + (tab.id === activeTabId ? ' active' : '');
-            pill.dataset.id = tab.id;
-            
-            let iconHtml = '';
-            const fav = getFaviconUrl(tab.url);
-            if (fav && !tab.isNewTab) {
-              iconHtml = `<img class="tab-favicon" src="${fav}" alt="" onerror="this.style.display='none'" />`;
-            } else {
-              iconHtml = `<svg class="tab-favicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>`;
-            }
+        if (!tabsRail) return;
+        tabsRail.innerHTML = '';
+        tabs.forEach(tab => {
+          const pill = document.createElement('div');
+          pill.className = 'tab-pill' + (tab.id === activeTabId ? ' active' : '');
+          pill.dataset.id = tab.id;
 
-            pill.innerHTML = `
-              ${iconHtml}
-              <span class="tab-title-span">${escapeHtml(tab.title)}</span>
-              <span class="tab-close-x" title="Close">✕</span>
-            `;
-            pill.addEventListener('click', () => switchTab(tab.id));
-            pill.querySelector('.tab-close-x').addEventListener('click', (e) => closeTab(tab.id, e));
-            tabsRail.appendChild(pill);
-          });
-        }
+          const fav = getFaviconUrl(tab.url);
+          const iconHtml = (fav && !tab.isNewTab)
+            ? `<img class="tab-favicon" src="${fav}" alt="" onerror="this.style.display='none'" />`
+            : `<svg class="tab-favicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>`;
 
-        // 2. Update Mobile Tab Counter
+          pill.innerHTML = `
+            ${iconHtml}
+            <span class="tab-title-span">${escapeHtml(tab.title)}</span>
+            <span class="tab-close-x" title="Close">✕</span>
+          `;
+          pill.addEventListener('click', () => switchTab(tab.id));
+          pill.querySelector('.tab-close-x').addEventListener('click', (e) => closeTab(tab.id, e));
+          tabsRail.appendChild(pill);
+        });
+
         if (mobileTabCount) {
           mobileTabCount.textContent = tabs.length;
         }
+      }
 
-        // 3. Update Mobile Drawer List
-        if (drawerList) {
-          drawerList.innerHTML = '';
-          tabs.forEach(tab => {
-            const item = document.createElement('div');
-            item.className = 'drawer-tab-item' + (tab.id === activeTabId ? ' active' : '');
-            
-            const fav = getFaviconUrl(tab.url);
-            const iconHtml = (fav && !tab.isNewTab)
-              ? `<img class="tab-favicon" src="${fav}" alt="" />`
-              : `<svg class="tab-favicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>`;
+      function saveSessionTabs() {
+        try {
+          const data = tabs.map(t => ({ url: t.url, title: t.title, isNewTab: t.isNewTab }));
+          localStorage.setItem('staunt_session_tabs', JSON.stringify(data));
+        } catch(e) {}
+      }
 
-            item.innerHTML = `
-              <div class="drawer-tab-info">
-                ${iconHtml}
-                <span class="drawer-tab-title">${escapeHtml(tab.title)}</span>
-              </div>
-              <span class="tab-close-x" style="padding: 6px;">✕</span>
-            `;
+      function restoreSessionTabs() {
+        try {
+          const raw = localStorage.getItem('staunt_session_tabs');
+          if (raw) {
+            const list = JSON.parse(raw);
+            if (Array.isArray(list) && list.length > 0) {
+              list.forEach(t => createTab(t.url));
+              return;
+            }
+          }
+        } catch(e) {}
+        createTab();
+      }
 
-            item.addEventListener('click', () => {
-              switchTab(tab.id);
-              mobileDrawer.classList.remove('open');
-            });
-            item.querySelector('.tab-close-x').addEventListener('click', (e) => {
-              closeTab(tab.id, e);
-              renderTabs();
-            });
-
-            drawerList.appendChild(item);
-          });
+      // ─── SECURITY BADGE EVALUATION ───
+      function updateSecurityBadge(url) {
+        if (!url || url.startsWith('about:')) {
+          securityBadge.className = 'security-badge';
+          securityLabel.textContent = 'Staunt';
+          return;
+        }
+        if (url.startsWith('https://')) {
+          securityBadge.className = 'security-badge';
+          securityLabel.textContent = 'Secure';
+        } else {
+          securityBadge.className = 'security-badge insecure';
+          securityLabel.textContent = 'Not Secure';
         }
       }
 
-      function escapeHtml(str) {
-        return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      securityBadge.addEventListener('click', () => {
+        const tab = tabs.find(t => t.id === activeTabId);
+        const url = tab ? tab.url : '';
+        const body = document.getElementById('security-modal-body');
+        if (!url) {
+          body.innerHTML = '<strong>Staunt Browser Ultra</strong><br/>You are viewing the New Tab launchpad with zero network exposure.';
+        } else if (url.startsWith('https://')) {
+          body.innerHTML = `
+            <div style="color: #34d399; font-weight: 600; margin-bottom: 8px;">🔒 Connection is Secure</div>
+            <div><strong>Host:</strong> ${getDomain(url)}</div>
+            <div><strong>Protocol:</strong> TLS/HTTPS Encryption Active</div>
+            <div><strong>Certificate:</strong> Validated Authority</div>
+            <div style="margin-top: 8px;">Your information (passwords, cookies) remains private when sent to this site.</div>
+          `;
+        } else {
+          body.innerHTML = `
+            <div style="color: #f87171; font-weight: 600; margin-bottom: 8px;">⚠️ Connection is Not Secure</div>
+            <div><strong>Host:</strong> ${getDomain(url)}</div>
+            <div><strong>Protocol:</strong> Unencrypted HTTP</div>
+            <div style="margin-top: 8px;">You should not enter sensitive information on this site.</div>
+          `;
+        }
+        securityModal.classList.add('open');
+      });
+
+      document.getElementById('security-close-btn').addEventListener('click', () => securityModal.classList.remove('open'));
+      document.getElementById('security-ok-btn').addEventListener('click', () => securityModal.classList.remove('open'));
+
+      // ─── BOOKMARK STAR STATE ───
+      function updateBookmarkStarState(url) {
+        if (!url) {
+          omniboxStar.classList.remove('active');
+          return;
+        }
+        const bms = getStoredBookmarks();
+        const exists = bms.some(b => b.url === url);
+        omniboxStar.classList.toggle('active', exists);
       }
+
+      omniboxStar.addEventListener('click', () => {
+        const tab = tabs.find(t => t.id === activeTabId);
+        if (!tab || !tab.url) return;
+        let bms = getStoredBookmarks();
+        const idx = bms.findIndex(b => b.url === tab.url);
+        if (idx >= 0) {
+          bms.splice(idx, 1);
+          omniboxStar.classList.remove('active');
+        } else {
+          bms.push({ name: tab.title || getDomain(tab.url), url: tab.url });
+          omniboxStar.classList.add('active');
+        }
+        saveBookmarks(bms);
+      });
 
       // ─── VIEWPORT DOM BUILDER ───
       function buildTabViewport(tab) {
@@ -1589,107 +2181,188 @@
         vp.dataset.id = tab.id;
 
         vp.innerHTML = `
-          <!-- New Tab Luxury Launchpad -->
+          <!-- New Tab Homepage -->
           <div class="newtab-wall" id="wall-${tab.id}">
-            <div class="launch-clock" id="clock-${tab.id}">--:--</div>
-            <div class="launch-greeting">Staunt Browser Ultra • Universal Web Engine</div>
+            <div class="launch-clock-wrap" id="clock-wrap-${tab.id}" title="Click to toggle 12h/24h">
+              <div class="launch-clock" id="clock-${tab.id}">--:--:--</div>
+              <div class="launch-date" id="date-${tab.id}">------</div>
+            </div>
+            <div class="launch-greeting" id="greeting-${tab.id}">Good day</div>
 
-            <div class="speed-grid">
-              <div class="speed-tile" data-url="https://www.google.com">
-                <div class="tile-icon" style="background: rgba(66,133,244,0.18); color: #4285f4;">G</div>
-                <div class="tile-label">Google</div>
-              </div>
-              <div class="speed-tile" id="speed-tile-ytdl">
-                <div class="tile-icon" style="background: rgba(239,68,68,0.2); color: #ef4444;">⬇</div>
-                <div class="tile-label">Downloader</div>
-              </div>
-              <div class="speed-tile" data-url="https://www.youtube.com">
-                <div class="tile-icon" style="background: rgba(255,0,0,0.18); color: #ff453a;">▶</div>
-                <div class="tile-label">YouTube</div>
-              </div>
-              <div class="speed-tile" data-url="https://www.wikipedia.org">
-                <div class="tile-icon" style="background: rgba(255,255,255,0.15); color: #cbd5e1;">W</div>
-                <div class="tile-label">Wikipedia</div>
-              </div>
-              <div class="speed-tile" data-url="https://github.com">
-                <div class="tile-icon" style="background: rgba(255,255,255,0.15); color: #fff;">⌥</div>
-                <div class="tile-label">GitHub</div>
-              </div>
-              <div class="speed-tile" data-url="https://www.reddit.com">
-                <div class="tile-icon" style="background: rgba(255,69,0,0.18); color: #ff4500;">R</div>
-                <div class="tile-label">Reddit</div>
-              </div>
-              <div class="speed-tile" data-url="https://news.ycombinator.com">
-                <div class="tile-icon" style="background: rgba(255,102,0,0.18); color: #ff6600;">Y</div>
-                <div class="tile-label">HN News</div>
-              </div>
-              <div class="speed-tile" data-url="https://www.bbc.com/news">
-                <div class="tile-icon" style="background: rgba(187,25,25,0.18); color: #ef4444;">B</div>
-                <div class="tile-label">BBC</div>
-              </div>
-              <div class="speed-tile" data-url="https://duckduckgo.com">
-                <div class="tile-icon" style="background: rgba(222,88,51,0.18); color: #de5833;">🦆</div>
-                <div class="tile-label">DuckDuck</div>
+            <!-- Home Search -->
+            <div class="home-search-wrap">
+              <div class="home-search-box">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color: var(--text-dim);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" class="home-search-input" id="home-search-${tab.id}" placeholder="Search the web..." />
+                <button class="home-search-btn" id="home-search-btn-${tab.id}">➔</button>
               </div>
             </div>
 
-            <div class="app-badge-row">
-              <a href="/assets/Staunt-Browser-Setup.exe" download="Staunt-Browser-Setup.exe" class="app-badge-card">
-                <span style="font-size: 20px;">🪟</span>
-                <div style="text-align: left;">
-                  <div style="font-size: 12px; font-weight: 600;">Windows App</div>
-                  <div style="font-size: 11px; color: var(--text-muted);">Hardware Acceleration</div>
-                </div>
-                <div class="badge-btn">Get .EXE</div>
-              </a>
-              <a href="/assets/Staunt-Browser-Mobile.apk" download="Staunt-Browser-Mobile.apk" class="app-badge-card">
-                <span style="font-size: 20px;">📱</span>
-                <div style="text-align: left;">
-                  <div style="font-size: 12px; font-weight: 600;">Android App</div>
-                  <div style="font-size: 11px; color: var(--text-muted);">Universal 5.19 MB</div>
-                </div>
-                <div class="badge-btn" style="background: linear-gradient(135deg, #10b981, #059669);">Get .APK</div>
-              </a>
+            <!-- Shortcuts Section -->
+            <div class="shortcuts-section">
+              <div class="speed-grid" id="grid-${tab.id}"></div>
             </div>
           </div>
 
-          <!-- Pure Webpage Canvas -->
-          <iframe 
-            class="embed-frame" 
-            id="frame-${tab.id}" 
-            style="display: none;"
-            allow="accelerometer; autoplay; clipboard-read; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen; microphone; camera; display-capture; geolocation"
-          ></iframe>
+          <!-- Webpage Frame Container -->
+          <div class="webpage-container" id="web-container-${tab.id}" style="display: none;">
+            <div class="fallback-banner" id="fallback-banner-${tab.id}">
+              <span>⚡ Viewing via Staunt Engine. For full 4K 60fps &amp; Google login:</span>
+              <div style="display: flex; gap: 8px;">
+                <button class="action-btn" id="fb-popout-${tab.id}" style="background: #8b5cf6; color: #fff;">Open Native ↗</button>
+                <button class="action-btn" id="fb-dismiss-${tab.id}">✕</button>
+              </div>
+            </div>
+            <iframe 
+              class="embed-frame" 
+              id="frame-${tab.id}" 
+              sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-same-origin allow-scripts"
+              allow="accelerometer; autoplay; clipboard-read; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen; microphone; camera; display-capture; geolocation"
+            ></iframe>
+          </div>
         `;
 
         canvas.appendChild(vp);
 
-        // Speed dials click listener
-        vp.querySelectorAll('.speed-tile').forEach(tile => {
-          tile.addEventListener('click', () => {
-            const u = tile.dataset.url;
-            if (u) navigateTo(u, tab.id);
-          });
+        // Bind clock toggle
+        const clockWrap = vp.querySelector(`#clock-wrap-${tab.id}`);
+        clockWrap.addEventListener('click', () => {
+          is24Hour = !is24Hour;
+          localStorage.setItem('staunt_clock_24h', is24Hour);
+          updateAllClocks();
         });
 
+        // Bind home search
+        const homeInput = vp.querySelector(`#home-search-${tab.id}`);
+        const homeBtn = vp.querySelector(`#home-search-btn-${tab.id}`);
+        const submitHomeSearch = () => {
+          const val = homeInput.value.trim();
+          if (val) navigateTo(val, tab.id);
+        };
+        homeBtn.addEventListener('click', submitHomeSearch);
+        homeInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') submitHomeSearch();
+        });
+
+        // Fallback banner actions
+        const fbPopout = vp.querySelector(`#fb-popout-${tab.id}`);
+        const fbDismiss = vp.querySelector(`#fb-dismiss-${tab.id}`);
+        const fbBanner = vp.querySelector(`#fallback-banner-${tab.id}`);
+        if (fbPopout) fbPopout.addEventListener('click', () => doPopout());
+        if (fbDismiss) fbDismiss.addEventListener('click', () => fbBanner.classList.remove('show'));
+
+        renderGridForTab(tab.id);
         updateClock(tab.id);
+      }
+
+      function renderGridForTab(tabId) {
+        const grid = document.getElementById('grid-' + tabId);
+        if (!grid) return;
+        grid.innerHTML = '';
+        const list = getStoredShortcuts();
+
+        list.forEach((item, idx) => {
+          const tile = document.createElement('div');
+          tile.className = 'speed-tile';
+          const fav = getFaviconUrl(item.url);
+          const letter = item.name ? item.name.charAt(0).toUpperCase() : '?';
+
+          tile.innerHTML = `
+            <div class="tile-delete-btn" title="Delete Shortcut">✕</div>
+            <div class="tile-icon-box">
+              <img class="tile-icon-img" src="${fav}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+              <div class="tile-icon-letter" style="display: none;">${letter}</div>
+            </div>
+            <div class="tile-label">${escapeHtml(item.name)}</div>
+          `;
+
+          tile.addEventListener('click', (e) => {
+            if (e.target.closest('.tile-delete-btn')) return;
+            navigateTo(item.url, tabId);
+          });
+
+          tile.querySelector('.tile-delete-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            list.splice(idx, 1);
+            saveShortcuts(list);
+            tabs.forEach(t => renderGridForTab(t.id));
+          });
+
+          grid.appendChild(tile);
+        });
+
+        // "+ Add Shortcut" tile
+        const addTile = document.createElement('div');
+        addTile.className = 'speed-tile speed-tile-add';
+        addTile.innerHTML = `
+          <div class="tile-icon-box" style="background: rgba(139, 92, 246, 0.15); color: #c4b5fd; font-size: 20px;">+</div>
+          <div class="tile-label">Add Shortcut</div>
+        `;
+        addTile.addEventListener('click', () => openShortcutModal());
+        grid.appendChild(addTile);
       }
 
       function updateClock(tabId) {
         const now = new Date();
-        let h = now.getHours();
-        const m = String(now.getMinutes()).padStart(2, '0');
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        h = h % 12 || 12;
+        const dateEl = document.getElementById('date-' + tabId);
         const clockEl = document.getElementById('clock-' + tabId);
-        if (clockEl) clockEl.textContent = `${h}:${m} ${ampm}`;
+        const greetingEl = document.getElementById('greeting-' + tabId);
+
+        if (clockEl) {
+          let h = now.getHours();
+          const m = String(now.getMinutes()).padStart(2, '0');
+          const s = String(now.getSeconds()).padStart(2, '0');
+          if (!is24Hour) {
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            clockEl.textContent = `${h}:${m}:${s} ${ampm}`;
+          } else {
+            clockEl.textContent = `${String(h).padStart(2, '0')}:${m}:${s}`;
+          }
+        }
+
+        if (dateEl) {
+          dateEl.textContent = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        }
+
+        if (greetingEl) {
+          const hr = now.getHours();
+          if (hr < 12) greetingEl.textContent = 'Good morning';
+          else if (hr < 18) greetingEl.textContent = 'Good afternoon';
+          else greetingEl.textContent = 'Good evening';
+        }
       }
 
-      setInterval(() => {
+      function updateAllClocks() {
         tabs.forEach(t => updateClock(t.id));
-      }, 1000);
+      }
+      setInterval(updateAllClocks, 1000);
 
-      // ─── UNIVERSAL NAVIGATION ENGINE ───
+      // ─── SHORTCUT MODAL ───
+      function openShortcutModal() {
+        document.getElementById('shortcut-name-input').value = '';
+        document.getElementById('shortcut-url-input').value = '';
+        shortcutModal.classList.add('open');
+      }
+
+      document.getElementById('shortcut-close-btn').addEventListener('click', () => shortcutModal.classList.remove('open'));
+      document.getElementById('shortcut-cancel-btn').addEventListener('click', () => shortcutModal.classList.remove('open'));
+      document.getElementById('shortcut-save-btn').addEventListener('click', () => {
+        const name = document.getElementById('shortcut-name-input').value.trim();
+        let url = document.getElementById('shortcut-url-input').value.trim();
+        if (!name || !url) {
+          alert('Please enter both name and URL');
+          return;
+        }
+        if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+        const list = getStoredShortcuts();
+        list.push({ name, url });
+        saveShortcuts(list);
+        shortcutModal.classList.remove('open');
+        tabs.forEach(t => renderGridForTab(t.id));
+      });
+
+      // ─── NAVIGATION ENGINE ───
       function navigateTo(target, tabId = activeTabId) {
         const tab = tabs.find(t => t.id === tabId);
         if (!tab) return;
@@ -1703,30 +2376,41 @@
 
         if (tabId === activeTabId) {
           omnibox.value = resolved;
+          updateSecurityBadge(resolved);
+          updateBookmarkStarState(resolved);
         }
         renderTabs();
+        addHistoryEntry(resolved, tab.title);
 
         const vp = document.getElementById('viewport-' + tab.id);
         if (vp) {
           const wall = vp.querySelector('.newtab-wall');
-          const iframe = vp.querySelector('.embed-frame');
+          const webContainer = vp.querySelector('#web-container-' + tab.id);
+          const iframe = vp.querySelector('#frame-' + tab.id);
+          const fallbackBanner = vp.querySelector('#fallback-banner-' + tab.id);
 
           if (wall) wall.style.display = 'none';
-          if (iframe) {
-            iframe.style.display = 'block';
-            startProgress();
+          if (webContainer) webContainer.style.display = 'flex';
 
+          if (iframe) {
+            startProgress();
             let targetSrc = resolved;
             if (!resolved.includes('youtube.com/embed/')) {
               targetSrc = '/gateway?url=' + encodeURIComponent(resolved);
             }
             iframe.src = targetSrc;
-            iframe.onload = () => finishProgress();
+            iframe.onload = () => {
+              finishProgress();
+              if (resolved.includes('youtube.com') || resolved.includes('github.com')) {
+                fallbackBanner.classList.add('show');
+              }
+            };
           }
         }
+        saveSessionTabs();
       }
 
-      // ─── NAVIGATION CONTROLS (SHARED DESKTOP & MOBILE) ───
+      // ─── NAVIGATION CONTROLS ───
       function doBack() {
         const vp = document.getElementById('viewport-' + activeTabId);
         if (vp) {
@@ -1748,6 +2432,8 @@
       }
 
       function doReload() {
+        const reloadBtn = document.getElementById('nav-reload');
+        if (reloadBtn) reloadBtn.classList.add('spinning');
         const vp = document.getElementById('viewport-' + activeTabId);
         if (vp) {
           const iframe = vp.querySelector('.embed-frame');
@@ -1756,6 +2442,9 @@
             iframe.src = iframe.src;
           }
         }
+        setTimeout(() => {
+          if (reloadBtn) reloadBtn.classList.remove('spinning');
+        }, 800);
       }
 
       function doHome() {
@@ -1765,18 +2454,20 @@
         tab.title = 'New Tab';
         tab.isNewTab = true;
         omnibox.value = '';
+        updateSecurityBadge('');
+        updateBookmarkStarState('');
         renderTabs();
 
         const vp = document.getElementById('viewport-' + tab.id);
         if (vp) {
           const wall = vp.querySelector('.newtab-wall');
-          const iframe = vp.querySelector('.embed-frame');
+          const webContainer = vp.querySelector('#web-container-' + tab.id);
+          const iframe = vp.querySelector('#frame-' + tab.id);
           if (wall) wall.style.display = 'flex';
-          if (iframe) {
-            iframe.style.display = 'none';
-            iframe.src = 'about:blank';
-          }
+          if (webContainer) webContainer.style.display = 'none';
+          if (iframe) iframe.src = 'about:blank';
         }
+        saveSessionTabs();
       }
 
       function doPopout() {
@@ -1785,171 +2476,55 @@
         window.open(targetUrl, '_blank', 'noopener,noreferrer');
       }
 
-      // Bind Desktop Nav
+      // Bind nav buttons
       document.getElementById('nav-back').addEventListener('click', doBack);
       document.getElementById('nav-forward').addEventListener('click', doForward);
       document.getElementById('nav-reload').addEventListener('click', doReload);
       document.getElementById('nav-home').addEventListener('click', doHome);
       document.getElementById('nav-popout').addEventListener('click', doPopout);
 
-      // Bind Mobile Nav
+      // Mobile nav buttons
       document.getElementById('m-nav-back').addEventListener('click', doBack);
       document.getElementById('m-nav-forward').addEventListener('click', doForward);
       document.getElementById('m-nav-reload').addEventListener('click', doReload);
       document.getElementById('m-nav-home').addEventListener('click', doHome);
       document.getElementById('m-nav-popout').addEventListener('click', doPopout);
 
-      // Mobile Tabs Drawer
-      mobileTabsBtn.addEventListener('click', () => {
-        renderTabs();
-        mobileDrawer.classList.add('open');
-      });
-      document.getElementById('drawer-close-btn').addEventListener('click', () => {
-        mobileDrawer.classList.remove('open');
-      });
-      document.getElementById('drawer-btn-new-tab').addEventListener('click', () => {
-        createTab();
-        mobileDrawer.classList.remove('open');
-        omnibox.focus();
-      });
-      mobileDrawer.addEventListener('click', (e) => {
-        if (e.target === mobileDrawer) mobileDrawer.classList.remove('open');
+      // ─── BOOKMARKS & HISTORY BUTTONS ───
+      document.getElementById('btn-toggle-bookmarks').addEventListener('click', () => {
+        bookmarksBar.classList.toggle('hidden');
+        renderBookmarksBar();
       });
 
-      // ─── REAL-TIME POSTMESSAGE URL & NAVIGATION SYNC ───
-      window.addEventListener('message', (event) => {
-        if (!event.data) return;
-
-        if (event.data.type === 'STAUNT_SHORTCUT') {
-          handleGlobalShortcut(event.data);
-          return;
-        }
-
-        if (event.data.type === 'STAUNT_URL_CHANGE') {
-          const rawUrl = event.data.url;
-          let cleanUrl = rawUrl;
-          if (rawUrl.includes('/gateway?url=')) {
-            cleanUrl = decodeURIComponent(rawUrl.split('/gateway?url=')[1]);
-          }
-
-          const tab = tabs.find(t => t.id === activeTabId);
-          if (tab) {
-            tab.url = cleanUrl;
-            if (event.data.title) {
-              tab.title = event.data.title;
-              document.title = event.data.title + ' • Staunt Browser';
-            }
-            if (document.activeElement !== omnibox) {
-              omnibox.value = cleanUrl;
-            }
-            renderTabs();
-          }
-        } else if (event.data.type === 'STAUNT_NAVIGATE') {
-          if (event.data.url) {
-            navigateTo(event.data.url);
-          }
-        }
+      document.getElementById('btn-open-history').addEventListener('click', () => {
+        renderHistoryList();
+        historyDrawer.classList.add('open');
       });
 
-      // ─── DESKTOP KEYBOARD SHORTCUTS ───
-      function handleGlobalShortcut(e) {
-        const isMac = (navigator.platform || '').toUpperCase().indexOf('MAC') >= 0;
-        const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
-        const key = (e.key || '').toLowerCase();
-
-        if (cmdOrCtrl && key === 't') {
-          if (e.preventDefault) e.preventDefault();
-          createTab();
-          omnibox.focus();
-          return;
-        }
-        if (cmdOrCtrl && key === 'w') {
-          if (e.preventDefault) e.preventDefault();
-          if (activeTabId) closeTab(activeTabId);
-          return;
-        }
-        if ((cmdOrCtrl && key === 'r') || e.key === 'F5') {
-          if (e.preventDefault) e.preventDefault();
-          doReload();
-          return;
-        }
-        if ((cmdOrCtrl && key === 'l') || (e.altKey && key === 'd')) {
-          if (e.preventDefault) e.preventDefault();
-          omnibox.focus();
-          omnibox.select();
-          return;
-        }
-        if (e.altKey && e.key === 'ArrowLeft') {
-          if (e.preventDefault) e.preventDefault();
-          doBack();
-          return;
-        }
-        if (e.altKey && e.key === 'ArrowRight') {
-          if (e.preventDefault) e.preventDefault();
-          doForward();
-          return;
-        }
-        if (e.key === 'F11') {
-          if (e.preventDefault) e.preventDefault();
-          toggleFullscreen();
-          return;
-        }
-        if (e.key === 'Escape') {
-          if (downloadModal.classList.contains('open')) downloadModal.classList.remove('open');
-          if (mobileDrawer.classList.contains('open')) mobileDrawer.classList.remove('open');
-          if (document.activeElement === omnibox) omnibox.blur();
-          return;
-        }
-      }
-
-      window.addEventListener('keydown', (e) => {
-        if (document.activeElement === omnibox && e.key === 'Enter') return;
-        handleGlobalShortcut(e);
+      document.getElementById('history-close-btn').addEventListener('click', () => historyDrawer.classList.remove('open'));
+      historyDrawer.addEventListener('click', (e) => {
+        if (e.target === historyDrawer) historyDrawer.classList.remove('open');
       });
 
-      // ─── OMNIBOX SUBMIT ───
-      omnibox.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          const val = omnibox.value.trim();
-          if (val) {
-            navigateTo(val);
-            omnibox.blur();
-          }
-        }
+      historySearchInput.addEventListener('input', (e) => {
+        renderHistoryList(e.target.value.trim());
       });
 
-      document.getElementById('btn-add-tab').addEventListener('click', () => createTab());
-
-      // ─── IMMERSIVE MODE & FULLSCREEN ───
-      let isImmersive = false;
-      function toggleImmersive(val) {
-        isImmersive = typeof val === 'boolean' ? val : !isImmersive;
-        document.body.classList.toggle('immersive-mode', isImmersive);
-        if (btnImmersive) btnImmersive.textContent = isImmersive ? '▼ Show Bar' : '▲ Immersive';
-      }
-
-      if (btnImmersive) btnImmersive.addEventListener('click', () => toggleImmersive());
-
-      function toggleFullscreen() {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(() => {});
-          toggleImmersive(true);
-        } else {
-          document.exitFullscreen().catch(() => {});
-          toggleImmersive(false);
+      document.getElementById('btn-clear-history').addEventListener('click', () => {
+        if (confirm('Clear entire browsing history?')) {
+          localStorage.removeItem('staunt_history');
+          renderHistoryList();
         }
-      }
+      });
 
       // ─── DOWNLOAD MODAL ───
       const btnModal = document.getElementById('btn-open-download-modal');
-      const modalClose = document.getElementById('modal-close-btn');
-
+      const downloadClose = document.getElementById('download-close-btn');
       if (btnModal) btnModal.addEventListener('click', () => downloadModal.classList.add('open'));
-      if (modalClose) modalClose.addEventListener('click', () => downloadModal.classList.remove('open'));
+      if (downloadClose) downloadClose.addEventListener('click', () => downloadModal.classList.remove('open'));
       downloadModal.addEventListener('click', (e) => {
         if (e.target === downloadModal) downloadModal.classList.remove('open');
       });
-
 
       // ─── YOUTUBE & VIDEO DOWNLOADER CONTROLLER ───
       const ytModal = document.getElementById('yt-downloader-modal');
@@ -1986,34 +2561,8 @@
         if (e.target === ytModal) closeYtDownloader();
       });
 
-      
-      const btnTabYt = document.getElementById('btn-tab-yt-downloader');
-      if (btnTabYt) btnTabYt.addEventListener('click', () => openYtDownloader());
-
-      const btnTabApp = document.getElementById('btn-tab-download-app');
-      if (btnTabApp) btnTabApp.addEventListener('click', () => downloadModal.classList.add('open'));
-
-      const omniboxStar = document.getElementById('omnibox-star');
-      if (omniboxStar) {
-        omniboxStar.addEventListener('click', () => {
-          omniboxStar.classList.toggle('active');
-          const tab = tabs.find(t => t.id === activeTabId);
-          if (tab) {
-            alert('★ Bookmarked: ' + (tab.title || tab.url));
-          }
-        });
-      }
-
-      const btnOpenYtDesktop = document.getElementById('btn-open-yt-downloader');
-      if (btnOpenYtDesktop) btnOpenYtDesktop.addEventListener('click', () => openYtDownloader());
-
-      const btnOpenYtMobile = document.getElementById('m-nav-ytdl');
-      if (btnOpenYtMobile) btnOpenYtMobile.addEventListener('click', () => openYtDownloader());
-
-      document.addEventListener('click', (e) => {
-        const tile = e.target.closest('#speed-tile-ytdl');
-        if (tile) openYtDownloader();
-      });
+      document.getElementById('btn-open-yt-downloader').addEventListener('click', () => openYtDownloader());
+      document.getElementById('m-nav-ytdl').addEventListener('click', () => openYtDownloader());
 
       if (ytBtnPaste) {
         ytBtnPaste.addEventListener('click', async () => {
@@ -2090,66 +2639,147 @@
             body: JSON.stringify({ url: url })
           });
           const data = await resp.json();
-          ytLoading.style.display = 'none';
 
-          if (!resp.ok) {
-            throw new Error(data.error || 'Failed to analyze video. Check URL and try again.');
+          ytLoading.style.display = 'none';
+          if (!resp.ok || !data.success) {
+            ytError.textContent = data.error || 'Failed to extract video streams. Please check URL.';
+            ytError.style.display = 'block';
+            return;
           }
 
-          renderYtDetails(url, data);
+          document.getElementById('yt-thumb-img').src = data.thumbnail || '';
+          document.getElementById('yt-dur').textContent = data.duration_string || '--:--';
+          document.getElementById('yt-title').textContent = data.title || 'Video';
+          document.getElementById('yt-uploader').textContent = (data.uploader || 'Creator') + ' • ' + (data.views ? data.views.toLocaleString() + ' views' : '');
+
+          const vList = document.getElementById('yt-video-list');
+          vList.innerHTML = '';
+          (data.formats || []).forEach(f => {
+            const row = document.createElement('div');
+            row.className = 'yt-format-row';
+            const resTag = f.resolution || f.quality || 'MP4 Video';
+            row.innerHTML = `
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="yt-fmt-tag">${resTag}</span>
+                <span style="color: #94a3b8; font-size: 11px;">MP4 Video • ${f.size_string || '~HD'}</span>
+              </div>
+              <a href="/api/download?url=${encodeURIComponent(url)}&format=${encodeURIComponent(f.format_id || 'best')}" class="yt-btn-dl" target="_blank" download>
+                ⬇ Download
+              </a>
+            `;
+            vList.appendChild(row);
+          });
+
+          const aList = document.getElementById('yt-audio-list');
+          aList.innerHTML = '';
+          (data.audio_formats || []).forEach(f => {
+            const row = document.createElement('div');
+            row.className = 'yt-format-row';
+            row.innerHTML = `
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="yt-fmt-tag audio">${f.abr ? f.abr + 'kbps' : 'MP3 Audio'}</span>
+                <span style="color: #94a3b8; font-size: 11px;">HQ Audio • ${f.size_string || '~Audio'}</span>
+              </div>
+              <a href="/api/download?url=${encodeURIComponent(url)}&format=${encodeURIComponent(f.format_id || 'bestaudio')}&audio=true" class="yt-btn-dl audio" target="_blank" download>
+                ⬇ Download MP3
+              </a>
+            `;
+            aList.appendChild(row);
+          });
+
+          ytResult.style.display = 'flex';
         } catch(err) {
           ytLoading.style.display = 'none';
+          ytError.textContent = 'Connection error: ' + err.message;
           ytError.style.display = 'block';
-          ytError.textContent = err.message || 'Error communicating with downloader server.';
         }
       }
 
-      function renderYtDetails(originalUrl, data) {
-        document.getElementById('yt-thumb-img').src = data.thumbnail || '';
-        document.getElementById('yt-dur').textContent = data.duration_string || '--:--';
-        document.getElementById('yt-title').textContent = data.title || 'Video Title';
-        document.getElementById('yt-uploader').textContent = (data.uploader || 'Creator') + ' • ' + (Number(data.views || 0).toLocaleString()) + ' views';
+      // ─── GLOBAL KEYBOARD SHORTCUTS ───
+      window.addEventListener('keydown', (e) => {
+        const isMac = (navigator.platform || '').toUpperCase().indexOf('MAC') >= 0;
+        const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+        const key = (e.key || '').toLowerCase();
 
-        const vList = document.getElementById('yt-video-list');
-        const aList = document.getElementById('yt-audio-list');
-        vList.innerHTML = '';
-        aList.innerHTML = '';
+        if (cmdOrCtrl && key === 't') {
+          e.preventDefault();
+          createTab();
+          omnibox.focus();
+          return;
+        }
+        if (cmdOrCtrl && key === 'w') {
+          e.preventDefault();
+          if (activeTabId) closeTab(activeTabId);
+          return;
+        }
+        if ((cmdOrCtrl && key === 'l') || (e.altKey && key === 'd')) {
+          e.preventDefault();
+          omnibox.focus();
+          omnibox.select();
+          return;
+        }
+        if (cmdOrCtrl && key === 'h') {
+          e.preventDefault();
+          renderHistoryList();
+          historyDrawer.classList.toggle('open');
+          return;
+        }
+        if (cmdOrCtrl && key === 'b') {
+          e.preventDefault();
+          bookmarksBar.classList.toggle('hidden');
+          renderBookmarksBar();
+          return;
+        }
+        if (key === 'escape') {
+          historyDrawer.classList.remove('open');
+          securityModal.classList.remove('open');
+          shortcutModal.classList.remove('open');
+          downloadModal.classList.remove('open');
+          ytModal.classList.remove('open');
+          omnibox.blur();
+        }
+      });
 
-        (data.video_formats || []).forEach(f => {
-          const row = document.createElement('div');
-          row.className = 'yt-format-row';
-          row.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="yt-fmt-tag">${f.resolution}</span>
-              <span style="font-size: 11.5px; color: #94a3b8;">${f.filesize_approx || 'HD'}</span>
-            </div>
-            <a class="yt-btn-dl" href="/api/download/video?url=${encodeURIComponent(originalUrl)}&resolution=${encodeURIComponent(f.resolution)}&height=${f.height || ''}&format_id=${f.format_id || ''}" target="_blank">
-              ⬇ Download MP4
-            </a>
-          `;
-          vList.appendChild(row);
-        });
+      omnibox.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const val = omnibox.value.trim();
+          if (val) {
+            navigateTo(val);
+            omnibox.blur();
+          }
+        }
+      });
 
-        (data.audio_formats || []).forEach(a => {
-          const row = document.createElement('div');
-          row.className = 'yt-format-row';
-          row.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="yt-fmt-tag audio">MP3 ${a.quality}</span>
-              <span style="font-size: 11.5px; color: #94a3b8;">${a.approx_size || ''}</span>
-            </div>
-            <a class="yt-btn-dl audio" href="/api/download/video?url=${encodeURIComponent(originalUrl)}&is_audio=1&audio_bitrate=${encodeURIComponent(a.bitrate)}&audio_format=mp3" target="_blank">
-              🎵 Download MP3
-            </a>
-          `;
-          aList.appendChild(row);
-        });
+      document.getElementById('btn-add-tab').addEventListener('click', () => createTab());
 
-        ytResult.style.display = 'flex';
-      }
+      // ─── REAL-TIME POSTMESSAGE URL & NAVIGATION SYNC ───
+      window.addEventListener('message', (event) => {
+        if (!event.data) return;
+        if (event.data.type === 'STAUNT_URL_CHANGE') {
+          const rawUrl = event.data.url;
+          let cleanUrl = rawUrl;
+          if (rawUrl.includes('/gateway?url=')) {
+            cleanUrl = decodeURIComponent(rawUrl.split('/gateway?url=')[1]);
+          }
+          const tab = tabs.find(t => t.id === activeTabId);
+          if (tab) {
+            tab.url = cleanUrl;
+            if (event.data.title) {
+              tab.title = event.data.title;
+              document.title = event.data.title + ' • Staunt Browser';
+            }
+            if (document.activeElement !== omnibox) {
+              omnibox.value = cleanUrl;
+            }
+            renderTabs();
+            addHistoryEntry(cleanUrl, tab.title);
+          }
+        }
+      });
 
-      // Initialize initial tab
-      createTab();
+      // Initialize
+      renderBookmarksBar();
+      restoreSessionTabs();
     })();
   </script>
 </body>
