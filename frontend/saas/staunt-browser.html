@@ -1783,6 +1783,17 @@
       text-rendering: optimizeLegibility;
     }
     
+  
+    /* ─── PHASE 8: DRAG-DROP PIPELINES, TEXT SELECTION & AUDIO MIXING ─── */
+    .tabs-strip, .app-header, .mobile-bottom-bar, .drawer-panel, .modal-box {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .viewport-canvas.drag-over {
+      outline: 2px dashed var(--accent) !important;
+      outline-offset: -4px;
+    }
+    
   </style>
 </head>
 <body>
@@ -4294,6 +4305,71 @@
       // 5. Native Desktop Crash Dump Path
       window.getDesktopCrashDumpPath = function() {
         return '%LOCALAPPDATA%\\StauntBrowser\\CrashDumps';
+      };
+
+    })();
+    </script>
+    
+
+    <script>
+    // =========================================================================
+    // PHASE 8: WEBAUTHN, PAYMENTS, CLIPBOARD, WEBAUDIO & NATIVE IPC RUNTIME
+    // =========================================================================
+    (function initPhase8Runtime() {
+      // 1. WebAuthn RP ID and Client Data Validator
+      window.validateWebAuthnOptions = function(options) {
+        if (!options || typeof options !== 'object') return { valid: false, error: 'Invalid options' };
+        if (options.rp && options.rp.id) {
+          const expectedDomain = window.location.hostname;
+          if (options.rp.id !== expectedDomain && !expectedDomain.endsWith('.' + options.rp.id)) {
+            return { valid: false, error: 'SecurityError: Mismatched RP ID' };
+          }
+        }
+        return { valid: true };
+      };
+
+      // 2. Client-side Clipboard HTML Sanitizer
+      window.sanitizeClipboardHtml = function(rawHtml) {
+        if (!rawHtml) return '';
+        // Strip script tags, on* handlers, and javascript: expressions
+        return rawHtml
+          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+          .replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '')
+          .replace(/javascript:/gi, 'blocked:');
+      };
+
+      // 3. Multiline Clipboard Text Normalizer
+      window.normalizeClipboardText = function(rawText) {
+        if (!rawText) return '';
+        return rawText.replace(/\r\n|\r/g, '\n');
+      };
+
+      // 4. ISO 4217 Currency Code Validator
+      window.isValidCurrencyCode = function(code) {
+        if (!code || typeof code !== 'string') return false;
+        return /^[A-Z]{3}$/.test(code.toUpperCase());
+      };
+
+      // 5. Biquad Filter Frequency Clamping Calculator
+      window.clampFilterFrequency = function(freq, sampleRate) {
+        const nyquist = (sampleRate || 44100) / 2;
+        return Math.min(Math.max(10, freq), nyquist);
+      };
+
+      // 6. Native Windows IPC Ring Buffer Simulator
+      window.stauntIpcBuffer = {
+        queue: [],
+        maxSize: 100,
+        send: function(msg) {
+          if (this.queue.length >= this.maxSize) {
+            this.queue.shift(); // Backpressure eviction
+          }
+          this.queue.push({ msg, time: Date.now() });
+          return true;
+        },
+        size: function() {
+          return this.queue.length;
+        }
       };
 
     })();
