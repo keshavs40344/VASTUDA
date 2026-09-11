@@ -78,6 +78,32 @@ DEFAULT_HEADERS = {
 # ==============================================================================
 # 1. NATIVE WINDOWS DESKTOP PACKAGE DOWNLOAD
 # ==============================================================================
+# ==============================================================================
+# 0. VERSION & UPDATE NOTIFICATION ENDPOINT
+# ==============================================================================
+CURRENT_APP_VERSION = "3.4.0"
+LATEST_RELEASE_NOTES = "Staunt Ultra V3.4.0: Consolidated Sovereign Hub, Enhanced AI Copilot, Strict TLS Interstitial and Multi-Viewport Parity."
+
+@browser_bp.route("/api/browser/version", methods=["GET"])
+def get_browser_version():
+    """Returns latest version, release notes, download URLs, and update status for all clients."""
+    client_version = request.args.get("v", "1.0.0").strip()
+    is_update_available = (client_version != CURRENT_APP_VERSION)
+    return jsonify({
+        "current_version": CURRENT_APP_VERSION,
+        "client_version": client_version,
+        "update_available": is_update_available,
+        "mandatory": False,
+        "release_notes": LATEST_RELEASE_NOTES,
+        "downloads": {
+            "windows_exe": "/assets/Staunt-Browser-Setup.exe",
+            "windows_zip": "/api/browser/download/windows",
+            "android_apk": "/assets/Staunt-Browser-Mobile.apk"
+        },
+        "timestamp": time.time()
+    })
+
+
 @browser_bp.route("/api/browser/download/windows", methods=["GET"])
 def download_windows_package():
     """Serves the standalone native Windows desktop Staunt Browser installer package."""

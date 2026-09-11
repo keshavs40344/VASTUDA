@@ -2384,9 +2384,85 @@
     .workspace-name { font-size: 13px; font-weight: 700; color: #fff; }
     .workspace-count { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
 
+
+    /* ─── APP UPDATE NOTIFICATION BANNER ─── */
+    .update-notification-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 36px;
+      background: linear-gradient(90deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 0.95));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 12.5px;
+      z-index: 100000;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+      animation: slideDownUpdate 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideDownUpdate {
+      from { transform: translateY(-100%); }
+      to { transform: translateY(0); }
+    }
+    .update-banner-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .update-pulse {
+      font-size: 14px;
+      animation: pulse 1.5s infinite;
+    }
+    .update-banner-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .update-action-btn {
+      background: #fff;
+      color: #065f46;
+      border: none;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .update-action-btn:hover {
+      background: #ecfdf5;
+      transform: scale(1.03);
+    }
+    .update-dismiss {
+      cursor: pointer;
+      opacity: 0.8;
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .update-dismiss:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
 </style>
 </head>
 <body>
+  <!-- ─── BROWSER UPDATE NOTIFICATION BANNER ─── -->
+  <div class="update-notification-banner" id="update-notification-banner" style="display: none;">
+    <div class="update-banner-content">
+      <span class="update-pulse">🚀</span>
+      <span class="update-text"><strong>Staunt Ultra Update Available!</strong> A newer version (<span id="update-target-version">v3.4.0</span>) is ready with enhanced security, 60fps rendering, and faster speeds.</span>
+    </div>
+    <div class="update-banner-actions">
+      <button class="update-action-btn" id="btn-update-now" onclick="document.getElementById('download-modal').classList.add('open');">Update Now</button>
+      <span class="update-dismiss" id="btn-dismiss-update" onclick="document.getElementById('update-notification-banner').style.display='none'; localStorage.setItem('staunt_update_dismissed', Date.now());" title="Dismiss">✕</span>
+    </div>
+  </div>
+
   <div class="offline-banner" id="offline-banner">⚠️ Network connection offline. Cache mode active.</div>
 
   <!-- ROW 1: DESKTOP TAB STRIP -->
@@ -6877,7 +6953,7 @@
   <script src="/saas/shield-engine.js"></script>
   <script src="/saas/command-palette.js"></script>
   <script src="/saas/reader-mode.js"></script>
-  <script src="/saas/vault-storage.js">
+  <script src="/saas/vault-storage.js"></script>
   // ─── SUITE HUB DROPDOWN TOGGLE LOGIC ───
   (function() {
     const hubBtn = document.getElementById('btn-open-hub-menu');
@@ -6903,5 +6979,47 @@
 
 </script>
 
+<script>
+
+  // ─── AUTOMATIC UPDATE NOTIFICATION SYSTEM ───
+  (function initUpdateNotificationEngine() {
+    const LOCAL_APP_VERSION = "3.3.0"; // Previous installed version signature
+    window.STAUNT_VERSION = LOCAL_APP_VERSION;
+
+    async function checkForUpdates() {
+      try {
+        const lastDismissed = localStorage.getItem('staunt_update_dismissed');
+        // Show banner at most once every 6 hours if dismissed
+        if (lastDismissed && (Date.now() - parseInt(lastDismissed, 10)) < 21600000) {
+          return;
+        }
+
+        const res = await fetch('/api/browser/version?v=' + encodeURIComponent(LOCAL_APP_VERSION));
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (data.update_available) {
+          const banner = document.getElementById('update-notification-banner');
+          const verSpan = document.getElementById('update-target-version');
+          if (verSpan) verSpan.textContent = 'v' + data.current_version;
+          if (banner) {
+            banner.style.display = 'flex';
+            // Adjust header top if banner is visible
+            const tabsStrip = document.getElementById('tabs-strip');
+            const mainHdr = document.getElementById('main-header');
+            if (tabsStrip) tabsStrip.style.top = '36px';
+            if (mainHdr) mainHdr.style.top = 'calc(var(--tabs-h) + 36px)';
+          }
+        }
+      } catch (err) {
+        console.warn('[Staunt Update Engine] Update check skipped:', err);
+      }
+    }
+
+    // Run check after initial page load
+    setTimeout(checkForUpdates, 1500);
+  })();
+
+</script>
 </body>
 </html>
