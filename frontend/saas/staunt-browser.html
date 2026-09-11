@@ -2624,7 +2624,12 @@
         saveBookmarks(bms);
       });
 
-            // ─── OMNIBOX AUTOCOMPLETE & LIVE MATH CHIP (250ms DEBOUNCED) ───
+                  // ─── OMNIBOX AUTOCOMPLETE & LIVE MATH CHIP (250ms DEBOUNCED) ───
+      const SUGGESTIONS_BANK = [
+        'google.com', 'youtube.com', 'github.com', 'reddit.com', 'wikipedia.org',
+        'twitter.com', 'instagram.com', 'news.ycombinator.com', 'netflix.com',
+        'amazon.com', 'stackoverflow.com', 'duckduckgo.com', 'linkedin.com'
+      ];
       const calcChip = document.getElementById('omnibox-calc-chip');
       const calcVal = document.getElementById('omnibox-calc-val');
       let omniboxDebounceTimer = null;
