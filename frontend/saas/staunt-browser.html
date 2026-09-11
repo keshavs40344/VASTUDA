@@ -58,6 +58,8 @@
       color: var(--text-white);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       user-select: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     /* ─── ROW 1: DESKTOP TAB STRIP ─── */
@@ -140,6 +142,8 @@
       position: relative;
       transition: all 0.15s ease;
       flex-shrink: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
 
     .tab-pill:hover {
@@ -1067,6 +1071,8 @@
       flex-direction: column;
       gap: 16px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+      will-change: transform;
+      transform: translateZ(0);
     }
 
     .modal-head {
@@ -1741,6 +1747,24 @@
     /* Phase 4 Touch Action & Sizing Rules */
     .tabs-strip, .app-header, .mobile-bottom-bar, .btn-nav-icon, .action-btn, .m-nav-btn {
       touch-action: manipulation;
+    }
+    
+  
+    /* ─── PHASE 5: ADVANCED CSS, DARK SCHEME & THERMAL ADAPTATION ─── */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        color-scheme: dark;
+      }
+    }
+    body.thermal-throttle *,
+    body.thermal-throttle ::before,
+    body.thermal-throttle ::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    .viewport-canvas {
+      overflow-x: hidden !important;
+      max-width: 100vw !important;
     }
     
   </style>
@@ -3960,5 +3984,156 @@
       window.safeParseStorage = safeParseStorage;
     })();
     </script>
+
+    <script>
+    // =========================================================================
+    // PHASE 5: ZERO-TRUST FRAMES, THERMAL, PWA & PROCESS ARCHITECTURE RUNTIME
+    // =========================================================================
+    (function initPhase5Runtime() {
+      // 1. Zero-Trust Window Name Sanitization across origin navigation
+      window.sanitizeWindowName = function(targetOrigin, currentOrigin) {
+        if (targetOrigin !== currentOrigin) {
+          window.name = '';
+        }
+        return window.name;
+      };
+
+      // 2. Strict PostMessage Origin Validator
+      window.safePostMessageListener = function(event, trustedOrigins) {
+        if (!trustedOrigins || !Array.isArray(trustedOrigins)) return { valid: false, dropped: true };
+        if (!trustedOrigins.includes(event.origin)) {
+          console.warn('[Staunt Shield] Dropped untrusted postMessage from origin:', event.origin);
+          return { valid: false, dropped: true };
+        }
+        return { valid: true, data: event.data };
+      };
+
+      // 3. Document.Domain Locking Defense
+      window.lockDocumentDomain = function() {
+        try {
+          Object.defineProperty(document, 'domain', {
+            get: function() { return location.hostname; },
+            set: function(val) {
+              throw new DOMException("Illegal assignment to document.domain in sovereign context", "SecurityError");
+            },
+            configurable: false
+          });
+          return true;
+        } catch(e) {
+          return false;
+        }
+      };
+      // Execute document.domain lock immediately
+      try { window.lockDocumentDomain(); } catch(e) {}
+
+      // 4. External Protocol Smuggling Interceptor
+      window.isSafeProtocol = function(urlStr) {
+        if (!urlStr) return false;
+        const dangerousProtocols = ['ssh:', 'smb:', 'disk:', 'file:', 'ftp:', 'telnet:', 'gopher:', 'ldap:'];
+        try {
+          const parsed = new URL(urlStr, window.location.href);
+          if (dangerousProtocols.includes(parsed.protocol.toLowerCase())) {
+            return false;
+          }
+          return true;
+        } catch(e) {
+          const lower = urlStr.trim().toLowerCase();
+          for (const dp of dangerousProtocols) {
+            if (lower.startsWith(dp)) return false;
+          }
+          return true;
+        }
+      };
+
+      // 5. Sensor Telemetry Lockdown (Ambient Light, Accelerometer, IdleDetector)
+      window.sensorShield = {
+        isAmbientLightBlocked: function() {
+          return !('AmbientLightSensor' in window) || window.__stauntAmbientLightBlocked === true;
+        },
+        isMotionSensorBlocked: function(origin) {
+          if (!origin || origin !== window.location.origin) return true;
+          return false;
+        },
+        isIdleDetectionAllowed: function() {
+          return false; // strictly gated behind explicit user toggle
+        }
+      };
+
+      // 6. Thermal and CPU Saturation Throttler
+      window.setThermalThrottling = function(enabled) {
+        if (enabled) {
+          document.body.classList.add('thermal-throttle');
+          window.__stauntTickRate = 5000;
+        } else {
+          document.body.classList.remove('thermal-throttle');
+          window.__stauntTickRate = 1000;
+        }
+        return window.__stauntTickRate;
+      };
+
+      // 7. Screen Wake Lock Lifecycle Manager
+      window.stauntWakeLock = {
+        sentinel: null,
+        request: async function() {
+          if ('wakeLock' in navigator) {
+            try {
+              this.sentinel = await navigator.wakeLock.request('screen');
+              return true;
+            } catch(e) { return false; }
+          }
+          return false;
+        },
+        releaseOnHidden: function() {
+          if (document.visibilityState === 'hidden' && this.sentinel) {
+            this.sentinel.release();
+            this.sentinel = null;
+            return true;
+          }
+          return false;
+        }
+      };
+      document.addEventListener('visibilitychange', () => {
+        window.stauntWakeLock.releaseOnHidden();
+      });
+
+      // 8. Dynamic Viewport Overflow Clipping Verification
+      window.checkViewportIntegrity = function() {
+        const docW = document.documentElement.clientWidth;
+        const bodyW = document.body.clientWidth;
+        const winW = window.innerWidth;
+        return bodyW <= winW && docW <= winW;
+      };
+
+      // 9. Vibration Abuse Limiter
+      window.safeVibrate = function(pattern, userActivated) {
+        if (!userActivated) return false;
+        if ('vibrate' in navigator) {
+          return navigator.vibrate(pattern);
+        }
+        return false;
+      };
+
+      // 10. Native C# Chromium Shell Bridge Simulator & Manifest
+      window.stauntNativeIPC = {
+        validatePayload: function(payload) {
+          if (!payload || typeof payload !== 'object') return false;
+          if (!payload.action || typeof payload.action !== 'string') return false;
+          return true;
+        },
+        getJumplistShortcuts: function() {
+          return [
+            { title: 'New Tab', action: 'NEW_TAB' },
+            { title: 'New Window', action: 'NEW_WINDOW' },
+            { title: 'Downloads', action: 'OPEN_DOWNLOADS' }
+          ];
+        },
+        getSwitches: function() {
+          return ['--disable-background-networking', '--disable-component-update'];
+        }
+      };
+
+    })();
+    </script>
+    
 </body>
 </html>
