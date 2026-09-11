@@ -1,7 +1,9 @@
 ﻿package com.staunt.browser
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,6 +11,8 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.webkit.DownloadListener
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.*
@@ -44,6 +48,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnFindPrev: ImageButton
     private lateinit var btnFindNext: ImageButton
     private lateinit var btnFindClose: ImageButton
+
+    // Real File Upload Request Callback
+    private var fileUploadCallback: ValueCallback<Array<Uri>>? = null
+    private val FILE_CHOOSER_REQUEST_CODE = 1001
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -320,9 +328,14 @@ class MainActivity : AppCompatActivity() {
             setSupportZoom(true)
             builtInZoomControls = true
             displayZoomControls = false
+            allowFileAccess = true
+            allowContentAccess = true
+            mediaPlaybackRequiresUserGesture = false
+            cacheMode = WebSettings.LOAD_DEFAULT
         }
 
         webView.webViewClient = StauntWebViewClient(
+            this,
             adBlockEngine,
             historyDb,
             onPageStarted = { url ->
@@ -343,6 +356,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         webView.webChromeClient = StauntChromeClient(
+            this,
             onProgressChanged = { progress ->
                 progressBar.progress = progress
                 if (progress == 100) progressBar.visibility = View.GONE
@@ -353,11 +367,47 @@ class MainActivity : AppCompatActivity() {
                 if (tab != null && title.isNotBlank()) {
                     tab.title = title
                 }
+            },
+            onFileChooser = { callback, params ->
+                fileUploadCallback?.onReceiveValue(null)
+                fileUploadCallback = callback
+                val intent = params?.createIntent() ?: Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = "*/*"
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                }
+                try {
+                    startActivityForResult(intent, FILE_CHOOSER_REQUEST_CODE)
+                    true
+                } catch (e: Exception) {
+                    fileUploadCallback = null
+                    false
+                }
             }
         )
 
         webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, _ ->
             downloadHandler.downloadFile(url, userAgent, contentDisposition, mimetype)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == FILE_CHOOSER_REQUEST_CODE) {
+            if (fileUploadCallback == null) return
+            val results: Array<Uri>? = if (resultCode == Activity.RESULT_OK && data != null) {
+                if (data.dataString != null) {
+                    arrayOf(Uri.parse(data.dataString))
+                } else if (data.clipData != null) {
+                    val count = data.clipData!!.itemCount
+                    val uris = ArrayList<Uri>()
+                    for (i in 0 until count) {
+                        uris.add(data.clipData!!.getItemAt(i).uri)
+                    }
+                    uris.toTypedArray()
+                } else null
+            } else null
+            fileUploadCallback?.onReceiveValue(results)
+            fileUploadCallback = null
         }
     }
 

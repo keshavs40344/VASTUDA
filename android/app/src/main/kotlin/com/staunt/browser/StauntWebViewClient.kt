@@ -1,13 +1,14 @@
-package com.staunt.browser
+﻿package com.staunt.browser
 
+import android.app.AlertDialog
+import android.content.Context
 import android.graphics.Bitmap
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.net.http.SslError
+import android.webkit.*
 import java.io.ByteArrayInputStream
 
 class StauntWebViewClient(
+    private val context: Context,
     private val adBlockEngine: AdBlockEngine,
     private val historyDb: HistoryDb,
     private val onPageStarted: (String) -> Unit,
@@ -24,6 +25,27 @@ class StauntWebViewClient(
             return WebResourceResponse("text/plain", "UTF-8", ByteArrayInputStream("".toByteArray()))
         }
         return super.shouldInterceptRequest(view, request)
+    }
+
+    override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
+        val primaryError = when (error?.primaryError) {
+            SslError.SSL_EXPIRED -> "The security certificate has expired."
+            SslError.SSL_IDMISMATCH -> "The security certificate hostname does not match."
+            SslError.SSL_UNTRUSTED -> "The security certificate authority is untrusted."
+            SslError.SSL_NOTYETVALID -> "The security certificate is not yet valid."
+            else -> "An SSL security error occurred."
+        }
+
+        AlertDialog.Builder(context)
+            .setTitle("⚠️ Security Warning: Invalid SSL Certificate")
+            .setMessage("$primaryError\n\nContinuing may expose your sensitive information to attackers. Do you wish to proceed?")
+            .setPositiveButton("Proceed (Unsafe)") { _, _ -> handler?.proceed() }
+            .setNegativeButton("Go Back (Recommended)") { _, _ ->
+                handler?.cancel()
+                if (view?.canGoBack() == true) view.goBack()
+            }
+            .setCancelable(false)
+            .show()
     }
 
     override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {

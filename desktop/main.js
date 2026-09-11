@@ -157,7 +157,7 @@ function showAboutDialog() {
     type: 'info',
     title: 'About Staunt Browser',
     message: 'Staunt Browser Ultra',
-    detail: 'Version 2.0.0\nBy VASTUDA Sovereign Systems\n\nPowered by Chromium via Electron'
+    detail: `Version: 2.0.0\nVendor: VASTUDA Sovereign Systems\nChromium: ${process.versions.chrome || 'Engine version unavailable'}\nElectron: ${process.versions.electron || 'Unavailable'}\nNode.js: ${process.versions.node || 'Unavailable'}\nV8: ${process.versions.v8 || 'Unavailable'}\nOS: ${process.platform} ${process.arch}`
   });
 }
 
