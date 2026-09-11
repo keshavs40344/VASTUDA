@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Staunt Browser Ultra</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'><circle cx='12' cy='12' r='10'/><path d='M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20' stroke='%23fff' stroke-width='2'/></svg>" />
+  
+  <!-- Typography Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- External Design System -->
+  <link rel="stylesheet" href="staunt-ultra-theme.css" />
+</head>
+<body>
+
+  <!-- =========================================================================
+       DELIVERABLE 3: UNIFIED DOM LAYOUT & INTERACTIVE SHELL
+       ========================================================================= -->
+
+  <!-- ROW 1: DESKTOP TAB STRIP (38px Draggable Titlebar) -->
+  <nav class="staunt-tabstrip" id="staunt-tabstrip" role="tablist" aria-label="Browser tabs">
+    <div class="staunt-brand-tag" id="staunt-brand-btn" title="Staunt Browser Ultra">
+      <div class="staunt-brand-icon">S</div>
+      <span>STAUNT ULTRA</span>
+    </div>
+
+    <!-- Draggable rail area for standalone window motion -->
+    <div class="staunt-tab-drag-area">
+      <div class="staunt-tab-rail" id="staunt-tabs-rail">
+        <!-- Tab Pills rendered dynamically -->
+      </div>
+      <button class="staunt-btn-newtab" id="staunt-btn-add-tab" title="Open New Tab (Ctrl+T)">+</button>
+    </div>
+  </nav>
+
+  <!-- ROW 2: NAVIGATION TOOLBAR (44px Fixed Height) -->
+  <header class="staunt-toolbar" id="staunt-toolbar">
+    <!-- Back / Forward / Reload / Home Navigation -->
+    <div class="staunt-nav-cluster">
+      <button class="staunt-nav-btn" id="staunt-nav-back" title="Back (Alt+Left)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="staunt-nav-btn" id="staunt-nav-forward" title="Forward (Alt+Right)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+      <button class="staunt-nav-btn" id="staunt-nav-reload" title="Reload (Ctrl+R)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
+      <button class="staunt-nav-btn" id="staunt-nav-home" title="Home New Tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </button>
+    </div>
+
+    <!-- Toolbar Omnibox -->
+    <div class="staunt-toolbar-omnibox">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color: var(--staunt-text-dim);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <input type="text" id="staunt-top-omnibox" placeholder="Search Google or enter web address..." autocomplete="off" spellcheck="false" />
+    </div>
+
+    <!-- Action Utility Cluster -->
+    <div class="staunt-action-cluster">
+      <button class="staunt-action-btn" id="staunt-btn-history" title="History (Ctrl+H)">🕒 History</button>
+      <button class="staunt-action-btn" id="staunt-btn-shield" title="Privacy Shield">🛡️ Shield</button>
+      <button class="staunt-action-btn" id="staunt-btn-downloads" title="Downloader">⬇ Downloader</button>
+      <button class="staunt-action-btn" id="staunt-btn-settings" title="Settings">⚙️ Settings</button>
+      <button class="staunt-action-btn staunt-btn-native" id="staunt-btn-native" title="Open in Dedicated Native Window">Native ↗</button>
+      <button class="staunt-action-btn staunt-btn-getapp" id="staunt-btn-getapp" title="Download Desktop App">⚡ Get App</button>
+    </div>
+  </header>
+
+  <!-- VIEWPORT CONTAINER -->
+  <main class="staunt-viewport" id="staunt-viewport">
+    <!-- Viewports are dynamically attached here per tab -->
+  </main>
+
+  <!-- =========================================================================
+       MODALS & SLIDE DRAWERS
+       ========================================================================= -->
+
+  <!-- Modal: Add Custom Shortcut -->
+  <div class="staunt-overlay" id="staunt-shortcut-modal" role="dialog" aria-modal="true">
+    <div class="staunt-modal-card">
+      <div class="staunt-modal-header">
+        <h3>Add Shortcut</h3>
+        <span class="staunt-modal-close" id="staunt-modal-shortcut-close">✕</span>
+      </div>
+      <div class="staunt-field-group">
+        <label for="staunt-input-shortcut-name">Shortcut Name</label>
+        <input type="text" class="staunt-field-input" id="staunt-input-shortcut-name" placeholder="e.g. GitHub" />
+      </div>
+      <div class="staunt-field-group">
+        <label for="staunt-input-shortcut-url">Target URL</label>
+        <input type="text" class="staunt-field-input" id="staunt-input-shortcut-url" placeholder="e.g. https://github.com" />
+      </div>
+      <div class="staunt-modal-actions">
+        <button class="staunt-btn-sec" id="staunt-btn-shortcut-cancel">Cancel</button>
+        <button class="staunt-btn-pri" id="staunt-btn-shortcut-save">Save Shortcut</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Get Desktop App -->
+  <div class="staunt-overlay" id="staunt-app-modal" role="dialog" aria-modal="true">
+    <div class="staunt-modal-card">
+      <div class="staunt-modal-header">
+        <h3>Staunt Browser Ultra Desktop</h3>
+        <span class="staunt-modal-close" id="staunt-modal-app-close">✕</span>
+      </div>
+      <p style="font-size: 13px; color: var(--staunt-text-dim); line-height: 1.6; margin-bottom: 20px;">
+        Experience native 60fps hardware acceleration, independent user profile caching, and zero host frame collisions with the Windows C# standalone launcher.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <a href="/assets/Staunt-Browser-Setup.exe" download="Staunt-Browser-Setup.exe" style="text-decoration: none;">
+          <button class="staunt-btn-pri" style="width: 100%; height: 42px;">Download Windows Setup (.exe)</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer: Settings -->
+  <div class="staunt-drawer-overlay" id="staunt-settings-drawer" role="dialog" aria-modal="true">
+    <div class="staunt-drawer-panel">
+      <div class="staunt-modal-header">
+        <h3>Browser Settings</h3>
+        <span class="staunt-modal-close" id="staunt-drawer-settings-close">✕</span>
+      </div>
+      <div class="staunt-field-group">
+        <label>Default Search Engine</label>
+        <select id="staunt-select-engine" class="staunt-field-input" style="cursor: pointer;">
+          <option value="google">Google</option>
+          <option value="duckduckgo">DuckDuckGo</option>
+          <option value="bing">Bing</option>
+        </select>
+      </div>
+      <div class="staunt-field-group">
+        <label>Clock Display Format</label>
+        <select id="staunt-select-clock" class="staunt-field-input" style="cursor: pointer;">
+          <option value="12">12-Hour (AM/PM)</option>
+          <option value="24">24-Hour Military</option>
+        </select>
+      </div>
+      <button class="staunt-btn-sec" id="staunt-btn-clear-cache" style="margin-top: auto;">Clear Storage &amp; Reset Shortcuts</button>
+    </div>
+  </div>
+
+  <!-- Drawer: History -->
+  <div class="staunt-drawer-overlay" id="staunt-history-drawer" role="dialog" aria-modal="true">
+    <div class="staunt-drawer-panel">
+      <div class="staunt-modal-header">
+        <h3>Browsing History</h3>
+        <span class="staunt-modal-close" id="staunt-drawer-history-close">✕</span>
+      </div>
+      <input type="text" class="staunt-field-input" id="staunt-history-filter" placeholder="Filter history..." style="margin-bottom: 16px;" />
+      <div id="staunt-history-list" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
+      <button class="staunt-btn-sec" id="staunt-btn-clear-history" style="margin-top: 16px; color: #f87171;">Clear All History</button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       ZERO-DEPENDENCY VANILLA JAVASCRIPT CONTROLLER
+       ========================================================================= -->
+  <script>
+    (function() {
+      'use strict';
+
+      // 1. Initial State & Persistent Defaults
+      const DEFAULT_SHORTCUTS = [
+        { name: 'Google', url: 'https://www.google.com' },
+        { name: 'YouTube', url: 'https://www.youtube.com' },
+        { name: 'GitHub', url: 'https://github.com' },
+        { name: 'Wikipedia', url: 'https://www.wikipedia.org' },
+        { name: 'Reddit', url: 'https://www.reddit.com' }
+      ];
+
+      let tabs = [];
+      let activeTabId = null;
+      let nextTabId = 1;
+      let is24Hour = localStorage.getItem('staunt_clock_24h') === 'true';
+
+      // DOM Elements
+      const tabsRail = document.getElementById('staunt-tabs-rail');
+      const addTabBtn = document.getElementById('staunt-btn-add-tab');
+      const topOmnibox = document.getElementById('staunt-top-omnibox');
+      const viewport = document.getElementById('staunt-viewport');
+
+      // Modals & Drawers
+      const shortcutModal = document.getElementById('staunt-shortcut-modal');
+      const shortcutNameInput = document.getElementById('staunt-input-shortcut-name');
+      const shortcutUrlInput = document.getElementById('staunt-input-shortcut-url');
+      const appModal = document.getElementById('staunt-app-modal');
+      const settingsDrawer = document.getElementById('staunt-settings-drawer');
+      const historyDrawer = document.getElementById('staunt-history-drawer');
+      const historyList = document.getElementById('staunt-history-list');
+
+      // 2. Storage Abstraction
+      function getShortcuts() {
+        try {
+          const raw = localStorage.getItem('staunt_shortcuts');
+          return raw ? JSON.parse(raw) : DEFAULT_SHORTCUTS;
+        } catch(e) {
+          return DEFAULT_SHORTCUTS;
+        }
+      }
+
+      function saveShortcuts(list) {
+        localStorage.setItem('staunt_shortcuts', JSON.stringify(list));
+      }
+
+      function getHistory() {
+        try {
+          const raw = localStorage.getItem('staunt_history');
+          return raw ? JSON.parse(raw) : [];
+        } catch(e) {
+          return [];
+        }
+      }
+
+      function addHistory(url, title) {
+        if (!url || url.startsWith('about:')) return;
+        let hist = getHistory();
+        hist = hist.filter(h => h.url !== url);
+        hist.unshift({
+          url: url,
+          title: title || url,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+        if (hist.length > 100) hist = hist.slice(0, 100);
+        localStorage.setItem('staunt_history', JSON.stringify(hist));
+      }
+
+      // 3. Tab Management
+      function createTab(initialUrl = '') {
+        const tabId = nextTabId++;
+        const tab = {
+          id: tabId,
+          url: initialUrl,
+          title: initialUrl ? extractDomain(initialUrl) : 'New Tab',
+          isNewTab: !initialUrl
+        };
+        tabs.push(tab);
+
+        buildTabDOM(tab);
+        renderTabStrip();
+        switchTab(tabId);
+
+        if (initialUrl) {
+          navigateTo(initialUrl, tabId);
+        }
+      }
+
+      function switchTab(tabId) {
+        activeTabId = tabId;
+        const currentTab = tabs.find(t => t.id === tabId);
+        if (!currentTab) return;
+
+        topOmnibox.value = currentTab.isNewTab ? '' : currentTab.url;
+
+        document.querySelectorAll('.staunt-tab-view').forEach(view => {
+          view.style.display = (view.dataset.tabId == tabId) ? 'flex' : 'none';
+        });
+
+        renderTabStrip();
+      }
+
+      function closeTab(tabId, e) {
+        if (e) e.stopPropagation();
+        const idx = tabs.findIndex(t => t.id === tabId);
+        if (idx === -1) return;
+
+        const view = document.getElementById('staunt-view-' + tabId);
+        if (view) view.remove();
+
+        tabs.splice(idx, 1);
+
+        if (tabs.length === 0) {
+          createTab();
+          return;
+        }
+
+        if (activeTabId === tabId) {
+          const nextIndex = Math.min(idx, tabs.length - 1);
+          switchTab(tabs[nextIndex].id);
+        } else {
+          renderTabStrip();
+        }
+      }
+
+      function renderTabStrip() {
+        tabsRail.innerHTML = '';
+        tabs.forEach(tab => {
+          const pill = document.createElement('div');
+          pill.className = 'staunt-tab-pill' + (tab.id === activeTabId ? ' active' : '');
+          pill.setAttribute('role', 'tab');
+          pill.setAttribute('aria-selected', tab.id === activeTabId ? 'true' : 'false');
+
+          const faviconUrl = tab.url ? `https://www.google.com/s2/favicons?domain=${extractDomain(tab.url)}&sz=32` : '';
+          const iconMarkup = (!tab.isNewTab && faviconUrl)
+            ? `<img class="staunt-tab-icon" src="${faviconUrl}" alt="" onerror="this.style.display='none'" />`
+            : `<svg class="staunt-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>`;
+
+          pill.innerHTML = `
+            ${iconMarkup}
+            <span class="staunt-tab-title">${escapeHtml(tab.title)}</span>
+            <span class="staunt-tab-close" title="Close Tab">✕</span>
+          `;
+
+          pill.addEventListener('click', () => switchTab(tab.id));
+          pill.querySelector('.staunt-tab-close').addEventListener('click', (e) => closeTab(tab.id, e));
+
+          tabsRail.appendChild(pill);
+        });
+      }
+
+      // 4. Viewport & New Tab Dashboard Construction
+      function buildTabDOM(tab) {
+        const view = document.createElement('div');
+        view.className = 'staunt-tab-view';
+        view.id = 'staunt-view-' + tab.id;
+        view.dataset.tabId = tab.id;
+        view.style.width = '100%';
+        view.style.height = '100%';
+        view.style.display = 'none';
+        view.style.flexDirection = 'column';
+
+        view.innerHTML = `
+          <div class="staunt-newtab-wall" id="staunt-wall-${tab.id}">
+            <!-- Digital Clock Section -->
+            <div class="staunt-hero-clock-wrap" id="staunt-clock-wrap-${tab.id}" title="Click to toggle 12h/24h format">
+              <div class="staunt-digital-clock" id="staunt-clock-${tab.id}">--:--:--</div>
+              <div class="staunt-date-badge" id="staunt-date-${tab.id}">------</div>
+              <div class="staunt-greeting-badge" id="staunt-greeting-${tab.id}">Good day</div>
+            </div>
+
+            <!-- Center Search Omnibox -->
+            <div class="staunt-hero-omnibox-wrap">
+              <div class="staunt-hero-omnibox">
+                <svg class="staunt-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" class="staunt-hero-input" id="staunt-hero-input-${tab.id}" placeholder="Search Google or enter web address..." autocomplete="off" />
+                <button class="staunt-hero-submit" id="staunt-hero-submit-${tab.id}" title="Navigate">➔</button>
+              </div>
+            </div>
+
+            <!-- Shortcuts Grid -->
+            <div class="staunt-shortcuts-container">
+              <div class="staunt-shortcuts-grid" id="staunt-grid-${tab.id}"></div>
+            </div>
+          </div>
+
+          <!-- Webpage IFrame Viewer -->
+          <iframe 
+            class="staunt-web-frame" 
+            id="staunt-frame-${tab.id}" 
+            style="display: none; width: 100%; height: 100%; border: none; background: #fff;"
+            sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-same-origin allow-scripts"
+            allow="accelerometer; autoplay; clipboard-read; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+          ></iframe>
+        `;
+
+        viewport.appendChild(view);
+
+        // Bind Clock Toggle
+        view.querySelector(`#staunt-clock-wrap-${tab.id}`).addEventListener('click', () => {
+          is24Hour = !is24Hour;
+          localStorage.setItem('staunt_clock_24h', is24Hour);
+          renderAllClocks();
+        });
+
+        // Bind Hero Omnibox Search
+        const heroInput = view.querySelector(`#staunt-hero-input-${tab.id}`);
+        const heroSubmit = view.querySelector(`#staunt-hero-submit-${tab.id}`);
+        const performSearch = () => {
+          const q = heroInput.value.trim();
+          if (q) navigateTo(q, tab.id);
+        };
+        heroSubmit.addEventListener('click', performSearch);
+        heroInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') performSearch();
+        });
+
+        renderShortcutsForTab(tab.id);
+        updateClockForTab(tab.id);
+      }
+
+      // 5. Shortcuts Renderer & LocalStorage Persistence
+      function renderShortcutsForTab(tabId) {
+        const grid = document.getElementById('staunt-grid-' + tabId);
+        if (!grid) return;
+        grid.innerHTML = '';
+        const list = getShortcuts();
+
+        list.forEach((item, idx) => {
+          const card = document.createElement('div');
+          card.className = 'staunt-shortcut-card';
+          const domain = extractDomain(item.url);
+          const fav = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+          const letter = item.name ? item.name.charAt(0).toUpperCase() : '?';
+
+          card.innerHTML = `
+            <div class="staunt-card-delete-btn" title="Remove Shortcut">✕</div>
+            <div class="staunt-card-icon-box">
+              <img class="staunt-card-icon-img" src="${fav}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+              <div class="staunt-card-icon-letter" style="display: none;">${letter}</div>
+            </div>
+            <div class="staunt-card-label">${escapeHtml(item.name)}</div>
+          `;
+
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('.staunt-card-delete-btn')) return;
+            navigateTo(item.url, tabId);
+          });
+
+          card.querySelector('.staunt-card-delete-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            list.splice(idx, 1);
+            saveShortcuts(list);
+            tabs.forEach(t => renderShortcutsForTab(t.id));
+          });
+
+          grid.appendChild(card);
+        });
+
+        // "+ Add Shortcut" Card
+        const addCard = document.createElement('div');
+        addCard.className = 'staunt-shortcut-card staunt-card-add';
+        addCard.innerHTML = `
+          <div class="staunt-card-icon-box" style="background: rgba(59, 130, 246, 0.12); color: var(--staunt-text-accent); font-size: 20px;">+</div>
+          <div class="staunt-card-label">Add Shortcut</div>
+        `;
+        addCard.addEventListener('click', () => {
+          shortcutNameInput.value = '';
+          shortcutUrlInput.value = '';
+          shortcutModal.classList.add('open');
+          shortcutNameInput.focus();
+        });
+        grid.appendChild(addCard);
+      }
+
+      // 6. Navigation Execution
+      function navigateTo(target, tabId = activeTabId) {
+        const tab = tabs.find(t => t.id === tabId);
+        if (!tab) return;
+
+        let url = target.trim();
+        if (/^https?:\/\//i.test(url)) {
+          // Absolute URL
+        } else if (/^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(url) && !url.includes(' ')) {
+          url = 'https://' + url;
+        } else {
+          url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+        }
+
+        tab.url = url;
+        tab.title = extractDomain(url);
+        tab.isNewTab = false;
+
+        if (tabId === activeTabId) {
+          topOmnibox.value = url;
+        }
+        renderTabStrip();
+        addHistory(url, tab.title);
+
+        const view = document.getElementById('staunt-view-' + tab.id);
+        if (view) {
+          const wall = view.querySelector(`#staunt-wall-${tab.id}`);
+          const frame = view.querySelector(`#staunt-frame-${tab.id}`);
+          if (wall) wall.style.display = 'none';
+          if (frame) {
+            frame.style.display = 'block';
+            frame.src = url;
+          }
+        }
+      }
+
+      // 7. Digital Clock & Localized Date Script
+      function updateClockForTab(tabId) {
+        const clockEl = document.getElementById('staunt-clock-' + tabId);
+        const dateEl = document.getElementById('staunt-date-' + tabId);
+        const greetingEl = document.getElementById('staunt-greeting-' + tabId);
+        if (!clockEl) return;
+
+        const now = new Date();
+        let hours = now.getHours();
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        if (!is24Hour) {
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          hours = hours % 12 || 12;
+          clockEl.textContent = `${hours}:${minutes}:${seconds} ${ampm}`;
+        } else {
+          clockEl.textContent = `${String(hours).padStart(2, '0')}:${minutes}:${seconds}`;
+        }
+
+        if (dateEl) {
+          dateEl.textContent = now.toLocaleDateString(undefined, {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+        }
+
+        if (greetingEl) {
+          const h = now.getHours();
+          if (h < 12) greetingEl.textContent = 'Good morning';
+          else if (h < 18) greetingEl.textContent = 'Good afternoon';
+          else greetingEl.textContent = 'Good evening';
+        }
+      }
+
+      function renderAllClocks() {
+        tabs.forEach(t => updateClockForTab(t.id));
+      }
+      setInterval(renderAllClocks, 1000);
+
+      // 8. Utility Functions
+      function extractDomain(url) {
+        try {
+          return new URL(url).hostname.replace(/^www\./, '');
+        } catch(e) {
+          return url || 'New Tab';
+        }
+      }
+
+      function escapeHtml(str) {
+        return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      // 9. Event Wiring & Modal Handlers
+      addTabBtn.addEventListener('click', () => createTab());
+
+      topOmnibox.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const val = topOmnibox.value.trim();
+          if (val) navigateTo(val, activeTabId);
+        }
+      });
+
+      // Navigation Bar Buttons
+      document.getElementById('staunt-nav-back').addEventListener('click', () => {
+        const frame = document.getElementById('staunt-frame-' + activeTabId);
+        if (frame && frame.contentWindow) {
+          try { frame.contentWindow.history.back(); } catch(e) {}
+        }
+      });
+
+      document.getElementById('staunt-nav-forward').addEventListener('click', () => {
+        const frame = document.getElementById('staunt-frame-' + activeTabId);
+        if (frame && frame.contentWindow) {
+          try { frame.contentWindow.history.forward(); } catch(e) {}
+        }
+      });
+
+      document.getElementById('staunt-nav-reload').addEventListener('click', () => {
+        const frame = document.getElementById('staunt-frame-' + activeTabId);
+        if (frame && frame.style.display !== 'none') {
+          frame.src = frame.src;
+        }
+      });
+
+      document.getElementById('staunt-nav-home').addEventListener('click', () => {
+        const tab = tabs.find(t => t.id === activeTabId);
+        if (!tab) return;
+        tab.url = '';
+        tab.title = 'New Tab';
+        tab.isNewTab = true;
+        topOmnibox.value = '';
+        renderTabStrip();
+
+        const view = document.getElementById('staunt-view-' + tab.id);
+        if (view) {
+          const wall = view.querySelector(`#staunt-wall-${tab.id}`);
+          const frame = view.querySelector(`#staunt-frame-${tab.id}`);
+          if (wall) wall.style.display = 'flex';
+          if (frame) {
+            frame.style.display = 'none';
+            frame.src = 'about:blank';
+          }
+        }
+      });
+
+      document.getElementById('staunt-btn-native').addEventListener('click', () => {
+        const currentTab = tabs.find(t => t.id === activeTabId);
+        const url = (currentTab && currentTab.url) ? currentTab.url : (topOmnibox.value || 'https://www.google.com');
+        window.open(url, '_blank', 'noopener,noreferrer');
+      });
+
+      document.getElementById('staunt-btn-getapp').addEventListener('click', () => {
+        appModal.classList.add('open');
+      });
+
+      document.getElementById('staunt-modal-app-close').addEventListener('click', () => {
+        appModal.classList.remove('open');
+      });
+
+      // Shortcut Modal Actions
+      document.getElementById('staunt-modal-shortcut-close').addEventListener('click', () => shortcutModal.classList.remove('open'));
+      document.getElementById('staunt-btn-shortcut-cancel').addEventListener('click', () => shortcutModal.classList.remove('open'));
+      document.getElementById('staunt-btn-shortcut-save').addEventListener('click', () => {
+        const name = shortcutNameInput.value.trim();
+        let url = shortcutUrlInput.value.trim();
+        if (!name || !url) return;
+        if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+        const list = getShortcuts();
+        list.push({ name, url });
+        saveShortcuts(list);
+        shortcutModal.classList.remove('open');
+        tabs.forEach(t => renderShortcutsForTab(t.id));
+      });
+
+      // Settings Drawer
+      document.getElementById('staunt-btn-settings').addEventListener('click', () => settingsDrawer.classList.add('open'));
+      document.getElementById('staunt-drawer-settings-close').addEventListener('click', () => settingsDrawer.classList.remove('open'));
+      document.getElementById('staunt-btn-clear-cache').addEventListener('click', () => {
+        localStorage.removeItem('staunt_shortcuts');
+        localStorage.removeItem('staunt_history');
+        tabs.forEach(t => renderShortcutsForTab(t.id));
+        alert('Local storage and custom shortcuts reset.');
+      });
+
+      // History Drawer
+      document.getElementById('staunt-btn-history').addEventListener('click', () => {
+        renderHistoryDrawer();
+        historyDrawer.classList.add('open');
+      });
+      document.getElementById('staunt-drawer-history-close').addEventListener('click', () => historyDrawer.classList.remove('open'));
+      document.getElementById('staunt-btn-clear-history').addEventListener('click', () => {
+        localStorage.removeItem('staunt_history');
+        renderHistoryDrawer();
+      });
+
+      function renderHistoryDrawer(filter = '') {
+        historyList.innerHTML = '';
+        const list = getHistory();
+        const filtered = filter ? list.filter(h => h.title.toLowerCase().includes(filter.toLowerCase()) || h.url.toLowerCase().includes(filter.toLowerCase())) : list;
+        if (filtered.length === 0) {
+          historyList.innerHTML = '<div style="color: var(--staunt-text-muted); font-size: 13px; text-align: center; padding: 20px;">No browsing history recorded</div>';
+          return;
+        }
+        filtered.forEach(h => {
+          const row = document.createElement('div');
+          row.style.padding = '8px 12px';
+          row.style.background = 'rgba(255,255,255,0.04)';
+          row.style.borderRadius = '6px';
+          row.style.cursor = 'pointer';
+          row.innerHTML = `
+            <div style="font-size: 13px; color: #fff; font-weight: 500;">${escapeHtml(h.title)}</div>
+            <div style="font-size: 11px; color: var(--staunt-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(h.url)} • ${h.time}</div>
+          `;
+          row.addEventListener('click', () => {
+            navigateTo(h.url);
+            historyDrawer.classList.remove('open');
+          });
+          historyList.appendChild(row);
+        });
+      }
+
+      // Close overlays on backdrop click
+      [shortcutModal, appModal, settingsDrawer, historyDrawer].forEach(el => {
+        el.addEventListener('click', (e) => {
+          if (e.target === el) el.classList.remove('open');
+        });
+      });
+
+      // Bootstrap First Tab
+      createTab();
+
+    })();
+  </script>
+</body>
+</html>
