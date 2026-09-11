@@ -1634,9 +1634,64 @@
         font-size: 48px !important;
       }
     }
+
+    /* Offline Notice Banner */
+    .offline-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 28px;
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      gap: 6px;
+    }
+
+    /* Omnibox Math Calc Chip */
+    .omnibox-calc-chip {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: rgba(139, 92, 246, 0.25);
+      border: 1px solid rgba(139, 92, 246, 0.5);
+      color: #c4b5fd;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .omnibox-calc-chip:hover {
+      background: rgba(139, 92, 246, 0.4);
+      color: #fff;
+    }
+    .tab-fallback-letter {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
   </style>
 </head>
 <body>
+  <div class="offline-banner" id="offline-banner">⚠️ Network connection offline. Cache mode active.</div>
 
   <!-- ROW 1: DESKTOP TAB STRIP -->
   <nav class="tabs-strip desktop-only" id="tabs-strip">
@@ -1701,6 +1756,7 @@
       <!-- Autocomplete Dropdown -->
       <div class="autocomplete-dropdown" id="autocomplete-dropdown"></div>
 
+      <div class="omnibox-calc-chip" id="omnibox-calc-chip" title="Calculated result (Click to use)"><span style="opacity: 0.8;">=</span> <span id="omnibox-calc-val"></span></div>
       <button class="omnibox-action-star" id="omnibox-star" title="Bookmark Page">★</button>
       <button class="omnibox-action-btn" id="nav-popout" title="Open Page in Dedicated Window (100% Native 60fps - Zero Restrictions)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -2237,20 +2293,68 @@
         }, 250);
       }
 
+            // ─── SAFE MATH EVALUATOR ───
+      function evaluateMathExpression(str) {
+        if (!str) return null;
+        const cleaned = str.trim();
+        if (/^[0-9\.\s\+\-\*/\(\)\^\%]+$/.test(cleaned) && /[\+\-\*/\^\%]/.test(cleaned)) {
+          try {
+            const sanitized = cleaned.replace(/\^/g, '**');
+            const result = Function('"use strict"; return (' + sanitized + ')')();
+            if (typeof result === 'number' && !isNaN(result) && isFinite(result)) {
+              return String(Math.round(result * 1000000) / 1000000);
+            }
+          } catch(e) {}
+        }
+        return null;
+      }
+
       // ─── UNIVERSAL URL RESOLVER ───
       function resolveTargetUrl(raw) {
         if (!raw) return '';
         let trimmed = raw.trim();
 
+        // 1. Math calculation check
+        const mathResult = evaluateMathExpression(trimmed);
+        if (mathResult !== null) {
+          return 'https://www.google.com/search?q=' + encodeURIComponent(trimmed + ' = ' + mathResult);
+        }
+
+        // 2. Search engine prefix overrides: yt, g, ddg, b
+        if (/^yt\s+/i.test(trimmed)) {
+          return 'https://www.youtube.com/results?search_query=' + encodeURIComponent(trimmed.replace(/^yt\s+/i, '').trim());
+        }
+        if (/^g\s+/i.test(trimmed)) {
+          return 'https://www.google.com/search?q=' + encodeURIComponent(trimmed.replace(/^g\s+/i, '').trim());
+        }
+        if (/^ddg\s+/i.test(trimmed)) {
+          return 'https://duckduckgo.com/?q=' + encodeURIComponent(trimmed.replace(/^ddg\s+/i, '').trim());
+        }
+        if (/^b\s+/i.test(trimmed)) {
+          return 'https://www.bing.com/search?q=' + encodeURIComponent(trimmed.replace(/^b\s+/i, '').trim());
+        }
+
+        // 3. Absolute HTTP/HTTPS
         if (/^https?:\/\//i.test(trimmed)) {
           return optimizeUrl(trimmed);
         }
 
+        // 4. Localhost or IP address (e.g. localhost:3000, 127.0.0.1:8080)
+        if (/^(localhost|127\.0\.0\.1|0\.0\.0\.0)(:\d+)?(\/.*)?$/i.test(trimmed)) {
+          return 'http://' + trimmed;
+        }
+        if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?(\/.*)?$/.test(trimmed)) {
+          return 'http://' + trimmed;
+        }
+
+        // 5. Standard domain without protocol (e.g., example.com, sub.domain.org/path)
         if (/^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(trimmed) && !trimmed.includes(' ')) {
           return optimizeUrl('https://' + trimmed);
         }
 
-        return SEARCH_ENGINES[currentEngineKey].url + encodeURIComponent(trimmed);
+        // 6. Multi-word or general search query via selected engine
+        const eng = SEARCH_ENGINES[currentEngineKey] || SEARCH_ENGINES.google;
+        return eng.url + encodeURIComponent(trimmed);
       }
 
       function optimizeUrl(url) {
@@ -2385,9 +2489,14 @@
           pill.dataset.id = tab.id;
 
           const fav = getFaviconUrl(tab.url);
-          const iconHtml = (fav && !tab.isNewTab)
-            ? `<img class="tab-favicon" src="${fav}" alt="" onerror="this.style.display='none'" />`
-            : `<svg class="tab-favicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>`;
+          const letter = (tab.title || 'N').charAt(0).toUpperCase();
+          let iconHtml = '';
+          if (fav && !tab.isNewTab) {
+            iconHtml = `<img class="tab-favicon" src="${fav}" alt="" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline-flex';" />
+                        <span class="tab-fallback-letter" style="display:none;">${letter}</span>`;
+          } else {
+            iconHtml = `<svg class="tab-favicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>`;
+          }
 
           pill.innerHTML = `
             ${iconHtml}
@@ -2398,6 +2507,16 @@
 
           pill.addEventListener('click', () => switchTab(tab.id));
           pill.querySelector('.tab-close-x').addEventListener('click', (e) => closeTab(tab.id, e));
+          
+          const audioIcon = pill.querySelector('.tab-audio-icon');
+          if (audioIcon) {
+            audioIcon.textContent = tab.isMuted ? '🔇' : '🔊';
+            audioIcon.addEventListener('click', (e) => {
+              e.stopPropagation();
+              tab.isMuted = !tab.isMuted;
+              audioIcon.textContent = tab.isMuted ? '🔇' : '🔊';
+            });
+          }
 
           // Pin / Unpin on contextmenu
           pill.addEventListener('contextmenu', (e) => {
@@ -2505,39 +2624,62 @@
         saveBookmarks(bms);
       });
 
-      // ─── OMNIBOX AUTOCOMPLETE ───
-      const SUGGESTIONS_BANK = [
-        'google.com', 'youtube.com', 'github.com', 'reddit.com', 'wikipedia.org',
-        'twitter.com', 'instagram.com', 'news.ycombinator.com', 'netflix.com',
-        'amazon.com', 'stackoverflow.com', 'duckduckgo.com', 'linkedin.com'
-      ];
+            // ─── OMNIBOX AUTOCOMPLETE & LIVE MATH CHIP (250ms DEBOUNCED) ───
+      const calcChip = document.getElementById('omnibox-calc-chip');
+      const calcVal = document.getElementById('omnibox-calc-val');
+      let omniboxDebounceTimer = null;
+
+      if (calcChip) {
+        calcChip.addEventListener('click', () => {
+          if (calcVal && calcVal.textContent) {
+            omnibox.value = calcVal.textContent;
+            calcChip.style.display = 'none';
+            omnibox.focus();
+          }
+        });
+      }
 
       omnibox.addEventListener('input', () => {
-        const val = omnibox.value.trim().toLowerCase();
-        if (!val || val.length < 2) {
-          autocompleteDropdown.classList.remove('open');
-          return;
-        }
-        const matches = SUGGESTIONS_BANK.filter(s => s.includes(val)).slice(0, 4);
-        if (matches.length === 0) {
-          autocompleteDropdown.classList.remove('open');
-          return;
-        }
-        autocompleteDropdown.innerHTML = '';
-        matches.forEach(m => {
-          const item = document.createElement('div');
-          item.className = 'autocomplete-item';
-          item.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span>${m}</span>
-          `;
-          item.addEventListener('click', () => {
-            navigateTo('https://' + m);
+        clearTimeout(omniboxDebounceTimer);
+        omniboxDebounceTimer = setTimeout(() => {
+          const raw = omnibox.value;
+          const val = raw.trim();
+
+          // Check live math evaluation
+          const math = evaluateMathExpression(val);
+          if (math !== null && calcChip && calcVal) {
+            calcVal.textContent = math;
+            calcChip.style.display = 'inline-flex';
+          } else if (calcChip) {
+            calcChip.style.display = 'none';
+          }
+
+          if (!val || val.length < 2) {
             autocompleteDropdown.classList.remove('open');
+            return;
+          }
+          const valLower = val.toLowerCase();
+          const matches = SUGGESTIONS_BANK.filter(s => s.includes(valLower)).slice(0, 4);
+          if (matches.length === 0) {
+            autocompleteDropdown.classList.remove('open');
+            return;
+          }
+          autocompleteDropdown.innerHTML = '';
+          matches.forEach(m => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.innerHTML = `
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <span>${m}</span>
+            `;
+            item.addEventListener('click', () => {
+              navigateTo('https://' + m);
+              autocompleteDropdown.classList.remove('open');
+            });
+            autocompleteDropdown.appendChild(item);
           });
-          autocompleteDropdown.appendChild(item);
-        });
-        autocompleteDropdown.classList.add('open');
+          autocompleteDropdown.classList.add('open');
+        }, 250);
       });
 
       document.addEventListener('click', (e) => {
@@ -3223,6 +3365,18 @@
       renderBookmarksBar();
       restoreSessionTabs();
     })();
+
+      // ─── OFFLINE / ONLINE NETWORK LISTENERS ───
+      const offlineBanner = document.getElementById('offline-banner');
+      window.addEventListener('offline', () => {
+        if (offlineBanner) offlineBanner.style.display = 'flex';
+        document.body.classList.add('is-offline');
+      });
+      window.addEventListener('online', () => {
+        if (offlineBanner) offlineBanner.style.display = 'none';
+        document.body.classList.remove('is-offline');
+      });
+
   </script>
 </body>
 </html>
