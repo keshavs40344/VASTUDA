@@ -11,6 +11,7 @@
     "test:phase4": "node test-staunt-browser-phase4.js",
     "test:phase5": "node test-staunt-browser-phase5.js",
     "test:phase6": "node test-staunt-browser-phase6.js",
-    "test:phase7": "node test-staunt-browser-phase7.js"
+    "test:phase7": "node test-staunt-browser-phase7.js",
+    "test:phase8": "node test-staunt-browser-phase8.js"
   }
 }
