@@ -262,6 +262,164 @@
       backdrop-filter: blur(12px);
     }
 
+    /* ─── ENHANCED TOOLBAR & SUITE MENU DESIGN ─── */
+    .action-btn-ai {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.25) 0%, rgba(59, 130, 246, 0.2) 100%) !important;
+      border-color: rgba(139, 92, 246, 0.45) !important;
+      color: #e0e7ff !important;
+      font-weight: 600 !important;
+      box-shadow: 0 0 12px rgba(139, 92, 246, 0.2);
+    }
+    .action-btn-ai:hover {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.4) 0%, rgba(59, 130, 246, 0.35) 100%) !important;
+      border-color: rgba(139, 92, 246, 0.7) !important;
+      color: #fff !important;
+      box-shadow: 0 0 16px rgba(139, 92, 246, 0.4);
+    }
+    .ai-sparkle {
+      font-size: 13px;
+      animation: pulse-sparkle 2s infinite ease-in-out;
+    }
+    @keyframes pulse-sparkle {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+
+    .shield-badge-count {
+      background: #10b981;
+      color: #000;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 10px;
+      margin-left: 2px;
+      letter-spacing: -0.2px;
+    }
+
+    /* Suite Dropdown Menu Container */
+    .suite-dropdown-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .suite-menu-trigger {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      font-weight: 600;
+      color: var(--text-base);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .suite-menu-trigger:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
+
+    .suite-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      width: 240px;
+      background: rgba(18, 18, 26, 0.96);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      padding: 6px;
+      z-index: 99999;
+      animation: menuFadeIn 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .suite-dropdown-menu.show {
+      display: block;
+    }
+    @keyframes menuFadeIn {
+      from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .suite-menu-group-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      padding: 6px 10px 4px 10px;
+      text-transform: uppercase;
+    }
+
+    .suite-menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-radius: 7px;
+      font-size: 12px;
+      color: var(--text-base);
+      cursor: pointer;
+      transition: all 0.1s ease;
+      user-select: none;
+    }
+    .suite-menu-item:hover {
+      background: rgba(59, 130, 246, 0.2);
+      color: #fff;
+      transform: translateX(2px);
+    }
+    .suite-shortcut {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .suite-badge {
+      font-size: 9px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #000;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .suite-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 4px 2px;
+    }
+
+    /* Windows Window Controls */
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 6px;
+    }
+    .win-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .win-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+    .win-close:hover {
+      background: #ef4444 !important;
+      color: #fff !important;
+    }
+
+
     /* ─── ROW 2: NAVIGATION & OMNIBOX HEADER ─── */
     .app-header {
       position: fixed;
@@ -2240,54 +2398,58 @@
     <div class="tabs-rail" id="tabs-rail" role="tablist" aria-label="Browser tabs"></div>
     <button class="btn-new-tab" id="btn-add-tab" title="New Tab (Ctrl+T)">+</button>
     <div class="tab-strip-actions">
-      <button class="action-btn" id="btn-open-ai" title="Staunt Sovereign AI Copilot (Alt+A)" style="color: #c4b5fd; border-color: rgba(139, 92, 246, 0.4);">
-        🤖 AI
+      <!-- High-Frequency Quick Access -->
+      <button class="action-btn action-btn-ai" id="btn-open-ai" title="Staunt Sovereign AI Copilot (Alt+A)">
+        <span class="ai-sparkle">✨</span> <span>AI Copilot</span>
       </button>
-      <button class="action-btn" id="btn-open-taskmgr" title="Browser Task Manager (Ctrl+Shift+Esc)">
-        📊 Tasks
-      </button>
-      <button class="action-btn" id="btn-open-devtools" title="Developer Tools (F12 / Ctrl+Shift+I)">
-        🛠️ DevTools
-      </button>
+
       <button class="action-btn" id="btn-open-workspaces" title="Arc Workspaces (Alt+W)">
         🗂️ Spaces
       </button>
-      <button class="action-btn" id="btn-open-qr" title="Share QR Code">
-        📱 QR
+
+      <button class="action-btn" id="btn-open-privacy" title="Privacy & Security Shield">
+        🛡️ <span id="staunt-shield-badge" class="shield-badge-count">12</span>
       </button>
-      <button class="action-btn" id="btn-open-specs" title="300+ Feature Matrix & Specifications">
-        📋 Specs
-      </button>
-</div>
-    <div class="tab-strip-actions">
+
       <button class="action-btn" id="btn-open-palette" title="Command Palette (Ctrl+K)">
-        ⚡ Actions
+        ⚡ Palette
       </button>
-      <button class="action-btn" id="btn-open-reader" title="Safari Reader Mode (Alt+R)">
-        📖 Reader
-      </button>
-      <button class="action-btn" id="btn-open-history" title="History (Ctrl+H)">
-        🕒 History
-      </button>
-      <button class="action-btn" id="btn-toggle-bookmarks" title="Bookmarks Bar (Ctrl+B)">
-        ★ Bookmarks
-      </button>
-      <button class="action-btn" id="btn-open-downloads" title="Downloads Manager (Ctrl+J)">
-        📥 Downloads
-      </button>
-      <button class="action-btn" id="btn-open-privacy" title="Privacy Shield">
-        🛡️ Shield <span id="staunt-shield-badge" style="display: none; background: #ef4444; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 8px; margin-left: 2px;">0</span>
-      </button>
-      <button class="action-btn btn-header-yt" id="btn-open-yt-downloader" title="Video & Audio Downloader">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-        Downloader
-      </button>
-      <button class="action-btn" id="btn-open-settings" title="Settings">
-        ⚙️ Settings
-      </button>
+
+      <!-- Consolidated Suite Menu Button -->
+      <div class="suite-dropdown-wrap">
+        <button class="action-btn suite-menu-trigger" id="btn-open-hub-menu" title="All Sovereign Tools & Master Hubs">
+          <span>≡ Hub</span>
+        </button>
+        <div class="suite-dropdown-menu" id="suite-dropdown-menu">
+          <div class="suite-menu-group-label">SYSTEM TOOLS</div>
+          <div class="suite-menu-item" id="btn-open-taskmgr"><span>📊 Browser Task Manager</span> <span class="suite-shortcut">Shift+Esc</span></div>
+          <div class="suite-menu-item" id="btn-open-devtools"><span>🛠️ Developer Tools Core</span> <span class="suite-shortcut">F12</span></div>
+          <div class="suite-menu-item" id="btn-open-specs"><span>📋 300+ Parameter Specs</span> <span class="suite-badge">All 300</span></div>
+          
+          <div class="suite-menu-group-label">BROWSING HUBS</div>
+          <div class="suite-menu-item" id="btn-open-reader"><span>📖 Safari Reader Mode</span> <span class="suite-shortcut">Alt+R</span></div>
+          <div class="suite-menu-item" id="btn-open-history"><span>🕒 Browsing History</span> <span class="suite-shortcut">Ctrl+H</span></div>
+          <div class="suite-menu-item" id="btn-toggle-bookmarks"><span>★ Bookmarks Bar</span> <span class="suite-shortcut">Ctrl+B</span></div>
+          <div class="suite-menu-item" id="btn-open-downloads"><span>📥 Downloads Manager</span> <span class="suite-shortcut">Ctrl+J</span></div>
+          <div class="suite-menu-item" id="btn-open-yt-downloader"><span>▶️ 4K Video Downloader</span></div>
+          <div class="suite-menu-item" id="btn-open-qr"><span>📱 Share to Mobile QR</span></div>
+          
+          <div class="suite-divider"></div>
+          <div class="suite-menu-item" id="btn-open-settings"><span>⚙️ Browser Settings</span></div>
+          <div class="suite-menu-item" id="btn-menu-about"><span>ℹ️ About Staunt Ultra</span></div>
+        </div>
+      </div>
+
       <button class="action-btn btn-download-app" id="btn-open-download-modal" title="Download Desktop & Mobile Apps">
         ⚡ Get App
       </button>
+
+      <!-- Native Windows Window Controls -->
+      <div class="window-controls desktop-only">
+        <div class="win-btn win-min" title="Minimize" onclick="if(window.chrome && window.chrome.webview){window.chrome.webview.postMessage('MINIMIZE');} else {alert('Minimize window');}">─</div>
+        <div class="win-btn win-max" title="Maximize" onclick="if(window.chrome && window.chrome.webview){window.chrome.webview.postMessage('MAXIMIZE');} else {document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();}">□</div>
+        <div class="win-btn win-close" title="Close" onclick="if(window.chrome && window.chrome.webview){window.chrome.webview.postMessage('CLOSE');} else {window.close();}">✕</div>
+      </div>
     </div>
   </nav>
 
@@ -6715,7 +6877,31 @@
   <script src="/saas/shield-engine.js"></script>
   <script src="/saas/command-palette.js"></script>
   <script src="/saas/reader-mode.js"></script>
-  <script src="/saas/vault-storage.js"></script>
+  <script src="/saas/vault-storage.js">
+  // ─── SUITE HUB DROPDOWN TOGGLE LOGIC ───
+  (function() {
+    const hubBtn = document.getElementById('btn-open-hub-menu');
+    const hubMenu = document.getElementById('suite-dropdown-menu');
+    if (hubBtn && hubMenu) {
+      hubBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        hubMenu.classList.toggle('show');
+      });
+      document.addEventListener('click', function(e) {
+        if (!hubMenu.contains(e.target) && e.target !== hubBtn) {
+          hubMenu.classList.remove('show');
+        }
+      });
+      // Close dropdown when any item inside is clicked
+      hubMenu.querySelectorAll('.suite-menu-item').forEach(item => {
+        item.addEventListener('click', function() {
+          hubMenu.classList.remove('show');
+        });
+      });
+    }
+  })();
+
+</script>
 
 </body>
 </html>
