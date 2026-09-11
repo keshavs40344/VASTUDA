@@ -20,25 +20,25 @@
 
   <style>
     :root {
-      --bg-canvas: #101216;
-      --bg-tabstrip: #12141a;
-      --bg-toolbar: #1a1d24;
-      --bg-tab-active: #1a1d24;
+      --bg-canvas: #12141a;
+      --bg-tabstrip: #16181f;
+      --bg-toolbar: #1a1c24;
+      --bg-tab-active: #20232d;
       --bg-tab-inactive: transparent;
-      --bg-tab-hover: rgba(255, 255, 255, 0.06);
-      --bg-surface: #1e222d;
-      --bg-surface-hover: #262b38;
-      --bg-omnibox: #222632;
-      --bg-omnibox-hover: #282d3b;
-      --bg-omnibox-focus: #282d3b;
+      --bg-tab-hover: rgba(255, 255, 255, 0.05);
+      --bg-surface: #1b1e27;
+      --bg-surface-hover: #222632;
+      --bg-omnibox: #222530;
+      --bg-omnibox-hover: #272b37;
+      --bg-omnibox-focus: #2a2e3a;
       --accent: #3b82f6;
       --accent-hover: #2563eb;
       --accent-gradient: #3b82f6;
-      --border-subtle: 1px solid rgba(255, 255, 255, 0.08);
-      --border-highlight: 1px solid rgba(255, 255, 255, 0.14);
+      --border-subtle: 1px solid rgba(255, 255, 255, 0.07);
+      --border-highlight: 1px solid rgba(255, 255, 255, 0.12);
       --border-focus: 1px solid #3b82f6;
-      --primary-focus-glow: rgba(59, 130, 246, 0.25);
-      --text-white: #e2e8f0;
+      --primary-focus-glow: rgba(59, 130, 246, 0.2);
+      --text-white: #f1f5f9;
       --text-dim: #94a3b8;
       --text-muted: #64748b;
       --tabs-h: 36px;
@@ -131,14 +131,12 @@
     .tabs-rail::-webkit-scrollbar { display: none; }
 
     .tab-pill {
-      height: 32px;
-      min-width: 140px;
-      max-width: 220px;
+      height: 28px;
+      min-width: 130px;
+      max-width: 210px;
       background: var(--bg-tab-inactive);
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
+      border-radius: 6px;
       border: 1px solid transparent;
-      border-bottom: none;
       padding: 0 10px;
       display: flex;
       align-items: center;
@@ -147,24 +145,24 @@
       color: var(--text-dim);
       cursor: pointer;
       position: relative;
-      transition: all 0.15s ease;
+      transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
       flex-shrink: 0;
+      margin-bottom: 3px;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
     }
 
     .tab-pill:hover {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--text-white);
     }
 
     .tab-pill.active {
       background: var(--bg-tab-active);
-      border-color: rgba(255, 255, 255, 0.08);
-      border-bottom: none;
+      border: 1px solid rgba(255, 255, 255, 0.09);
       color: #fff;
       font-weight: 500;
-      box-shadow: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
     }
 
     .tab-pill.pinned {
@@ -485,27 +483,27 @@
     /* Omnibox Floating Bar */
     .omnibox-wrapper {
       flex: 1;
-      height: 34px;
+      height: 32px;
       background: var(--bg-omnibox);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
       display: flex;
       align-items: center;
       padding: 0 10px;
       gap: 8px;
-      transition: all 0.2s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
       position: relative;
     }
 
     .omnibox-wrapper:hover {
       background: var(--bg-omnibox-hover);
-      border-color: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.14);
     }
 
     .omnibox-wrapper:focus-within {
       background: var(--bg-omnibox-focus);
       border-color: var(--border-focus);
-      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
     }
 
     .security-badge {
@@ -957,10 +955,10 @@
     }
 
     .tile-icon-box {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.06);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -968,16 +966,16 @@
     }
 
     .tile-icon-img {
-      width: 24px;
-      height: 24px;
-      border-radius: 4px;
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
       object-fit: contain;
     }
 
     .tile-icon-letter {
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 700;
-      color: #c4b5fd;
+      color: #93c5fd;
     }
 
     .tile-label {
@@ -2500,17 +2498,22 @@
       </button>
     </div>
 
-    <!-- Browser Action Toolbar (Chrome/Brave style) -->
+    <!-- Browser Action Toolbar (Safari-inspired Minimalist Chrome) -->
     <div class="header-actions desktop-only">
-      <!-- Privacy Shield Button -->
+      <!-- Privacy Shield Button (Restrained, no gamified badge) -->
       <button class="btn-nav-icon" id="btn-open-privacy" title="Privacy & Security Shield">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span id="staunt-shield-badge" class="shield-badge-count">12</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span id="staunt-shield-badge" class="shield-badge-count" style="display:none;">12</span>
+      </button>
+
+      <!-- Contextual AI Assistant Icon Button -->
+      <button class="btn-nav-icon" id="btn-open-ai" title="Staunt AI Assistant (Alt+A)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="8.5" cy="16" r="1" fill="currentColor"/><circle cx="15.5" cy="16" r="1" fill="currentColor"/><path d="M12 7v4"/><circle cx="12" cy="5" r="2"/></svg>
       </button>
 
       <!-- Extensions Button -->
       <button class="btn-nav-icon" id="btn-open-extensions" title="Extensions (staunt://extensions)" onclick="navigateTo('staunt://extensions')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/></svg>
       </button>
 
       <!-- 3-Dots Browser Menu Dropdown -->
@@ -2527,7 +2530,7 @@
           <div class="suite-menu-item" id="btn-toggle-bookmarks"><span>★ Bookmarks Bar</span> <span class="suite-shortcut">Ctrl+B</span></div>
           <div class="suite-menu-item" onclick="navigateTo('staunt://passwords')"><span>🔐 Password Manager</span></div>
           <div class="suite-divider"></div>
-          <div class="suite-menu-item" id="btn-open-ai"><span>🤖 Staunt AI Assistant</span> <span class="suite-shortcut">Alt+A</span></div>
+          <div class="suite-menu-item" id="btn-open-ai-menu" onclick="if(window.openAiCopilot) window.openAiCopilot();"><span>🤖 Staunt AI Assistant</span> <span class="suite-shortcut">Alt+A</span></div>
           <div class="suite-menu-item" id="btn-open-workspaces"><span>🗂️ Workspaces</span> <span class="suite-shortcut">Alt+W</span></div>
           <div class="suite-menu-item" id="btn-open-palette"><span>⚡ Command Palette</span> <span class="suite-shortcut">Ctrl+K</span></div>
           <div class="suite-menu-item" id="btn-open-reader"><span>📖 Reader Mode</span> <span class="suite-shortcut">Alt+R</span></div>
@@ -2616,9 +2619,12 @@
         <h3>Privacy &amp; Security Shield</h3>
         <span class="drawer-close" id="privacy-close-btn">✕</span>
       </div>
-      <div style="background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 14px; text-align: center;">
-        <div style="font-size: 26px; font-weight: 800; color: #a78bfa;" id="shield-count">Active</div>
-        <div style="font-size: 11px; color: var(--text-dim);">Real-Time Content &amp; Script Protection</div>
+      <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; padding: 12px 14px; text-align: left;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 12px; font-weight: 600; color: #f1f5f9;">Protection Status</span>
+          <span style="font-size: 11px; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 2px 8px; border-radius: 4px;" id="shield-count">Active</span>
+        </div>
+        <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Hardware-isolated tracker and fingerprint defense active.</div>
       </div>
       <div class="setting-row">
         <div class="setting-label">
