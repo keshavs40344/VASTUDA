@@ -763,11 +763,54 @@ def staunt_web_proxy():
         response.headers["X-Content-Type-Options"] = "nosniff"
         return response
 
+    except requests.exceptions.SSLError as ssl_err:
+        logger.error(f"[SSL CERTIFICATE ERROR] {ssl_err}")
+        return render_staunt_ssl_cert_error_page(target_url, str(ssl_err)), 495
     except requests.exceptions.Timeout:
         return render_staunt_error_page(target_url, "Gateway Timeout", "The requested web server did not respond in time (14s limit)."), 504
     except Exception as e:
         return render_staunt_error_page(target_url, "Navigation Notice", f"Staunt Engine was unable to reach this destination: {str(e)}"), 502
 
+
+def render_staunt_ssl_cert_error_page(url, error_details):
+    domain = urllib.parse.urlparse(url).netloc or url
+    return Response(
+        f"""<!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Privacy Error — Staunt Browser</title>
+          <style>
+            body {{ margin:0; background:#0a0e1a; color:#f8fafc; font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display:flex; align-items:center; justify-content:center; height:100vh; padding:20px; box-sizing:border-box; }}
+            .cert-card {{ background:#0f172a; border:1px solid rgba(239,68,68,0.3); border-radius:16px; max-width:580px; width:100%; padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.8); }}
+            .icon-badge {{ width:56px; height:56px; border-radius:14px; background:rgba(239,68,68,0.15); color:#ef4444; display:flex; align-items:center; justify-content:center; font-size:28px; margin-bottom:20px; border:1px solid rgba(239,68,68,0.3); }}
+            h1 {{ font-size:20px; font-weight:800; margin:0 0 10px; color:#fff; }}
+            p {{ color:#94a3b8; font-size:13.5px; line-height:1.6; margin:0 0 16px; }}
+            .code-box {{ background:#070b14; border:1px solid #1e293b; padding:12px 14px; border-radius:8px; font-family:monospace; font-size:11.5px; color:#f87171; word-break:break-all; margin-bottom:20px; }}
+            .btn-row {{ display:flex; gap:12px; justify-content:flex-end; }}
+            .btn-back {{ background:#3b82f6; border:none; color:#fff; padding:10px 20px; font-size:13px; font-weight:700; border-radius:8px; cursor:pointer; }}
+            .btn-back:hover {{ background:#2563eb; }}
+          </style>
+        </head>
+        <body>
+          <div class="cert-card">
+            <div class="icon-badge">⚠️</div>
+            <h1>Your connection is not private</h1>
+            <p>
+              Attackers might be trying to steal your credentials, passwords, or messages from <strong>{domain}</strong> (for example, passwords, messages, or payment cards).
+            </p>
+            <div class="code-box">
+              <strong>NET::ERR_CERT_AUTHORITY_INVALID</strong><br>
+              {error_details}
+            </div>
+            <div class="btn-row">
+              <button class="btn-back" onclick="window.history.back()">Back to safety</button>
+            </div>
+          </div>
+        </body>
+        </html>""",
+        mimetype="text/html"
+    )
 
 def render_staunt_error_page(url, title, message):
     return Response(
