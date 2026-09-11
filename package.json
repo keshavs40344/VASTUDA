@@ -15,6 +15,7 @@
     "test:phase8": "node test-staunt-browser-phase8.js",
     "test:phase9": "node test-staunt-browser-phase9.js",
     "test:phase10": "node test-staunt-browser-phase10.js",
-    "test:critical": "node test-critical-15.js"
+    "test:critical": "node test-critical-15.js",
+    "test:matrix": "node test-highspeed-501-1000.js"
   }
 }
