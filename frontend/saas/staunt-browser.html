@@ -901,20 +901,20 @@
     }
 
     .launch-clock {
-      font-size: 38px;
+      font-size: 22px;
       font-weight: 600;
-      letter-spacing: -0.5px;
-      line-height: 1.1;
+      letter-spacing: 0.2px;
+      line-height: 1.2;
       font-variant-numeric: tabular-nums;
       color: var(--text-white);
     }
 
     .launch-date {
-      font-size: 13px;
-      font-weight: 500;
+      font-size: 12px;
+      font-weight: 400;
       color: var(--text-dim);
-      margin-top: 6px;
-      letter-spacing: 0.3px;
+      margin-top: 3px;
+      letter-spacing: 0.2px;
     }
 
     .launch-greeting {
@@ -2588,8 +2588,8 @@
         <span id="staunt-shield-badge" class="shield-badge-count" style="display:none;">12</span>
       </button>
 
-      <!-- Contextual AI Assistant Icon Button -->
-      <button class="btn-nav-icon" id="btn-open-ai" title="Staunt AI Assistant (Alt+A)" aria-label="Staunt AI Assistant">
+      <!-- Contextual AI Assistant Icon Button (Accessible via 3-dots menu and Alt+A) -->
+      <button class="btn-nav-icon" id="btn-open-ai" title="Staunt AI Assistant (Alt+A)" aria-label="Staunt AI Assistant" style="display: none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="8.5" cy="16" r="1" fill="currentColor"/><circle cx="15.5" cy="16" r="1" fill="currentColor"/><path d="M12 7v4"/><circle cx="12" cy="5" r="2"/></svg>
       </button>
 
@@ -2604,28 +2604,28 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
         </button>
         <div class="suite-dropdown-menu" id="suite-dropdown-menu">
-          <div class="suite-menu-item" onclick="createTab();"><span>📄 New Tab</span> <span class="suite-shortcut">Ctrl+T</span></div>
-          <div class="suite-menu-item" onclick="window.open('/', '_blank');"><span>🪟 New Window</span> <span class="suite-shortcut">Ctrl+N</span></div>
+          <div class="suite-menu-item" onclick="createTab();"><span>New Tab</span> <span class="suite-shortcut">Ctrl+T</span></div>
+          <div class="suite-menu-item" onclick="window.open('/', '_blank');"><span>New Window</span> <span class="suite-shortcut">Ctrl+N</span></div>
           <div class="suite-divider"></div>
-          <div class="suite-menu-item" id="btn-open-history"><span>🕒 History</span> <span class="suite-shortcut">Ctrl+H</span></div>
-          <div class="suite-menu-item" id="btn-open-downloads"><span>📥 Downloads</span> <span class="suite-shortcut">Ctrl+J</span></div>
-          <div class="suite-menu-item" id="btn-toggle-bookmarks"><span>★ Bookmarks Bar</span> <span class="suite-shortcut">Ctrl+B</span></div>
-          <div class="suite-menu-item" onclick="navigateTo('staunt://passwords')"><span>🔐 Password Manager</span></div>
+          <div class="suite-menu-item" id="btn-open-history"><span>History</span> <span class="suite-shortcut">Ctrl+H</span></div>
+          <div class="suite-menu-item" id="btn-open-downloads"><span>Downloads</span> <span class="suite-shortcut">Ctrl+J</span></div>
+          <div class="suite-menu-item" id="btn-toggle-bookmarks"><span>Bookmarks Bar</span> <span class="suite-shortcut">Ctrl+B</span></div>
+          <div class="suite-menu-item" onclick="navigateTo('staunt://passwords')"><span>Password Manager</span></div>
           <div class="suite-divider"></div>
-          <div class="suite-menu-item" id="btn-open-ai-menu" onclick="if(window.openAiCopilot) window.openAiCopilot();"><span>🤖 Staunt AI Assistant</span> <span class="suite-shortcut">Alt+A</span></div>
-          <div class="suite-menu-item" id="btn-open-workspaces"><span>🗂️ Workspaces</span> <span class="suite-shortcut">Alt+W</span></div>
-          <div class="suite-menu-item" id="btn-open-palette"><span>⚡ Command Palette</span> <span class="suite-shortcut">Ctrl+K</span></div>
-          <div class="suite-menu-item" id="btn-open-reader"><span>📖 Reader Mode</span> <span class="suite-shortcut">Alt+R</span></div>
-          <div class="suite-menu-item" id="btn-open-yt-downloader"><span>▶️ Video Downloader</span></div>
-          <div class="suite-menu-item" id="btn-open-qr"><span>📱 Share via QR</span></div>
+          <div class="suite-menu-item" id="btn-open-ai-menu" onclick="if(window.openAiCopilot) window.openAiCopilot();"><span>Staunt AI Assistant</span> <span class="suite-shortcut">Alt+A</span></div>
+          <div class="suite-menu-item" id="btn-open-workspaces"><span>Workspaces</span> <span class="suite-shortcut">Alt+W</span></div>
+          <div class="suite-menu-item" id="btn-open-palette"><span>Command Palette</span> <span class="suite-shortcut">Ctrl+K</span></div>
+          <div class="suite-menu-item" id="btn-open-reader"><span>Reader Mode</span> <span class="suite-shortcut">Alt+R</span></div>
+          <div class="suite-menu-item" id="btn-open-yt-downloader"><span>Media Downloader</span></div>
+          <div class="suite-menu-item" id="btn-open-qr"><span>Share via QR Code</span></div>
           <div class="suite-divider"></div>
-          <div class="suite-menu-item" id="btn-open-taskmgr"><span>📊 Task Manager</span> <span class="suite-shortcut">Shift+Esc</span></div>
-          <div class="suite-menu-item" id="btn-open-devtools"><span>🛠️ Developer Tools</span> <span class="suite-shortcut">F12</span></div>
-          <div class="suite-menu-item" id="btn-open-specs"><span>📋 Feature Specifications</span> <span class="suite-badge">300+</span></div>
-          <div class="suite-menu-item" id="btn-open-download-modal"><span>⚡ Native Desktop App</span></div>
+          <div class="suite-menu-item" id="btn-open-taskmgr"><span>Task Manager</span> <span class="suite-shortcut">Shift+Esc</span></div>
+          <div class="suite-menu-item" id="btn-open-devtools"><span>Developer Tools</span> <span class="suite-shortcut">F12</span></div>
+          <div class="suite-menu-item" id="btn-open-specs"><span>Feature Specifications</span> <span class="suite-badge">300+</span></div>
+          <div class="suite-menu-item" id="btn-open-download-modal"><span>Native Applications</span></div>
           <div class="suite-divider"></div>
-          <div class="suite-menu-item" id="btn-open-settings"><span>⚙️ Settings</span></div>
-          <div class="suite-menu-item" id="btn-menu-about" onclick="navigateTo('staunt://about')"><span>ℹ️ About Staunt</span></div>
+          <div class="suite-menu-item" id="btn-open-settings"><span>Settings</span></div>
+          <div class="suite-menu-item" id="btn-menu-about" onclick="navigateTo('staunt://about')"><span>About Staunt</span></div>
         </div>
       </div>
     </div>
@@ -2800,87 +2800,135 @@
   <div class="drawer-overlay" id="settings-drawer" role="dialog" aria-modal="true">
     <div class="drawer-panel" style="overflow-y: auto;">
       <div class="drawer-head">
-        <h3>Browser Settings</h3>
+        <h3>Settings</h3>
         <span class="drawer-close" id="settings-close-btn">✕</span>
       </div>
       
-      <div style="font-size: 11.5px; font-weight: 700; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 6px;">General &amp; Appearance</div>
-      <div class="setting-row">
-        <div class="setting-label">
-          <span>Default Search Engine</span>
-          <small>Omnibox query provider</small>
-        </div>
-        <select id="settings-engine-select" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 8px; font-size: 12px;">
-          <option value="google">Google</option>
-          <option value="duckduckgo">DuckDuckGo</option>
-          <option value="bing">Bing</option>
-        </select>
-      </div>
-      <div class="setting-row">
-        <div class="setting-label">
-          <span>Clock Format</span>
-          <small>12-Hour vs 24-Hour display</small>
-        </div>
-        <select id="settings-clock-select" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 8px; font-size: 12px;">
-          <option value="12">12-Hour (AM/PM)</option>
-          <option value="24">24-Hour</option>
-        </select>
-      </div>
-      <div class="setting-row">
-        <div class="setting-label">
-          <span>Wallpaper Theme</span>
-          <small>New Tab background</small>
-        </div>
-        <select id="settings-wallpaper-select" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 8px; font-size: 12px;">
-          <option value="default">Cosmic Purple (Default)</option>
-          <option value="deep_space">Deep Space Obsidian</option>
-          <option value="aurora">Emerald Aurora</option>
-        </select>
+      <!-- Live Settings Search Input -->
+      <div style="margin: 4px 0 14px 0;">
+        <input type="text" class="history-search-input" id="settings-search-input" placeholder="Search settings..." aria-label="Search browser settings" />
       </div>
 
-      <div style="font-size: 11.5px; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 6px;">Performance &amp; Battery</div>
-      <div class="setting-row">
-        <div class="setting-label">
-          <span>Memory Saver (Tab Sleeping)</span>
-          <small>Suspend background tabs inactive &gt; 5m</small>
+      <div id="settings-sections-container">
+        <!-- 1. General & Search -->
+        <div class="settings-group" data-group="general">
+          <div style="font-size: 11.5px; font-weight: 700; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.5px; margin: 10px 0 6px;">General &amp; Search</div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Default Search Engine</span>
+              <small>Omnibox query provider</small>
+            </div>
+            <select id="settings-engine-select" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 8px; font-size: 12px;">
+              <option value="google">Google</option>
+              <option value="duckduckgo">DuckDuckGo</option>
+              <option value="bing">Bing</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Clock Format</span>
+              <small>12-Hour vs 24-Hour display on New Tab</small>
+            </div>
+            <select id="settings-clock-select" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 8px; font-size: 12px;">
+              <option value="12">12-Hour (AM/PM)</option>
+              <option value="24">24-Hour</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Wallpaper Theme</span>
+              <small>New Tab aesthetic profile</small>
+            </div>
+            <select id="settings-wallpaper-select" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 8px; font-size: 12px;">
+              <option value="default">Midnight Slate (Default)</option>
+              <option value="deep_space">Deep Space Obsidian</option>
+              <option value="aurora">Muted Aurora</option>
+            </select>
+          </div>
         </div>
-        <input type="checkbox" id="settings-tab-sleeping-toggle" checked />
-      </div>
-      <div class="setting-row">
-        <div class="setting-label">
-          <span>Hardware GPU Acceleration</span>
-          <small>Hardware-accelerated CSS compositor</small>
+
+        <!-- 2. Performance & Tabs -->
+        <div class="settings-group" data-group="performance">
+          <div style="font-size: 11.5px; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 6px;">Tabs &amp; Performance</div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Memory Saver (Tab Sleeping)</span>
+              <small>Suspend background tabs inactive &gt; 5m</small>
+            </div>
+            <input type="checkbox" id="settings-tab-sleeping-toggle" checked />
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Hardware Acceleration</span>
+              <small>GPU compositor for smooth page rendering</small>
+            </div>
+            <input type="checkbox" id="settings-gpu-toggle" checked />
+          </div>
         </div>
-        <input type="checkbox" id="settings-gpu-toggle" checked />
-      </div>
 
-      <div style="font-size: 11.5px; font-weight: 700; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 6px;">Storage &amp; Site Data</div>
-      <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px; font-size: 12px; line-height: 1.9; margin-bottom: 12px;">
-        <div style="display: flex; justify-content: space-between;"><span>Application Footprint:</span> <strong id="storage-app-size">2.4 MB</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Browser Cache:</span> <strong id="storage-cache-size" style="color: #60a5fa;">Calculating...</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Cookies &amp; Local Storage:</span> <strong id="storage-cookie-size" style="color: #34d399;">Calculating...</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Recorded Downloads:</span> <strong id="storage-download-size" style="color: #c4b5fd;">Calculating...</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span>Available Storage Quota:</span> <strong id="storage-quota-size" style="color: var(--text-dim);">Calculating...</strong></div>
-      </div>
-
-      <div class="setting-row">
-        <div class="setting-label">
-          <span>Cache Limit</span>
-          <small>Automatic LRU cache ceiling</small>
+        <!-- 3. Bookmarks & Data Portability -->
+        <div class="settings-group" data-group="bookmarks">
+          <div style="font-size: 11.5px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 6px;">Bookmarks &amp; Data Portability</div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Export Bookmarks</span>
+              <small>Save bookmarks as JSON file</small>
+            </div>
+            <button class="action-btn" id="btn-export-bookmarks-json" onclick="window.exportBookmarksJson()" style="font-size: 11px; padding: 5px 12px;">Export JSON</button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Import Bookmarks</span>
+              <small>Restore bookmarks from JSON file</small>
+            </div>
+            <label class="action-btn" style="font-size: 11px; padding: 5px 12px; cursor: pointer;">
+              Import JSON
+              <input type="file" id="input-import-bookmarks-file" accept=".json" style="display: none;" onchange="window.importBookmarksJson(this)" />
+            </label>
+          </div>
         </div>
-        <select id="settings-cache-limit-select" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 8px; font-size: 12px;">
-          <option value="50">50 MB</option>
-          <option value="100" selected>100 MB (Standard)</option>
-          <option value="250">250 MB</option>
-          <option value="500">500 MB</option>
-        </select>
-      </div>
 
-      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; margin-bottom: 10px;">
-        <button class="action-btn" onclick="window.clearBrowserCache()" style="background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25);">Clear Browser Cache</button>
-        <button class="action-btn" onclick="window.clearSiteDataOnly()" style="background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25);">Clear Site Data &amp; Cookies</button>
-        <button class="action-btn" onclick="window.clearDownloadsList()" style="background: rgba(255,255,255,0.06); color: #cbd5e1; border: 1px solid var(--border-subtle);">Clear Downloads List</button>
-        <button class="action-btn" onclick="window.clearAllBrowsingData()" style="background: rgba(239,68,68,0.25); color: #fca5a5; border: 1px solid rgba(239,68,68,0.4); font-weight: 700;">Clear All Browsing Data</button>
+        <!-- 4. Storage & Site Data -->
+        <div class="settings-group" data-group="storage">
+          <div style="font-size: 11.5px; font-weight: 700; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 6px;">Storage &amp; Site Data</div>
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px; font-size: 12px; line-height: 1.9; margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between;"><span>Application Footprint:</span> <strong id="storage-app-size">2.4 MB</strong></div>
+            <div style="display: flex; justify-content: space-between;"><span>Browser Cache:</span> <strong id="storage-cache-size" style="color: #60a5fa;">Calculating...</strong></div>
+            <div style="display: flex; justify-content: space-between;"><span>Cookies &amp; Local Storage:</span> <strong id="storage-cookie-size" style="color: #34d399;">Calculating...</strong></div>
+            <div style="display: flex; justify-content: space-between;"><span>Recorded Downloads:</span> <strong id="storage-download-size" style="color: #c4b5fd;">Calculating...</strong></div>
+            <div style="display: flex; justify-content: space-between;"><span>Available Storage Quota:</span> <strong id="storage-quota-size" style="color: var(--text-dim);">Calculating...</strong></div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label">
+              <span>Cache Limit</span>
+              <small>Automatic LRU cache ceiling</small>
+            </div>
+            <select id="settings-cache-limit-select" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid var(--border-subtle); border-radius: 6px; padding: 4px 8px; font-size: 12px;">
+              <option value="50">50 MB</option>
+              <option value="100" selected>100 MB (Standard)</option>
+              <option value="250">250 MB</option>
+              <option value="500">500 MB</option>
+            </select>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; margin-bottom: 10px;">
+            <button class="action-btn" onclick="window.clearBrowserCache()" style="background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25);">Clear Browser Cache</button>
+            <button class="action-btn" onclick="window.clearSiteDataOnly()" style="background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25);">Clear Site Data &amp; Cookies</button>
+            <button class="action-btn" onclick="window.clearDownloadsList()" style="background: rgba(255,255,255,0.06); color: #cbd5e1; border: 1px solid var(--border-subtle);">Clear Downloads List</button>
+            <button class="action-btn" onclick="window.clearAllBrowsingData()" style="background: rgba(239,68,68,0.25); color: #fca5a5; border: 1px solid rgba(239,68,68,0.4); font-weight: 700;">Clear All Browsing Data</button>
+          </div>
+        </div>
+
+        <!-- 5. About Staunt Section in Settings -->
+        <div class="settings-group" data-group="about">
+          <div style="font-size: 11.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 6px;">About Staunt Browser</div>
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 12px 14px; font-size: 12px; line-height: 1.6; color: var(--text-dim);">
+            <div>Staunt Browser — <strong>Version 2.0.0</strong></div>
+            <div style="font-size: 11px; margin-top: 4px; color: var(--text-muted);">Chromium Engine Core • Zero Telemetry Architecture</div>
+            <button class="action-btn" onclick="navigateTo('staunt://about'); document.getElementById('settings-drawer').classList.remove('open');" style="margin-top: 8px; font-size: 11px; padding: 5px 12px;">Open Full About Page</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -3015,20 +3063,20 @@
   
   <!-- ─── CONTEXT MENU SYSTEM ─── -->
   <div class="staunt-context-menu" id="staunt-context-menu">
-    <div class="ctx-item" id="ctx-back">⬅️ Back (Alt+Left)</div>
-    <div class="ctx-item" id="ctx-forward">➡️ Forward (Alt+Right)</div>
-    <div class="ctx-item" id="ctx-reload">🔄 Reload (Ctrl+R)</div>
+    <div class="ctx-item" id="ctx-back">Back <span style="margin-left: auto; color: var(--text-muted); font-size: 11px;">Alt+←</span></div>
+    <div class="ctx-item" id="ctx-forward">Forward <span style="margin-left: auto; color: var(--text-muted); font-size: 11px;">Alt+→</span></div>
+    <div class="ctx-item" id="ctx-reload">Reload <span style="margin-left: auto; color: var(--text-muted); font-size: 11px;">Ctrl+R</span></div>
     <div class="ctx-divider"></div>
-    <div class="ctx-item" id="ctx-new-tab">📑 Open in New Tab (Ctrl+T)</div>
-    <div class="ctx-item" id="ctx-duplicate-tab">👥 Duplicate Tab</div>
-    <div class="ctx-item" id="ctx-sleep-tab">🌙 Sleep Tab (Save RAM)</div>
+    <div class="ctx-item" id="ctx-new-tab">New Tab <span style="margin-left: auto; color: var(--text-muted); font-size: 11px;">Ctrl+T</span></div>
+    <div class="ctx-item" id="ctx-duplicate-tab">Duplicate Tab</div>
+    <div class="ctx-item" id="ctx-sleep-tab">Suspend Tab (Memory Saver)</div>
     <div class="ctx-divider"></div>
-    <div class="ctx-item" id="ctx-copy-link">🔗 Copy Page URL</div>
-    <div class="ctx-item" id="ctx-qr">📱 Generate Page QR Code</div>
-    <div class="ctx-item" id="ctx-ai-summarize">🤖 Summarize with AI</div>
+    <div class="ctx-item" id="ctx-copy-link">Copy Address</div>
+    <div class="ctx-item" id="ctx-qr">Create QR Code for Page</div>
+    <div class="ctx-item" id="ctx-ai-summarize">Page Summary (Assistant)</div>
     <div class="ctx-divider"></div>
-    <div class="ctx-item" id="ctx-view-source">📄 View Page Source</div>
-    <div class="ctx-item" id="ctx-inspect">🛠️ Inspect Element (F12)</div>
+    <div class="ctx-item" id="ctx-view-source">View Page Source</div>
+    <div class="ctx-item" id="ctx-inspect">Inspect Element <span style="margin-left: auto; color: var(--text-muted); font-size: 11px;">F12</span></div>
   </div>
 
   <!-- ─── BROWSER TASK MANAGER MODAL ─── -->
@@ -3603,10 +3651,7 @@
       function getStoredDownloads() {
         try {
           const raw = localStorage.getItem('staunt_downloads');
-          return raw ? JSON.parse(raw) : [
-            { name: 'Staunt-Browser-Setup.exe', size: '7.68 KB', date: 'Just now', status: 'Completed' },
-            { name: 'Staunt-Browser-Mobile.apk', size: '5.19 MB', date: 'Just now', status: 'Completed' }
-          ];
+          return raw ? JSON.parse(raw) : [];
         } catch(e) {
           return [];
         }
@@ -3617,7 +3662,13 @@
         downloadsList.innerHTML = '';
         const dls = getStoredDownloads();
         if (dls.length === 0) {
-          downloadsList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">No recent downloads</div>';
+          downloadsList.innerHTML = `
+            <div style="padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.5;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>No downloads yet</span>
+              <span style="font-size: 11px; opacity: 0.7;">Files you download will appear here.</span>
+            </div>
+          `;
           return;
         }
         dls.forEach(item => {
@@ -3625,7 +3676,7 @@
           row.className = 'history-item';
           row.innerHTML = `
             <div class="history-info">
-              <div class="history-title">📄 ${escapeHtml(item.name)}</div>
+              <div class="history-title">${escapeHtml(item.name)}</div>
               <div class="history-url">${item.size} • ${item.status}</div>
             </div>
             <div class="history-time">${item.date}</div>
@@ -4049,6 +4100,8 @@
       window.renderTabs = renderTabs;
       window.getStoredHistory = getStoredHistory;
       window.getStoredBookmarks = getStoredBookmarks;
+      window.getStoredDownloads = getStoredDownloads;
+      window.renderDownloadsList = renderDownloadsList;
       window.closeTab = closeTab;
       window.createTab = createTab;
       window.switchTab = switchTab;
@@ -4707,6 +4760,73 @@
         if (typeof window.refreshStorageDisplay === 'function') window.refreshStorageDisplay();
       });
       document.getElementById('settings-close-btn').addEventListener('click', () => settingsDrawer.classList.remove('open'));
+      // ─── SETTINGS SEARCH FILTERING ───
+      const settingsSearchInput = document.getElementById('settings-search-input');
+      if (settingsSearchInput) {
+        settingsSearchInput.addEventListener('input', function(e) {
+          const q = e.target.value.toLowerCase().trim();
+          const groups = document.querySelectorAll('#settings-sections-container .settings-group');
+          groups.forEach(group => {
+            const text = group.textContent.toLowerCase();
+            if (!q || text.includes(q)) {
+              group.style.display = '';
+            } else {
+              group.style.display = 'none';
+            }
+          });
+        });
+      }
+
+      // ─── BOOKMARKS EXPORT & IMPORT (DATA PORTABILITY) ───
+      window.exportBookmarksJson = function() {
+        try {
+          const bms = window.getStoredBookmarks ? window.getStoredBookmarks() : [];
+          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bms, null, 2));
+          const dlAnchor = document.createElement('a');
+          dlAnchor.setAttribute("href", dataStr);
+          dlAnchor.setAttribute("download", "staunt-bookmarks-backup.json");
+          document.body.appendChild(dlAnchor);
+          dlAnchor.click();
+          dlAnchor.remove();
+          if (window.showToast) window.showToast('Bookmarks exported successfully', 'success');
+        } catch(err) {
+          if (window.showToast) window.showToast('Failed to export bookmarks: ' + err.message, 'error');
+        }
+      };
+
+      window.importBookmarksJson = function(fileInput) {
+        if (!fileInput || !fileInput.files || !fileInput.files[0]) return;
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const imported = JSON.parse(e.target.result);
+            if (Array.isArray(imported)) {
+              const current = window.getStoredBookmarks ? window.getStoredBookmarks() : [];
+              const urlSet = new Set(current.map(b => b.url));
+              let added = 0;
+              imported.forEach(b => {
+                if (b && b.name && b.url && !urlSet.has(b.url)) {
+                  current.push({ name: String(b.name), url: String(b.url) });
+                  urlSet.add(b.url);
+                  added++;
+                }
+              });
+              if (window.saveBookmarks) window.saveBookmarks(current);
+              else if (typeof saveBookmarks === 'function') saveBookmarks(current);
+              else safeStorage.set('staunt_bookmarks', current);
+              if (typeof renderBookmarksBar === 'function') renderBookmarksBar();
+              if (window.showToast) window.showToast(`Imported ${added} new bookmarks`, 'success');
+            } else {
+              if (window.showToast) window.showToast('Invalid bookmark JSON format', 'error');
+            }
+          } catch(err) {
+            if (window.showToast) window.showToast('Failed to parse bookmarks JSON', 'error');
+          }
+        };
+        reader.readAsText(file);
+      };
+
 
       const settingsEngine = document.getElementById('settings-engine-select');
       if (settingsEngine) {
@@ -6490,41 +6610,24 @@
 
       // ─── 1. DOWNLOADS PAGE ───
       function renderDownloadsPage(container) {
+        const dls = window.getStoredDownloads ? window.getStoredDownloads() : [];
         container.innerHTML = `
           ${renderInternalPageHeader('📥', 'Downloads Manager', 'Manage active transfers, saved packages, and file rules')}
           <div style="display: flex; flex-direction: column; gap: 12px; max-width: 800px;">
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 24px;">🪟</span>
+            ${dls.length ? dls.map(item => `
+              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
                 <div>
-                  <div style="font-weight: 700; color: #fff; font-size: 14px;">Staunt-Browser-Setup.exe</div>
-                  <div style="font-size: 12px; color: var(--text-dim);">11.7 KB • Windows x64 Native Core • Complete</div>
+                  <div style="font-weight: 700; color: #fff; font-size: 14px;">${escapeHtml(item.name)}</div>
+                  <div style="font-size: 12px; color: var(--text-dim);">${item.size} • ${item.status}</div>
                 </div>
+                <div style="font-size: 12px; color: var(--text-muted);">${item.date}</div>
               </div>
-              <a href="/assets/Staunt-Browser-Setup.exe" download class="action-btn" style="background: #3b82f6; color: #fff;">Open File</a>
-            </div>
-
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 24px;">📱</span>
-                <div>
-                  <div style="font-weight: 700; color: #fff; font-size: 14px;">Staunt-Browser-Mobile.apk</div>
-                  <div style="font-size: 12px; color: var(--text-dim);">5.19 MB • Android 8.0+ Universal • Complete</div>
-                </div>
+            `).join('') : `
+              <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 36px; text-align: center; color: var(--text-dim);">
+                <div style="font-size: 14px; font-weight: 600; color: #f1f5f9; margin-bottom: 4px;">No downloads yet</div>
+                <div style="font-size: 12px;">Files you download while browsing will appear here.</div>
               </div>
-              <a href="/assets/Staunt-Browser-Mobile.apk" download class="action-btn" style="background: #10b981; color: #fff;">Open File</a>
-            </div>
-
-            <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 24px;">🗜️</span>
-                <div>
-                  <div style="font-weight: 700; color: #fff; font-size: 14px;">Staunt-Browser-Windows-Setup.zip</div>
-                  <div style="font-size: 12px; color: var(--text-dim);">5.4 KB • Compressed Package • Complete</div>
-                </div>
-              </div>
-              <a href="/assets/Staunt-Browser-Windows-Setup.zip" download class="action-btn" style="background: #6366f1; color: #fff;">Open File</a>
-            </div>
+            `}
           </div>
         `;
       }
@@ -7086,47 +7189,48 @@
         const hostEngine = getHostEngineInfo();
         const platform = navigator.userAgentData?.platform || navigator.platform || 'Client OS';
         container.innerHTML = `
-          ${renderInternalPageHeader('ℹ️', 'About Staunt Browser Ultra', 'Independent Multi-Tab Browser Architecture • Sovereign 3-Tier Platform')}
+          ${renderInternalPageHeader('ℹ️', 'About Staunt Browser', 'Independent Browser Architecture • Native Platform Editions')}
           <div style="max-width: 820px; display: flex; flex-direction: column; gap: 16px;">
             <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 20px;">
               <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-                <div style="width: 48px; height: 48px; border-radius: 12px; background: #8b5cf6; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #fff;">S</div>
+                <div style="width: 44px; height: 44px; border-radius: 10px; background: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: #fff;">S</div>
                 <div>
-                  <h2 style="font-size: 18px; font-weight: 800; color: #fff;">Staunt Browser Ultra</h2>
-                  <p style="font-size: 12px; color: var(--text-dim);">Version 3.4.0 (Official Build) • 64-bit</p>
+                  <h2 style="font-size: 18px; font-weight: 700; color: #fff;">Staunt Browser</h2>
+                  <p style="font-size: 12px; color: var(--text-dim);">Version 2.0.0 (Official Release Build)</p>
                 </div>
               </div>
               <div style="font-size: 12.5px; color: var(--text-dim); line-height: 1.8;">
-                <div>Active Edition: <strong style="color: #60a5fa;">Web Application Edition (Active Container)</strong></div>
-                <div>Host Runtime Engine: <strong style="color: #34d399;">${hostEngine} (${platform})</strong></div>
-                <div>Release Date: <strong>September 11, 2026</strong></div>
-                <div>License: <strong>MIT Open Source &amp; Sovereign Zero-Telemetry License</strong></div>
+                <div>Edition: <strong style="color: #60a5fa;">${window.__STAUNT_PLATFORM === 'web' ? 'Web Application Edition' : window.__STAUNT_PLATFORM}</strong></div>
+                <div>Engine: <strong style="color: #34d399;">Chromium Core via ${hostEngine} (${platform})</strong></div>
+                <div>Attribution: <strong>VASTUDA Sovereign Systems</strong></div>
+                <div>License: <strong>MIT Open Source &bull; Zero Telemetry Guarantee</strong></div>
               </div>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
               <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px;">
-                <div style="font-weight: 700; color: #60a5fa; font-size: 13px; margin-bottom: 6px;">🌐 Web Edition</div>
+                <div style="font-weight: 700; color: #60a5fa; font-size: 13px; margin-bottom: 6px;">Web Edition</div>
                 <div style="font-size: 12px; color: var(--text-dim); line-height: 1.5;">
-                  Runs inside your browser. Sandboxed iframe tabs, reverse-proxy gateway, client-side cryptographic storage, and real-time EasyList shield.
+                  Runs in modern web browsers with sandboxed tabs, reverse-proxy gateway, and client-side cryptographic storage.
                 </div>
               </div>
               <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px;">
-                <div style="font-weight: 700; color: #34d399; font-size: 13px; margin-bottom: 6px;">🖥️ Windows Native C++</div>
+                <div style="font-weight: 700; color: #34d399; font-size: 13px; margin-bottom: 6px;">Windows Desktop</div>
                 <div style="font-size: 12px; color: var(--text-dim); line-height: 1.5;">
-                  Standalone desktop app. Win32 launcher, Chromium core, multi-process memory isolation, WebRTC IP leak prevention, direct downloads.
+                  Standalone 64-bit desktop application powered by Electron and Chromium core with native menus and process isolation.
                 </div>
               </div>
               <div style="background: #0f1422; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 14px;">
-                <div style="font-weight: 700; color: #a78bfa; font-size: 13px; margin-bottom: 6px;">📱 Android Edition</div>
+                <div style="font-weight: 700; color: #a78bfa; font-size: 13px; margin-bottom: 6px;">Android Edition</div>
                 <div style="font-size: 12px; color: var(--text-dim); line-height: 1.5;">
-                  Native mobile APK. Android WebView engine, responsive bottom navigation, swipe tab drawer, native share sheet, biometric unlock.
+                  Native Kotlin APK with Android System WebView, network-level EasyList ad blocking, and tab manager.
                 </div>
               </div>
             </div>
           </div>
         `;
       }
+      window.renderAboutPage = renderAboutPage;
 
       // ─── 19. WHAT'S NEW (300+ FEATURES MATRIX) PAGE ───
       function renderWhatsNewPage(container) {
@@ -7911,7 +8015,7 @@
 
   // ─── AUTOMATIC UPDATE NOTIFICATION SYSTEM ───
   (function initUpdateNotificationEngine() {
-    const LOCAL_APP_VERSION = "3.3.0"; // Previous installed version signature
+    const LOCAL_APP_VERSION = "2.0.0"; // Previous installed version signature
     window.STAUNT_VERSION = LOCAL_APP_VERSION;
 
     async function checkForUpdates() {
