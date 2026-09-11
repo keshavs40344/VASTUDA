@@ -4384,7 +4384,7 @@
         // Strip script tags, on* handlers, and javascript: expressions
         return rawHtml
           .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-          .replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '')
+          .replace(/\son\w+\s*=\s*(?:[^\s>]+|["'][^"']*["'])/gi, '')
           .replace(/javascript:/gi, 'blocked:');
       };
 
