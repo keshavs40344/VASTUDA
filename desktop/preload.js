@@ -39,6 +39,31 @@ const secureAPI = Object.freeze({
     ipcRenderer.send('undo-close-tab');
   },
 
+  duplicateTab: (tabId) => {
+    const id = sanitizeNumber(tabId, -1);
+    if (id > 0) ipcRenderer.send('duplicate-tab', id);
+  },
+
+  pinTab: (tabId, isPinned) => {
+    const id = sanitizeNumber(tabId, -1);
+    if (id > 0) ipcRenderer.send('pin-tab', id, Boolean(isPinned));
+  },
+
+  closeOtherTabs: (tabId) => {
+    const id = sanitizeNumber(tabId, -1);
+    if (id > 0) ipcRenderer.send('close-other-tabs', id);
+  },
+
+  closeTabsToRight: (tabId) => {
+    const id = sanitizeNumber(tabId, -1);
+    if (id > 0) ipcRenderer.send('close-tabs-to-right', id);
+  },
+
+  showTabContextMenu: (tabId) => {
+    const id = sanitizeNumber(tabId, -1);
+    if (id > 0) ipcRenderer.send('show-tab-context-menu', id);
+  },
+
   toggleSplitView: (secId) => {
     const id = secId ? sanitizeNumber(secId, null) : null;
     ipcRenderer.send('toggle-split-view', id);
@@ -62,7 +87,13 @@ const secureAPI = Object.freeze({
   goBack: () => ipcRenderer.send('nav-back'),
   goForward: () => ipcRenderer.send('nav-forward'),
   reload: () => ipcRenderer.send('nav-reload'),
+  stopNavigation: () => ipcRenderer.send('nav-stop'),
   goHome: () => ipcRenderer.send('nav-home'),
+
+  // Autocomplete Suggestions API
+  getSuggestions: (query) => {
+    return ipcRenderer.invoke('get-suggestions', sanitizeString(query, 256));
+  },
 
   // Find In Page API
   findInPage: (text, forward = true) => {
@@ -86,6 +117,7 @@ const secureAPI = Object.freeze({
 
   // History & Bookmarks Query API
   getHistory: () => ipcRenderer.invoke('get-history'),
+  clearHistory: (range) => ipcRenderer.invoke('clear-history', sanitizeString(range, 64)),
   getBookmarks: () => ipcRenderer.invoke('get-bookmarks'),
   addBookmark: (item) => {
     if (item && typeof item === 'object') {
@@ -96,6 +128,21 @@ const secureAPI = Object.freeze({
       });
     }
   },
+
+  // Downloads Vault API
+  getDownloads: () => ipcRenderer.invoke('get-downloads'),
+  openDownload: (itemPath) => {
+    const p = sanitizeString(itemPath, 4096);
+    if (p) ipcRenderer.send('open-download', p);
+  },
+  showInFolder: (itemPath) => {
+    const p = sanitizeString(itemPath, 4096);
+    if (p) ipcRenderer.send('show-in-folder', p);
+  },
+
+  // Settings API
+  getSettings: () => ipcRenderer.invoke('get-settings'),
+  saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
 
   // Layout & Shell State
   setSidebarState: (isCollapsed) => {

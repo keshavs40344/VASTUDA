@@ -2,7 +2,7 @@
 // Former Google Project Zero / Chromium Security Team Architectural Grade
 // Resolves Viewport Freeze & Blank Screen via Precision WebContentsView Geometry
 
-const { app, BrowserWindow, WebContentsView, BrowserView, session, ipcMain, Menu, dialog, clipboard } = require('electron');
+const { app, BrowserWindow, WebContentsView, BrowserView, session, ipcMain, Menu, dialog, clipboard, screen, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { isHomographOrDeceptive } = require('./src/adblocker');
@@ -14,23 +14,132 @@ const {
 } = require('./src/adblocker-core');
 
 // =============================================================================
-// WINDOW STATE PERSISTENCE
+// ROBUST WINDOW STATE PERSISTENCE (Fixes Progressive Window Shrinking Bug)
 // =============================================================================
 const USER_DATA_PATH = app.getPath('userData');
-let windowState = { width: 1440, height: 900, x: undefined, y: undefined, isMaximized: false };
 const WINDOW_STATE_FILE = path.join(USER_DATA_PATH, 'window-state.json');
 
-try {
-  if (fs.existsSync(WINDOW_STATE_FILE)) {
-    windowState = { ...windowState, ...JSON.parse(fs.readFileSync(WINDOW_STATE_FILE, 'utf-8')) };
+const DEFAULT_WINDOW_BOUNDS = {
+  width: 1200,
+  height: 800,
+  x: undefined,
+  y: undefined,
+  isMaximized: false,
+  isFullScreen: false
+};
+
+let windowState = { ...DEFAULT_WINDOW_BOUNDS };
+
+function loadWindowState() {
+  try {
+    if (fs.existsSync(WINDOW_STATE_FILE)) {
+      const raw = JSON.parse(fs.readFileSync(WINDOW_STATE_FILE, 'utf-8'));
+      if (raw && typeof raw === 'object') {
+        if (Number.isFinite(raw.width) && raw.width >= 600) windowState.width = Math.round(raw.width);
+        if (Number.isFinite(raw.height) && raw.height >= 400) windowState.height = Math.round(raw.height);
+        if (Number.isFinite(raw.x)) windowState.x = Math.round(raw.x);
+        if (Number.isFinite(raw.y)) windowState.y = Math.round(raw.y);
+        windowState.isMaximized = Boolean(raw.isMaximized);
+        windowState.isFullScreen = Boolean(raw.isFullScreen);
+      }
+    }
+  } catch (e) {
+    console.warn('[WINDOW STATE] Failed to parse window-state.json, falling back to defaults:', e.message);
+    windowState = { ...DEFAULT_WINDOW_BOUNDS };
   }
-} catch(e) {}
+}
+
+loadWindowState();
+
+function getValidatedWindowState() {
+  const displays = screen.getAllDisplays();
+  if (!displays || displays.length === 0) return windowState;
+
+  const targetPoint = {
+    x: (windowState.x !== undefined) ? (windowState.x + Math.floor(windowState.width / 2)) : displays[0].workArea.x + 100,
+    y: (windowState.y !== undefined) ? (windowState.y + Math.floor(windowState.height / 2)) : displays[0].workArea.y + 100
+  };
+
+  const activeDisplay = screen.getDisplayNearestPoint(targetPoint) || screen.getPrimaryDisplay();
+  const workArea = activeDisplay.workArea;
+
+  const minWidth = 800;
+  const minHeight = 500;
+
+  let width = Math.min(Math.max(windowState.width || 1200, minWidth), workArea.width);
+  let height = Math.min(Math.max(windowState.height || 800, minHeight), workArea.height);
+
+  let x = windowState.x;
+  let y = windowState.y;
+
+  const isOutside = (x === undefined || y === undefined ||
+    x + width < workArea.x + 50 ||
+    x > workArea.x + workArea.width - 50 ||
+    y + height < workArea.y + 50 ||
+    y > workArea.y + workArea.height - 50);
+
+  if (isOutside) {
+    x = Math.round(workArea.x + Math.max(0, (workArea.width - width) / 2));
+    y = Math.round(workArea.y + Math.max(0, (workArea.height - height) / 2));
+  } else {
+    x = Math.max(workArea.x, Math.min(x, workArea.x + workArea.width - width));
+    y = Math.max(workArea.y, Math.min(y, workArea.y + workArea.height - height));
+  }
+
+  return {
+    width: Math.round(width),
+    height: Math.round(height),
+    x: Math.round(x),
+    y: Math.round(y),
+    isMaximized: windowState.isMaximized,
+    isFullScreen: windowState.isFullScreen
+  };
+}
+
+let saveStateDebounceTimer = null;
 
 function saveWindowState() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
-  const bounds = mainWindow.getBounds();
-  windowState = { ...bounds, isMaximized: mainWindow.isMaximized() };
-  try { fs.writeFileSync(WINDOW_STATE_FILE, JSON.stringify(windowState), 'utf-8'); } catch(e) {}
+  if (mainWindow.isMinimized()) return;
+
+  const isMax = mainWindow.isMaximized();
+  const isFull = mainWindow.isFullScreen();
+
+  let bounds;
+  if (typeof mainWindow.getNormalBounds === 'function') {
+    bounds = mainWindow.getNormalBounds();
+  } else if (!isMax && !isFull) {
+    bounds = mainWindow.getBounds();
+  } else {
+    bounds = {
+      x: windowState.x,
+      y: windowState.y,
+      width: windowState.width,
+      height: windowState.height
+    };
+  }
+
+  if (bounds && bounds.width >= 600 && bounds.height >= 400) {
+    windowState = {
+      x: Math.round(bounds.x),
+      y: Math.round(bounds.y),
+      width: Math.round(bounds.width),
+      height: Math.round(bounds.height),
+      isMaximized: isMax,
+      isFullScreen: isFull
+    };
+
+    try {
+      fs.writeFileSync(WINDOW_STATE_FILE, JSON.stringify(windowState), 'utf-8');
+    } catch (e) {
+      console.warn('[WINDOW STATE SAVE ERROR]', e.message);
+    }
+  }
+}
+
+function scheduleSaveWindowState() {
+  if (saveStateDebounceTimer) clearTimeout(saveStateDebounceTimer);
+  saveStateDebounceTimer = setTimeout(saveWindowState, 300);
 }
 
 // =============================================================================
@@ -79,13 +188,25 @@ let splitRatio = 0.5;
 const TOOLBAR_HEIGHT = 44; // Fixed native 44px Apple topbar
 
 // =============================================================================
-// LOCAL VAULT STORAGE (History & Bookmarks)
+// LOCAL VAULT STORAGE (History, Bookmarks, Downloads, Settings)
 // =============================================================================
 const HISTORY_FILE = path.join(USER_DATA_PATH, 'staunt_history_vault.json');
 const BOOKMARKS_FILE = path.join(USER_DATA_PATH, 'staunt_bookmarks_vault.json');
+const DOWNLOADS_FILE = path.join(USER_DATA_PATH, 'staunt_downloads_vault.json');
+const SETTINGS_FILE = path.join(USER_DATA_PATH, 'staunt_settings.json');
 
 let historyDB = [];
 let bookmarksDB = [];
+let downloadsDB = [];
+const DEFAULT_SETTINGS = {
+  searchEngine: 'staunt',
+  searchUrl: 'http://127.0.0.1:5000',
+  homeUrl: 'staunt://newtab',
+  shieldLevel: 'standard',
+  hardwareAcceleration: true,
+  restoreTabsOnStartup: false
+};
+let settingsDB = { ...DEFAULT_SETTINGS };
 
 try {
   if (fs.existsSync(HISTORY_FILE)) {
@@ -101,6 +222,22 @@ try {
   }
 } catch (e) {
   bookmarksDB = [];
+}
+
+try {
+  if (fs.existsSync(DOWNLOADS_FILE)) {
+    downloadsDB = JSON.parse(fs.readFileSync(DOWNLOADS_FILE, 'utf-8'));
+  }
+} catch (e) {
+  downloadsDB = [];
+}
+
+try {
+  if (fs.existsSync(SETTINGS_FILE)) {
+    settingsDB = { ...DEFAULT_SETTINGS, ...JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf-8')) };
+  }
+} catch (e) {
+  settingsDB = { ...DEFAULT_SETTINGS };
 }
 
 function recordHistory(url, title) {
@@ -120,6 +257,43 @@ function recordHistory(url, title) {
   
   try {
     fs.writeFileSync(HISTORY_FILE, JSON.stringify(historyDB.slice(0, 1000)), 'utf-8');
+  } catch (e) {}
+}
+
+function clearHistoryRange(range = 'all') {
+  const now = Date.now();
+  if (range === '1h' || range === 'last-hour') {
+    const cutoff = now - 3600 * 1000;
+    historyDB = historyDB.filter(h => h.timestamp < cutoff);
+  } else if (range === '24h' || range === 'last-24h') {
+    const cutoff = now - 24 * 3600 * 1000;
+    historyDB = historyDB.filter(h => h.timestamp < cutoff);
+  } else if (range === '7d' || range === 'last-7d') {
+    const cutoff = now - 7 * 24 * 3600 * 1000;
+    historyDB = historyDB.filter(h => h.timestamp < cutoff);
+  } else if (range === '4w' || range === 'last-4w') {
+    const cutoff = now - 28 * 24 * 3600 * 1000;
+    historyDB = historyDB.filter(h => h.timestamp < cutoff);
+  } else {
+    historyDB = [];
+  }
+  try {
+    fs.writeFileSync(HISTORY_FILE, JSON.stringify(historyDB), 'utf-8');
+  } catch (e) {}
+  return { success: true, count: historyDB.length };
+}
+
+function recordDownload(entry) {
+  if (!entry || !entry.id) return;
+  const existingIdx = downloadsDB.findIndex(d => d.id === entry.id);
+  if (existingIdx !== -1) {
+    downloadsDB[existingIdx] = { ...downloadsDB[existingIdx], ...entry };
+  } else {
+    downloadsDB.unshift(entry);
+    if (downloadsDB.length > 200) downloadsDB.pop();
+  }
+  try {
+    fs.writeFileSync(DOWNLOADS_FILE, JSON.stringify(downloadsDB.slice(0, 100)), 'utf-8');
   } catch (e) {}
 }
 
@@ -238,11 +412,12 @@ const menuTemplate = [
 // MAIN WINDOW INITIALIZATION (Frameless, #090a0f Background)
 // =============================================================================
 function createMainWindow() {
+  const validatedState = getValidatedWindowState();
   mainWindow = new BrowserWindow({
-    width: windowState.width,
-    height: windowState.height,
-    x: windowState.x,
-    y: windowState.y,
+    width: validatedState.width,
+    height: validatedState.height,
+    x: validatedState.x,
+    y: validatedState.y,
     minWidth: 900,
     minHeight: 600,
     frame: false,
@@ -263,7 +438,11 @@ function createMainWindow() {
     }
   });
 
-  if (windowState.isMaximized) mainWindow.maximize();
+  if (validatedState.isMaximized) {
+    mainWindow.maximize();
+  } else if (validatedState.isFullScreen) {
+    mainWindow.setFullScreen(true);
+  }
 
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
@@ -325,8 +504,9 @@ function createMainWindow() {
     callback(true);
   });
 
-  // Native Download Manager
+  // Native Download Manager with Persistent Vault Tracking
   session.defaultSession.on('will-download', (event, item, webContents) => {
+    const downloadId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
     const totalBytes = item.getTotalBytes();
     let fileName = item.getFilename();
     const saveDir = app.getPath('downloads');
@@ -344,41 +524,82 @@ function createMainWindow() {
     }
     item.setSavePath(targetPath);
 
+    const downloadEntry = {
+      id: downloadId,
+      fileName: fileName,
+      filePath: targetPath,
+      totalBytes: totalBytes,
+      receivedBytes: 0,
+      state: 'progressing',
+      url: item.getURL() || '',
+      mimeType: item.getMimeType() || '',
+      timestamp: Date.now()
+    };
+    recordDownload(downloadEntry);
+
     item.on('updated', (e, state) => {
-      if (state === 'progressing' && !item.isPaused()) {
-        const received = item.getReceivedBytes();
-        const percent = totalBytes > 0 ? Math.floor((received / totalBytes) * 100) : 0;
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send('download-progress', {
-            fileName: fileName,
-            percent: percent,
-            receivedBytes: received,
-            totalBytes: totalBytes
-          });
-        }
+      const received = item.getReceivedBytes();
+      const percent = totalBytes > 0 ? Math.floor((received / totalBytes) * 100) : 0;
+      downloadEntry.receivedBytes = received;
+      downloadEntry.state = state;
+      recordDownload(downloadEntry);
+
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('download-progress', {
+          id: downloadId,
+          fileName: fileName,
+          filePath: targetPath,
+          percent: percent,
+          receivedBytes: received,
+          totalBytes: totalBytes,
+          state: state
+        });
       }
     });
 
     item.once('done', (e, state) => {
+      downloadEntry.state = state;
+      downloadEntry.receivedBytes = item.getReceivedBytes();
+      recordDownload(downloadEntry);
+
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send('download-complete', {
+          id: downloadId,
           fileName: fileName,
-          state: state
+          filePath: targetPath,
+          state: state,
+          totalBytes: totalBytes
         });
       }
     });
   });
 
-  // Dynamic Window Resize Observers (Immediate Bounds Recalculation)
-  mainWindow.on('resize', () => updateLayoutBounds());
-  mainWindow.on('move', () => updateLayoutBounds());
+  // Dynamic Window Resize Observers (Immediate Bounds Recalculation & Window State Debounce)
+  mainWindow.on('resize', () => {
+    updateLayoutBounds();
+    scheduleSaveWindowState();
+  });
+  mainWindow.on('move', () => {
+    updateLayoutBounds();
+    scheduleSaveWindowState();
+  });
   mainWindow.on('maximize', () => {
     updateLayoutBounds();
+    scheduleSaveWindowState();
     setTimeout(updateLayoutBounds, 25);
   });
   mainWindow.on('unmaximize', () => {
     updateLayoutBounds();
+    scheduleSaveWindowState();
     setTimeout(updateLayoutBounds, 25);
+  });
+  mainWindow.on('enter-full-screen', () => {
+    updateLayoutBounds();
+    scheduleSaveWindowState();
+  });
+  mainWindow.on('leave-full-screen', () => {
+    updateLayoutBounds();
+    scheduleSaveWindowState();
   });
   
   mainWindow.on('close', () => saveWindowState());
@@ -657,7 +878,7 @@ function setupWebContentsEvents(tabObj) {
           <div class="code">${errorDescription} (${errorCode})</div>
           <div class="btn-group">
             <button onclick="location.reload()">🔄 Try Again</button>
-            <button class="sec" onclick="location.href='https://duckduckgo.com/?q=${encodeURIComponent(validatedURL)}'">🔍 Search on DuckDuckGo</button>
+            <button class="sec" onclick="location.href='${STAUNT_SEARCH_URL}/?q=${encodeURIComponent(validatedURL)}'">🔍 Search on STAUNT</button>
           </div>
         </div>
       </body>
@@ -830,6 +1051,48 @@ function undoCloseTab() {
   if (closedTabsStack.length > 0) {
     const lastClosed = closedTabsStack.pop();
     createTab(lastClosed.url, { workspaceId: lastClosed.workspaceId, isPinned: lastClosed.isPinned });
+  }
+}
+
+function duplicateTab(tabId) {
+  const tab = tabs.get(tabId);
+  if (!tab) return;
+  return createTab(tab.url, {
+    workspaceId: tab.workspaceId,
+    isIncognito: tab.isIncognito
+  });
+}
+
+function setTabPinned(tabId, isPinned) {
+  const tab = tabs.get(tabId);
+  if (!tab) return;
+  tab.isPinned = Boolean(isPinned);
+  notifyTabUpdated(tab);
+}
+
+function closeOtherTabs(tabId) {
+  const allIds = Array.from(tabs.keys());
+  for (const id of allIds) {
+    if (id !== tabId) {
+      closeTab(id);
+    }
+  }
+}
+
+function closeTabsToRight(tabId) {
+  const allIds = Array.from(tabs.keys());
+  const idx = allIds.indexOf(tabId);
+  if (idx !== -1) {
+    for (let i = idx + 1; i < allIds.length; i++) {
+      closeTab(allIds[i]);
+    }
+  }
+}
+
+function handleStop() {
+  const tab = tabs.get(activeTabId);
+  if (tab && tab.view && tab.view.webContents) {
+    tab.view.webContents.stop();
   }
 }
 
@@ -1163,6 +1426,169 @@ ipcMain.on('add-bookmark', (e, item) => {
       fs.writeFileSync(BOOKMARKS_FILE, JSON.stringify(bookmarksDB), 'utf-8');
     } catch (e) {}
   }
+});
+
+ipcMain.on('nav-stop', (e) => { if (verifyIpcSender(e)) handleStop(); });
+ipcMain.on('stop-navigation', (e) => { if (verifyIpcSender(e)) handleStop(); });
+
+ipcMain.on('duplicate-tab', (e, tabId) => {
+  if (!verifyIpcSender(e)) return;
+  const targetId = typeof tabId === 'number' ? tabId : activeTabId;
+  duplicateTab(targetId);
+});
+
+ipcMain.on('pin-tab', (e, tabId, isPinned) => {
+  if (!verifyIpcSender(e)) return;
+  const targetId = typeof tabId === 'number' ? tabId : activeTabId;
+  setTabPinned(targetId, isPinned);
+});
+
+ipcMain.on('close-other-tabs', (e, tabId) => {
+  if (!verifyIpcSender(e)) return;
+  const targetId = typeof tabId === 'number' ? tabId : activeTabId;
+  closeOtherTabs(targetId);
+});
+
+ipcMain.on('close-tabs-to-right', (e, tabId) => {
+  if (!verifyIpcSender(e)) return;
+  const targetId = typeof tabId === 'number' ? tabId : activeTabId;
+  closeTabsToRight(targetId);
+});
+
+ipcMain.on('show-tab-context-menu', (e, tabId) => {
+  if (!verifyIpcSender(e)) return;
+  const targetId = typeof tabId === 'number' ? tabId : activeTabId;
+  const tab = tabs.get(targetId);
+  if (!tab) return;
+
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'New Tab',
+      accelerator: 'CmdOrCtrl+T',
+      click: () => createTab('staunt://newtab')
+    },
+    {
+      label: 'Duplicate Tab',
+      click: () => duplicateTab(targetId)
+    },
+    { type: 'separator' },
+    {
+      label: tab.isPinned ? 'Unpin Tab' : 'Pin Tab',
+      click: () => setTabPinned(targetId, !tab.isPinned)
+    },
+    {
+      label: tab.isMuted ? 'Unmute Tab' : 'Mute Tab',
+      click: () => {
+        tab.isMuted = !tab.isMuted;
+        if (tab.view && tab.view.webContents) tab.view.webContents.setAudioMuted(tab.isMuted);
+        notifyTabUpdated(tab);
+      }
+    },
+    { type: 'separator' },
+    {
+      label: 'Close Tab',
+      accelerator: 'CmdOrCtrl+W',
+      click: () => closeTab(targetId)
+    },
+    {
+      label: 'Close Other Tabs',
+      enabled: tabs.size > 1,
+      click: () => closeOtherTabs(targetId)
+    },
+    {
+      label: 'Close Tabs to the Right',
+      click: () => closeTabsToRight(targetId)
+    }
+  ]);
+  contextMenu.popup({ window: mainWindow });
+});
+
+// 5. Downloads & Vault Handlers
+ipcMain.handle('get-downloads', (e) => {
+  if (!verifyIpcSender(e)) return [];
+  return downloadsDB;
+});
+
+ipcMain.on('open-download', (e, itemPath) => {
+  if (!verifyIpcSender(e)) return;
+  if (typeof itemPath === 'string' && itemPath.trim()) {
+    shell.openPath(itemPath.trim());
+  }
+});
+
+ipcMain.on('show-in-folder', (e, itemPath) => {
+  if (!verifyIpcSender(e)) return;
+  if (typeof itemPath === 'string' && itemPath.trim()) {
+    shell.showItemInFolder(itemPath.trim());
+  }
+});
+
+ipcMain.handle('clear-history', (e, range) => {
+  if (!verifyIpcSender(e)) return { success: false };
+  return clearHistoryRange(range);
+});
+
+// 6. Intelligent Omnibox Autocomplete Suggestions Handlers
+ipcMain.handle('get-suggestions', async (e, query) => {
+  if (!verifyIpcSender(e)) return [];
+  if (!query || typeof query !== 'string') return [];
+  const trimmed = query.trim().slice(0, 256);
+  if (!trimmed) return [];
+
+  // Match from local history
+  const historyMatches = historyDB
+    .filter(h => (h.title && h.title.toLowerCase().includes(trimmed.toLowerCase())) ||
+                 (h.url && h.url.toLowerCase().includes(trimmed.toLowerCase())))
+    .slice(0, 3)
+    .map(h => ({ text: h.title || h.url, url: h.url, type: 'history' }));
+
+  // Query local STAUNT search engine /api/suggest
+  let remoteSuggestions = [];
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 800);
+    const resp = await fetch(`${STAUNT_SEARCH_URL}/api/suggest?q=${encodeURIComponent(trimmed)}`, {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (resp.ok) {
+      const data = await resp.json();
+      if (Array.isArray(data)) {
+        remoteSuggestions = data.map(s => (typeof s === 'string' ? { text: s, type: 'search' } : s));
+      }
+    }
+  } catch (err) {
+    // Offline or server unreachable fallback
+  }
+
+  const seen = new Set();
+  const results = [];
+  for (const item of [...historyMatches, ...remoteSuggestions]) {
+    const key = (item.text || '').toLowerCase();
+    if (key && !seen.has(key)) {
+      seen.add(key);
+      results.push(item);
+    }
+    if (results.length >= 8) break;
+  }
+  return results;
+});
+
+// 7. Settings Vault Handlers
+ipcMain.handle('get-settings', (e) => {
+  if (!verifyIpcSender(e)) return DEFAULT_SETTINGS;
+  return settingsDB;
+});
+
+ipcMain.handle('save-settings', (e, newSettings) => {
+  if (!verifyIpcSender(e)) return { success: false };
+  if (newSettings && typeof newSettings === 'object') {
+    settingsDB = { ...settingsDB, ...newSettings };
+    try {
+      fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settingsDB, null, 2), 'utf-8');
+    } catch (err) {}
+  }
+  return { success: true, settings: settingsDB };
 });
 
 ipcMain.on('toggle-devtools', (e) => {
