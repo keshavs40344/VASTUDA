@@ -1,1 +1,1 @@
-web: gunicorn core.web_server:app --workers 3 --threads 8 --timeout 60 --bind 0.0.0.0:$PORT
+web: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120

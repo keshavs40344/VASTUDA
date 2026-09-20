@@ -1,16 +1,18 @@
 services:
   - type: web
-    name: vastuda-saas-core
+    name: vastuda-search
     env: python
     region: oregon
     plan: free
-    branch: main
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn core.web_server:app --bind 0.0.0.0:$PORT
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120"
+    autoDeploy: true
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.9
       - key: PORT
         value: 10000
-      - key: ENVIRONMENT
-        value: production
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: GROQ_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false

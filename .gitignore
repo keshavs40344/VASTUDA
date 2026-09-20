@@ -1,8 +1,37 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
-.env
-.venv/
-*.db
-.DS_Store
+*.py[cod]
+*$py.class
 
+# Environment variables & secrets
+.env
+.env.local
+*.key
+
+# SQLite database local files
+*.db
+*.db-shm
+*.db-wal
+
+# Large binaries and build archives
+*.exe
+*.apk
+*.zip
+*.tar.gz
+cloudflared.exe
+
+# Dependencies & logs
+node_modules/
+logs/
+*.log
 scratch/
+LIVE_URL.txt
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# OS metadata
+.DS_Store
+Thumbs.db

@@ -1,0 +1,17 @@
+{
+  "name": "VASTUDA Discovery Engine",
+  "short_name": "VASTUDA",
+  "description": "Independent AI Discovery & Neural Web Engine with live web search, academic research synthesis, code search, and built-in Reader Mode.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08080a",
+  "theme_color": "#0071e3",
+  "icons": [
+    {
+      "src": "/static/icons/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
