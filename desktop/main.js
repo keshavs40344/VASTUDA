@@ -97,8 +97,10 @@ function getValidatedWindowState() {
     height: Math.round(height),
     x: Math.round(x),
     y: Math.round(y),
-    isMaximized: windowState.isMaximized,
-    isFullScreen: windowState.isFullScreen
+    isMaximized: Boolean(windowState.isMaximized || windowState.maximized),
+    maximized: Boolean(windowState.isMaximized || windowState.maximized),
+    isFullScreen: Boolean(windowState.isFullScreen || windowState.fullscreen),
+    fullscreen: Boolean(windowState.isFullScreen || windowState.fullscreen)
   };
 }
 
@@ -751,6 +753,15 @@ function createMainWindow() {
   mainWindow.on('close', () => {
     saveSessionTabs();
     saveWindowState();
+    // Clean up all tab views to prevent orphaned WebContentsView instances
+    for (const [id, tab] of tabs.entries()) {
+      try {
+        detachTabView(tab);
+        if (tab.view && tab.view.webContents && !tab.view.webContents.isDestroyed()) {
+          tab.view.webContents.close();
+        }
+      } catch (e) {}
+    }
   });
   
   mainWindow.on('closed', () => {
@@ -1849,13 +1860,26 @@ ipcMain.on('show-about', (e) => {
   if (verifyIpcSender(e)) showAboutDialog();
 });
 
-// App Lifecycle
-app.whenReady().then(() => {
-  createMainWindow();
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
+// App Lifecycle with Single Instance Lock (prevent duplicate windows)
+const gotTheSingleInstanceLock = app.requestSingleInstanceLock();
+
+if (!gotTheSingleInstanceLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
   });
-});
+
+  app.whenReady().then(() => {
+    createMainWindow();
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
+    });
+  });
+}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
