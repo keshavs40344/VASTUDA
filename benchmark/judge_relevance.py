@@ -27,6 +27,16 @@ import requests
 import textwrap
 import time
 
+try:
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    if hasattr(sys.stderr, 'reconfigure'):
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    if hasattr(sys.stdin, 'reconfigure'):
+        sys.stdin.reconfigure(encoding='utf-8', errors='replace')
+except Exception:
+    pass
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 VASTUDA_ROOT = os.path.dirname(SCRIPT_DIR)
 
@@ -195,11 +205,16 @@ def load_judgments() -> dict:
 
 
 def save_judgments(judgments: dict):
-    """Save judgments to disk atomically."""
+    """Save judgments to disk atomically and update human_relevance_report.json."""
     tmp_path = JUDGMENTS_PATH + ".tmp"
     with open(tmp_path, "w", encoding="utf-8") as f:
         json.dump(judgments, f, ensure_ascii=False, indent=2)
     os.replace(tmp_path, JUDGMENTS_PATH)
+    try:
+        from benchmark.generate_human_relevance_report import generate_report
+        generate_report()
+    except Exception:
+        pass
 
 
 # ---------------------------------------------------------------------------
