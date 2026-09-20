@@ -921,8 +921,10 @@ function toggleSplitView(secId) {
 }
 
 // =============================================================================
-// URL SANITIZER & PARSER (Auto-Prepend https & DDG Fallback)
+// URL SANITIZER & PARSER (Intelligent URL vs STAUNT Search)
 // =============================================================================
+const STAUNT_SEARCH_URL = process.env.STAUNT_SEARCH_URL || 'http://127.0.0.1:5000';
+
 function formatUrlOrSearch(input) {
   const trimmed = (input || '').trim().slice(0, 2048);
 
@@ -937,16 +939,22 @@ function formatUrlOrSearch(input) {
     return newTabUrl;
   }
 
-  if (/^https?:\/\//i.test(trimmed) || /^file:\/\//i.test(trimmed)) {
+  if (/^https?:\/\//i.test(trimmed) || /^file:\/\//i.test(trimmed) || trimmed.startsWith('staunt://')) {
     return trimmed;
   }
 
-  const isDomain = /^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/i.test(trimmed) || /^localhost(:\d+)?(\/.*)?$/i.test(trimmed);
+  const isLocalhost = /^localhost(:\d+)?(\/.*)?$/i.test(trimmed);
+  const isIpv4 = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:\d+)?(\/.*)?$/.test(trimmed);
+  const isDomain = /^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/i.test(trimmed) && !trimmed.includes(' ');
+
+  if (isLocalhost || isIpv4) {
+    return 'http://' + trimmed;
+  }
   if (isDomain) {
-    return trimmed.startsWith('localhost') ? 'http://' + trimmed : 'https://' + trimmed;
+    return 'https://' + trimmed;
   }
 
-  return `https://html.duckduckgo.com/html/?q=${encodeURIComponent(trimmed)}`;
+  return `${STAUNT_SEARCH_URL}/?q=${encodeURIComponent(trimmed)}`;
 }
 
 // =============================================================================
@@ -971,10 +979,17 @@ function handleNavigate(url) {
   }
 }
 
+function handleHome() {
+  handleNavigate('staunt://newtab');
+}
+
 ipcMain.on('navigate-to', (e, url) => {
   if (!verifyIpcSender(e)) return;
   handleNavigate(url);
 });
+
+ipcMain.on('nav-home', (e) => { if (verifyIpcSender(e)) handleHome(); });
+ipcMain.on('go-home', (e) => { if (verifyIpcSender(e)) handleHome(); });
 
 // 2. Navigation Actions (Back / Forward / Reload)
 function handleBack() {

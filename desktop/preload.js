@@ -62,6 +62,7 @@ const secureAPI = Object.freeze({
   goBack: () => ipcRenderer.send('nav-back'),
   goForward: () => ipcRenderer.send('nav-forward'),
   reload: () => ipcRenderer.send('nav-reload'),
+  goHome: () => ipcRenderer.send('nav-home'),
 
   // Find In Page API
   findInPage: (text, forward = true) => {

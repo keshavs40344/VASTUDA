@@ -30,17 +30,17 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 32px 20px;
+      padding: 32px 16px;
     }
 
     /* Subtle Dynamic Time & Contextual Date */
     .greeting-container {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 28px;
     }
 
     .greeting-time {
-      font-size: 54px;
+      font-size: 52px;
       font-weight: 200;
       letter-spacing: -0.03em;
       color: rgba(255, 255, 255, 0.90);
@@ -59,7 +59,7 @@
     .search-container {
       width: 100%;
       max-width: 580px;
-      margin-bottom: 42px;
+      margin-bottom: 36px;
     }
 
     .search-box {
@@ -122,21 +122,18 @@
       padding-left: 10px;
     }
 
-    /* 6-Tile Pristine Grid */
+    /* Responsive Grid: 3 columns on mobile, 6 on wider screens */
     .favorites-grid {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 20px 14px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px 12px;
       justify-items: center;
     }
 
-    @media (max-width: 640px) {
+    @media (min-width: 600px) {
       .favorites-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px 12px;
-      }
-      .greeting-time {
-        font-size: 44px;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 20px 14px;
       }
     }
 
@@ -164,13 +161,8 @@
       position: relative;
     }
 
-    .favorite-tile:hover .squircle {
-      transform: scale(1.08);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
-    }
-
     .favorite-tile:active .squircle {
-      transform: scale(0.96);
+      transform: scale(0.94);
     }
 
     .tile-label {
@@ -184,10 +176,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 76px;
-    }
-
-    .favorite-tile:hover .tile-label {
-      opacity: 1;
     }
 
     .delete-btn {
@@ -344,7 +332,7 @@
           const val = searchInput.value.trim();
           if (val) {
             let target = val;
-            if (!/^https?:\/\//i.test(val) && !val.startsWith('staunt://') && !val.startsWith('file://')) {
+            if (!/^https?:\/\//i.test(val) && !val.startsWith('file://')) {
               const isLocalhost = /^localhost(:\d+)?(\/.*)?$/i.test(val);
               const isIpv4 = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:\d+)?(\/.*)?$/.test(val);
               const isDomain = /^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/i.test(val) && !val.includes(' ');
@@ -354,7 +342,7 @@
               } else if (isDomain) {
                 target = 'https://' + val;
               } else {
-                target = 'http://127.0.0.1:5000/?q=' + encodeURIComponent(val);
+                target = 'https://patrick-downloadable-presidential-emma.trycloudflare.com/?q=' + encodeURIComponent(val);
               }
             }
             window.location.href = target;
@@ -363,7 +351,7 @@
       });
     }
 
-    // Ensure all authentic favorite tiles navigate the tab directly
+    // Ensure all authentic favorite tiles navigate directly
     document.querySelectorAll('.favorite-tile').forEach(tile => {
       tile.addEventListener('click', (e) => {
         if (e.target.closest('.delete-btn')) return;

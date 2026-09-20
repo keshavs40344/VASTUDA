@@ -1,4 +1,4 @@
-﻿package com.staunt.browser
+package com.staunt.browser
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -53,6 +53,11 @@ class MainActivity : AppCompatActivity() {
     private var fileUploadCallback: ValueCallback<Array<Uri>>? = null
     private val FILE_CHOOSER_REQUEST_CODE = 1001
 
+    companion object {
+        const val NEW_TAB_URL = "file:///android_asset/newtab.html"
+        const val STAUNT_SEARCH_BASE = "https://patrick-downloadable-presidential-emma.trycloudflare.com/?q="
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -83,11 +88,15 @@ class MainActivity : AppCompatActivity() {
             if (actionId == EditorInfo.IME_ACTION_GO || event?.keyCode == KeyEvent.KEYCODE_ENTER) {
                 var url = etUrl.text.toString().trim()
                 if (url.isNotEmpty()) {
-                    if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                        if (url.contains(".") && !url.contains(" ")) {
+                    if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("file://")) {
+                        val isLocalhost = url.startsWith("localhost") || url.startsWith("127.0.0.1") || url.startsWith("10.0.2.2")
+                        val isDomain = url.contains(".") && !url.contains(" ")
+                        if (isLocalhost) {
+                            url = "http://$url"
+                        } else if (isDomain) {
                             url = "https://$url"
                         } else {
-                            url = "https://www.google.com/search?q=" + android.net.Uri.encode(url)
+                            url = STAUNT_SEARCH_BASE + android.net.Uri.encode(url)
                         }
                     }
                     tabManager.getActiveTab()?.webView?.loadUrl(url)
@@ -115,8 +124,13 @@ class MainActivity : AppCompatActivity() {
             activeTabId = { tabManager.activeTabId },
             onTabSelected = { tab ->
                 tabManager.switchTab(tab.id)
-                etUrl.setText(tab.webView.url ?: "")
-                updateSecurityIcon(tab.webView.url ?: "")
+                val u = tab.webView.url ?: ""
+                if (u == NEW_TAB_URL || u.contains("newtab.html")) {
+                    etUrl.setText("")
+                } else {
+                    etUrl.setText(u)
+                }
+                updateSecurityIcon(u)
                 hideTabSwitcher()
             },
             onTabClosed = { tab ->
@@ -251,7 +265,7 @@ class MainActivity : AppCompatActivity() {
             showTabSwitcher()
         }
         findViewById<ImageButton>(R.id.btnNavHome).setOnClickListener {
-            tabManager.getActiveTab()?.webView?.loadUrl("https://www.google.com")
+            tabManager.getActiveTab()?.webView?.loadUrl(NEW_TAB_URL)
         }
         findViewById<ImageButton>(R.id.btnNavTabs).setOnClickListener {
             showTabSwitcher()
@@ -315,7 +329,7 @@ class MainActivity : AppCompatActivity() {
         setupWebView(tab.webView)
         tabManager.switchTab(tab.id)
         updateTabCount()
-        tab.webView.loadUrl("https://www.google.com")
+        tab.webView.loadUrl(NEW_TAB_URL)
     }
 
     private fun setupWebView(webView: WebView) {
@@ -339,7 +353,11 @@ class MainActivity : AppCompatActivity() {
             adBlockEngine,
             historyDb,
             onPageStarted = { url ->
-                etUrl.setText(url)
+                if (url == NEW_TAB_URL || url.contains("newtab.html")) {
+                    etUrl.setText("")
+                } else {
+                    etUrl.setText(url)
+                }
                 updateSecurityIcon(url)
                 progressBar.visibility = View.VISIBLE
             },
