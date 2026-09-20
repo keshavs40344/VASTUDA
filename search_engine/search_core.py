@@ -265,10 +265,15 @@ def execute_web_query(query, max_results=8, topic="general", include_images=True
         search_duckduckgo_raw, query, max_results, time_range
     )
 
-    done, not_done = concurrent.futures.wait([tav_future, ddg_future], timeout=3.5)
+    # High-speed bounded wait: return as soon as first provider completes with results
+    done, not_done = concurrent.futures.wait(
+        [tav_future, ddg_future],
+        timeout=1.8,
+        return_when=concurrent.futures.FIRST_COMPLETED
+    )
     for f in done:
         try:
-            res = f.result(timeout=0.1)
+            res = f.result(timeout=0.05)
             if res and res.get("results"):
                 if res.get("provider") == "tavily":
                     tav_results = res.get("results", [])
@@ -278,14 +283,20 @@ def execute_web_query(query, max_results=8, topic="general", include_images=True
         except Exception:
             pass
 
-    # If Tavily finished and returned results, check DDG briefly (0.5s) if still pending
-    if not ddg_results and ddg_future in not_done:
-        try:
-            res = ddg_future.result(timeout=0.5)
-            if res and res.get("results"):
-                ddg_results = res.get("results", [])
-        except Exception:
-            pass
+    # If first completed provider yielded insufficient results (< 4) and other is still pending, wait briefly
+    if (len(tav_results) + len(ddg_results)) < 4 and not_done:
+        done_rest, _ = concurrent.futures.wait(not_done, timeout=0.8)
+        for f in done_rest:
+            try:
+                res = f.result(timeout=0.05)
+                if res and res.get("results"):
+                    if res.get("provider") == "tavily":
+                        tav_results = res.get("results", [])
+                        tav_images = res.get("images", [])
+                    elif res.get("provider") == "duckduckgo":
+                        ddg_results = res.get("results", [])
+            except Exception:
+                pass
 
     # Combine available results and deduplicate
     combined = tav_results + ddg_results

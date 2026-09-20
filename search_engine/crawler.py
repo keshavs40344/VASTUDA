@@ -23,33 +23,60 @@ from search_engine import db, indexer, query_engine
 logger = logging.getLogger("VASTUDA_Crawler")
 
 ROBOTS_CACHE = {}
-USER_AGENT = "VASTUDA-Bot/5.0 (+https://vastuda.internal/bot; bot@vastuda.internal)"
+USER_AGENT = "VASTUDA-Bot/5.1 (+https://vastuda.internal/bot; bot@vastuda.internal)"
 MAX_PAGE_SIZE = 2500000  # 2.5 MB maximum
 
+# Internal diagnostic telemetry (ground-truth counters)
+CRAWLER_DIAGNOSTICS = {
+    "urls_attempted": 0,
+    "urls_successful": 0,
+    "urls_rejected_robots": 0,
+    "urls_rejected_ssrf": 0,
+    "http_failures": 0,
+    "duplicate_pages": 0,
+    "content_extraction_failures": 0,
+    "last_crawl_time": 0
+}
 
-# Curated high-value open seed sources
+
+# Curated high-value open seed sources across tech, science, governance, and Indian public knowledge
 SEED_SOURCES = [
     # Official Programming & Technical Documentation
     "https://docs.python.org/3/tutorial/index.html",
     "https://docs.python.org/3/tutorial/datastructures.html",
+    "https://docs.python.org/3/tutorial/controlflow.html",
     "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
     "https://developer.mozilla.org/en-US/docs/Learn/HTML",
     "https://developer.mozilla.org/en-US/docs/Learn/CSS",
+    "https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Flexbox",
     "https://docs.docker.com/get-started/",
     "https://git-scm.com/doc",
-    # Open Knowledge & Science
+    "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+    "https://www.sqlite.org/wal.html",
+    # Open Knowledge, Science & Computing
     "https://en.wikipedia.org/wiki/Artificial_intelligence",
     "https://en.wikipedia.org/wiki/Machine_learning",
     "https://en.wikipedia.org/wiki/Quantum_computing",
     "https://en.wikipedia.org/wiki/Domain_Name_System",
     "https://en.wikipedia.org/wiki/Transformer_(machine_learning_model)",
-    # Indian Governance & Law
+    "https://en.wikipedia.org/wiki/Speed_of_light",
+    "https://en.wikipedia.org/wiki/Solar_System",
+    "https://en.wikipedia.org/wiki/Photosynthesis",
+    "https://en.wikipedia.org/wiki/Binary_search_algorithm",
+    "https://en.wikipedia.org/wiki/Relational_database",
+    # Indian Governance, Law & Space Science
     "https://en.wikipedia.org/wiki/Constitution_of_India",
-    "https://hi.wikipedia.org/wiki/%E0%A4%AD%E0%A4%BE%E0%A4%B0%E0%A4%A4_%E0%A4%95%E0%A4%BE_%E0%A4%B8%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8",
+    "https://en.wikipedia.org/wiki/Preamble_to_the_Constitution_of_India",
+    "https://en.wikipedia.org/wiki/Fundamental_Rights,_Directive_Principles_and_Fundamental_Duties_of_India",
+    "https://en.wikipedia.org/wiki/Indian_Space_Research_Organisation",
     "https://www.india.gov.in/my-government/constitution-india",
-    # Hindi Knowledge & Technology
+    # Hindi Knowledge & Science
+    "https://hi.wikipedia.org/wiki/%E0%A4%AD%E0%A4%BE%E0%A4%B0%E0%A4%A4_%E0%A4%95%E0%A4%BE_%E0%A4%B8%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8",
+    "https://hi.wikipedia.org/wiki/%E0%A4%AD%E0%A4%BE%E0%A4%B0%E0%A4%A4%E0%A5%80%E0%A4%AF_%E0%A4%85%E0%A4%82%E0%A4%A4%E0%A4%B0%E0%A4%bf%E0%A4%95%E0%A5%8D%E0%A4%B7_%E0%A4%85%E0%A4%A8%E0%A4%B8%E0%A4%82%E0%A4%A7%E0%A4%BE%E0%A4%A8_%E0%A4%B8%E0%A4%82%E0%A4%97%E0%A4%A0%E0%A4%A8",
     "https://hi.wikipedia.org/wiki/%E0%A4%95%E0%A4%82%E0%A4%AA%E0%A5%8D%E0%A4%AF%E0%A5%82%E0%A4%9F%E0%A4%B0",
-    "https://hi.wikipedia.org/wiki/%E0%A4%B8%E0%A5%8C%E0%A4%B0%E0%A4%AE%E0%A4%A3%E0%A5%8D%E0%A4%A1%E0%A4%B2"
+    "https://hi.wikipedia.org/wiki/%E0%A4%B8%E0%A5%8C%E0%A4%B0%E0%A4%AE%E0%A4%A3%E0%A5%8D%E0%A4%A1%E0%A4%B2",
+    "https://hi.wikipedia.org/wiki/%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%95%E0%A4%BE%E0%A4%B6_%E0%A4%B8%E0%A4%82%E0%A4%B6%E0%A5%8D%E0%A4%B2%E0%A5%87%E0%A4%B7%E0%A4%A3",
+    "https://hi.wikipedia.org/wiki/%E0%A4%87%E0%A4%82%E0%A4%9F%E0%A4%B0%E0%A4%A8%E0%A5%87%E0%A4%9F"
 ]
 
 
@@ -210,10 +237,12 @@ def crawl_url(target_url: str, max_depth: int = 1, source_type: str = "web", qua
     Fetch, extract content, and index a single URL safely and politely.
     """
     clean_url = urllib.parse.urldefrag(target_url.strip())[0]
+    CRAWLER_DIAGNOSTICS["urls_attempted"] += 1
 
     # 1. SSRF Safety Check
     if not is_safe_url(clean_url):
         logger.warning(f"[Crawler] SSRF rejection for URL: {clean_url}")
+        CRAWLER_DIAGNOSTICS["urls_rejected_ssrf"] += 1
         with db.get_db() as conn:
             conn.execute("UPDATE crawl_queue SET status = 'blocked_ssrf' WHERE url = ?", (clean_url,))
             conn.commit()
@@ -223,6 +252,7 @@ def crawl_url(target_url: str, max_depth: int = 1, source_type: str = "web", qua
     allowed, discovered_sitemaps = is_allowed_by_robots(clean_url)
     if not allowed:
         logger.info(f"[Crawler] Blocked by robots.txt: {clean_url}")
+        CRAWLER_DIAGNOSTICS["urls_rejected_robots"] += 1
         with db.get_db() as conn:
             conn.execute("UPDATE crawl_queue SET status = 'blocked_robots' WHERE url = ?", (clean_url,))
             conn.commit()
@@ -244,6 +274,7 @@ def crawl_url(target_url: str, max_depth: int = 1, source_type: str = "web", qua
     try:
         with requests.get(clean_url, headers=headers, timeout=8, stream=True, allow_redirects=True) as resp:
             if resp.status_code != 200:
+                CRAWLER_DIAGNOSTICS["http_failures"] += 1
                 with db.get_db() as conn:
                     conn.execute("UPDATE crawl_queue SET status = ?, retry_count = retry_count + 1 WHERE url = ?",
                                  (f"http_{resp.status_code}", clean_url))
@@ -374,6 +405,9 @@ def crawl_url(target_url: str, max_depth: int = 1, source_type: str = "web", qua
                          (now, clean_url))
             conn.commit()
 
+        CRAWLER_DIAGNOSTICS["urls_successful"] += 1
+        CRAWLER_DIAGNOSTICS["last_crawl_time"] = now
+
         return {
             "status": "indexed",
             "doc_id": doc_id,
@@ -384,11 +418,23 @@ def crawl_url(target_url: str, max_depth: int = 1, source_type: str = "web", qua
         }
 
     except Exception as e:
+        CRAWLER_DIAGNOSTICS["content_extraction_failures"] += 1
         logger.error(f"Parsing error on {clean_url}: {e}")
         return {"status": "parse_error", "error": str(e), "url": clean_url}
 
 
-def seed_crawl_knowledge(max_seeds: int = 15):
+def get_crawler_diagnostics() -> dict:
+    """Return genuine, accurate internal crawler diagnostics."""
+    stats = indexer.get_index_stats()
+    diag = dict(CRAWLER_DIAGNOSTICS)
+    diag["documents_indexed"] = stats.get("indexed_documents", 0)
+    diag["domains_indexed"] = stats.get("unique_domains", 0)
+    diag["queue_size"] = stats.get("queued_urls", 0)
+    diag["languages"] = stats.get("languages", {})
+    return diag
+
+
+def seed_crawl_knowledge(max_seeds: int = 35):
     """
     Seed initial high-value knowledge documents into VASTUDA index.
     """
@@ -396,7 +442,7 @@ def seed_crawl_knowledge(max_seeds: int = 15):
     indexed_count = 0
     for seed_url in SEED_SOURCES[:max_seeds]:
         try:
-            res = crawl_url(seed_url, max_depth=0, source_type="curated_seed", quality_score=1.5)
+            res = crawl_url(seed_url, max_depth=0, source_type="curated_seed", quality_score=1.0)
             if res.get("status") == "indexed":
                 indexed_count += 1
                 print(f"  [Indexed] {seed_url[:45]} -> doc_id {res.get('doc_id')}")

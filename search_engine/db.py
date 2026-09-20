@@ -120,7 +120,10 @@ def init_db():
             ("source_type", "TEXT DEFAULT 'web'"),
             ("author", "TEXT DEFAULT ''"),
             ("inbound_links_count", "INTEGER DEFAULT 0"),
-            ("canonical_domain", "TEXT DEFAULT ''")
+            ("canonical_domain", "TEXT DEFAULT ''"),
+            ("published_at", "INTEGER DEFAULT 0"),
+            ("updated_at", "INTEGER DEFAULT 0"),
+            ("crawled_at", "INTEGER DEFAULT 0")
         ]:
             try:
                 conn.execute(f"ALTER TABLE documents ADD COLUMN {col_name} {col_type}")

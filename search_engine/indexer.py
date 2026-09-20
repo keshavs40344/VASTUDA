@@ -197,32 +197,54 @@ def compute_relevance_score(doc: dict, query: str, query_info: dict = None) -> t
     elif query_lang == "hinglish" and (doc_lang in ("en", "hi") or any(t in body for t in ["sikhe", "kare", "kaise", "hindi"])):
         lang_boost += 8.0
 
-    # 5. Authority & Quality Signal
-    quality = float(doc.get("quality_score") or 1.0)
-    source_type = doc.get("source_type", "web")
-    authority_boost = quality * 8.0
-    if source_type in ("official_doc", "academic", "gov"):
-        authority_boost += 10.0
+    # 5. Measurable Content Structure Quality (no arbitrary authority bonuses)
+    quality_boost = 0.0
+    body_word_count = len(body.split())
+    if 250 <= body_word_count <= 10000:
+        quality_boost += 4.0  # Substantive content length
+    if headings and len(headings.strip()) > 15:
+        quality_boost += 3.0  # Structured document with headings
+    if doc.get("meta_desc") and len(str(doc.get("meta_desc")).strip()) > 25:
+        quality_boost += 2.0  # Quality metadata description present
 
-    # 6. Freshness Signal (Query-dependent)
+    # 6. Intent-Aligned Content Congruence (Query-document intent match)
+    intent_boost = 0.0
+    q_intent = query_info.get("intent", "informational") if query_info else "informational"
+    c_type = (doc.get("content_type") or "web").lower()
+    s_type = (doc.get("source_type") or "web").lower()
+
+    if q_intent in ("tutorial", "code") and ("doc" in c_type or "doc" in s_type):
+        intent_boost += 6.0
+    elif q_intent in ("academic", "definition") and (s_type in ("academic", "encyclopedic") or "wiki" in doc.get("domain", "")):
+        intent_boost += 6.0
+    elif q_intent == "navigational" and doc.get("canonical_url", "").rstrip("/") == f"https://{doc.get('domain', '')}":
+        intent_boost += 8.0  # Root domain page matches navigational queries
+
+    # 7. Freshness Signal (Query-dependent: strong for temporal, minimal for evergreen)
     fresh_boost = 0.0
     fresh_required = query_info.get("freshness_required", False) if query_info else False
-    crawl_date = doc.get("crawl_date") or int(time.time())
-    age_days = max(0, (time.time() - crawl_date) / 86400.0)
+    pub_at = int(doc.get("published_at") or 0)
+    upd_at = int(doc.get("updated_at") or 0)
+    crw_at = int(doc.get("crawled_at") or doc.get("crawl_date") or time.time())
+    best_ts = upd_at or pub_at or crw_at
+    age_days = max(0, (time.time() - best_ts) / 86400.0)
+
     if fresh_required:
         if age_days <= 2:
             fresh_boost += 25.0
         elif age_days <= 7:
-            fresh_boost += 15.0
+            fresh_boost += 16.0
         elif age_days <= 30:
             fresh_boost += 8.0
+        elif age_days <= 180:
+            fresh_boost += 2.0
         else:
-            fresh_boost -= 5.0
+            fresh_boost -= 6.0
     else:
-        # Evergreen query: weak freshness signal
-        fresh_boost = max(0.0, 3.0 - (age_days * 0.05))
+        # Evergreen query: minimal freshness impact, preserve authoritative long-standing content
+        fresh_boost = max(0.0, 2.0 - (age_days * 0.01))
 
-    # 7. Spam / Thin Page Penalties
+    # 8. Spam / Thin Page Penalties
     spam_penalty = 0.0
     body_len = len(body.strip())
     if body_len < 120:
@@ -237,7 +259,7 @@ def compute_relevance_score(doc: dict, query: str, query_info: dict = None) -> t
 
     composite_score = round(
         bm25_score + title_boost + heading_boost + phrase_boost +
-        lang_boost + authority_boost + fresh_boost - spam_penalty,
+        lang_boost + quality_boost + intent_boost + fresh_boost - spam_penalty,
         2
     )
 
@@ -247,7 +269,8 @@ def compute_relevance_score(doc: dict, query: str, query_info: dict = None) -> t
         "heading_boost": round(heading_boost, 2),
         "phrase_boost": round(phrase_boost, 2),
         "lang_boost": round(lang_boost, 2),
-        "authority_boost": round(authority_boost, 2),
+        "quality_boost": round(quality_boost, 2),
+        "intent_boost": round(intent_boost, 2),
         "freshness_boost": round(fresh_boost, 2),
         "spam_penalty": round(spam_penalty, 2),
         "final_score": composite_score
@@ -319,35 +342,60 @@ def search_local_index(query: str, limit: int = 8, query_info: dict = None):
     # Sort descending by composite score
     scored.sort(key=lambda x: x["score"], reverse=True)
 
-    # Apply controlled domain diversity: max 2 results per domain in top positions
+    # Adaptive Domain Diversity (score-proportional damping instead of rigid hard cutoff):
     domain_counts = {}
-    ranked_results = []
+    domain_best_scores = {}
+    for item in scored:
+        d = item["doc"].get("domain") or ""
+        if d not in domain_best_scores:
+            domain_best_scores[d] = item["score"]
 
     for item in scored:
         doc = item["doc"]
         domain = doc.get("domain") or ""
-        current_count = domain_counts.get(domain, 0)
-        
-        # If domain already has 2 results, apply diversity penalty
-        if current_count >= 2:
-            item["score"] -= 20.0
-            item["breakdown"]["diversity_penalty"] = 20.0
-        else:
-            item["breakdown"]["diversity_penalty"] = 0.0
+        curr_count = domain_counts.get(domain, 0)
+        curr_score = item["score"]
 
-    # Re-sort after diversity adjustments
+        # Highest score from other domains
+        other_best = max([s for d, s in domain_best_scores.items() if d != domain] or [0.0])
+        score_gap = curr_score - other_best
+
+        diversity_penalty = 0.0
+        if curr_count == 1:
+            # 2nd result from this domain: gentle damping if alternatives are competitive
+            if score_gap < 15.0:
+                diversity_penalty = 4.0
+        elif curr_count == 2:
+            # 3rd result from this domain: moderate damping unless vastly superior
+            if score_gap < 30.0:
+                diversity_penalty = 10.0
+            else:
+                diversity_penalty = 4.0
+        elif curr_count >= 3:
+            # 4th+ result: strong damping to prevent monopoly
+            diversity_penalty = 22.0
+
+        item["score"] = round(item["score"] - diversity_penalty, 2)
+        item["breakdown"]["diversity_penalty"] = diversity_penalty
+        domain_counts[domain] = curr_count + 1
+
+    # Re-sort after adaptive diversity adjustments
     scored.sort(key=lambda x: x["score"], reverse=True)
 
-    domain_counts.clear()
+    ranked_results = []
+    final_domain_counts = {}
     for item in scored:
         doc = item["doc"]
         domain = doc.get("domain") or ""
-        if domain_counts.get(domain, 0) >= 2 and len(ranked_results) < limit:
-            continue  # Reserve top positions for domain diversity
 
-        domain_counts[domain] = domain_counts.get(domain, 0) + 1
+        cnt = final_domain_counts.get(domain, 0)
+        # Avoid total saturation if multiple domains are available
+        if cnt >= 3 and len(ranked_results) < limit and len(domain_best_scores) > 1:
+            continue
+
+        final_domain_counts[domain] = cnt + 1
         snippet = doc.get("matched_snippet") or doc.get("meta_desc") or "Relevant page from VASTUDA index."
-        
+
         ranked_results.append({
             "title": doc.get("title") or domain,
             "url": doc.get("canonical_url") or doc.get("url"),

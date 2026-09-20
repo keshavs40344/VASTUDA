@@ -976,6 +976,58 @@ def api_crawler_stats():
     return jsonify(indexer.get_index_stats())
 
 
+@app.route("/api/crawler/diagnostics", methods=["GET"])
+def api_crawler_diagnostics():
+    return jsonify(crawler.get_crawler_diagnostics())
+
+
+@app.route("/api/search/debug", methods=["GET"])
+def api_search_debug():
+    """Development-only query debugging endpoint with detailed ranking telemetry."""
+    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "127.0.0.1").split(",")[0].strip()
+    auth_key = request.headers.get("X-Vastuda-Debug-Key") or request.args.get("debug_key")
+    is_local = client_ip in ("127.0.0.1", "::1", "localhost")
+    is_authorized = auth_key == os.getenv("DEBUG_KEY", "vastuda-dev-2026")
+
+    if not (is_local or is_authorized):
+        return jsonify({"error": "Unauthorized. Debug endpoint is restricted to development environments.", "status": 403}), 403
+
+    query = request.args.get("q", "").strip()
+    if not query:
+        return jsonify({"error": "Missing query parameter 'q'"}), 400
+
+    from search_engine import query_engine
+
+    q_info = query_engine.understand_query(query)
+    local_candidates = indexer.search_local_index(query, limit=10, query_info=q_info)
+
+    external_candidates = []
+    try:
+        ext_res = search_core.execute_web_query(query, max_results=6)
+        external_candidates = ext_res.get("results", [])
+    except Exception:
+        external_candidates = []
+
+    hybrid_res = search_core.search_with_hybrid_ranking(query, max_results=8)
+
+    return jsonify({
+        "raw_query": query,
+        "normalized_query": q_info.get("normalized_query"),
+        "detected_language": q_info.get("language"),
+        "intent": q_info.get("intent"),
+        "vertical": q_info.get("vertical"),
+        "freshness_required": q_info.get("freshness_required"),
+        "entities": q_info.get("entities"),
+        "expanded_terms": q_info.get("expanded_terms"),
+        "local_candidates_count": len(local_candidates),
+        "local_candidates": local_candidates,
+        "external_candidates_count": len(external_candidates),
+        "external_candidates": external_candidates,
+        "provider": hybrid_res.get("provider"),
+        "ranking": hybrid_res.get("results", [])
+    })
+
+
 
 @app.route("/api/destination", methods=["GET"])
 def api_destination():

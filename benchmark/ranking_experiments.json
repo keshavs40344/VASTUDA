@@ -1,0 +1,452 @@
+{
+  "Python list comprehension syntax and examples": {
+    "exp_a_top_3": [
+      [
+        "5. Data Structures — Python 3.14.7 documentation",
+        38.17
+      ],
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        34.83
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        34.83
+      ]
+    ],
+    "exp_b_top_3": [
+      [
+        "5. Data Structures — Python 3.14.7 documentation",
+        36.09
+      ],
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        32.74
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        32.74
+      ]
+    ],
+    "exp_c_top_3": [
+      [
+        "5. Data Structures — Python 3.14.7 documentation",
+        42.17
+      ],
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        38.83
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        38.83
+      ]
+    ],
+    "rank_shifts": false
+  },
+  "machine learning fundamentals": {
+    "exp_a_top_3": [
+      [
+        "Machine learning - Wikipedia",
+        43.67
+      ],
+      [
+        "Transformer (deep learning) - Wikipedia",
+        35.33
+      ],
+      [
+        "Artificial intelligence - Wikipedia",
+        30.33
+      ]
+    ],
+    "exp_b_top_3": [
+      [
+        "Machine learning - Wikipedia",
+        35.34
+      ],
+      [
+        "Transformer (deep learning) - Wikipedia",
+        31.16
+      ],
+      [
+        "Artificial intelligence - Wikipedia",
+        30.33
+      ]
+    ],
+    "exp_c_top_3": [
+      [
+        "Machine learning - Wikipedia",
+        47.67
+      ],
+      [
+        "Transformer (deep learning) - Wikipedia",
+        39.33
+      ],
+      [
+        "Artificial intelligence - Wikipedia",
+        34.33
+      ]
+    ],
+    "rank_shifts": false
+  },
+  "भारत का संविधान": {
+    "exp_a_top_3": [
+      [
+        "भारत का संविधान - विकिपीडिया",
+        72.0
+      ],
+      [
+        "प्रकाश-संश्लेषण - विकिपीडिया",
+        37.0
+      ],
+      [
+        "संगणक - विकिपीडिया",
+        27.0
+      ]
+    ],
+    "exp_b_top_3": [
+      [
+        "भारत का संविधान - विकिपीडिया",
+        54.5
+      ],
+      [
+        "प्रकाश-संश्लेषण - विकिपीडिया",
+        37.0
+      ],
+      [
+        "संगणक - विकिपीडिया",
+        27.0
+      ]
+    ],
+    "exp_c_top_3": [
+      [
+        "भारत का संविधान - विकिपीडिया",
+        76.0
+      ],
+      [
+        "प्रकाश-संश्लेषण - विकिपीडिया",
+        41.0
+      ],
+      [
+        "संगणक - विकिपीडिया",
+        31.0
+      ]
+    ],
+    "rank_shifts": false
+  },
+  "Python kaise sikhe": {
+    "exp_a_top_3": [
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        38.67
+      ],
+      [
+        "5. Data Structures — Python 3.14.7 documentation",
+        35.33
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        35.33
+      ]
+    ],
+    "exp_b_top_3": [
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        34.51
+      ],
+      [
+        "5. Data Structures — Python 3.14.7 documentation",
+        31.16
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        31.16
+      ]
+    ],
+    "exp_c_top_3": [
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        42.67
+      ],
+      [
+        "5. Data Structures — Python 3.14.7 documentation",
+        39.33
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        39.33
+      ]
+    ],
+    "rank_shifts": false
+  },
+  "how to optimize sqlite query performance WAL mode": {
+    "exp_a_top_3": [
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        33.37
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        33.37
+      ],
+      [
+        "Write-Ahead Logging",
+        33.25
+      ]
+    ],
+    "exp_b_top_3": [
+      [
+        "Write-Ahead Logging",
+        33.25
+      ],
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        31.81
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        31.81
+      ]
+    ],
+    "exp_c_top_3": [
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        37.37
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        37.37
+      ],
+      [
+        "Write-Ahead Logging",
+        37.25
+      ]
+    ],
+    "rank_shifts": true
+  },
+  "latest AI news 2026": {
+    "exp_a_top_3": [
+      [
+        "Domain Name System - Wikipedia",
+        58.75
+      ],
+      [
+        "Transformer (deep learning) - Wikipedia",
+        52.5
+      ],
+      [
+        "Relational database - Wikipedia",
+        52.5
+      ]
+    ],
+    "exp_b_top_3": [
+      [
+        "Domain Name System - Wikipedia",
+        55.62
+      ],
+      [
+        "Transformer (deep learning) - Wikipedia",
+        52.5
+      ],
+      [
+        "Relational database - Wikipedia",
+        52.5
+      ]
+    ],
+    "exp_c_top_3": [
+      [
+        "Domain Name System - Wikipedia",
+        62.75
+      ],
+      [
+        "Transformer (deep learning) - Wikipedia",
+        56.5
+      ],
+      [
+        "Relational database - Wikipedia",
+        56.5
+      ]
+    ],
+    "rank_shifts": false
+  },
+  "what is quantum computing": {
+    "exp_a_top_3": [
+      [
+        "Quantum computing - Wikipedia",
+        47.0
+      ],
+      [
+        "Photosynthesis - Wikipedia",
+        35.75
+      ],
+      [
+        "ISRO - Wikipedia",
+        35.75
+      ]
+    ],
+    "exp_b_top_3": [
+      [
+        "Quantum computing - Wikipedia",
+        40.75
+      ],
+      [
+        "Photosynthesis - Wikipedia",
+        32.62
+      ],
+      [
+        "ISRO - Wikipedia",
+        32.62
+      ]
+    ],
+    "exp_c_top_3": [
+      [
+        "Quantum computing - Wikipedia",
+        51.0
+      ],
+      [
+        "Photosynthesis - Wikipedia",
+        39.75
+      ],
+      [
+        "ISRO - Wikipedia",
+        39.75
+      ]
+    ],
+    "rank_shifts": false
+  },
+  "binary search tree insertion algorithm python": {
+    "exp_a_top_3": [
+      [
+        "Binary search - Wikipedia",
+        40.33
+      ],
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        34.83
+      ],
+      [
+        "5. Data Structures — Python 3.14.7 documentation",
+        33.17
+      ]
+    ],
+    "exp_b_top_3": [
+      [
+        "Binary search - Wikipedia",
+        36.16
+      ],
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        32.74
+      ],
+      [
+        "5. Data Structures — Python 3.14.7 documentation",
+        31.09
+      ]
+    ],
+    "exp_c_top_3": [
+      [
+        "Binary search - Wikipedia",
+        44.33
+      ],
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        38.83
+      ],
+      [
+        "5. Data Structures — Python 3.14.7 documentation",
+        37.17
+      ]
+    ],
+    "rank_shifts": false
+  },
+  "सौर मंडल के ग्रह": {
+    "exp_a_top_3": [
+      [
+        "सौर मण्डल - विकिपीडिया",
+        49.5
+      ],
+      [
+        "भारत का संविधान - विकिपीडिया",
+        27.0
+      ],
+      [
+        "संगणक - विकिपीडिया",
+        27.0
+      ]
+    ],
+    "exp_b_top_3": [
+      [
+        "सौर मण्डल - विकिपीडिया",
+        43.25
+      ],
+      [
+        "भारत का संविधान - विकिपीडिया",
+        27.0
+      ],
+      [
+        "संगणक - विकिपीडिया",
+        27.0
+      ]
+    ],
+    "exp_c_top_3": [
+      [
+        "सौर मण्डल - विकिपीडिया",
+        53.5
+      ],
+      [
+        "भारत का संविधान - विकिपीडिया",
+        31.0
+      ],
+      [
+        "संगणक - विकिपीडिया",
+        31.0
+      ]
+    ],
+    "rank_shifts": false
+  },
+  "step by step guide to setup cloudflare tunnel on windows": {
+    "exp_a_top_3": [
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        36.0
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        36.0
+      ],
+      [
+        "Preamble to the Constitution of India - Wikipedia",
+        34.0
+      ]
+    ],
+    "exp_b_top_3": [
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        33.5
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        33.5
+      ],
+      [
+        "Structuring content with HTML - Learn web development | MDN",
+        32.25
+      ]
+    ],
+    "exp_c_top_3": [
+      [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        40.0
+      ],
+      [
+        "4. More Control Flow Tools — Python 3.14.7 documentation",
+        40.0
+      ],
+      [
+        "Preamble to the Constitution of India - Wikipedia",
+        38.0
+      ]
+    ],
+    "rank_shifts": true
+  }
+}
