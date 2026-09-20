@@ -20,4 +20,10 @@ except Exception as e:
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, threaded=True)
+    try:
+        from waitress import serve
+        print(f"[Production Server] Serving VASTUDA with Waitress on 0.0.0.0:{port}...")
+        serve(app, host="0.0.0.0", port=port, threads=8)
+    except Exception as err:
+        print(f"[Production Server] Fallback to Flask server: {err}")
+        app.run(host="0.0.0.0", port=port, threaded=True)
