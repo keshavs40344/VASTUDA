@@ -115,9 +115,15 @@ const secureAPI = Object.freeze({
     ipcRenderer.send('print-to-pdf');
   },
 
+  // Tab Cycling API
+  cycleTab: (direction = 1) => {
+    ipcRenderer.send('cycle-tab', sanitizeNumber(direction, 1));
+  },
+
   // History & Bookmarks Query API
   getHistory: () => ipcRenderer.invoke('get-history'),
   clearHistory: (range) => ipcRenderer.invoke('clear-history', sanitizeString(range, 64)),
+  deleteHistoryItem: (id) => ipcRenderer.invoke('delete-history-item', sanitizeString(id, 64)),
   getBookmarks: () => ipcRenderer.invoke('get-bookmarks'),
   addBookmark: (item) => {
     if (item && typeof item === 'object') {
@@ -128,6 +134,9 @@ const secureAPI = Object.freeze({
       });
     }
   },
+  toggleBookmark: () => ipcRenderer.invoke('toggle-bookmark'),
+  checkIsBookmarked: (url) => ipcRenderer.invoke('check-is-bookmarked', sanitizeString(url, 2048)),
+  deleteBookmark: (id) => ipcRenderer.invoke('delete-bookmark', sanitizeString(id, 64)),
 
   // Downloads Vault API
   getDownloads: () => ipcRenderer.invoke('get-downloads'),
@@ -139,6 +148,7 @@ const secureAPI = Object.freeze({
     const p = sanitizeString(itemPath, 4096);
     if (p) ipcRenderer.send('show-in-folder', p);
   },
+  clearDownloads: () => ipcRenderer.invoke('clear-downloads'),
 
   // Settings API
   getSettings: () => ipcRenderer.invoke('get-settings'),
@@ -157,10 +167,17 @@ const secureAPI = Object.freeze({
     ipcRenderer.send('toggle-devtools');
   },
 
+  showAbout: () => {
+    ipcRenderer.send('show-about');
+  },
+
   // Native Window Controls (Supports both win-* and window-* aliases)
   minimizeWindow: () => ipcRenderer.send('win-min'),
   maximizeWindow: () => ipcRenderer.send('win-max'),
   closeWindow: () => ipcRenderer.send('win-close'),
+  createWindow: () => ipcRenderer.send('create-window'),
+  createIncognitoWindow: () => ipcRenderer.send('create-incognito-window'),
+  toggleFullscreen: () => ipcRenderer.send('toggle-fullscreen'),
 
   // Safe Parameterized Inbound Listeners
   onUrlUpdated: (cb) => { if (typeof cb === 'function') ipcRenderer.on('url-updated', (e, d) => cb(d)); },
@@ -174,7 +191,10 @@ const secureAPI = Object.freeze({
   onPermissionRequested: (cb) => { if (typeof cb === 'function') ipcRenderer.on('permission-requested', (e, d) => cb(d)); },
   onFindResult: (cb) => { if (typeof cb === 'function') ipcRenderer.on('find-result', (e, d) => cb(d)); },
   onDownloadProgress: (cb) => { if (typeof cb === 'function') ipcRenderer.on('download-progress', (e, d) => cb(d)); },
-  onDownloadComplete: (cb) => { if (typeof cb === 'function') ipcRenderer.on('download-complete', (e, d) => cb(d)); }
+  onDownloadComplete: (cb) => { if (typeof cb === 'function') ipcRenderer.on('download-complete', (e, d) => cb(d)); },
+  onBookmarkStatusChanged: (cb) => { if (typeof cb === 'function') ipcRenderer.on('bookmark-status-changed', (e, d) => cb(d)); },
+  onShowBookmarks: (cb) => { if (typeof cb === 'function') ipcRenderer.on('show-bookmarks', () => cb()); },
+  onToggleFindBar: (cb) => { if (typeof cb === 'function') ipcRenderer.on('toggle-find-bar', () => cb()); }
 });
 
 // Expose both namespaces (stauntAPI & stauntSecureBridge)

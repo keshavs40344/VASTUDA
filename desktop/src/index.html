@@ -464,7 +464,205 @@
       cursor: pointer;
       transition: background 0.12s;
     }
-    .btn-primary-action:hover { background: #7c3aed; }
+    .omnibox-action-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+    .omnibox-action-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .omnibox-action-btn.bookmarked {
+      color: #ffd60a;
+    }
+    .omnibox-action-btn.bookmarked svg {
+      fill: #ffd60a;
+    }
+    .omnibox-action-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Floating Three-Dot Menu */
+    .three-dot-menu {
+      position: fixed;
+      top: calc(var(--header-height) + 4px);
+      right: 12px;
+      width: 260px;
+      background: rgba(18, 20, 30, 0.98);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 0.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 10px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+      padding: 6px 0;
+      z-index: 10010;
+      display: none;
+      flex-direction: column;
+    }
+    .three-dot-menu.active {
+      display: flex;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+      transition: background 0.12s ease;
+      user-select: none;
+    }
+    .menu-item:hover {
+      background: rgba(139, 92, 246, 0.28);
+      color: #fff;
+    }
+    .menu-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .menu-item-left svg {
+      width: 14px;
+      height: 14px;
+      color: var(--text-muted);
+    }
+    .menu-item:hover .menu-item-left svg {
+      color: #fff;
+    }
+    .menu-shortcut {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .menu-divider {
+      height: 0.5px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 5px 0;
+    }
+    .menu-zoom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 14px;
+      font-size: 12.5px;
+    }
+    .zoom-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 2px 6px;
+    }
+    .zoom-ctrl-btn {
+      background: transparent;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .zoom-ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Modal Lists & Filter Inputs */
+    .modal-filter-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 0.5px solid rgba(255, 255, 255, 0.14);
+      border-radius: 6px;
+      padding: 7px 10px;
+      color: #fff;
+      font-size: 12.5px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+    .modal-filter-input:focus {
+      border-color: var(--border-focus);
+    }
+    .modal-scroll-list {
+      max-height: 280px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-right: 4px;
+    }
+    .modal-scroll-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .modal-scroll-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+    }
+    .list-entry-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .list-entry-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .entry-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .entry-title {
+      font-weight: 500;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .entry-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .entry-delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-left: 8px;
+    }
+    .entry-delete-btn:hover {
+      color: #ff5f56;
+      background: rgba(255, 95, 86, 0.15);
+    }
+    .empty-list-notice {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      padding: 24px 0;
+    }
 
     /* Download Toast */
     .download-toast {
@@ -547,6 +745,11 @@
           spellcheck="false" 
           autocomplete="off" 
         />
+        <button class="omnibox-action-btn" id="btnDeskBookmark" title="Bookmark this tab (Ctrl+D)">
+          <svg id="starIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </button>
       </div>
       <div id="omnibox-dropdown" class="omnibox-dropdown" style="display: none;"></div>
     </div>
@@ -562,6 +765,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
       </button>
 
+      <button class="action-icon-btn" id="btnDeskDownloads" title="Downloads (Ctrl+J)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+
       <button class="action-icon-btn" id="btnDeskSettings" title="Settings / Clear Browsing Data (Ctrl+Shift+Del)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
@@ -569,7 +776,187 @@
       <button class="action-icon-btn" id="btnDevTools" title="Developer Tools (F12)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
       </button>
+
+      <button class="action-icon-btn" id="btnDeskMenu" title="Customize and control Staunt">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+      </button>
     </div>
+  </header>
+
+  <!-- Floating Three-Dot Menu -->
+  <div class="three-dot-menu" id="threeDotMenu">
+    <div class="menu-item" id="menuItemNewTab">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        <span>New Tab</span>
+      </div>
+      <span class="menu-shortcut">Ctrl+T</span>
+    </div>
+    <div class="menu-item" id="menuItemNewWindow">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+        <span>New Window</span>
+      </div>
+      <span class="menu-shortcut">Ctrl+N</span>
+    </div>
+    <div class="menu-item" id="menuItemNewIncognito">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M7 12a5 5 0 0 1 10 0M5 18a2 2 0 1 0 4 0 2 2 0 1 0-4 0M15 18a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/></svg>
+        <span>New Incognito Window</span>
+      </div>
+      <span class="menu-shortcut">Ctrl+Shift+N</span>
+    </div>
+    <div class="menu-divider"></div>
+    <div class="menu-item" id="menuItemHistory">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>History</span>
+      </div>
+      <span class="menu-shortcut">Ctrl+H</span>
+    </div>
+    <div class="menu-item" id="menuItemDownloads">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Downloads</span>
+      </div>
+      <span class="menu-shortcut">Ctrl+J</span>
+    </div>
+    <div class="menu-item" id="menuItemBookmarks">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Bookmarks</span>
+      </div>
+      <span class="menu-shortcut">Ctrl+Shift+O</span>
+    </div>
+    <div class="menu-divider"></div>
+    <div class="menu-zoom-row">
+      <span style="color: rgba(255,255,255,0.85);">Zoom</span>
+      <div class="zoom-btn-group">
+        <button class="zoom-ctrl-btn" id="btnZoomOut" title="Zoom out (Ctrl+-)">−</button>
+        <span id="zoomLevelDisplay" style="font-size: 11px; min-width: 32px; text-align: center;">100%</span>
+        <button class="zoom-ctrl-btn" id="btnZoomIn" title="Zoom in (Ctrl++)">+</button>
+        <button class="zoom-ctrl-btn" id="btnFullscreen" title="Fullscreen (F11)" style="font-size: 11px;">⛶</button>
+      </div>
+    </div>
+    <div class="menu-item" id="menuItemPrint">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        <span>Print...</span>
+      </div>
+      <span class="menu-shortcut">Ctrl+P</span>
+    </div>
+    <div class="menu-item" id="menuItemFind">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Find in page...</span>
+      </div>
+      <span class="menu-shortcut">Ctrl+F</span>
+    </div>
+    <div class="menu-divider"></div>
+    <div class="menu-item" id="menuItemSettings">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Clear browsing data</span>
+      </div>
+      <span class="menu-shortcut">Ctrl+Shift+Del</span>
+    </div>
+    <div class="menu-item" id="menuItemDevTools">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+        <span>Developer Tools</span>
+      </div>
+      <span class="menu-shortcut">F12</span>
+    </div>
+    <div class="menu-divider"></div>
+    <div class="menu-item" id="menuItemAbout">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>About Staunt</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Modal -->
+  <div class="modal-overlay" id="historyModal">
+    <div class="modal-box" style="width: 520px;">
+      <div class="modal-header">
+        <div class="modal-title">Browsing History</div>
+        <button class="modal-close" id="btnHistoryClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="modal-filter-input" id="historyFilterInput" placeholder="Search history..." />
+        <div class="modal-scroll-list" id="historyScrollList">
+          <div class="empty-list-notice">Loading history...</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btnClearHistoryBtn">Clear Browsing Data</button>
+        <button class="btn-primary-action" id="btnCloseHistoryModal">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookmarks Modal -->
+  <div class="modal-overlay" id="bookmarksModal">
+    <div class="modal-box" style="width: 520px;">
+      <div class="modal-header">
+        <div class="modal-title">Bookmarks</div>
+        <button class="modal-close" id="btnBookmarksClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="modal-filter-input" id="bookmarksFilterInput" placeholder="Search bookmarks..." />
+        <div class="modal-scroll-list" id="bookmarksScrollList">
+          <div class="empty-list-notice">Loading bookmarks...</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btnBookmarkCurrentPageModal">★ Bookmark Current Tab</button>
+        <button class="btn-primary-action" id="btnCloseBookmarksModal">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Downloads Modal -->
+  <div class="modal-overlay" id="downloadsModal">
+    <div class="modal-box" style="width: 520px;">
+      <div class="modal-header">
+        <div class="modal-title">Downloads</div>
+        <button class="modal-close" id="btnDownloadsClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-scroll-list" id="downloadsScrollList">
+          <div class="empty-list-notice">No downloads found.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="btnClearDownloadsListBtn">Clear List</button>
+        <button class="btn-primary-action" id="btnCloseDownloadsModal">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Modal -->
+  <div class="modal-overlay" id="aboutModal">
+    <div class="modal-box" style="width: 440px; text-align: center;">
+      <div class="modal-header">
+        <div class="modal-title" style="flex: 1; text-align: center;">About Staunt Browser Ultra</div>
+        <button class="modal-close" id="btnAboutClose">&times;</button>
+      </div>
+      <div class="modal-body" style="align-items: center; gap: 10px; padding: 10px 0;">
+        <div style="font-size: 36px; margin-bottom: 4px;">🪐</div>
+        <div style="font-size: 16px; font-weight: 700; color: #fff;">Staunt Browser Ultra</div>
+        <div style="font-size: 12px; color: var(--text-muted);">Version 2.0.0 (Enterprise Hardened)</div>
+        <div style="font-size: 11.5px; color: var(--text-dim); margin-top: 6px; line-height: 1.6;">
+          VASTUDA Sovereign Systems<br/>
+          Chromium Precision WebContentsView Engine<br/>
+          Obsidian High-Performance Shell • Privacy-First Zero-Telemetry
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content: center;">
+        <button class="btn-primary-action" id="btnCloseAboutModal">Close</button>
+      </div>
+    </div>
+  </div>
   </header>
 
   <!-- Settings / Clear Data Modal -->
@@ -643,6 +1030,39 @@
       const downloadToast = document.getElementById('downloadToast');
       const downloadToastText = document.getElementById('downloadToastText');
 
+      const btnBookmark = document.getElementById('btnDeskBookmark');
+      const starIcon = document.getElementById('starIcon');
+      const btnDownloads = document.getElementById('btnDeskDownloads');
+      const btnMenu = document.getElementById('btnDeskMenu');
+      const threeDotMenu = document.getElementById('threeDotMenu');
+
+      const historyModal = document.getElementById('historyModal');
+      const btnHistoryClose = document.getElementById('btnHistoryClose');
+      const btnCloseHistoryModal = document.getElementById('btnCloseHistoryModal');
+      const historyFilterInput = document.getElementById('historyFilterInput');
+      const historyScrollList = document.getElementById('historyScrollList');
+      const btnClearHistoryBtn = document.getElementById('btnClearHistoryBtn');
+
+      const bookmarksModal = document.getElementById('bookmarksModal');
+      const btnBookmarksClose = document.getElementById('btnBookmarksClose');
+      const btnCloseBookmarksModal = document.getElementById('btnCloseBookmarksModal');
+      const bookmarksFilterInput = document.getElementById('bookmarksFilterInput');
+      const bookmarksScrollList = document.getElementById('bookmarksScrollList');
+      const btnBookmarkCurrentPageModal = document.getElementById('btnBookmarkCurrentPageModal');
+
+      const downloadsModal = document.getElementById('downloadsModal');
+      const btnDownloadsClose = document.getElementById('btnDownloadsClose');
+      const btnCloseDownloadsModal = document.getElementById('btnCloseDownloadsModal');
+      const downloadsScrollList = document.getElementById('downloadsScrollList');
+      const btnClearDownloadsListBtn = document.getElementById('btnClearDownloadsListBtn');
+
+      const aboutModal = document.getElementById('aboutModal');
+      const btnAboutClose = document.getElementById('btnAboutClose');
+      const btnCloseAboutModal = document.getElementById('btnCloseAboutModal');
+
+      const zoomLevelDisplay = document.getElementById('zoomLevelDisplay');
+      let currentZoomLevel = 0;
+
       let currentTabs = [];
       let activeTabId = null;
       let isPageLoading = false;
@@ -679,6 +1099,77 @@
         btnSettings.addEventListener('click', () => openSettingsModal());
       }
 
+      // Bookmark Star Logic
+      function updateBookmarkStar(isBookmarked) {
+        if (!btnBookmark) return;
+        if (isBookmarked) {
+          btnBookmark.classList.add('bookmarked');
+          btnBookmark.title = 'Remove bookmark (Ctrl+D)';
+        } else {
+          btnBookmark.classList.remove('bookmarked');
+          btnBookmark.title = 'Bookmark this tab (Ctrl+D)';
+        }
+      }
+
+      if (btnBookmark) {
+        btnBookmark.addEventListener('click', async () => {
+          if (typeof api.toggleBookmark === 'function') {
+            const res = await api.toggleBookmark();
+            if (res) {
+              updateBookmarkStar(res.bookmarked);
+              showDownloadToast(res.bookmarked ? '★ Bookmark added' : 'Bookmark removed', 2000);
+            }
+          }
+        });
+      }
+
+      if (typeof api.onBookmarkStatusChanged === 'function') {
+        api.onBookmarkStatusChanged((data) => {
+          if (data && omnibox.value === data.url) {
+            updateBookmarkStar(data.bookmarked);
+          }
+        });
+      }
+
+      // Three-Dot Floating Menu
+      if (btnMenu && threeDotMenu) {
+        btnMenu.addEventListener('click', (e) => {
+          e.stopPropagation();
+          threeDotMenu.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('#threeDotMenu') && !e.target.closest('#btnDeskMenu')) {
+            threeDotMenu.classList.remove('active');
+          }
+        });
+
+        const closeMenu = () => threeDotMenu.classList.remove('active');
+
+        document.getElementById('menuItemNewTab')?.addEventListener('click', () => { closeMenu(); api.createTab('staunt://newtab'); });
+        document.getElementById('menuItemNewWindow')?.addEventListener('click', () => { closeMenu(); if (typeof api.createWindow === 'function') api.createWindow(); });
+        document.getElementById('menuItemNewIncognito')?.addEventListener('click', () => { closeMenu(); if (typeof api.createIncognitoWindow === 'function') api.createIncognitoWindow(); else api.createTab('staunt://newtab', { isIncognito: true }); });
+        document.getElementById('menuItemHistory')?.addEventListener('click', () => { closeMenu(); openHistoryModal(); });
+        document.getElementById('menuItemDownloads')?.addEventListener('click', () => { closeMenu(); openDownloadsModal(); });
+        document.getElementById('menuItemBookmarks')?.addEventListener('click', () => { closeMenu(); openBookmarksModal(); });
+        document.getElementById('menuItemPrint')?.addEventListener('click', () => { closeMenu(); if (typeof api.printToPDF === 'function') api.printToPDF(); });
+        document.getElementById('menuItemFind')?.addEventListener('click', () => { closeMenu(); omnibox.focus(); omnibox.select(); });
+        document.getElementById('menuItemSettings')?.addEventListener('click', () => { closeMenu(); openSettingsModal(); });
+        document.getElementById('menuItemDevTools')?.addEventListener('click', () => { closeMenu(); api.toggleDevTools(); });
+        document.getElementById('menuItemAbout')?.addEventListener('click', () => { closeMenu(); openAboutModal(); });
+
+        document.getElementById('btnZoomIn')?.addEventListener('click', () => adjustZoom(0.5));
+        document.getElementById('btnZoomOut')?.addEventListener('click', () => adjustZoom(-0.5));
+        document.getElementById('btnFullscreen')?.addEventListener('click', () => { closeMenu(); if (typeof api.toggleFullscreen === 'function') api.toggleFullscreen(); });
+      }
+
+      function adjustZoom(delta) {
+        currentZoomLevel = Math.max(-3, Math.min(3, currentZoomLevel + delta));
+        if (typeof api.setZoom === 'function') api.setZoom(currentZoomLevel);
+        const pct = Math.round(100 * Math.pow(1.2, currentZoomLevel));
+        if (zoomLevelDisplay) zoomLevelDisplay.textContent = pct + '%';
+      }
+
       // Settings Modal
       function openSettingsModal() {
         if (settingsModal) settingsModal.classList.add('active');
@@ -705,6 +1196,202 @@
           closeSettingsModal();
           showDownloadToast('Browsing data cleared successfully');
         });
+      }
+
+      // History Modal
+      let currentHistoryData = [];
+      async function openHistoryModal() {
+        if (!historyModal) return;
+        historyModal.classList.add('active');
+        if (typeof api.getHistory === 'function') {
+          currentHistoryData = await api.getHistory() || [];
+          renderHistoryItems(currentHistoryData);
+        }
+      }
+      function closeHistoryModal() {
+        if (historyModal) historyModal.classList.remove('active');
+      }
+      function renderHistoryItems(items) {
+        if (!historyScrollList) return;
+        historyScrollList.innerHTML = '';
+        if (!items || items.length === 0) {
+          historyScrollList.innerHTML = '<div class="empty-list-notice">No browsing history yet.</div>';
+          return;
+        }
+        items.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'list-entry-item';
+          const timeStr = item.timestamp ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+          row.innerHTML = `
+            <div class="entry-info">
+              <span class="entry-title">${escapeHtml(item.title || item.url)}</span>
+              <span class="entry-meta">${timeStr ? timeStr + ' • ' : ''}${escapeHtml(item.url)}</span>
+            </div>
+            <button class="entry-delete-btn" title="Remove from history">✕</button>
+          `;
+          row.addEventListener('click', (e) => {
+            if (e.target.closest('.entry-delete-btn')) return;
+            closeHistoryModal();
+            api.navigateTo(item.url);
+          });
+          const delBtn = row.querySelector('.entry-delete-btn');
+          delBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (typeof api.deleteHistoryItem === 'function') {
+              await api.deleteHistoryItem(item.id);
+            }
+            row.remove();
+          });
+          historyScrollList.appendChild(row);
+        });
+      }
+      if (historyFilterInput) {
+        historyFilterInput.addEventListener('input', () => {
+          const q = historyFilterInput.value.toLowerCase().trim();
+          const filtered = currentHistoryData.filter(h => (h.title && h.title.toLowerCase().includes(q)) || (h.url && h.url.toLowerCase().includes(q)));
+          renderHistoryItems(filtered);
+        });
+      }
+      btnHistoryClose?.addEventListener('click', closeHistoryModal);
+      btnCloseHistoryModal?.addEventListener('click', closeHistoryModal);
+      btnClearHistoryBtn?.addEventListener('click', () => { closeHistoryModal(); openSettingsModal(); });
+      historyModal?.addEventListener('click', (e) => { if (e.target === historyModal) closeHistoryModal(); });
+
+      // Bookmarks Modal
+      let currentBookmarksData = [];
+      async function openBookmarksModal() {
+        if (!bookmarksModal) return;
+        bookmarksModal.classList.add('active');
+        if (typeof api.getBookmarks === 'function') {
+          currentBookmarksData = await api.getBookmarks() || [];
+          renderBookmarksItems(currentBookmarksData);
+        }
+      }
+      function closeBookmarksModal() {
+        if (bookmarksModal) bookmarksModal.classList.remove('active');
+      }
+      function renderBookmarksItems(items) {
+        if (!bookmarksScrollList) return;
+        bookmarksScrollList.innerHTML = '';
+        if (!items || items.length === 0) {
+          bookmarksScrollList.innerHTML = '<div class="empty-list-notice">No bookmarks saved yet. Click ★ in the address bar to bookmark pages.</div>';
+          return;
+        }
+        items.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'list-entry-item';
+          row.innerHTML = `
+            <div class="entry-info">
+              <span class="entry-title">${escapeHtml(item.title || item.url)}</span>
+              <span class="entry-meta">${escapeHtml(item.url)}</span>
+            </div>
+            <button class="entry-delete-btn" title="Delete bookmark">✕</button>
+          `;
+          row.addEventListener('click', (e) => {
+            if (e.target.closest('.entry-delete-btn')) return;
+            closeBookmarksModal();
+            api.navigateTo(item.url);
+          });
+          const delBtn = row.querySelector('.entry-delete-btn');
+          delBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (typeof api.deleteBookmark === 'function') {
+              await api.deleteBookmark(item.id);
+            }
+            row.remove();
+          });
+          bookmarksScrollList.appendChild(row);
+        });
+      }
+      if (bookmarksFilterInput) {
+        bookmarksFilterInput.addEventListener('input', () => {
+          const q = bookmarksFilterInput.value.toLowerCase().trim();
+          const filtered = currentBookmarksData.filter(b => (b.title && b.title.toLowerCase().includes(q)) || (b.url && b.url.toLowerCase().includes(q)));
+          renderBookmarksItems(filtered);
+        });
+      }
+      btnBookmarksClose?.addEventListener('click', closeBookmarksModal);
+      btnCloseBookmarksModal?.addEventListener('click', closeBookmarksModal);
+      btnBookmarkCurrentPageModal?.addEventListener('click', async () => {
+        if (typeof api.toggleBookmark === 'function') {
+          const res = await api.toggleBookmark();
+          if (res) {
+            updateBookmarkStar(res.bookmarked);
+            currentBookmarksData = await api.getBookmarks() || [];
+            renderBookmarksItems(currentBookmarksData);
+          }
+        }
+      });
+      bookmarksModal?.addEventListener('click', (e) => { if (e.target === bookmarksModal) closeBookmarksModal(); });
+
+      // Downloads Modal
+      async function openDownloadsModal() {
+        if (!downloadsModal) return;
+        downloadsModal.classList.add('active');
+        if (typeof api.getDownloads === 'function') {
+          const items = await api.getDownloads() || [];
+          renderDownloadsItems(items);
+        }
+      }
+      function closeDownloadsModal() {
+        if (downloadsModal) downloadsModal.classList.remove('active');
+      }
+      function renderDownloadsItems(items) {
+        if (!downloadsScrollList) return;
+        downloadsScrollList.innerHTML = '';
+        if (!items || items.length === 0) {
+          downloadsScrollList.innerHTML = '<div class="empty-list-notice">No downloads found.</div>';
+          return;
+        }
+        items.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'list-entry-item';
+          const sizeMb = item.totalBytes ? (item.totalBytes / (1024 * 1024)).toFixed(1) + ' MB' : '';
+          row.innerHTML = `
+            <div class="entry-info">
+              <span class="entry-title">${escapeHtml(item.fileName || 'Download')}</span>
+              <span class="entry-meta">${sizeMb ? sizeMb + ' • ' : ''}${escapeHtml(item.state || 'completed')}</span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn-cancel" style="padding: 3px 8px; font-size: 11px;" id="btnOpen-${item.id}">Open</button>
+              <button class="btn-cancel" style="padding: 3px 8px; font-size: 11px;" id="btnFolder-${item.id}">Folder</button>
+            </div>
+          `;
+          row.querySelector(`#btnOpen-${item.id}`)?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (typeof api.openDownload === 'function') api.openDownload(item.filePath);
+          });
+          row.querySelector(`#btnFolder-${item.id}`)?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (typeof api.showInFolder === 'function') api.showInFolder(item.filePath);
+          });
+          downloadsScrollList.appendChild(row);
+        });
+      }
+      btnDownloads?.addEventListener('click', openDownloadsModal);
+      btnDownloadsClose?.addEventListener('click', closeDownloadsModal);
+      btnCloseDownloadsModal?.addEventListener('click', closeDownloadsModal);
+      btnClearDownloadsListBtn?.addEventListener('click', async () => {
+        if (typeof api.clearDownloads === 'function') {
+          await api.clearDownloads();
+          renderDownloadsItems([]);
+        }
+      });
+      downloadsModal?.addEventListener('click', (e) => { if (e.target === downloadsModal) closeDownloadsModal(); });
+
+      // About Modal
+      function openAboutModal() {
+        if (aboutModal) aboutModal.classList.add('active');
+      }
+      function closeAboutModal() {
+        if (aboutModal) aboutModal.classList.remove('active');
+      }
+      btnAboutClose?.addEventListener('click', closeAboutModal);
+      btnCloseAboutModal?.addEventListener('click', closeAboutModal);
+      aboutModal?.addEventListener('click', (e) => { if (e.target === aboutModal) closeAboutModal(); });
+
+      if (typeof api.onShowBookmarks === 'function') {
+        api.onShowBookmarks(() => openBookmarksModal());
       }
 
       // Download Toast Helper
@@ -1003,6 +1690,13 @@
               lockIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>';
             }
 
+            // Synchronize Bookmark Star state
+            if (typeof data.isBookmarked === 'boolean') {
+              updateBookmarkStar(data.isBookmarked);
+            } else if (data.url && typeof api.checkIsBookmarked === 'function') {
+              api.checkIsBookmarked(data.url).then(b => updateBookmarkStar(b));
+            }
+
             // Update Back/Forward button disabled state if provided
             if (typeof data.canGoBack === 'boolean') {
               document.getElementById('btnDeskBack').disabled = !data.canGoBack;
@@ -1060,8 +1754,17 @@
 
       // Global Keyboard Shortcuts
       window.addEventListener('keydown', (e) => {
+        // Ctrl+Tab / Ctrl+Shift+Tab -> Cycle Tabs
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Tab') {
+          e.preventDefault();
+          if (typeof api.cycleTab === 'function') {
+            api.cycleTab(e.shiftKey ? -1 : 1);
+          }
+          return;
+        }
+
         // Ctrl+L or Ctrl+K or Ctrl+E -> Focus Omnibox
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'l' || e.key === 'k' || e.key === 'e')) {
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'l' || e.key === 'k' || e.key === 'e')) {
           e.preventDefault();
           omnibox.focus();
           omnibox.select();
@@ -1080,6 +1783,47 @@
         else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'w') {
           e.preventDefault();
           if (activeTabId) api.closeTab(activeTabId);
+        }
+        // Ctrl+N -> New Window
+        else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'n') {
+          e.preventDefault();
+          if (typeof api.createWindow === 'function') api.createWindow();
+        }
+        // Ctrl+Shift+N -> New Incognito Window
+        else if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'N' || e.key === 'n')) {
+          e.preventDefault();
+          if (typeof api.createIncognitoWindow === 'function') api.createIncognitoWindow();
+          else api.createTab('staunt://newtab', { isIncognito: true });
+        }
+        // Ctrl+H -> History
+        else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'h') {
+          e.preventDefault();
+          openHistoryModal();
+        }
+        // Ctrl+J -> Downloads
+        else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'j') {
+          e.preventDefault();
+          openDownloadsModal();
+        }
+        // Ctrl+Shift+O -> Bookmarks
+        else if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'O' || e.key === 'o')) {
+          e.preventDefault();
+          openBookmarksModal();
+        }
+        // Ctrl+D -> Bookmark Tab
+        else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'd') {
+          e.preventDefault();
+          if (btnBookmark) btnBookmark.click();
+        }
+        // Ctrl+P -> Print
+        else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'p') {
+          e.preventDefault();
+          if (typeof api.printToPDF === 'function') api.printToPDF();
+        }
+        // F11 -> Fullscreen
+        else if (e.key === 'F11') {
+          e.preventDefault();
+          if (typeof api.toggleFullscreen === 'function') api.toggleFullscreen();
         }
         // Alt+Left -> Back
         else if (e.altKey && e.key === 'ArrowLeft') {
@@ -1100,6 +1844,16 @@
         else if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'Delete' || e.key === 'Del')) {
           e.preventDefault();
           openSettingsModal();
+        }
+        // Escape -> Close all modals and menus
+        else if (e.key === 'Escape') {
+          if (threeDotMenu) threeDotMenu.classList.remove('active');
+          closeSettingsModal();
+          closeHistoryModal();
+          closeBookmarksModal();
+          closeDownloadsModal();
+          closeAboutModal();
+          hideSuggestions();
         }
       });
 

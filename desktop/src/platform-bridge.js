@@ -43,7 +43,7 @@
     });
   }
 
-  // 2. Anonymized Search Sanitizer (DuckDuckGo Lite / Brave Zero-Telemetry)
+  // 2. STAUNT Sovereign Search Sanitizer (Privacy-First Zero-Telemetry)
   function formatCleanSearch(input) {
     const trimmed = (input || '').trim();
     if (!trimmed || trimmed === 'staunt://newtab' || trimmed === 'about:blank') {
@@ -59,8 +59,8 @@
       return 'https://' + trimmed;
     }
 
-    // Zero-telemetry query forwarder (DuckDuckGo Lite parameter-stripped)
-    return `https://html.duckduckgo.com/html/?q=${encodeURIComponent(trimmed)}`;
+    // STAUNT Sovereign Search Forwarder
+    return `http://127.0.0.1:5000/?q=${encodeURIComponent(trimmed)}`;
   }
 
   // 3. Platform Unified Methods

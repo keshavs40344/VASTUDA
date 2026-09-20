@@ -297,6 +297,111 @@ function recordDownload(entry) {
   } catch (e) {}
 }
 
+const SESSION_FILE = path.join(USER_DATA_PATH, 'staunt_session_tabs.json');
+
+function saveSessionTabs() {
+  if (tabs.size === 0) return;
+  const sessionTabs = [];
+  for (const [id, tab] of tabs.entries()) {
+    if (!tab.isIncognito && tab.url && !tab.url.startsWith('javascript:') && !tab.url.startsWith('data:')) {
+      sessionTabs.push({
+        url: tab.url,
+        title: tab.title,
+        isPinned: tab.isPinned,
+        workspaceId: tab.workspaceId
+      });
+    }
+  }
+  try {
+    fs.writeFileSync(SESSION_FILE, JSON.stringify(sessionTabs), 'utf-8');
+  } catch (e) {}
+}
+
+function restoreSessionTabs() {
+  try {
+    if (fs.existsSync(SESSION_FILE)) {
+      const data = JSON.parse(fs.readFileSync(SESSION_FILE, 'utf-8'));
+      if (Array.isArray(data) && data.length > 0) {
+        for (const item of data) {
+          createTab(item.url || 'staunt://newtab', {
+            isPinned: Boolean(item.isPinned),
+            workspaceId: item.workspaceId
+          });
+        }
+        return true;
+      }
+    }
+  } catch (e) {}
+  return false;
+}
+
+function cycleTab(direction = 1) {
+  const tabIds = Array.from(tabs.keys());
+  if (tabIds.length <= 1) return;
+  const currentIndex = tabIds.indexOf(activeTabId);
+  const nextIndex = (currentIndex + direction + tabIds.length) % tabIds.length;
+  switchTab(tabIds[nextIndex]);
+}
+
+function isUrlBookmarked(url) {
+  if (!url || typeof url !== 'string') return false;
+  const clean = url.trim();
+  if (!clean || clean.startsWith('staunt://') || clean.includes('newtab.html') || clean === 'about:blank') return false;
+  return bookmarksDB.some(b => b.url === clean);
+}
+
+function toggleBookmarkCurrentPage() {
+  const tab = tabs.get(activeTabId);
+  if (!tab) return { bookmarked: false };
+  const currentUrl = tab.url;
+  if (!currentUrl || currentUrl.startsWith('staunt://') || currentUrl.includes('newtab.html') || currentUrl === 'about:blank') {
+    return { bookmarked: false, url: currentUrl };
+  }
+  const existingIdx = bookmarksDB.findIndex(b => b.url === currentUrl);
+  if (existingIdx !== -1) {
+    bookmarksDB.splice(existingIdx, 1);
+    try { fs.writeFileSync(BOOKMARKS_FILE, JSON.stringify(bookmarksDB), 'utf-8'); } catch(e) {}
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('bookmark-status-changed', { url: currentUrl, bookmarked: false });
+    }
+    return { bookmarked: false, url: currentUrl };
+  } else {
+    const newItem = {
+      id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+      title: tab.title || currentUrl,
+      url: currentUrl,
+      favicon: tab.favicon || '',
+      createdAt: Date.now()
+    };
+    bookmarksDB.unshift(newItem);
+    try { fs.writeFileSync(BOOKMARKS_FILE, JSON.stringify(bookmarksDB), 'utf-8'); } catch(e) {}
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('bookmark-status-changed', { url: currentUrl, bookmarked: true, bookmark: newItem });
+    }
+    return { bookmarked: true, url: currentUrl, bookmark: newItem };
+  }
+}
+
+function deleteBookmark(id) {
+  const initLen = bookmarksDB.length;
+  bookmarksDB = bookmarksDB.filter(b => b.id !== id);
+  try { fs.writeFileSync(BOOKMARKS_FILE, JSON.stringify(bookmarksDB), 'utf-8'); } catch(e) {}
+  return { success: bookmarksDB.length < initLen };
+}
+
+function deleteHistoryItem(id) {
+  const initLen = historyDB.length;
+  historyDB = historyDB.filter(h => h.id !== id);
+  try { fs.writeFileSync(HISTORY_FILE, JSON.stringify(historyDB), 'utf-8'); } catch(e) {}
+  return { success: historyDB.length < initLen };
+}
+
+function clearDownloads() {
+  downloadsDB = [];
+  try { fs.writeFileSync(DOWNLOADS_FILE, JSON.stringify([]), 'utf-8'); } catch(e) {}
+  return { success: true };
+}
+
 // =============================================================================
 // NATIVE MENU HELPERS
 // =============================================================================
@@ -453,7 +558,11 @@ function createMainWindow() {
     mainWindow.show();
     // Instantiate and attach initial WebContentsView immediately so viewport is never 0x0
     if (tabs.size === 0) {
-      createTab('staunt://newtab');
+      if (settingsDB.restoreTabsOnStartup && restoreSessionTabs()) {
+        console.log('[SESSION] Restored tabs from previous session');
+      } else {
+        createTab('staunt://newtab');
+      }
     } else {
       updateLayoutBounds();
     }
@@ -602,7 +711,10 @@ function createMainWindow() {
     scheduleSaveWindowState();
   });
   
-  mainWindow.on('close', () => saveWindowState());
+  mainWindow.on('close', () => {
+    saveSessionTabs();
+    saveWindowState();
+  });
   
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -927,7 +1039,8 @@ function broadcastUrlSync(tabObj) {
       url: tabObj.url,
       title: tabObj.title,
       canGoBack: tabObj.canGoBack,
-      canGoForward: tabObj.canGoForward
+      canGoForward: tabObj.canGoForward,
+      isBookmarked: isUrlBookmarked(tabObj.url)
     });
   }
 }
@@ -1528,12 +1641,66 @@ ipcMain.handle('clear-history', (e, range) => {
   return clearHistoryRange(range);
 });
 
+ipcMain.on('cycle-tab', (e, direction) => {
+  if (!verifyIpcSender(e)) return;
+  cycleTab(typeof direction === 'number' ? direction : 1);
+});
+
+ipcMain.handle('toggle-bookmark', (e) => {
+  if (!verifyIpcSender(e)) return { bookmarked: false };
+  return toggleBookmarkCurrentPage();
+});
+
+ipcMain.handle('check-is-bookmarked', (e, url) => {
+  if (!verifyIpcSender(e)) return false;
+  return isUrlBookmarked(url);
+});
+
+ipcMain.handle('delete-bookmark', (e, id) => {
+  if (!verifyIpcSender(e)) return { success: false };
+  return deleteBookmark(id);
+});
+
+ipcMain.handle('delete-history-item', (e, id) => {
+  if (!verifyIpcSender(e)) return { success: false };
+  return deleteHistoryItem(id);
+});
+
+ipcMain.handle('clear-downloads', (e) => {
+  if (!verifyIpcSender(e)) return { success: false };
+  return clearDownloads();
+});
+
+ipcMain.on('create-window', (e) => {
+  if (!verifyIpcSender(e)) return;
+  createMainWindow();
+});
+
+ipcMain.on('create-incognito-window', (e) => {
+  if (!verifyIpcSender(e)) return;
+  createTab('staunt://newtab', { isIncognito: true });
+});
+
+ipcMain.on('toggle-fullscreen', (e) => {
+  if (!verifyIpcSender(e)) return;
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.setFullScreen(!mainWindow.isFullScreen());
+  }
+});
+
 // 6. Intelligent Omnibox Autocomplete Suggestions Handlers
 ipcMain.handle('get-suggestions', async (e, query) => {
   if (!verifyIpcSender(e)) return [];
   if (!query || typeof query !== 'string') return [];
   const trimmed = query.trim().slice(0, 256);
   if (!trimmed) return [];
+
+  // Match from local bookmarks
+  const bookmarkMatches = bookmarksDB
+    .filter(b => (b.title && b.title.toLowerCase().includes(trimmed.toLowerCase())) ||
+                 (b.url && b.url.toLowerCase().includes(trimmed.toLowerCase())))
+    .slice(0, 2)
+    .map(b => ({ text: b.title || b.url, url: b.url, type: 'bookmark' }));
 
   // Match from local history
   const historyMatches = historyDB
@@ -1563,7 +1730,7 @@ ipcMain.handle('get-suggestions', async (e, query) => {
 
   const seen = new Set();
   const results = [];
-  for (const item of [...historyMatches, ...remoteSuggestions]) {
+  for (const item of [...bookmarkMatches, ...historyMatches, ...remoteSuggestions]) {
     const key = (item.text || '').toLowerCase();
     if (key && !seen.has(key)) {
       seen.add(key);
@@ -1598,6 +1765,10 @@ ipcMain.on('toggle-devtools', (e) => {
       tab.view.webContents.toggleDevTools();
     }
   }
+});
+
+ipcMain.on('show-about', (e) => {
+  if (verifyIpcSender(e)) showAboutDialog();
 });
 
 // App Lifecycle
