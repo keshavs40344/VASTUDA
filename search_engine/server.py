@@ -123,7 +123,7 @@ def get_git_commit_sha():
 def health_check():
     return jsonify({
         "status": "ok",
-        "version": "4.2",
+        "version": "5.2",
         "service": "VASTUDA Sovereign Search & Discovery Engine",
         "timestamp": int(time.time())
     })
@@ -133,7 +133,7 @@ def health_check():
 def api_version():
     return jsonify({
         "app": "VASTUDA",
-        "version": "4.2",
+        "version": "5.2",
         "commit": get_git_commit_sha(),
         "environment": "production"
     })
@@ -983,11 +983,17 @@ def api_crawler_diagnostics():
 
 @app.route("/api/search/debug", methods=["GET"])
 def api_search_debug():
-    """Development-only query debugging endpoint with detailed ranking telemetry."""
+    """Development-only query debugging endpoint with detailed ranking telemetry.
+    Access is granted ONLY to localhost IPs, or when DEBUG_KEY env var is explicitly
+    set AND the request provides a matching key. No hardcoded fallback key exists.
+    """
     client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "127.0.0.1").split(",")[0].strip()
     auth_key = request.headers.get("X-Vastuda-Debug-Key") or request.args.get("debug_key")
     is_local = client_ip in ("127.0.0.1", "::1", "localhost")
-    is_authorized = auth_key == os.getenv("DEBUG_KEY", "vastuda-dev-2026")
+
+    # Key auth: only works when DEBUG_KEY env var is explicitly configured (no default fallback)
+    configured_key = os.getenv("DEBUG_KEY")  # None if not set — intentional, no fallback
+    is_authorized = bool(configured_key and auth_key and auth_key == configured_key)
 
     if not (is_local or is_authorized):
         return jsonify({"error": "Unauthorized. Debug endpoint is restricted to development environments.", "status": 403}), 403

@@ -39,21 +39,47 @@ CRAWLER_DIAGNOSTICS = {
 }
 
 
-# Curated high-value open seed sources across tech, science, governance, and Indian public knowledge
+# Curated high-value open seed sources — expanded for 5.2 index quality
+# Targets: 20+ domains, ~100–200 indexable documents of genuine reference quality.
+# Every URL here is publicly accessible, robot-compliant, and informationally dense.
 SEED_SOURCES = [
-    # Official Programming & Technical Documentation
+    # ── Python Official Documentation ──────────────────────────────────────
     "https://docs.python.org/3/tutorial/index.html",
     "https://docs.python.org/3/tutorial/datastructures.html",
     "https://docs.python.org/3/tutorial/controlflow.html",
+    "https://docs.python.org/3/tutorial/classes.html",
+    "https://docs.python.org/3/tutorial/errors.html",
+    "https://docs.python.org/3/library/functions.html",
+    "https://docs.python.org/3/library/itertools.html",
+    "https://docs.python.org/3/library/collections.html",
+    "https://docs.python.org/3/glossary.html",
+
+    # ── MDN Web Docs — HTML/CSS/JS ─────────────────────────────────────────
     "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures",
+    "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise",
     "https://developer.mozilla.org/en-US/docs/Learn/HTML",
     "https://developer.mozilla.org/en-US/docs/Learn/CSS",
     "https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Flexbox",
-    "https://docs.docker.com/get-started/",
+    "https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Grids",
+    "https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview",
+    "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch",
+
+    # ── Git & DevOps ───────────────────────────────────────────────────────
     "https://git-scm.com/doc",
     "https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging",
+    "https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F",
+    "https://docs.docker.com/get-started/",
+    "https://docs.docker.com/get-started/overview/",
+
+    # ── SQLite & Databases ─────────────────────────────────────────────────
     "https://www.sqlite.org/wal.html",
-    # Open Knowledge, Science & Computing
+    "https://www.sqlite.org/fts5.html",
+    "https://www.sqlite.org/queryplanner.html",
+    "https://www.sqlite.org/lang_select.html",
+
+    # ── Wikipedia — CS Fundamentals & Algorithms ───────────────────────────
     "https://en.wikipedia.org/wiki/Artificial_intelligence",
     "https://en.wikipedia.org/wiki/Machine_learning",
     "https://en.wikipedia.org/wiki/Quantum_computing",
@@ -64,20 +90,64 @@ SEED_SOURCES = [
     "https://en.wikipedia.org/wiki/Photosynthesis",
     "https://en.wikipedia.org/wiki/Binary_search_algorithm",
     "https://en.wikipedia.org/wiki/Relational_database",
-    # Indian Governance, Law & Space Science
+    "https://en.wikipedia.org/wiki/Neural_network_(machine_learning)",
+    "https://en.wikipedia.org/wiki/Sorting_algorithm",
+    "https://en.wikipedia.org/wiki/Big_O_notation",
+    "https://en.wikipedia.org/wiki/Hash_table",
+    "https://en.wikipedia.org/wiki/Graph_(abstract_data_type)",
+    "https://en.wikipedia.org/wiki/Linked_list",
+    "https://en.wikipedia.org/wiki/Dynamic_programming",
+    "https://en.wikipedia.org/wiki/Recursion_(computer_science)",
+    "https://en.wikipedia.org/wiki/Application_programming_interface",
+    "https://en.wikipedia.org/wiki/Representational_state_transfer",
+    "https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol",
+    "https://en.wikipedia.org/wiki/Internet_protocol_suite",
+    "https://en.wikipedia.org/wiki/Encryption",
+    "https://en.wikipedia.org/wiki/Public-key_cryptography",
+    "https://en.wikipedia.org/wiki/Linux",
+    "https://en.wikipedia.org/wiki/Open-source_software",
+    "https://en.wikipedia.org/wiki/Version_control",
+    "https://en.wikipedia.org/wiki/Compiler",
+    "https://en.wikipedia.org/wiki/Operating_system",
+
+    # ── Wikipedia — Science & Nature ───────────────────────────────────────
+    "https://en.wikipedia.org/wiki/Climate_change",
+    "https://en.wikipedia.org/wiki/DNA",
+    "https://en.wikipedia.org/wiki/Evolution",
+    "https://en.wikipedia.org/wiki/Black_hole",
+    "https://en.wikipedia.org/wiki/Theory_of_relativity",
+    "https://en.wikipedia.org/wiki/Periodic_table",
+    "https://en.wikipedia.org/wiki/Human_brain",
+    "https://en.wikipedia.org/wiki/Vaccine",
+    "https://en.wikipedia.org/wiki/Protein",
+    "https://en.wikipedia.org/wiki/Internet",
+
+    # ── Indian Governance, Law & Space Science ────────────────────────────
     "https://en.wikipedia.org/wiki/Constitution_of_India",
     "https://en.wikipedia.org/wiki/Preamble_to_the_Constitution_of_India",
     "https://en.wikipedia.org/wiki/Fundamental_Rights,_Directive_Principles_and_Fundamental_Duties_of_India",
     "https://en.wikipedia.org/wiki/Indian_Space_Research_Organisation",
+    "https://en.wikipedia.org/wiki/Chandrayaan-3",
+    "https://en.wikipedia.org/wiki/Aditya-L1",
+    "https://en.wikipedia.org/wiki/India",
+    "https://en.wikipedia.org/wiki/Economy_of_India",
     "https://www.india.gov.in/my-government/constitution-india",
-    # Hindi Knowledge & Science
+
+    # ── Hindi Wikipedia — Science, Technology & India ─────────────────────
+    # (URLs are percent-encoded Unicode for Devanagari article names)
     "https://hi.wikipedia.org/wiki/%E0%A4%AD%E0%A4%BE%E0%A4%B0%E0%A4%A4_%E0%A4%95%E0%A4%BE_%E0%A4%B8%E0%A4%82%E0%A4%B5%E0%A4%BF%E0%A4%A7%E0%A4%BE%E0%A4%A8",
-    "https://hi.wikipedia.org/wiki/%E0%A4%AD%E0%A4%BE%E0%A4%B0%E0%A4%A4%E0%A5%80%E0%A4%AF_%E0%A4%85%E0%A4%82%E0%A4%A4%E0%A4%B0%E0%A4%bf%E0%A4%95%E0%A5%8D%E0%A4%B7_%E0%A4%85%E0%A4%A8%E0%A4%B8%E0%A4%82%E0%A4%A7%E0%A4%BE%E0%A4%A8_%E0%A4%B8%E0%A4%82%E0%A4%97%E0%A4%A0%E0%A4%A8",
+    "https://hi.wikipedia.org/wiki/%E0%A4%AD%E0%A4%BE%E0%A4%B0%E0%A4%A4%E0%A5%80%E0%A4%AF_%E0%A4%85%E0%A4%82%E0%A4%A4%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A5%8D%E0%A4%B7_%E0%A4%85%E0%A4%A8%E0%A5%81%E0%A4%B8%E0%A4%82%E0%A4%A7%E0%A4%BE%E0%A4%A8_%E0%A4%B8%E0%A4%82%E0%A4%97%E0%A4%A0%E0%A4%A8",
     "https://hi.wikipedia.org/wiki/%E0%A4%95%E0%A4%82%E0%A4%AA%E0%A5%8D%E0%A4%AF%E0%A5%82%E0%A4%9F%E0%A4%B0",
     "https://hi.wikipedia.org/wiki/%E0%A4%B8%E0%A5%8C%E0%A4%B0%E0%A4%AE%E0%A4%A3%E0%A5%8D%E0%A4%A1%E0%A4%B2",
     "https://hi.wikipedia.org/wiki/%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%95%E0%A4%BE%E0%A4%B6_%E0%A4%B8%E0%A4%82%E0%A4%B6%E0%A5%8D%E0%A4%B2%E0%A5%87%E0%A4%B7%E0%A4%A3",
-    "https://hi.wikipedia.org/wiki/%E0%A4%87%E0%A4%82%E0%A4%9F%E0%A4%B0%E0%A4%A8%E0%A5%87%E0%A4%9F"
+    "https://hi.wikipedia.org/wiki/%E0%A4%87%E0%A4%82%E0%A4%9F%E0%A4%B0%E0%A4%A8%E0%A5%87%E0%A4%9F",
+    "https://hi.wikipedia.org/wiki/%E0%A4%95%E0%A5%83%E0%A4%A4%E0%A5%8D%E0%A4%B0%E0%A4%BF%E0%A4%AE_%E0%A4%AC%E0%A5%81%E0%A4%A6%E0%A5%8D%E0%A4%A7%E0%A4%BF%E0%A4%AE%E0%A4%A4%E0%A5%8D%E0%A4%A4%E0%A4%BE",
+    "https://hi.wikipedia.org/wiki/%E0%A4%AD%E0%A4%BE%E0%A4%B0%E0%A4%A4",
+    "https://hi.wikipedia.org/wiki/%E0%A4%AE%E0%A4%B6%E0%A5%80%E0%A4%A8_%E0%A4%B2%E0%A4%B0%E0%A5%8D%E0%A4%A8%E0%A4%BF%E0%A4%82%E0%A4%97",
+    "https://hi.wikipedia.org/wiki/%E0%A4%A1%E0%A5%80%E0%A4%8F%E0%A4%A8%E0%A4%8F",
+    "https://hi.wikipedia.org/wiki/%E0%A4%9C%E0%A4%B2%E0%A4%B5%E0%A4%BE%E0%A4%AF%E0%A5%81_%E0%A4%AA%E0%A4%B0%E0%A4%BF%E0%A4%B5%E0%A4%B0%E0%A5%8D%E0%A4%A4%E0%A4%A8",
 ]
+
 
 
 def is_safe_url(url: str) -> bool:
@@ -434,20 +504,31 @@ def get_crawler_diagnostics() -> dict:
     return diag
 
 
-def seed_crawl_knowledge(max_seeds: int = 35):
+def seed_crawl_knowledge(max_seeds: int = 100):
     """
     Seed initial high-value knowledge documents into VASTUDA index.
+    Expanded in 5.2 to cover 90+ curated sources (Python docs, MDN, SQLite,
+    Wikipedia CS/Science/Hindi/India, Git, Docker).
     """
-    print(f"[Crawler] Seeding high-value knowledge from {min(len(SEED_SOURCES), max_seeds)} sources...")
+    total = min(len(SEED_SOURCES), max_seeds)
+    print(f"[Crawler] Seeding {total} high-value knowledge sources (5.2 expanded corpus)...")
     indexed_count = 0
     for seed_url in SEED_SOURCES[:max_seeds]:
         try:
             res = crawl_url(seed_url, max_depth=0, source_type="curated_seed", quality_score=1.0)
             if res.get("status") == "indexed":
                 indexed_count += 1
-                print(f"  [Indexed] {seed_url[:45]} -> doc_id {res.get('doc_id')}")
-            time.sleep(0.3)  # Polite crawling delay
+                print(f"  [Indexed] {seed_url[:55]} -> doc_id {res.get('doc_id')}")
+            elif res.get("status") in ("already_indexed", "thin_content", "robots_rejected"):
+                print(f"  [Skip:{res['status']}] {seed_url[:55]}")
+            time.sleep(0.3)  # Polite crawling delay (100ms between same-domain; 300ms overall)
         except Exception as e:
             logger.warning(f"Seed note on {seed_url}: {e}")
 
+    print(f"[Crawler] Seed crawl complete: {indexed_count}/{total} indexed.")
     return indexed_count
+
+
+def run_seed_crawl(max_docs: int = 100):
+    """Alias for server.py compatibility. Delegates to seed_crawl_knowledge."""
+    return seed_crawl_knowledge(max_seeds=max_docs)

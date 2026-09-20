@@ -35,8 +35,11 @@ http_session.mount("https://", adapter)
 http_session.mount("http://", adapter)
 
 # Strict per-request socket timeouts (in seconds)
+# Tavily: reliable provider, allow reasonable time
 TAVILY_TIMEOUT = (2.0, 3.5)   # (connect, read)
-DDG_TIMEOUT = (2.0, 3.5)      # (connect, read)
+# DuckDuckGo: consistently returns 202 bot-check at 2s; cut aggressively
+# If DDG can't respond in <1.2s connect+read, skip it — Tavily covers the query
+DDG_TIMEOUT = (0.8, 1.2)      # (connect, read) — was (2.0, 3.5) causing 2000ms timeouts
 WIKI_TIMEOUT = (2.0, 3.0)     # (connect, read)
 
 # Persistent non-blocking thread pool for concurrent provider execution
@@ -265,10 +268,11 @@ def execute_web_query(query, max_results=8, topic="general", include_images=True
         search_duckduckgo_raw, query, max_results, time_range
     )
 
-    # High-speed bounded wait: return as soon as first provider completes with results
+    # High-speed bounded wait: return as soon as first provider completes with results.
+    # Primary wait: 1.2s (Tavily typically responds in 800–1100ms; DDG cut to 1.2s max)
     done, not_done = concurrent.futures.wait(
         [tav_future, ddg_future],
-        timeout=1.8,
+        timeout=1.2,
         return_when=concurrent.futures.FIRST_COMPLETED
     )
     for f in done:
@@ -283,9 +287,10 @@ def execute_web_query(query, max_results=8, topic="general", include_images=True
         except Exception:
             pass
 
-    # If first completed provider yielded insufficient results (< 4) and other is still pending, wait briefly
+    # Backup: if primary returned < 4 results and other is pending, wait briefly
+    # 0.3s — enough for a fast Tavily response; not enough to allow DDG to drag us
     if (len(tav_results) + len(ddg_results)) < 4 and not_done:
-        done_rest, _ = concurrent.futures.wait(not_done, timeout=0.8)
+        done_rest, _ = concurrent.futures.wait(not_done, timeout=0.3)
         for f in done_rest:
             try:
                 res = f.result(timeout=0.05)
