@@ -34,13 +34,10 @@ adapter = requests.adapters.HTTPAdapter(pool_connections=25, pool_maxsize=25, ma
 http_session.mount("https://", adapter)
 http_session.mount("http://", adapter)
 
-# Strict per-request socket timeouts (in seconds)
-# Tavily: reliable provider, allow reasonable time
-TAVILY_TIMEOUT = (2.0, 3.5)   # (connect, read)
-# DuckDuckGo: consistently returns 202 bot-check at 2s; cut aggressively
-# If DDG can't respond in <1.2s connect+read, skip it — Tavily covers the query
-DDG_TIMEOUT = (0.8, 1.2)      # (connect, read) — was (2.0, 3.5) causing 2000ms timeouts
-WIKI_TIMEOUT = (2.0, 3.0)     # (connect, read)
+# Strict per-request socket timeouts (in seconds, Phase 5.3: connect 1.0s, read 2.5s)
+TAVILY_TIMEOUT = (1.0, 2.5)   # (connect 1.0s, read 2.5s) -> total 3.5s
+DDG_TIMEOUT = (0.8, 1.2)      # (connect 0.8s, read 1.2s)
+WIKI_TIMEOUT = (1.0, 2.0)     # (connect 1.0s, read 2.0s)
 
 # Persistent non-blocking thread pool for concurrent provider execution
 ASYNC_POOL = concurrent.futures.ThreadPoolExecutor(max_workers=16)
@@ -836,31 +833,29 @@ def classify_query_intent(query: str) -> dict:
     }
 
 
-def search_with_hybrid_ranking(query: str, max_results: int = 8, time_range=None):
+def search_with_hybrid_ranking(query: str, max_results: int = 8, time_range=None, debug: bool = False):
     """
-    Execute VASTUDA 5.0 Robust Multi-Layer Hybrid Search:
-    1. Query Understanding (language, intent, entities, freshness).
-    2. Query VASTUDA Local FTS5 Index (with term expansion if Hinglish).
-    3. Query Web Retriever (Tavily + DuckDuckGo + Wikipedia).
-       - If query is Hinglish and initial search returns 0, try expanded query.
+    Execute VASTUDA 5.3 Production Multi-Layer Hybrid Search:
+    1. Query Understanding (safe normalization, tokenization, phrase extraction, intent, language, freshness).
+    2. Query VASTUDA Local FTS5 Index (with site: restriction and term expansion).
+    3. Query Web Retriever (Tavily + DuckDuckGo + Wikipedia bounded non-blocking).
     4. Merge candidates, validate schema, normalize canonical URLs.
-    5. Deduplicate and score using multi-signal relevance ranker.
-    6. Enforce domain diversity (max 2 per domain in top 8).
+    5. Deduplicate and score using transparent multi-signal relevance ranker.
+    6. Enforce adaptive domain diversity damping.
     7. Determine transparent provider provenance.
     """
     q_info = query_engine.understand_query(query)
     q_lang = q_info.get("language", "en")
-    is_fresh = q_info.get("freshness_required", False)
 
     # 1. Local VASTUDA Index Retrieval
     local_candidates = []
     try:
-        raw_local = indexer.search_local_index(query, limit=6, query_info=q_info)
+        raw_local = indexer.search_local_index(query, limit=indexer.RANKING_TOP_K, query_info=q_info, debug=debug)
         # If Hinglish and few local matches, also try normalized/expanded terms
         if len(raw_local) < 2 and q_info.get("expanded_terms"):
             expanded_q = " ".join(q_info["expanded_terms"][:4])
             if expanded_q != query:
-                extra_local = indexer.search_local_index(expanded_q, limit=4, query_info=q_info)
+                extra_local = indexer.search_local_index(expanded_q, limit=6, query_info=q_info, debug=debug)
                 raw_local.extend(extra_local)
 
         for item in raw_local:
@@ -873,66 +868,26 @@ def search_with_hybrid_ranking(query: str, max_results: int = 8, time_range=None
         logger.warning(f"Local index fetch note: {e}")
 
     # 2. Web Retriever (External Fallback / Augmentation)
-    web_data = execute_web_query(query, max_results=max_results, time_range=time_range)
+    web_data = execute_web_query(query, max_results=max(max_results, 8), time_range=time_range)
     web_candidates = web_data.get("results", [])
 
     # If web query returned 0 and query is Hinglish or multi-term, try expanded query fallback
     if not web_candidates and q_lang == "hinglish" and q_info.get("expanded_terms"):
         fallback_q = " ".join(q_info["expanded_terms"][:4])
         logger.info(f"Hinglish fallback query to web: {fallback_q}")
-        web_data = execute_web_query(fallback_q, max_results=max_results, time_range=time_range)
+        web_data = execute_web_query(fallback_q, max_results=max(max_results, 8), time_range=time_range)
         web_candidates = web_data.get("results", [])
 
     # 3. Merge & Deduplicate
     combined = local_candidates + web_candidates
     deduped = deduplicate_results(combined)
 
-    # 4. Multi-Signal Ranking over merged candidates
-    for item in deduped:
-        if "score" not in item:
-            item_title = (item.get("title") or "").lower()
-            item_snippet = (item.get("snippet") or "").lower()
-            q_lower = query.lower()
-            q_tokens = [t for t in re.sub(r'[^\w\s]', ' ', q_lower).split() if len(t) > 1]
-            
-            ext_score = 30.0  # Base score
-            if q_lower in item_title:
-                ext_score += 30.0
-            elif q_tokens:
-                matches = sum(1 for t in q_tokens if t in item_title)
-                ext_score += (matches / len(q_tokens)) * 20.0
-            if q_lower in item_snippet:
-                ext_score += 10.0
-            if is_fresh:
-                ext_score += 5.0
-            item["score"] = round(ext_score, 2)
+    # 4. Multi-Signal Ranking over merged candidates using indexer.score_candidates
+    final_ranked = indexer.score_candidates(
+        deduped, query, query_info=q_info, debug=debug, max_results=max_results
+    )
 
-    # Sort descending by final score
-    deduped.sort(key=lambda x: x.get("score", 0), reverse=True)
-
-    # 5. Apply Domain Diversity (max 2 per domain in top results)
-    domain_counts = {}
-    final_ranked = []
-    overflow = []
-
-    for item in deduped:
-        d = item.get("domain", "").lower()
-        if domain_counts.get(d, 0) < 2:
-            domain_counts[d] = domain_counts.get(d, 0) + 1
-            final_ranked.append(item)
-        else:
-            overflow.append(item)
-        if len(final_ranked) >= max_results:
-            break
-
-    # Fill from overflow if needed
-    if len(final_ranked) < max_results and overflow:
-        for item in overflow:
-            final_ranked.append(item)
-            if len(final_ranked) >= max_results:
-                break
-
-    # 6. Provider Provenance Labeling
+    # 5. Provider Provenance Labeling
     has_local = any(r.get("source") == "VASTUDA Local Index" for r in final_ranked)
     has_web = any(r.get("source") != "VASTUDA Local Index" for r in final_ranked)
 

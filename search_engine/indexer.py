@@ -1,21 +1,54 @@
 """
-VASTUDA 5.0 — Intelligent Indexer & Transparent Multi-Signal Ranking Pipeline
+VASTUDA 5.3 — Production-Grade Indexer & Transparent Multi-Signal Ranking Pipeline
+
 Features:
 - FTS5 full-text indexing with SQLite WAL concurrency
-- Rich metadata (content_type, source_type, author, canonical_domain, language)
-- Multi-signal transparent relevance ranking (BM25 + Title + Heading + Phrase + Language + Freshness + Quality)
-- Controlled source diversity (domain clustering control)
-- Explainable score breakdown for every retrieved item
+- Configurable ranking weights & candidate limits via environment variables
+- Transparent Multi-Signal Ranking Engine:
+  * text_relevance_score (BM25 from FTS5)
+  * title_score (exact phrase, quoted phrase, token overlap)
+  * phrase_score (quoted exact phrase in body, contiguous term ordering)
+  * url_score (domain match, term in URL path/slug, site restriction)
+  * freshness_score (reliable timestamp, neutral for evergreen)
+  * quality_score (substantive length, structured headings, boilerplate control)
+  * authority_score (documentation, encyclopedic, academic source types)
+  * query_intent_score (query-document intent alignment)
+  * duplicate & spam penalties (thin content, keyword stuffing)
+- Adaptive domain diversity (score-proportional damping)
+- Machine-readable debug breakdown in developer debug mode
+- Passage snippet generation using search_validator
 """
 
+import os
 import re
 import time
 import hashlib
 import logging
 import urllib.parse
 from search_engine import db
+from search_engine import search_validator
+try:
+    from search_engine import query_engine
+except ImportError:
+    import query_engine
 
 logger = logging.getLogger("VASTUDA_Indexer")
+
+# Configurable Limits (Phase 5.3)
+RETRIEVAL_TOP_K = int(os.getenv("RETRIEVAL_TOP_K", 50))
+RANKING_TOP_K = int(os.getenv("RANKING_TOP_K", 30))
+FINAL_RESULTS = int(os.getenv("FINAL_RESULTS", os.getenv("SEARCH_TOP_K", 10)))
+
+# Configurable Ranking Weights (Phase 5.3)
+W_TEXT = float(os.getenv("RANK_TEXT_WEIGHT", 1.0))
+W_TITLE = float(os.getenv("RANK_TITLE_WEIGHT", 1.0))
+W_PHRASE = float(os.getenv("RANK_PHRASE_WEIGHT", 1.0))
+W_URL = float(os.getenv("RANK_URL_WEIGHT", 1.0))
+W_FRESHNESS = float(os.getenv("RANK_FRESHNESS_WEIGHT", 1.0))
+W_QUALITY = float(os.getenv("RANK_QUALITY_WEIGHT", 1.0))
+W_AUTHORITY = float(os.getenv("RANK_AUTHORITY_WEIGHT", 1.0))
+W_INTENT = float(os.getenv("RANK_INTENT_WEIGHT", 1.0))
+DIVERSITY_PENALTY_STEP = float(os.getenv("RANK_DIVERSITY_PENALTY", 4.0))
 
 
 def clean_text_for_fts(text: str) -> str:
@@ -23,7 +56,7 @@ def clean_text_for_fts(text: str) -> str:
     if not text:
         return ""
     # Remove special FTS punctuation and operators
-    clean = re.sub(r'[^\w\s]', ' ', text)
+    clean = re.sub(r'[^\w\s\u0900-\u097F]', ' ', text)
     tokens = [t for t in clean.strip().split() if len(t) > 0]
     if not tokens:
         return ""
@@ -48,13 +81,13 @@ def index_document(url: str, title: str, body_text: str, headings: str = "",
     if not url or not body_text:
         return 0
 
-    clean_url = url.strip()
+    clean_url = search_validator.normalize_url(url.strip()) or url.strip()
     try:
         domain = urllib.parse.urlparse(clean_url).netloc.lower()
     except Exception:
         domain = ""
 
-    canon_url = (canonical_url or clean_url).strip()
+    canon_url = search_validator.normalize_url((canonical_url or clean_url).strip()) or clean_url
     try:
         canonical_domain = urllib.parse.urlparse(canon_url).netloc.lower() or domain
     except Exception:
@@ -143,61 +176,106 @@ def index_document(url: str, title: str, body_text: str, headings: str = "",
 
 def compute_relevance_score(doc: dict, query: str, query_info: dict = None) -> tuple:
     """
-    Transparent Multi-Signal Relevance Scorer:
+    Transparent Multi-Signal Relevance Scorer (Phase 5.3):
     Evaluates:
-    - Base BM25 text match (from FTS5)
-    - Exact query match in title
-    - Term coverage in title
+    - Base BM25 text match (from FTS5) * W_TEXT
+    - Title matches (exact query, quoted phrases, token overlap) * W_TITLE
     - Heading matches
-    - Exact phrase match in body
+    - Phrase matches (quoted phrases in body, contiguous word ordering) * W_PHRASE
+    - URL and domain matches (query terms in path, domain match, site: restriction) * W_URL
     - Language congruence
-    - Source quality / authority
-    - Freshness signal (query-dependent)
+    - Source quality & Content structure * W_QUALITY
+    - Authority signal * W_AUTHORITY
+    - Query intent congruence * W_INTENT
+    - Freshness signal (query-dependent) * W_FRESHNESS
     - Low-quality / spam penalties
     Returns (composite_score, score_breakdown).
     """
-    q_lower = query.strip().lower()
-    q_tokens = [t for t in re.sub(r'[^\w\s]', ' ', q_lower).split() if len(t) > 1]
-    
+    q_info = query_info or {}
+    q_lower = (q_info.get("normalized_query") or query).strip().lower()
+    tokens = q_info.get("tokens") or [t for t in re.sub(r'[^\w\s\u0900-\u097F]', ' ', q_lower).split() if len(t) > 1]
+    phrases = q_info.get("phrases") or []
+
     title = (doc.get("title") or "").lower()
     headings = (doc.get("headings") or "").lower()
-    body = (doc.get("body_text") or "").lower()
+    body = (doc.get("body_text") or doc.get("snippet") or "").lower()
+    doc_url = (doc.get("canonical_url") or doc.get("url") or "").lower()
+    doc_domain = (doc.get("canonical_domain") or doc.get("domain") or "").lower()
     doc_lang = (doc.get("language") or "en").lower()
+
     raw_bm25 = abs(float(doc.get("bm25_rank") or 1.0))
-    # Normalized BM25 component (higher = better)
     bm25_score = min(raw_bm25 * 8.0, 50.0)
 
-    # 1. Title Signals
+    # 1. Title Signals (Step 6)
     title_boost = 0.0
     if q_lower and q_lower in title:
         title_boost += 35.0  # Full exact query phrase in title
-    elif q_tokens:
-        matched_tokens = sum(1 for t in q_tokens if t in title)
-        ratio = matched_tokens / len(q_tokens)
-        title_boost += ratio * 25.0
+    else:
+        # Check quoted phrases in title
+        for p in phrases:
+            if p.lower() in title:
+                title_boost += 20.0
+                break
+        if tokens:
+            matched_tokens = sum(1 for t in tokens if t in title)
+            ratio = matched_tokens / len(tokens)
+            title_boost += ratio * 22.0
 
     # 2. Heading Signals
     heading_boost = 0.0
     if q_lower and q_lower in headings:
-        heading_boost += 18.0
-    elif q_tokens:
-        matched_h = sum(1 for t in q_tokens if t in headings)
-        heading_boost += (matched_h / max(len(q_tokens), 1)) * 10.0
+        heading_boost += 16.0
+    elif tokens:
+        matched_h = sum(1 for t in tokens if t in headings)
+        heading_boost += (matched_h / max(len(tokens), 1)) * 10.0
 
-    # 3. Exact Phrase in Body
+    # 3. Phrase Signals (Step 7)
     phrase_boost = 0.0
-    if len(q_tokens) > 1 and q_lower in body:
-        phrase_boost += 12.0
+    # Strong boost for user's explicit quoted phrases appearing in body
+    for p in phrases:
+        if p.lower() in body:
+            phrase_boost += 16.0
+            break
 
-    # 4. Language Match Signal
+    # Natural word-order bonus for normal queries
+    if len(tokens) > 1:
+        if q_lower in body:
+            phrase_boost += 12.0
+        else:
+            # Check 2-token contiguous bigrams in body
+            bigram_matches = 0
+            for i in range(len(tokens) - 1):
+                bigram = f"{tokens[i]} {tokens[i+1]}"
+                if bigram in body:
+                    bigram_matches += 1
+            if bigram_matches > 0:
+                phrase_boost += min(8.0, bigram_matches * 3.0)
+
+    # 4. URL and Domain Signals (Step 8)
+    url_boost = 0.0
+    site_restr = q_info.get("site_restriction")
+    if site_restr and (site_restr in doc_domain or doc_domain in site_restr):
+        url_boost += 30.0  # Explicit site: restriction satisfied
+
+    # Check query terms in URL path / slug
+    if tokens:
+        tokens_in_url = sum(1 for t in tokens if t in doc_url)
+        if tokens_in_url > 0:
+            url_boost += min(8.0, (tokens_in_url / len(tokens)) * 8.0)
+
+    # Navigational root domain match
+    if q_info.get("intent") in ("navigational", "domain") and any(t in doc_domain for t in tokens):
+        url_boost += 10.0
+
+    # 5. Language Match Signal
     lang_boost = 0.0
-    query_lang = query_info.get("language", "en") if query_info else "en"
+    query_lang = q_info.get("language", "en")
     if query_lang == doc_lang:
         lang_boost += 10.0
     elif query_lang == "hinglish" and (doc_lang in ("en", "hi") or any(t in body for t in ["sikhe", "kare", "kaise", "hindi"])):
         lang_boost += 8.0
 
-    # 5. Measurable Content Structure Quality (no arbitrary authority bonuses)
+    # 6. Measurable Content Structure Quality (Step 9)
     quality_boost = 0.0
     body_word_count = len(body.split())
     if 250 <= body_word_count <= 10000:
@@ -207,25 +285,42 @@ def compute_relevance_score(doc: dict, query: str, query_info: dict = None) -> t
     if doc.get("meta_desc") and len(str(doc.get("meta_desc")).strip()) > 25:
         quality_boost += 2.0  # Quality metadata description present
 
-    # 6. Intent-Aligned Content Congruence (Query-document intent match)
-    intent_boost = 0.0
-    q_intent = query_info.get("intent", "informational") if query_info else "informational"
-    c_type = (doc.get("content_type") or "web").lower()
+    # 7. Authority Signal (Documentation, Encyclopedic, Academic)
+    authority_boost = 0.0
     s_type = (doc.get("source_type") or "web").lower()
+    c_type = (doc.get("content_type") or "web").lower()
+    if s_type in ("academic", "encyclopedic", "curated_seed") or "wiki" in doc_domain:
+        authority_boost += 5.0
+    elif "doc" in s_type or "doc" in c_type or any(d in doc_domain for d in ["python.org", "mozilla.org", "docker.com", "sqlite.org", "git-scm.com"]):
+        authority_boost += 5.0
 
-    if q_intent in ("tutorial", "code") and ("doc" in c_type or "doc" in s_type):
+    # 8. Intent-Aligned Content Congruence (Step 3 & 5)
+    intent_boost = 0.0
+    q_intent = q_info.get("intent", "informational")
+    if q_intent in ("tutorial", "code", "technical") and ("doc" in c_type or "doc" in s_type or any(d in doc_domain for d in ["python.org", "mozilla.org", "docker.com", "sqlite.org"])):
         intent_boost += 6.0
-    elif q_intent in ("academic", "definition") and (s_type in ("academic", "encyclopedic") or "wiki" in doc.get("domain", "")):
+    elif q_intent in ("academic", "definition") and (s_type in ("academic", "encyclopedic") or "wiki" in doc_domain):
         intent_boost += 6.0
-    elif q_intent == "navigational" and doc.get("canonical_url", "").rstrip("/") == f"https://{doc.get('domain', '')}":
-        intent_boost += 8.0  # Root domain page matches navigational queries
+    elif q_intent == "navigational" and doc.get("canonical_url", "").rstrip("/") == f"https://{doc_domain}":
+        intent_boost += 8.0
 
-    # 7. Freshness Signal (Query-dependent: strong for temporal, minimal for evergreen)
+    # 9. Freshness Signal (Step 13)
     fresh_boost = 0.0
-    fresh_required = query_info.get("freshness_required", False) if query_info else False
-    pub_at = int(doc.get("published_at") or 0)
-    upd_at = int(doc.get("updated_at") or 0)
-    crw_at = int(doc.get("crawled_at") or doc.get("crawl_date") or time.time())
+    fresh_required = q_info.get("freshness_required", False)
+
+    def _parse_ts(val):
+        if not val:
+            return 0
+        if isinstance(val, (int, float)):
+            return int(val)
+        try:
+            return int(float(str(val).strip()))
+        except (ValueError, TypeError):
+            return 0
+
+    pub_at = _parse_ts(doc.get("published_at"))
+    upd_at = _parse_ts(doc.get("updated_at"))
+    crw_at = _parse_ts(doc.get("crawled_at") or doc.get("crawl_date")) or int(time.time())
     best_ts = upd_at or pub_at or crw_at
     age_days = max(0, (time.time() - best_ts) / 86400.0)
 
@@ -241,84 +336,126 @@ def compute_relevance_score(doc: dict, query: str, query_info: dict = None) -> t
         else:
             fresh_boost -= 6.0
     else:
-        # Evergreen query: minimal freshness impact, preserve authoritative long-standing content
+        # Evergreen query: minimal freshness impact, preserve authoritative content
         fresh_boost = max(0.0, 2.0 - (age_days * 0.01))
 
-    # 8. Spam / Thin Page Penalties
+    # 10. Spam / Thin Page Penalties (Step 9 & 14)
     spam_penalty = 0.0
+    is_external_snippet = (doc.get("source") != "VASTUDA Local Index" and not doc.get("body_text"))
     body_len = len(body.strip())
-    if body_len < 120:
-        spam_penalty += 20.0
-    if q_tokens and body_len > 0:
+    if not is_external_snippet:
+        if body_len < 60:
+            spam_penalty += 40.0
+        elif body_len < 120:
+            spam_penalty += 20.0
+
+    if tokens and body_len > 0:
         # Keyword stuffing check
-        first_token = q_tokens[0]
+        first_token = tokens[0]
         token_count = body.count(first_token)
         density = (token_count * len(first_token)) / body_len
         if density > 0.12:
             spam_penalty += 25.0
 
+    # Composite weighted score calculation
+    weighted_text = bm25_score * W_TEXT
+    weighted_title = title_boost * W_TITLE
+    weighted_phrase = phrase_boost * W_PHRASE
+    weighted_url = url_boost * W_URL
+    weighted_freshness = fresh_boost * W_FRESHNESS
+    weighted_quality = quality_boost * W_QUALITY
+    weighted_authority = authority_boost * W_AUTHORITY
+    weighted_intent = intent_boost * W_INTENT
+
     composite_score = round(
-        bm25_score + title_boost + heading_boost + phrase_boost +
-        lang_boost + quality_boost + intent_boost + fresh_boost - spam_penalty,
+        weighted_text + weighted_title + heading_boost + weighted_phrase +
+        weighted_url + lang_boost + weighted_quality + weighted_authority +
+        weighted_intent + weighted_freshness - spam_penalty,
         2
     )
 
     breakdown = {
-        "bm25": round(bm25_score, 2),
-        "title_boost": round(title_boost, 2),
+        "bm25": round(weighted_text, 2),
+        "title_boost": round(weighted_title, 2),
         "heading_boost": round(heading_boost, 2),
-        "phrase_boost": round(phrase_boost, 2),
+        "phrase_boost": round(weighted_phrase, 2),
+        "url_boost": round(weighted_url, 2),
         "lang_boost": round(lang_boost, 2),
-        "quality_boost": round(quality_boost, 2),
-        "intent_boost": round(intent_boost, 2),
-        "freshness_boost": round(fresh_boost, 2),
+        "quality_boost": round(weighted_quality, 2),
+        "authority_boost": round(weighted_authority, 2),
+        "intent_boost": round(weighted_intent, 2),
+        "freshness_boost": round(weighted_freshness, 2),
         "spam_penalty": round(spam_penalty, 2),
-        "final_score": composite_score
+        "final_score": composite_score,
+        "signals": {
+            "text": round(weighted_text, 2),
+            "title": round(weighted_title, 2),
+            "phrase": round(weighted_phrase, 2),
+            "url": round(weighted_url, 2),
+            "freshness": round(weighted_freshness, 2),
+            "quality": round(weighted_quality, 2),
+            "authority": round(weighted_authority, 2),
+            "intent": round(weighted_intent, 2),
+            "spam_penalty": round(spam_penalty, 2)
+        }
     }
 
     return composite_score, breakdown
 
 
-def search_local_index(query: str, limit: int = 8, query_info: dict = None):
+def search_local_index(query: str, limit: int = None, query_info: dict = None, debug: bool = False):
     """
-    Execute VASTUDA 5.0 Local Index Retrieval:
-    1. Query FTS5 index for top candidate pool (up to 30 items)
-    2. Score candidates using multi-signal relevance pipeline
-    3. Apply source diversity limit (max 2 per domain in top results)
-    4. Return ranked results with explainable score breakdowns
+    Execute VASTUDA 5.3 Production Local Index Retrieval:
+    1. Query FTS5 index for top candidate pool (up to RETRIEVAL_TOP_K items)
+    2. Respect site: restriction if present
+    3. Score candidates using transparent multi-signal relevance pipeline
+    4. Apply adaptive domain diversity damping
+    5. Generate query-relevant passage snippets
+    6. Return ranked results (top FINAL_RESULTS or requested limit)
     """
+    if limit is None:
+        limit = FINAL_RESULTS
+
     clean_q = clean_text_for_fts(query)
     if not clean_q:
         return []
+
+    q_info = query_info or {}
+    site_restr = q_info.get("site_restriction")
 
     candidates = []
     try:
         with db.get_db() as conn:
             cursor = conn.cursor()
-            sql = """
-                SELECT 
-                    d.id,
-                    d.url,
-                    d.canonical_url,
-                    d.title,
-                    d.headings,
-                    d.body_text,
-                    d.domain,
-                    d.canonical_domain,
-                    d.meta_desc,
-                    d.language,
-                    d.quality_score,
-                    d.source_type,
-                    d.published_date,
-                    d.crawl_date,
-                    snippet(documents_fts, 2, '<b>', '</b>', '...', 28) AS matched_snippet,
-                    bm25(documents_fts, 5.0, 3.0, 1.0, 2.0) AS bm25_rank
-                FROM documents_fts
-                JOIN documents d ON d.id = documents_fts.rowid
-                WHERE documents_fts MATCH ?
-                LIMIT 40
-            """
-            cursor.execute(sql, (clean_q,))
+            if site_restr:
+                sql = f"""
+                    SELECT 
+                        d.id, d.url, d.canonical_url, d.title, d.headings,
+                        d.body_text, d.domain, d.canonical_domain, d.meta_desc,
+                        d.language, d.quality_score, d.source_type, d.content_type,
+                        d.published_date, d.crawl_date,
+                        bm25(documents_fts, 5.0, 3.0, 1.0, 2.0) AS bm25_rank
+                    FROM documents_fts
+                    JOIN documents d ON d.id = documents_fts.rowid
+                    WHERE documents_fts MATCH ? AND (d.domain LIKE ? OR d.canonical_domain LIKE ?)
+                    LIMIT {RETRIEVAL_TOP_K}
+                """
+                cursor.execute(sql, (clean_q, f"%{site_restr}%", f"%{site_restr}%"))
+            else:
+                sql = f"""
+                    SELECT 
+                        d.id, d.url, d.canonical_url, d.title, d.headings,
+                        d.body_text, d.domain, d.canonical_domain, d.meta_desc,
+                        d.language, d.quality_score, d.source_type, d.content_type,
+                        d.published_date, d.crawl_date,
+                        bm25(documents_fts, 5.0, 3.0, 1.0, 2.0) AS bm25_rank
+                    FROM documents_fts
+                    JOIN documents d ON d.id = documents_fts.rowid
+                    WHERE documents_fts MATCH ?
+                    LIMIT {RETRIEVAL_TOP_K}
+                """
+                cursor.execute(sql, (clean_q,))
+
             rows = cursor.fetchall()
             for r in rows:
                 candidates.append(dict(r))
@@ -332,7 +469,7 @@ def search_local_index(query: str, limit: int = 8, query_info: dict = None):
     # Score each candidate
     scored = []
     for doc in candidates:
-        score, breakdown = compute_relevance_score(doc, query, query_info=query_info)
+        score, breakdown = compute_relevance_score(doc, query, query_info=q_info)
         scored.append({
             "doc": doc,
             "score": score,
@@ -342,7 +479,7 @@ def search_local_index(query: str, limit: int = 8, query_info: dict = None):
     # Sort descending by composite score
     scored.sort(key=lambda x: x["score"], reverse=True)
 
-    # Adaptive Domain Diversity (score-proportional damping instead of rigid hard cutoff):
+    # Adaptive Domain Diversity (Step 11)
     domain_counts = {}
     domain_best_scores = {}
     for item in scored:
@@ -356,27 +493,24 @@ def search_local_index(query: str, limit: int = 8, query_info: dict = None):
         curr_count = domain_counts.get(domain, 0)
         curr_score = item["score"]
 
-        # Highest score from other domains
         other_best = max([s for d, s in domain_best_scores.items() if d != domain] or [0.0])
         score_gap = curr_score - other_best
 
         diversity_penalty = 0.0
         if curr_count == 1:
-            # 2nd result from this domain: gentle damping if alternatives are competitive
             if score_gap < 15.0:
-                diversity_penalty = 4.0
+                diversity_penalty = DIVERSITY_PENALTY_STEP
         elif curr_count == 2:
-            # 3rd result from this domain: moderate damping unless vastly superior
             if score_gap < 30.0:
-                diversity_penalty = 10.0
+                diversity_penalty = DIVERSITY_PENALTY_STEP * 2.5
             else:
-                diversity_penalty = 4.0
+                diversity_penalty = DIVERSITY_PENALTY_STEP
         elif curr_count >= 3:
-            # 4th+ result: strong damping to prevent monopoly
-            diversity_penalty = 22.0
+            diversity_penalty = DIVERSITY_PENALTY_STEP * 5.5
 
         item["score"] = round(item["score"] - diversity_penalty, 2)
         item["breakdown"]["diversity_penalty"] = diversity_penalty
+        item["breakdown"]["signals"]["diversity_penalty"] = diversity_penalty
         domain_counts[domain] = curr_count + 1
 
     # Re-sort after adaptive diversity adjustments
@@ -389,30 +523,136 @@ def search_local_index(query: str, limit: int = 8, query_info: dict = None):
         domain = doc.get("domain") or ""
 
         cnt = final_domain_counts.get(domain, 0)
-        # Avoid total saturation if multiple domains are available
+        # Prevent monopoly if alternatives exist
         if cnt >= 3 and len(ranked_results) < limit and len(domain_best_scores) > 1:
             continue
 
         final_domain_counts[domain] = cnt + 1
-        snippet = doc.get("matched_snippet") or doc.get("meta_desc") or "Relevant page from VASTUDA index."
 
-        ranked_results.append({
+        # High-quality passage snippet generation (Step 12)
+        raw_snippet = search_validator.generate_best_snippet(
+            doc.get("body_text") or doc.get("meta_desc") or "",
+            query=query,
+            max_len=240
+        )
+
+        result_dict = {
             "title": doc.get("title") or domain,
             "url": doc.get("canonical_url") or doc.get("url"),
             "domain": domain,
+            "display_url": (doc.get("canonical_url") or doc.get("url", "")).replace("https://", "").replace("http://", "").rstrip("/"),
             "favicon": f"https://www.google.com/s2/favicons?domain={domain}&sz=64" if domain else "",
-            "snippet": snippet,
+            "snippet": raw_snippet,
             "score": item["score"],
-            "score_breakdown": item["breakdown"],
             "language": doc.get("language", "en"),
+            "published_at": doc.get("published_date") or "Indexed",
             "published_date": doc.get("published_date") or "Indexed",
             "source": "VASTUDA Local Index"
-        })
+        }
+
+        # Expose internal ranking breakdown only in debug mode
+        if debug:
+            result_dict["score_breakdown"] = item["breakdown"]
+
+        ranked_results.append(result_dict)
 
         if len(ranked_results) >= limit:
             break
 
     return ranked_results
+
+
+def apply_domain_diversity(ranked_items: list, max_per_domain: int = 2, max_results: int = 10, penalty_step: float = None) -> list:
+    """
+    Apply adaptive domain diversity damping:
+    - Decreases scores of repeated domains adaptively
+    - Prevents any single domain from monopolizing top results
+    - Preserves high-quality results from multiple domains
+    """
+    p_step = penalty_step or DIVERSITY_PENALTY_STEP
+    domain_counts = {}
+    domain_best_scores = {}
+    for item in ranked_items:
+        d = item.get("domain") or ""
+        s = item.get("score", 0.0)
+        if d not in domain_best_scores or s > domain_best_scores[d]:
+            domain_best_scores[d] = s
+
+    adjusted = []
+    for item in ranked_items:
+        domain = item.get("domain") or ""
+        curr_count = domain_counts.get(domain, 0)
+        curr_score = item.get("score", 0.0)
+
+        other_best = max([s for d, s in domain_best_scores.items() if d != domain] or [0.0])
+        score_gap = curr_score - other_best
+
+        diversity_penalty = 0.0
+        if curr_count == 1:
+            if score_gap < 15.0:
+                diversity_penalty = p_step
+        elif curr_count == 2:
+            if score_gap < 30.0:
+                diversity_penalty = p_step * 2.5
+            else:
+                diversity_penalty = p_step
+        elif curr_count >= 3:
+            diversity_penalty = p_step * 5.5
+
+        new_item = dict(item)
+        new_item["score"] = round(curr_score - diversity_penalty, 2)
+        if "score_breakdown" in new_item and isinstance(new_item["score_breakdown"], dict):
+            new_item["score_breakdown"]["diversity_penalty"] = diversity_penalty
+            if "signals" in new_item["score_breakdown"]:
+                new_item["score_breakdown"]["signals"]["diversity_penalty"] = diversity_penalty
+        domain_counts[domain] = curr_count + 1
+        adjusted.append(new_item)
+
+    adjusted.sort(key=lambda x: x.get("score", 0), reverse=True)
+
+    final_results = []
+    final_counts = {}
+    for item in adjusted:
+        d = item.get("domain") or ""
+        cnt = final_counts.get(d, 0)
+        if cnt >= max_per_domain and len(final_results) < max_results and len(domain_best_scores) > 1:
+            continue
+        final_counts[d] = cnt + 1
+        final_results.append(item)
+        if len(final_results) >= max_results:
+            break
+
+    # If limit not met due to diversity filters, append remaining items
+    if len(final_results) < max_results:
+        for item in adjusted:
+            if item not in final_results:
+                final_results.append(item)
+                if len(final_results) >= max_results:
+                    break
+
+    return final_results
+
+
+def score_candidates(candidates: list, query: str, query_info: dict = None, debug: bool = False, max_results: int = 10) -> list:
+    """
+    Score and rank a candidate pool (from local index, web providers, or combined)
+    using the transparent multi-signal ranking formula and adaptive domain diversity.
+    """
+    if not candidates:
+        return []
+
+    q_info = query_info or query_engine.understand_query(query)
+    scored = []
+    for cand in candidates:
+        score, breakdown = compute_relevance_score(cand, query, query_info=q_info)
+        item = dict(cand)
+        item["score"] = score
+        if debug:
+            item["score_breakdown"] = breakdown
+        scored.append(item)
+
+    scored.sort(key=lambda x: x.get("score", 0), reverse=True)
+    return apply_domain_diversity(scored, max_per_domain=2, max_results=max_results)
 
 
 def get_index_stats():

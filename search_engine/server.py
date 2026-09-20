@@ -1,7 +1,9 @@
 import os
 import re
+import math
 import json
 import time
+import uuid
 import logging
 import threading
 import urllib.parse
@@ -123,7 +125,7 @@ def get_git_commit_sha():
 def health_check():
     return jsonify({
         "status": "ok",
-        "version": "5.2",
+        "version": "5.3",
         "service": "VASTUDA Sovereign Search & Discovery Engine",
         "timestamp": int(time.time())
     })
@@ -133,7 +135,7 @@ def health_check():
 def api_version():
     return jsonify({
         "app": "VASTUDA",
-        "version": "5.2",
+        "version": "5.3",
         "commit": get_git_commit_sha(),
         "environment": "production"
     })
@@ -191,22 +193,35 @@ CACHE_TTL = 900  # 15 minutes
 
 
 def evaluate_instant_math(query):
-    """Safely calculate simple arithmetic if query is a math expression."""
+    """Safely calculate arithmetic or basic math functions if query is a math expression."""
     if not query:
         return None
-    clean = query.strip().replace("x", "*").replace("×", "*").replace("÷", "/").replace("^", "**")
+    raw_clean = query.strip()
+    clean = raw_clean.replace("x", "*").replace("×", "*").replace("÷", "/").replace("^", "**")
+
+    # Check for sqrt(n) or square root of n
+    sqrt_match = re.match(r"^(?:sqrt|square\s*root)\s*\(\s*([\d\.]+)\s*\)$", clean, re.I)
+    if sqrt_match:
+        try:
+            val = float(sqrt_match.group(1))
+            res = math.sqrt(val)
+            formatted = str(int(res)) if res.is_integer() else f"{res:.6f}".rstrip("0").rstrip(".")
+            return {"expression": raw_clean, "result": formatted}
+        except Exception:
+            return None
+
     # Strict regex check: only digits, basic math symbols, spaces, parentheses
     if re.match(r"^[\d\s\+\-\*\/\(\)\.\%\*]+$", clean) and any(op in clean for op in "+-*/%*"):
         try:
             if len(clean) > 80 or clean.count("**") > 2:
                 return None
-            res = eval(clean, {"__builtins__": None}, {})
+            res = eval(clean, {"__builtins__": None, "math": math, "sqrt": math.sqrt}, {})
             if isinstance(res, (int, float)):
                 if isinstance(res, int) or (isinstance(res, float) and res.is_integer()):
                     formatted = str(int(res))
                 else:
                     formatted = f"{res:.6f}".rstrip("0").rstrip(".")
-                return {"expression": query.strip(), "result": formatted}
+                return {"expression": raw_clean, "result": formatted}
         except Exception:
             pass
     return None
@@ -817,14 +832,39 @@ def api_export_data():
 @app.route("/api/search", methods=["GET"])
 @app.route("/api/browser/search", methods=["GET"])
 def api_search():
+    t_start = time.time()
+    req_id = uuid.uuid4().hex[:12]
     query = request.args.get("q", "").strip()[:500]
     category = request.args.get("category", "all").strip().lower()
     time_filter = request.args.get("time", "").strip().lower()
     if time_filter not in ["day", "week", "month", "year"]:
         time_filter = None
 
+    # Safe pagination bounds (Step 17)
+    try:
+        page = max(1, min(int(request.args.get("page", 1)), 100))
+    except (ValueError, TypeError):
+        page = 1
+    try:
+        page_size = max(1, min(int(request.args.get("page_size", request.args.get("num", 10))), 50))
+    except (ValueError, TypeError):
+        page_size = 10
+
+    # Developer debug mode authorization (Step 22 & 28)
+    raw_debug = request.args.get("debug", "0").lower() in ("1", "true", "yes")
+    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "127.0.0.1").split(",")[0].strip()
+    debug_key = request.headers.get("X-Debug-Key", request.args.get("debug_key", ""))
+    configured_key = os.getenv("DEBUG_RANKING_KEY", "")
+    is_local = client_ip in ("127.0.0.1", "::1", "localhost")
+    debug_allowed = (
+        os.getenv("DEBUG_RANKING", "false").lower() in ("true", "1") or
+        is_local or
+        bool(configured_key and debug_key == configured_key)
+    )
+    debug_mode = raw_debug and debug_allowed
+
     if not query:
-        return jsonify({"error": "Empty query"}), 400
+        return jsonify({"error": "Empty query", "request_id": req_id}), 400
 
     # Auto-log search history if user is logged in
     user_id = session.get("user_id")
@@ -835,10 +875,10 @@ def api_search():
             logger.warning(f"History record error: {e}")
 
     # 1. PURE MATH CHECK (Zero Network Dependency)
-    # Expressions like 120*45, (12+8)*5, 100/4, 2^10 return immediately
     instant_math = evaluate_instant_math(query)
     if instant_math:
         return jsonify({
+            "request_id": req_id,
             "query": query,
             "category": category,
             "intent": {"intent": "calculation", "confidence": 1.0},
@@ -853,7 +893,6 @@ def api_search():
     intent_info = search_core.classify_query_intent(query)
 
     # 2. DIRECT URL NAVIGATION CHECK (Zero Search Overhead)
-    # Queries like https://example.com, www.example.com, example.com
     clean_q = query.strip()
     is_direct_url = (
         intent_info.get("intent") == "direct_nav" or
@@ -864,6 +903,7 @@ def api_search():
         target_nav_url = clean_q if clean_q.startswith(("http://", "https://")) else f"https://{clean_q}"
         norm_nav = normalize_url(target_nav_url) or target_nav_url
         return jsonify({
+            "request_id": req_id,
             "query": query,
             "category": category,
             "intent": {"intent": "direct_nav", "url": norm_nav},
@@ -878,9 +918,9 @@ def api_search():
         specialized_res = search_core.route_search_category(query, category, time_range=time_filter)
         if specialized_res is not None:
             if isinstance(specialized_res, dict):
+                specialized_res["request_id"] = req_id
                 specialized_res["intent"] = intent_info
                 specialized_res["time_filter"] = time_filter
-                # Validate results in specialized category
                 if "results" in specialized_res and isinstance(specialized_res["results"], list):
                     specialized_res["results"] = deduplicate_results(
                         [r for r in specialized_res["results"] if validate_result(r)]
@@ -888,18 +928,23 @@ def api_search():
             return jsonify(specialized_res)
 
     # 4. General / Web Search (All Category)
-    cache_key = f"all:{query.lower()}:{time_filter or 'any'}"
+    cache_key = f"all:{query.lower()}:{time_filter or 'any'}:{page}:{page_size}"
     now = time.time()
-    if cache_key in SEARCH_CACHE:
+    if not debug_mode and cache_key in SEARCH_CACHE:
         cached_time, cached_payload = SEARCH_CACHE[cache_key]
         if now - cached_time < CACHE_TTL:
-            return jsonify(cached_payload)
+            cached_copy = dict(cached_payload)
+            cached_copy["request_id"] = req_id
+            return jsonify(cached_copy)
 
     # Non-blocking destination intelligence check
     destination_data = get_destination_intel(query)
 
     # Hybrid Search: Local FTS5 Index + Bounded High-Speed Multi-Provider Retriever
-    search_data = search_core.search_with_hybrid_ranking(query, max_results=8, time_range=time_filter)
+    retrieve_count = max(page * page_size, 10)
+    search_data = search_core.search_with_hybrid_ranking(
+        query, max_results=retrieve_count, time_range=time_filter, debug=debug_mode
+    )
 
     # Fetch visual preview images (Wikimedia high-res public images)
     preview_images = search_core.fetch_wikimedia_images(query, limit=6)
@@ -909,7 +954,19 @@ def api_search():
         [r for r in search_data.get("results", []) if validate_result(r)]
     )
 
+    # Slice for requested pagination window
+    start_idx = (page - 1) * page_size
+    paged_results = validated_results[start_idx:start_idx + page_size]
+
+    elapsed_ms = round((time.time() - t_start) * 1000, 1)
+    logger.info(
+        f"[QUERY_LOG] req_id={req_id} query='{query}' category={category} "
+        f"intent={intent_info.get('intent')} total_found={len(validated_results)} "
+        f"returned={len(paged_results)} page={page} elapsed={elapsed_ms}ms"
+    )
+
     payload = {
+        "request_id": req_id,
         "query": query,
         "category": "all",
         "time_filter": time_filter,
@@ -917,11 +974,23 @@ def api_search():
         "provider": search_data.get("provider", "hybrid_vastuda"),
         "instant_answer": None,
         "destination": destination_data,
-        "results": validated_results,
+        "pagination": {
+            "page": page,
+            "page_size": page_size,
+            "total_results": len(validated_results),
+            "has_more": len(validated_results) > (page * page_size)
+        },
+        "results": paged_results,
         "images": preview_images or search_data.get("images", []),
-        "message": "Insufficient information from available sources." if not validated_results else None
+        "message": "Insufficient information from available sources." if not paged_results else None
     }
-    if payload.get("results"):
+    if debug_mode:
+        payload["debug_ranking"] = {
+            "query_info": search_data.get("query_understanding"),
+            "elapsed_ms": elapsed_ms
+        }
+
+    if payload.get("results") and not debug_mode:
         SEARCH_CACHE[cache_key] = (now, payload)
     return jsonify(payload)
 
