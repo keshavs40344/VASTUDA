@@ -25,7 +25,9 @@ const DEFAULT_WINDOW_BOUNDS = {
   x: undefined,
   y: undefined,
   isMaximized: false,
-  isFullScreen: false
+  isFullScreen: false,
+  maximized: false,
+  fullscreen: false
 };
 
 let windowState = { ...DEFAULT_WINDOW_BOUNDS };
@@ -39,8 +41,12 @@ function loadWindowState() {
         if (Number.isFinite(raw.height) && raw.height >= 400) windowState.height = Math.round(raw.height);
         if (Number.isFinite(raw.x)) windowState.x = Math.round(raw.x);
         if (Number.isFinite(raw.y)) windowState.y = Math.round(raw.y);
-        windowState.isMaximized = Boolean(raw.isMaximized);
-        windowState.isFullScreen = Boolean(raw.isFullScreen);
+        const maxVal = Boolean(raw.isMaximized !== undefined ? raw.isMaximized : raw.maximized);
+        windowState.isMaximized = maxVal;
+        windowState.maximized = maxVal;
+        const fullVal = Boolean(raw.isFullScreen !== undefined ? raw.isFullScreen : raw.fullscreen);
+        windowState.isFullScreen = fullVal;
+        windowState.fullscreen = fullVal;
       }
     }
   } catch (e) {
@@ -126,11 +132,13 @@ function saveWindowState() {
       width: Math.round(bounds.width),
       height: Math.round(bounds.height),
       isMaximized: isMax,
-      isFullScreen: isFull
+      maximized: isMax,
+      isFullScreen: isFull,
+      fullscreen: isFull
     };
 
     try {
-      fs.writeFileSync(WINDOW_STATE_FILE, JSON.stringify(windowState), 'utf-8');
+      fs.writeFileSync(WINDOW_STATE_FILE, JSON.stringify(windowState, null, 2), 'utf-8');
     } catch (e) {
       console.warn('[WINDOW STATE SAVE ERROR]', e.message);
     }
@@ -684,6 +692,23 @@ function createMainWindow() {
   });
 
   // Dynamic Window Resize Observers (Immediate Bounds Recalculation & Window State Debounce)
+  function broadcastWindowState(stateName) {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      const isMax = mainWindow.isMaximized();
+      const isMin = mainWindow.isMinimized();
+      const isFull = mainWindow.isFullScreen();
+      mainWindow.webContents.send('window-state-changed', {
+        state: stateName || (isFull ? 'FULLSCREEN' : isMax ? 'MAXIMIZED' : isMin ? 'MINIMIZED' : 'NORMAL'),
+        isMaximized: isMax,
+        maximized: isMax,
+        isMinimized: isMin,
+        minimized: isMin,
+        isFullScreen: isFull,
+        fullscreen: isFull
+      });
+    }
+  }
+
   mainWindow.on('resize', () => {
     updateLayoutBounds();
     scheduleSaveWindowState();
@@ -693,20 +718,32 @@ function createMainWindow() {
     scheduleSaveWindowState();
   });
   mainWindow.on('maximize', () => {
+    broadcastWindowState('MAXIMIZED');
     updateLayoutBounds();
     scheduleSaveWindowState();
     setTimeout(updateLayoutBounds, 25);
   });
   mainWindow.on('unmaximize', () => {
+    broadcastWindowState('NORMAL');
     updateLayoutBounds();
     scheduleSaveWindowState();
     setTimeout(updateLayoutBounds, 25);
   });
+  mainWindow.on('minimize', () => {
+    broadcastWindowState('MINIMIZED');
+  });
+  mainWindow.on('restore', () => {
+    broadcastWindowState(mainWindow.isMaximized() ? 'MAXIMIZED' : 'NORMAL');
+    updateLayoutBounds();
+    scheduleSaveWindowState();
+  });
   mainWindow.on('enter-full-screen', () => {
+    broadcastWindowState('FULLSCREEN');
     updateLayoutBounds();
     scheduleSaveWindowState();
   });
   mainWindow.on('leave-full-screen', () => {
+    broadcastWindowState('NORMAL');
     updateLayoutBounds();
     scheduleSaveWindowState();
   });
@@ -1409,8 +1446,25 @@ function handleMin() {
 
 function handleMax() {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    if (mainWindow.isMaximized()) mainWindow.unmaximize();
-    else mainWindow.maximize();
+    if (mainWindow.isFullScreen()) {
+      mainWindow.setFullScreen(false);
+    } else if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+}
+
+function handleRestore() {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    if (mainWindow.isFullScreen()) {
+      mainWindow.setFullScreen(false);
+    } else if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else if (mainWindow.isMinimized()) {
+      mainWindow.restore();
+    }
   }
 }
 
@@ -1422,6 +1476,30 @@ ipcMain.on('window-minimize', (e) => { if (verifyIpcSender(e)) handleMin(); });
 
 ipcMain.on('win-max', (e) => { if (verifyIpcSender(e)) handleMax(); });
 ipcMain.on('window-maximize', (e) => { if (verifyIpcSender(e)) handleMax(); });
+
+ipcMain.on('win-restore', (e) => { if (verifyIpcSender(e)) handleRestore(); });
+ipcMain.on('window-restore', (e) => { if (verifyIpcSender(e)) handleRestore(); });
+
+ipcMain.on('win-toggle-max', (e) => { if (verifyIpcSender(e)) handleMax(); });
+ipcMain.on('window-toggle-maximize', (e) => { if (verifyIpcSender(e)) handleMax(); });
+
+ipcMain.handle('get-window-state', (e) => {
+  if (!verifyIpcSender(e) || !mainWindow || mainWindow.isDestroyed()) {
+    return { isMaximized: false, maximized: false, isMinimized: false, minimized: false, isFullScreen: false, fullscreen: false, state: 'NORMAL' };
+  }
+  const isMax = mainWindow.isMaximized();
+  const isMin = mainWindow.isMinimized();
+  const isFull = mainWindow.isFullScreen();
+  return {
+    state: isFull ? 'FULLSCREEN' : isMax ? 'MAXIMIZED' : isMin ? 'MINIMIZED' : 'NORMAL',
+    isMaximized: isMax,
+    maximized: isMax,
+    isMinimized: isMin,
+    minimized: isMin,
+    isFullScreen: isFull,
+    fullscreen: isFull
+  };
+});
 
 // 4. Tab Lifecycle IPC Handlers
 ipcMain.on('create-tab', (e, url, opts) => {

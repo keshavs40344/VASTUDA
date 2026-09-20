@@ -174,12 +174,16 @@ const secureAPI = Object.freeze({
   // Native Window Controls (Supports both win-* and window-* aliases)
   minimizeWindow: () => ipcRenderer.send('win-min'),
   maximizeWindow: () => ipcRenderer.send('win-max'),
+  restoreWindow: () => ipcRenderer.send('win-restore'),
+  toggleMaximize: () => ipcRenderer.send('window-toggle-maximize'),
   closeWindow: () => ipcRenderer.send('win-close'),
   createWindow: () => ipcRenderer.send('create-window'),
   createIncognitoWindow: () => ipcRenderer.send('create-incognito-window'),
   toggleFullscreen: () => ipcRenderer.send('toggle-fullscreen'),
+  getWindowState: () => ipcRenderer.invoke('get-window-state'),
 
   // Safe Parameterized Inbound Listeners
+  onWindowStateChanged: (cb) => { if (typeof cb === 'function') ipcRenderer.on('window-state-changed', (e, d) => cb(d)); },
   onUrlUpdated: (cb) => { if (typeof cb === 'function') ipcRenderer.on('url-updated', (e, d) => cb(d)); },
   onTabCreated: (cb) => { if (typeof cb === 'function') ipcRenderer.on('tab-created', (e, d) => cb(d)); },
   onTabUpdated: (cb) => { if (typeof cb === 'function') ipcRenderer.on('tab-updated', (e, d) => cb(d)); },

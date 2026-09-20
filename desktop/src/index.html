@@ -95,6 +95,47 @@
     .tl-min { background: #ffbd2e; }
     .tl-max { background: #27c93f; }
 
+    /* Windows Desktop Caption Controls (Top-Right) */
+    .win-caption-controls {
+      display: flex;
+      align-items: center;
+      height: var(--header-height);
+      margin-left: 6px;
+      flex-shrink: 0;
+    }
+    .win-caption-btn {
+      width: 44px;
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.12s ease, color 0.12s ease;
+      outline: none;
+      padding: 0;
+    }
+    .win-caption-btn svg {
+      pointer-events: none;
+    }
+    .win-caption-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+    .win-caption-btn:active {
+      background: rgba(255, 255, 255, 0.14);
+    }
+    .win-caption-btn.win-btn-close:hover {
+      background: #e81123 !important;
+      color: #ffffff !important;
+    }
+    .win-caption-btn.win-btn-close:active {
+      background: #c4101f !important;
+      color: #ffffff !important;
+    }
+
     /* Navigation Controls */
     .nav-group {
       display: flex;
@@ -781,6 +822,20 @@
         <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
       </button>
     </div>
+
+    <!-- Windows Desktop Caption Controls (Minimize, Maximize/Restore, Close) -->
+    <div class="win-caption-controls no-drag" id="winControlsGroup">
+      <button class="win-caption-btn win-btn-min" id="winBtnMin" title="Minimize">
+        <svg viewBox="0 0 10 10" width="10" height="10"><line x1="0" y1="5" x2="10" y2="5" stroke="currentColor" stroke-width="1"/></svg>
+      </button>
+      <button class="win-caption-btn win-btn-max" id="winBtnMax" title="Maximize">
+        <svg id="iconWinMax" viewBox="0 0 10 10" width="10" height="10"><rect x="1.5" y="1.5" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+        <svg id="iconWinRestore" style="display:none;" viewBox="0 0 10 10" width="10" height="10"><path d="M3.5,1.5 h5 v5 h-1 v-4 h-4 z M1.5,3.5 h5 v5 h-5 z" fill="none" stroke="currentColor" stroke-width="1"/></svg>
+      </button>
+      <button class="win-caption-btn win-btn-close" id="winBtnClose" title="Close (Alt+F4)">
+        <svg viewBox="0 0 10 10" width="10" height="10"><line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1"/><line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1"/></svg>
+      </button>
+    </div>
   </header>
 
   <!-- Floating Three-Dot Menu -->
@@ -1071,10 +1126,67 @@
       let selectedSuggestIndex = -1;
       let toastDismissTimer = null;
 
-      // Window controls
-      document.getElementById('btnDeskClose').addEventListener('click', () => api.closeWindow());
-      document.getElementById('btnDeskMin').addEventListener('click', () => api.minimizeWindow());
-      document.getElementById('btnDeskMax').addEventListener('click', () => api.maximizeWindow());
+      // Window controls (macOS Traffic Lights + Windows Caption Controls)
+      const btnDeskClose = document.getElementById('btnDeskClose');
+      const btnDeskMin = document.getElementById('btnDeskMin');
+      const btnDeskMax = document.getElementById('btnDeskMax');
+      const winBtnMin = document.getElementById('winBtnMin');
+      const winBtnMax = document.getElementById('winBtnMax');
+      const winBtnClose = document.getElementById('winBtnClose');
+
+      if (btnDeskClose) btnDeskClose.addEventListener('click', () => api.closeWindow());
+      if (btnDeskMin) btnDeskMin.addEventListener('click', () => api.minimizeWindow());
+      if (btnDeskMax) btnDeskMax.addEventListener('click', () => {
+        if (typeof api.toggleMaximize === 'function') api.toggleMaximize();
+        else api.maximizeWindow();
+      });
+
+      if (winBtnMin) winBtnMin.addEventListener('click', () => api.minimizeWindow());
+      if (winBtnMax) winBtnMax.addEventListener('click', () => {
+        if (typeof api.toggleMaximize === 'function') api.toggleMaximize();
+        else api.maximizeWindow();
+      });
+      if (winBtnClose) winBtnClose.addEventListener('click', () => api.closeWindow());
+
+      // Double-click custom titlebar to toggle maximize / restore
+      const desktopTopBar = document.getElementById('desktop-topbar');
+      if (desktopTopBar) {
+        desktopTopBar.addEventListener('dblclick', (e) => {
+          if (e.target && e.target.closest && e.target.closest('.no-drag')) return;
+          if (typeof api.toggleMaximize === 'function') api.toggleMaximize();
+          else if (typeof api.maximizeWindow === 'function') api.maximizeWindow();
+        });
+      }
+
+      // Synchronize window state UI (Maximize / Restore icon & tooltip toggle)
+      function syncWindowStateUI(stateData) {
+        const isMax = Boolean(stateData && (stateData.isMaximized || stateData.maximized));
+        const isFull = Boolean(stateData && (stateData.isFullScreen || stateData.fullscreen));
+
+        const iconWinMax = document.getElementById('iconWinMax');
+        const iconWinRestore = document.getElementById('iconWinRestore');
+
+        if (isMax || isFull) {
+          if (iconWinMax) iconWinMax.style.display = 'none';
+          if (iconWinRestore) iconWinRestore.style.display = 'block';
+          if (winBtnMax) winBtnMax.title = 'Restore Down';
+          if (btnDeskMax) btnDeskMax.title = 'Restore Window';
+        } else {
+          if (iconWinMax) iconWinMax.style.display = 'block';
+          if (iconWinRestore) iconWinRestore.style.display = 'none';
+          if (winBtnMax) winBtnMax.title = 'Maximize';
+          if (btnDeskMax) btnDeskMax.title = 'Maximize Window';
+        }
+      }
+
+      if (typeof api.onWindowStateChanged === 'function') {
+        api.onWindowStateChanged((stateData) => {
+          syncWindowStateUI(stateData);
+        });
+      }
+      if (typeof api.getWindowState === 'function') {
+        api.getWindowState().then(syncWindowStateUI).catch(() => {});
+      }
 
       // Nav controls
       document.getElementById('btnDeskBack').addEventListener('click', () => api.goBack());

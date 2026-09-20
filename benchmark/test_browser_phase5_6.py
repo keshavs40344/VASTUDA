@@ -307,6 +307,46 @@ class TestBrowserPhase5_6(unittest.TestCase):
         self.assertIn("http://127.0.0.1:5000/?q=", self.platform_bridge)
         self.assertNotIn("duckduckgo", self.platform_bridge.lower())
 
+    # =========================================================================
+    # 9. SECTION 4A: WINDOW CONTROLS & WINDOW LIFECYCLE (Tests 26 - 30)
+    # =========================================================================
+    def test_26_window_caption_controls_markup_and_icons(self):
+        """Verify index.html contains standard Windows caption controls and maximize/restore SVGs."""
+        self.assertIn('id="winControlsGroup"', self.index_html)
+        self.assertIn('id="winBtnMin"', self.index_html)
+        self.assertIn('id="winBtnMax"', self.index_html)
+        self.assertIn('id="winBtnClose"', self.index_html)
+        self.assertIn('id="iconWinMax"', self.index_html)
+        self.assertIn('id="iconWinRestore"', self.index_html)
+        self.assertIn('.win-caption-btn.win-btn-close:hover', self.index_html)
+
+    def test_27_titlebar_double_click_toggle_maximize(self):
+        """Verify index.html attaches double-click listener on titlebar to toggle maximize/restore."""
+        self.assertIn("desktopTopBar.addEventListener('dblclick'", self.index_html)
+        self.assertIn("toggleMaximize", self.index_html)
+
+    def test_28_window_state_broadcast_and_ui_sync(self):
+        """Verify main.js broadcasts window-state-changed and index.html synchronizes state."""
+        self.assertIn("broadcastWindowState", self.main_js)
+        self.assertIn("window-state-changed", self.main_js)
+        self.assertIn("onWindowStateChanged", self.preload_js)
+        self.assertIn("syncWindowStateUI", self.index_html)
+        self.assertIn("getWindowState", self.preload_js)
+
+    def test_29_window_lifecycle_ipc_handlers(self):
+        """Verify main.js handles win-min, win-max, win-restore, window-toggle-maximize, get-window-state."""
+        self.assertIn("ipcMain.on('win-min'", self.main_js)
+        self.assertIn("ipcMain.on('win-max'", self.main_js)
+        self.assertIn("ipcMain.on('win-restore'", self.main_js)
+        self.assertIn("ipcMain.on('window-toggle-maximize'", self.main_js)
+        self.assertIn("ipcMain.handle('get-window-state'", self.main_js)
+
+    def test_30_window_restore_and_multimonitor_nearest_display(self):
+        """Verify handleRestore unmaximizes/restores and getValidatedWindowState finds nearest display."""
+        self.assertIn("function handleRestore()", self.main_js)
+        self.assertIn("getDisplayNearestPoint", self.main_js)
+        self.assertIn("getNormalBounds", self.main_js)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
