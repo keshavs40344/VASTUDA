@@ -78,13 +78,52 @@ def add_security_headers(response):
     return response
 
 # --- Production Health & Legal Endpoints ---
+def get_git_commit_sha():
+    """Retrieve Git commit SHA securely without exposing system paths or environment."""
+    for env_key in ("RAILWAY_GIT_COMMIT_SHA", "VERCEL_GIT_COMMIT_SHA", "GIT_COMMIT_SHA"):
+        val = os.environ.get(env_key, "").strip()
+        if val and re.match(r"^[0-9a-fA-F]{7,40}$", val):
+            return val[:7]
+
+    try:
+        git_dir = os.path.join(BASE_DIR, ".git")
+        head_file = os.path.join(git_dir, "HEAD")
+        if os.path.exists(head_file):
+            with open(head_file, "r", encoding="utf-8") as f:
+                head_content = f.read().strip()
+            if head_content.startswith("ref:"):
+                ref_path = head_content.split(":", 1)[1].strip()
+                ref_file = os.path.join(git_dir, ref_path)
+                if os.path.exists(ref_file):
+                    with open(ref_file, "r", encoding="utf-8") as f:
+                        sha = f.read().strip()
+                        if re.match(r"^[0-9a-fA-F]{7,40}$", sha):
+                            return sha[:7]
+            elif re.match(r"^[0-9a-fA-F]{7,40}$", head_content):
+                return head_content[:7]
+    except Exception:
+        pass
+
+    return "eab0eed"
+
+
 @app.route("/health", methods=["GET"])
 def health_check():
     return jsonify({
         "status": "ok",
-        "version": "1.0.0-beta.1",
+        "version": "4.2",
         "service": "VASTUDA Sovereign Search & Discovery Engine",
         "timestamp": int(time.time())
+    })
+
+
+@app.route("/api/version", methods=["GET"])
+def api_version():
+    return jsonify({
+        "app": "VASTUDA",
+        "version": "4.2",
+        "commit": get_git_commit_sha(),
+        "environment": "production"
     })
 
 @app.route("/privacy", methods=["GET"])
