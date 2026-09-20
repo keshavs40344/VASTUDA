@@ -10,11 +10,13 @@ from dotenv import load_dotenv
 
 try:
     from search_engine import indexer
+    from search_engine import query_engine
     from search_engine.search_validator import (
         normalize_url, validate_result, deduplicate_results, validate_image, safe_snippet
     )
 except ImportError:
     import indexer
+    import query_engine
     from search_validator import (
         normalize_url, validate_result, deduplicate_results, validate_image, safe_snippet
     )
@@ -619,11 +621,34 @@ def search_documents_mode(query):
             documents.append(doc_dict)
 
     deduped_docs = deduplicate_results(documents)
+    
+    # 2. Local Index Integration (Official Documentation & Knowledgebase)
+    local_docs = indexer.search_local_index(query, limit=8)
+    if local_docs:
+        local_formatted = []
+        for ld in local_docs:
+            norm_u = normalize_url(ld.get("url", ""))
+            if not norm_u:
+                continue
+            d_domain = ld.get("domain", "")
+            local_formatted.append({
+                "title": ld.get("title", ""),
+                "url": norm_u,
+                "domain": d_domain,
+                "snippet": safe_snippet(ld.get("snippet", "")),
+                "file_type": "DOC",
+                "file_size": "Official Documentation",
+                "source": "VASTUDA Local Index"
+            })
+        # Local docs get high precedence for documentation queries
+        deduped_docs = deduplicate_results(local_formatted + deduped_docs)
+
+    prov = "hybrid_vastuda" if (local_docs and web_data.get("results")) else ("local_index" if local_docs else web_data.get("provider", "docs"))
     payload = {
         "category": "docs",
         "query": query,
         "documents": deduped_docs,
-        "provider": web_data.get("provider", "docs")
+        "provider": prov
     }
     set_cached(f"docs:{query.lower()}", payload)
     return payload
@@ -782,85 +807,47 @@ def search_jobs_mode(query):
 
 # Query Intent Classifier
 def classify_query_intent(query: str) -> dict:
-    """
-    Classify queries into:
-    Web, News, Image, Video, Research, Document, Code, Jobs, Shopping, Places, Direct navigation, Calculation, Knowledge/AI.
-    """
-    q = (query or "").strip().lower()
-    if not q:
-        return {"intent": "web", "confidence": 1.0, "sub_intent": None}
-
-    # 1. Calculation / Math
-    clean_math = q.replace("x", "*").replace("×", "*").replace("÷", "/")
-    if re.match(r"^[\d\s\+\-\*\/\(\)\.\%]+$", clean_math) and any(op in clean_math for op in "+-*/%"):
-        return {"intent": "calculation", "confidence": 0.99, "target_category": "all"}
-
-    # 2. Direct Navigation
-    if re.match(r"^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$", q) or q.startswith(("localhost", "127.0.0.1")):
-        return {"intent": "direct_nav", "confidence": 0.98, "target_category": "web"}
-
-    # 3. Developer / Code
-    code_keywords = ["github", "python", "javascript", "react", "golang", "c++", "rust", "function", "api", "docker", "npm", "pip", "sql", "bug", "syntax", "stackoverflow", "css", "html", "class", "method", "sdk", "regex"]
-    if any(k in q.split() or f"{k} " in q or f" {k}" in q for k in code_keywords) or any(tok in q for tok in ["()", "{}", "import ", "def ", "console.log", "async ", "const "]):
-        return {"intent": "code", "confidence": 0.88, "target_category": "code"}
-
-    # 4. News
-    news_keywords = ["news", "latest", "today", "breaking", "update", "headlines", "election", "scandal", "war", "president", "minister"]
-    if any(k in q for k in news_keywords):
-        return {"intent": "news", "confidence": 0.90, "target_category": "news"}
-
-    # 5. Research / Academic / Literature
-    research_keywords = ["paper", "research", "study", "journal", "academic", "arxiv", "methodology", "meta-analysis", "clinical trial", "dissertation", "thesis"]
-    if any(k in q for k in research_keywords):
-        return {"intent": "research", "confidence": 0.92, "target_category": "research"}
-
-    # 6. Documents / PDFs
-    if "pdf" in q or "whitepaper" in q or "manual" in q or "handbook" in q or "filetype:" in q:
-        return {"intent": "document", "confidence": 0.95, "target_category": "docs"}
-
-    # 7. Images
-    if any(k in q for k in ["images", "image", "photos", "photo", "picture", "pictures", "wallpaper", "diagram", "chart"]):
-        return {"intent": "image", "confidence": 0.92, "target_category": "images"}
-
-    # 8. Videos
-    if any(k in q for k in ["video", "videos", "youtube", "clip", "trailer", "movie", "song", "stream"]):
-        return {"intent": "video", "confidence": 0.91, "target_category": "videos"}
-
-    # 9. Shopping
-    shopping_keywords = ["buy", "price", "discount", "under ₹", "under $", "deals", "amazon", "flipkart", "review", "laptop under", "phone under", "store", "sale"]
-    if any(k in q for k in shopping_keywords):
-        return {"intent": "shopping", "confidence": 0.89, "target_category": "shopping"}
-
-    # 10. Jobs
-    job_keywords = ["jobs", "careers", "hiring", "openings", "salary", "internship", "remote job", "vacancy"]
-    if any(k in q for k in job_keywords):
-        return {"intent": "jobs", "confidence": 0.92, "target_category": "jobs"}
-
-    # 11. Places / Travel
-    place_keywords = ["weather in", "hotels in", "flights to", "attractions", "distance from", "to visit", "tourism", "capital of"]
-    if any(k in q for k in place_keywords):
-        return {"intent": "places", "confidence": 0.85, "target_category": "places"}
-
-    # 12. Knowledge / AI Q&A
-    if q.startswith(("what is", "who is", "how to", "why does", "explain", "summarize", "tell me about", "define")):
-        return {"intent": "knowledge", "confidence": 0.82, "target_category": "ai"}
-
-    # Default fallback
-    return {"intent": "web", "confidence": 0.75, "target_category": "all"}
+    """Classify queries using structured deterministic Query Engine."""
+    u = query_engine.understand_query(query)
+    return {
+        "intent": u["intent"],
+        "confidence": 0.95,
+        "target_category": u["vertical"],
+        "language": u["language"],
+        "freshness_required": u["freshness_required"],
+        "entities": u["entities"],
+        "normalized_query": u["normalized_query"]
+    }
 
 
 def search_with_hybrid_ranking(query: str, max_results: int = 8, time_range=None):
     """
-    Execute Robust Multi-Layer Search:
-    1. Query local FTS5 index for indexed first-party pages.
-    2. Query web retriever (bounded concurrent Tavily + DuckDuckGo).
-    3. Merge, validate, and deduplicate by canonical URL.
-    4. Provide honest fallback if all providers return empty.
+    Execute VASTUDA 5.0 Robust Multi-Layer Hybrid Search:
+    1. Query Understanding (language, intent, entities, freshness).
+    2. Query VASTUDA Local FTS5 Index (with term expansion if Hinglish).
+    3. Query Web Retriever (Tavily + DuckDuckGo + Wikipedia).
+       - If query is Hinglish and initial search returns 0, try expanded query.
+    4. Merge candidates, validate schema, normalize canonical URLs.
+    5. Deduplicate and score using multi-signal relevance ranker.
+    6. Enforce domain diversity (max 2 per domain in top 8).
+    7. Determine transparent provider provenance.
     """
+    q_info = query_engine.understand_query(query)
+    q_lang = q_info.get("language", "en")
+    is_fresh = q_info.get("freshness_required", False)
+
+    # 1. Local VASTUDA Index Retrieval
     local_candidates = []
     try:
-        raw_local = indexer.search_local_index(query, limit=4)
-        for item in (raw_local or []):
+        raw_local = indexer.search_local_index(query, limit=6, query_info=q_info)
+        # If Hinglish and few local matches, also try normalized/expanded terms
+        if len(raw_local) < 2 and q_info.get("expanded_terms"):
+            expanded_q = " ".join(q_info["expanded_terms"][:4])
+            if expanded_q != query:
+                extra_local = indexer.search_local_index(expanded_q, limit=4, query_info=q_info)
+                raw_local.extend(extra_local)
+
+        for item in raw_local:
             norm = normalize_url(item.get("url", ""))
             if norm:
                 item["url"] = norm
@@ -869,27 +856,85 @@ def search_with_hybrid_ranking(query: str, max_results: int = 8, time_range=None
     except Exception as e:
         logger.warning(f"Local index fetch note: {e}")
 
+    # 2. Web Retriever (External Fallback / Augmentation)
     web_data = execute_web_query(query, max_results=max_results, time_range=time_range)
     web_candidates = web_data.get("results", [])
 
-    # Merge Priority: High-relevance local index entries + verified web candidates
+    # If web query returned 0 and query is Hinglish or multi-term, try expanded query fallback
+    if not web_candidates and q_lang == "hinglish" and q_info.get("expanded_terms"):
+        fallback_q = " ".join(q_info["expanded_terms"][:4])
+        logger.info(f"Hinglish fallback query to web: {fallback_q}")
+        web_data = execute_web_query(fallback_q, max_results=max_results, time_range=time_range)
+        web_candidates = web_data.get("results", [])
+
+    # 3. Merge & Deduplicate
     combined = local_candidates + web_candidates
-    deduped = deduplicate_results(combined)[:max_results]
+    deduped = deduplicate_results(combined)
+
+    # 4. Multi-Signal Ranking over merged candidates
+    for item in deduped:
+        if "score" not in item:
+            item_title = (item.get("title") or "").lower()
+            item_snippet = (item.get("snippet") or "").lower()
+            q_lower = query.lower()
+            q_tokens = [t for t in re.sub(r'[^\w\s]', ' ', q_lower).split() if len(t) > 1]
+            
+            ext_score = 30.0  # Base score
+            if q_lower in item_title:
+                ext_score += 30.0
+            elif q_tokens:
+                matches = sum(1 for t in q_tokens if t in item_title)
+                ext_score += (matches / len(q_tokens)) * 20.0
+            if q_lower in item_snippet:
+                ext_score += 10.0
+            if is_fresh:
+                ext_score += 5.0
+            item["score"] = round(ext_score, 2)
+
+    # Sort descending by final score
+    deduped.sort(key=lambda x: x.get("score", 0), reverse=True)
+
+    # 5. Apply Domain Diversity (max 2 per domain in top results)
+    domain_counts = {}
+    final_ranked = []
+    overflow = []
+
+    for item in deduped:
+        d = item.get("domain", "").lower()
+        if domain_counts.get(d, 0) < 2:
+            domain_counts[d] = domain_counts.get(d, 0) + 1
+            final_ranked.append(item)
+        else:
+            overflow.append(item)
+        if len(final_ranked) >= max_results:
+            break
+
+    # Fill from overflow if needed
+    if len(final_ranked) < max_results and overflow:
+        for item in overflow:
+            final_ranked.append(item)
+            if len(final_ranked) >= max_results:
+                break
+
+    # 6. Provider Provenance Labeling
+    has_local = any(r.get("source") == "VASTUDA Local Index" for r in final_ranked)
+    has_web = any(r.get("source") != "VASTUDA Local Index" for r in final_ranked)
 
     provider = "none"
-    if deduped:
-        if local_candidates and web_candidates:
+    if final_ranked:
+        if has_local and has_web:
             provider = "hybrid_vastuda"
-        elif web_candidates:
-            provider = web_data.get("provider", "web")
-        else:
+        elif has_local:
             provider = "local_index"
+        else:
+            provider = web_data.get("provider", "web")
 
     return {
-        "results": deduped,
+        "results": final_ranked,
         "images": web_data.get("images", []),
         "provider": provider,
-        "message": "Insufficient information from available sources." if not deduped else None
+        "query_understanding": q_info,
+        "message": "Insufficient information from available sources." if not final_ranked else None
     }
 
 

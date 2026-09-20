@@ -106,9 +106,27 @@ def init_db():
                 published_date TEXT DEFAULT '',
                 crawl_date INTEGER NOT NULL,
                 content_hash TEXT DEFAULT '',
-                quality_score REAL DEFAULT 1.0
+                quality_score REAL DEFAULT 1.0,
+                content_type TEXT DEFAULT 'text/html',
+                source_type TEXT DEFAULT 'web',
+                author TEXT DEFAULT '',
+                inbound_links_count INTEGER DEFAULT 0,
+                canonical_domain TEXT DEFAULT ''
             )
         """)
+        # Run safe migrations for existing tables
+        for col_name, col_type in [
+            ("content_type", "TEXT DEFAULT 'text/html'"),
+            ("source_type", "TEXT DEFAULT 'web'"),
+            ("author", "TEXT DEFAULT ''"),
+            ("inbound_links_count", "INTEGER DEFAULT 0"),
+            ("canonical_domain", "TEXT DEFAULT ''")
+        ]:
+            try:
+                conn.execute(f"ALTER TABLE documents ADD COLUMN {col_name} {col_type}")
+            except Exception:
+                pass
+
         # FTS5 full-text virtual table for fast indexing & searching
         try:
             conn.execute("""

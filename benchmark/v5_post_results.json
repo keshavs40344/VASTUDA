@@ -1,0 +1,2586 @@
+{
+  "summary": {
+    "benchmark_timestamp": 1789923521,
+    "total_queries": 100,
+    "successful_queries": 100,
+    "failed_queries": 0,
+    "total_execution_time_seconds": 142.0,
+    "latency_ms": {
+      "median": 1049.52,
+      "p95": 2800.77,
+      "mean": 1267.9,
+      "min": 10.05,
+      "max": 4456.74
+    },
+    "provider_breakdown": {
+      "hybrid_vastuda": 88,
+      "tavily": 10,
+      "local_index": 2
+    },
+    "total_local_index_hits": 368,
+    "category_summaries": {
+      "informational": {
+        "query_count": 10,
+        "avg_latency_ms": 1153.71,
+        "total_results": 80,
+        "avg_results_per_query": 8.0,
+        "local_hits": 38
+      },
+      "navigational": {
+        "query_count": 10,
+        "avg_latency_ms": 2071.99,
+        "total_results": 76,
+        "avg_results_per_query": 7.6,
+        "local_hits": 31
+      },
+      "academic": {
+        "query_count": 10,
+        "avg_latency_ms": 1602.12,
+        "total_results": 80,
+        "avg_results_per_query": 8.0,
+        "local_hits": 44
+      },
+      "programming": {
+        "query_count": 10,
+        "avg_latency_ms": 859.82,
+        "total_results": 80,
+        "avg_results_per_query": 8.0,
+        "local_hits": 44
+      },
+      "news": {
+        "query_count": 10,
+        "avg_latency_ms": 1146.4,
+        "total_results": 77,
+        "avg_results_per_query": 7.7,
+        "local_hits": 25
+      },
+      "hindi": {
+        "query_count": 10,
+        "avg_latency_ms": 1154.05,
+        "total_results": 78,
+        "avg_results_per_query": 7.8,
+        "local_hits": 10
+      },
+      "hinglish": {
+        "query_count": 10,
+        "avg_latency_ms": 893.59,
+        "total_results": 80,
+        "avg_results_per_query": 8.0,
+        "local_hits": 44
+      },
+      "long_tail": {
+        "query_count": 10,
+        "avg_latency_ms": 1093.71,
+        "total_results": 80,
+        "avg_results_per_query": 8.0,
+        "local_hits": 60
+      },
+      "questions": {
+        "query_count": 10,
+        "avg_latency_ms": 1056.95,
+        "total_results": 80,
+        "avg_results_per_query": 8.0,
+        "local_hits": 59
+      },
+      "comparisons": {
+        "query_count": 10,
+        "avg_latency_ms": 1646.67,
+        "total_results": 79,
+        "avg_results_per_query": 7.9,
+        "local_hits": 13
+      }
+    }
+  },
+  "query_results": [
+    {
+      "category": "informational",
+      "query": "machine learning",
+      "status": 200,
+      "latency_ms": 2240.5,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "www.energy.gov",
+        "www.ibm.com",
+        "mitsloan.mit.edu"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 4,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Machine learning - Wikipedia",
+        "Transformer (deep learning) - Wikipedia",
+        "Structuring content with HTML - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "what is quantum computing",
+      "status": 200,
+      "latency_ms": 785.04,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.docker.com",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "aws.amazon.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Get started | Docker Docs",
+        "Machine learning - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "Indian Constitution",
+      "status": 200,
+      "latency_ms": 1669.98,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "sansad.in",
+        "unimelb.libguides.com",
+        "constitutionnet.org",
+        "www.constituteproject.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Constitution of India - Wikipedia",
+        "Introduction",
+        "The Constitution - Indian Law - Library Guides at University of Melbourne"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "how does DNS work",
+      "status": 200,
+      "latency_ms": 788.49,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "newrelic.com",
+        "www.ibm.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Domain Name System - Wikipedia",
+        "Constitution of India - Wikipedia",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "photosynthesis process",
+      "status": 200,
+      "latency_ms": 932.16,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.monash.edu",
+        "education.nationalgeographic.org",
+        "ssec.si.edu",
+        "www.khanacademy.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Artificial intelligence - Wikipedia",
+        "The process of photosynthesis - Student Academic Success"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "black hole event horizon",
+      "status": 200,
+      "latency_ms": 1801.09,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.space.com",
+        "www.youtube.com",
+        "www.astro.ucla.edu",
+        "www.britannica.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Event horizon - Wikipedia",
+        "What is a black hole event horizon (and what happens there)? - Space",
+        "We Thought Black Holes Created Event Horizons. It Might Be ..."
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "solar system planets order",
+      "status": 200,
+      "latency_ms": 567.28,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "en.wikipedia.org",
+        "docs.python.org",
+        "labelstars.com",
+        "www.space.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Structuring content with HTML - Learn web development | MDN",
+        "Transformer (deep learning) - Wikipedia",
+        "5. Data Structures — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "global warming causes",
+      "status": 200,
+      "latency_ms": 926.23,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "wwf.org.au",
+        "palmetto.com",
+        "www.nrdc.org",
+        "science.nasa.gov"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Quantum computing - Wikipedia",
+        "Causes of global warming | WWF-Australia | Causes of global warming | WWF Australia"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "human circulatory system",
+      "status": 200,
+      "latency_ms": 914.4,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "docs.docker.com",
+        "kidshealth.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 5,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Domain Name System - Wikipedia",
+        "Machine learning - Wikipedia",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "history of internet",
+      "status": 200,
+      "latency_ms": 911.97,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "www.virginmedia.com",
+        "www.cs.odu.edu"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Domain Name System - Wikipedia",
+        "Machine learning - Wikipedia",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "python official website",
+      "status": 200,
+      "latency_ms": 4396.99,
+      "provider": "local_index",
+      "results_count": 4,
+      "top_domains": [
+        "docs.python.org",
+        "developer.mozilla.org",
+        "en.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 4,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "Structuring content with HTML - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "github login",
+      "status": 200,
+      "latency_ms": 2146.53,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "docs.github.com",
+        "github.com",
+        "it.coecis.cornell.edu"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Creating an account on GitHub - GitHub Docs",
+        "Authenticating to GitHub in GitHub Desktop",
+        "github-login · GitHub"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "wikipedia main page",
+      "status": 200,
+      "latency_ms": 931.33,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "hi.wikipedia.org",
+        "simple.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Domain Name System - Wikipedia",
+        "Constitution of India - Wikipedia",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "google scholar",
+      "status": 200,
+      "latency_ms": 1860.13,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "paperpile.com",
+        "www.youtube.com",
+        "libraries.catholic.edu",
+        "chromewebstore.google.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Machine learning - Wikipedia",
+        "How to use Google Scholar: the ultimate guide"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "stack overflow",
+      "status": 200,
+      "latency_ms": 2142.23,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "docs.python.org",
+        "docs.docker.com",
+        "en.wikipedia.org",
+        "www.reddit.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 4,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "CSS styling basics - Learn web development | MDN",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "npm registry",
+      "status": 200,
+      "latency_ms": 2771.15,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "help.sonatype.com",
+        "www.npmjs.com",
+        "forgejo.org",
+        "docs.gitlab.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Domain Name System - Wikipedia",
+        "npm Registry",
+        "npm | Home"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "arxiv preprints",
+      "status": 200,
+      "latency_ms": 2432.14,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.reddit.com",
+        "www.youtube.com",
+        "forums.zotero.org",
+        "info.arxiv.org",
+        "x.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "[D] Arxiv submissions of double-blind review papers",
+        "arXiv & SmartXiv Tutorial: Save Time and Enhance Your ...",
+        "An error occurred saving with arXiv.org. Attempting to ..."
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "supreme court of india",
+      "status": 200,
+      "latency_ms": 2078.66,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "www.sci.gov.in",
+        "ecommitteesci.gov.in"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Constitution of India - Wikipedia",
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "5. Data Structures — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "university of delhi",
+      "status": 200,
+      "latency_ms": 911.26,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "www.britannica.com",
+        "iirfranking.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Constitution of India - Wikipedia",
+        "Domain Name System - Wikipedia",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "w3schools python",
+      "status": 200,
+      "latency_ms": 1049.52,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "www.youtube.com",
+        "www.w3schools.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "Python - Introduction - W3Schools.com"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "transformer architecture attention is all you need",
+      "status": 200,
+      "latency_ms": 582.46,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "vastuda.internal",
+        "developer.mozilla.org",
+        "docs.docker.com",
+        "parseur.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "VASTUDA Sovereign Architecture Documentation",
+        "Quantum computing - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "deep learning nature review",
+      "status": 200,
+      "latency_ms": 598.63,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "networks.cs.ucdavis.edu",
+        "www.nature.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 5,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Machine learning - Wikipedia",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "CRISPR gene editing mechanism",
+      "status": 200,
+      "latency_ms": 625.69,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "pmc.ncbi.nlm.nih.gov",
+        "www.addgene.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 4,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Domain Name System - Wikipedia",
+        "Transformer (deep learning) - Wikipedia",
+        "JavaScript Guide - JavaScript | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "theory of relativity summary",
+      "status": 200,
+      "latency_ms": 1500.9,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "www.ebsco.com",
+        "www.sciencedirect.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Machine learning - Wikipedia",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "quantum entanglement experiment",
+      "status": 200,
+      "latency_ms": 1869.0,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.aip.org",
+        "www.caltech.edu",
+        "www.reddit.com",
+        "www.facebook.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Machine learning - Wikipedia",
+        "Entanglement and experiment, part 1: Before Bell - AIP.ORG"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "semiconductor physics basics",
+      "status": 200,
+      "latency_ms": 1228.36,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "en.wikipedia.org",
+        "www.electronics-tutorials.ws",
+        "www.youtube.com",
+        "www.physics.gov.az"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 4,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "CSS styling basics - Learn web development | MDN",
+        "Structuring content with HTML - Learn web development | MDN",
+        "Machine learning - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "economics supply and demand elasticity",
+      "status": 200,
+      "latency_ms": 2225.74,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "docs.docker.com",
+        "www.scribd.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Constitution of India - Wikipedia",
+        "Domain Name System - Wikipedia",
+        "5. Data Structures — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "sociological theories of urbanization",
+      "status": 200,
+      "latency_ms": 3044.97,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "pressbooks.howardcc.edu",
+        "oertx.highered.texas.gov"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Constitution of India - Wikipedia",
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "5. Data Structures — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "neuroscience neuroplasticity mechanisms",
+      "status": 200,
+      "latency_ms": 2800.77,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "en.wikipedia.org",
+        "www.physio-pedia.com",
+        "www.youtube.com",
+        "www.ncbi.nlm.nih.gov"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 3,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "JavaScript Guide - JavaScript | MDN",
+        "Artificial intelligence - Wikipedia",
+        "Transformer (deep learning) - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "algorithmic game theory nash equilibrium",
+      "status": 200,
+      "latency_ms": 1544.72,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www2.math.upenn.edu",
+        "www.maths.lse.ac.uk",
+        "www.cs.cmu.edu",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Artificial intelligence - Wikipedia",
+        "Machine learning - Wikipedia",
+        "Algorithmic Game Theory"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "Python tutorial",
+      "status": 200,
+      "latency_ms": 3258.48,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "docs.docker.com",
+        "developer.mozilla.org",
+        "www.pythontutorial.net",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 5,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "Get started | Docker Docs"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "Python list comprehension",
+      "status": 200,
+      "latency_ms": 22.31,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "developer.mozilla.org",
+        "en.wikipedia.org",
+        "realpython.com",
+        "www.geeksforgeeks.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "5. Data Structures — Python 3.14.7 documentation",
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "Structuring content with HTML - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "best Python libraries",
+      "status": 200,
+      "latency_ms": 983.0,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "www.datacamp.com",
+        "tryolabs.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 5,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "Quantum computing - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "javascript async await example",
+      "status": 200,
+      "latency_ms": 603.6,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "docs.python.org",
+        "en.wikipedia.org",
+        "www.youtube.com",
+        "www.geeksforgeeks.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "JavaScript Guide - JavaScript | MDN",
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "5. Data Structures — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "docker compose tutorial",
+      "status": 200,
+      "latency_ms": 882.22,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.docker.com",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "en.wikipedia.org",
+        "learn.microsoft.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Get started | Docker Docs",
+        "CSS styling basics - Learn web development | MDN",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "git merge vs rebase",
+      "status": 200,
+      "latency_ms": 584.21,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "shiftasia.com",
+        "www.youtube.com",
+        "www.atlassian.com",
+        "medium.com",
+        "dev.to"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Git Merge vs. Rebase: The Great Debate (And Which One YOU Should Use!)",
+        "Git MERGE vs REBASE: Everything You Need to Know",
+        "Merging vs. Rebasing | Atlassian Git Tutorial"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "react useEffect hook explained",
+      "status": 200,
+      "latency_ms": 553.66,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.geeksforgeeks.org",
+        "www.youtube.com",
+        "dmitripavlutin.com",
+        "legacy.reactjs.org",
+        "medium.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "ReactJS useEffect Hook - GeeksforGeeks",
+        "Learn React Hooks: useEffect - Simply Explained!",
+        "React's useEffect Hook Explained (4 min)"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "binary search python implementation",
+      "status": 200,
+      "latency_ms": 573.57,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "vastuda.internal",
+        "builtin.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "Domain Name System - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "sql inner join vs left join",
+      "status": 200,
+      "latency_ms": 585.95,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "pragmaticworks.com",
+        "www.sqlshack.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 4,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "5. Data Structures — Python 3.14.7 documentation",
+        "Domain Name System - Wikipedia",
+        "Quantum computing - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "rust ownership and borrowing",
+      "status": 200,
+      "latency_ms": 551.16,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "docs.python.org",
+        "docs.docker.com",
+        "en.wikipedia.org",
+        "dev.to"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "JavaScript Guide - JavaScript | MDN",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "Structuring content with HTML - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "latest AI news",
+      "status": 200,
+      "latency_ms": 860.46,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "vastuda.internal",
+        "blog.google",
+        "www.bbc.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 4,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Machine learning - Wikipedia",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "tech industry layoffs 2026",
+      "status": 200,
+      "latency_ms": 564.38,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "www.youtube.com",
+        "skillsyncer.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 5,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Structuring content with HTML - Learn web development | MDN",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "space mission launches 2026",
+      "status": 200,
+      "latency_ms": 565.92,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "www.spacex.com",
+        "nextspaceflight.com",
+        "space.skyrocket.de"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 3,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Domain Name System - Wikipedia",
+        "Structuring content with HTML - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "global renewable energy trends",
+      "status": 200,
+      "latency_ms": 596.0,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "online.utpb.edu",
+        "www.iea.org",
+        "www.enerdata.net",
+        "renewablesnow.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Quantum computing - Wikipedia",
+        "The Future of Renewable Energy: Trends and What’s Coming Next | UT Permian Basin Online"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "semiconductor chip manufacturing news",
+      "status": 200,
+      "latency_ms": 561.96,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "apacnewsnetwork.com",
+        "technode.global",
+        "www.larsentoubro.com",
+        "www.bgr.com",
+        "www.tomshardware.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "L&T Semiconductor, Tata Electronics Join Hands For Chip Manufacturing",
+        "Nexperia and Tata Electronics deepen India's semiconductor manufacturing push",
+        "L&T Semiconductor and Tata Electronics Partner to Expand Indigenous Manufacturing of Market-leading Chip Products for Global Customers"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "autonomous vehicles regulation",
+      "status": 200,
+      "latency_ms": 1202.78,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.volvoautonomoussolutions.com",
+        "www.ncsl.org",
+        "www.bakerdonelson.com",
+        "www.dmv.ca.gov"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Artificial intelligence - Wikipedia",
+        "Regulation of self-driving cars - Wikipedia",
+        "Navigating the road ahead: exploring the regulatory framework for autonomous vehicles in the United States"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "cybersecurity threats report",
+      "status": 200,
+      "latency_ms": 865.22,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.trellix.com",
+        "www.enisa.europa.eu",
+        "www.unicc.org",
+        "www.cisco.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Constitution of India - Wikipedia",
+        "Threat Reports | Trellix"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "quantum computing breakthrough",
+      "status": 200,
+      "latency_ms": 929.51,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.theguardian.com",
+        "www.nsf.gov",
+        "www.discovermagazine.com",
+        "www.networkworld.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Transformer (deep learning) - Wikipedia",
+        "Google hails breakthrough as quantum computer ..."
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "electric vehicles battery innovation",
+      "status": 200,
+      "latency_ms": 861.06,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "ev-lectron.com",
+        "www.greencars.com",
+        "driivz.com",
+        "www.reddit.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Artificial intelligence - Wikipedia",
+        "Electric Vehicle Innovations Shaping the Future of Mobility — Lectron EV",
+        "The Future of EV Batteries: What's Next?"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "tech startup venture capital updates",
+      "status": 200,
+      "latency_ms": 4456.74,
+      "provider": "local_index",
+      "results_count": 5,
+      "top_domains": [
+        "docs.python.org",
+        "developer.mozilla.org",
+        "en.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 5,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "Structuring content with HTML - Learn web development | MDN",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "भारत का संविधान",
+      "status": 200,
+      "latency_ms": 1716.83,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "hindi.lawrato.com",
+        "sansad.in",
+        "www.sci.gov.in",
+        "cdnbbsr.s3waas.gov.in"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारत का संविधान - विकिपीडिया",
+        "भारत का संविधान - विकिपीडिया",
+        "भारत का संविधान क्या है - संविधान की प्रस्तावना, मौलिक अधिकार और विशेषताएँ"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "कृत्रिम बुद्धिमत्ता क्या है",
+      "status": 200,
+      "latency_ms": 1366.06,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "www.drishtiias.com",
+        "www.sanskritiias.com",
+        "rajras.in",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारत का संविधान - विकिपीडिया",
+        "कृत्रिम बुद्धिमत्ता और नैतिकता",
+        "कृत्रिम बुद्धि - विकिपीडिया"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "सौर मंडल के ग्रह",
+      "status": 200,
+      "latency_ms": 1177.78,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "testbook.com",
+        "archive.org",
+        "bh.wikipedia.org",
+        "www.ck12.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारत का संविधान - विकिपीडिया",
+        "सौरमंडल (Solar System in Hindi) - सौरमंडल के ग्रह, क्षुद्र ग्रह, उल्कापिंड और धूमकेतु",
+        "हमारे सौर-मंडल के ग्रह"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "भारत की राजधानी",
+      "status": 200,
+      "latency_ms": 1209.41,
+      "provider": "hybrid_vastuda",
+      "results_count": 7,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "www.bbc.com",
+        "www.youtube.com",
+        "www.instagram.com",
+        "www.olympics.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारत का संविधान - विकिपीडिया",
+        "पाकिस्तान वाले 'मक्का समझौते' को ट्रंप की हरी झंडी भारत के लिए कितनी बड़ी चिंता? - BBC News हिंदी",
+        "Naya Bharat | A Comedy Special"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "भारतीय अर्थव्यवस्था का इतिहास",
+      "status": 200,
+      "latency_ms": 889.28,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "www.youtube.com",
+        "mpbou.edu.in",
+        "amp.bharatdiscovery.org",
+        "www.ignited.in"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारत का संविधान - विकिपीडिया",
+        "भारतीय अर्थव्यवस्था - विकिपीडिया",
+        "MHI-107 , भारतीय अर्थव्यवस्था का इतिहास-2 (C. 1700-2000 ..."
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "महात्मा गांधी का जीवन परिचय",
+      "status": 200,
+      "latency_ms": 1057.95,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "translate.google.com",
+        "hindi.webdunia.com",
+        "deepawali.co.in",
+        "www.bbc.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारत का संविधान - विकिपीडिया",
+        "Mahatma Gandhi | Biography, Education, Religion, Accomplishments, Death, Gandhi Jayanti, Martyrs’ Day & Facts | Britannica",
+        "Mahatma Gandhi : महात्मा गांधी का जीवन परिचय - mahatma gandhi jeevan parichay in hindi | Webdunia Hindi"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "जलवायु परिवर्तन के प्रभाव",
+      "status": 200,
+      "latency_ms": 882.82,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "resultmitra.com",
+        "metnet.imd.gov.in",
+        "hindi.downtoearth.org.in",
+        "www.drishtiias.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारत का संविधान - विकिपीडिया",
+        "जलवायु परिवर्तन (Climate Change): कारण, प्रभाव और समाधान (Causes, Impacts and Solutions) -",
+        "जलवायु परिवर्तन"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "कंप्यूटर कैसे काम करता है",
+      "status": 200,
+      "latency_ms": 883.9,
+      "provider": "hybrid_vastuda",
+      "results_count": 7,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "hi.quora.com",
+        "translate.google.com",
+        "askfilo.com",
+        "sabkuchhindime.in"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारत का संविधान - विकिपीडिया",
+        "कम्प्यूटर कैसे काम करता है और इसका उपयोग किसके लिए किया जाता है? - Quora",
+        "कंप्यूटर कैसे काम करते हैं? एक सरल परिचय"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "लोकतंत्र का महत्व",
+      "status": 200,
+      "latency_ms": 2346.4,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "askfilo.com",
+        "www.studyfry.com",
+        "ijaer.org",
+        "hi.quora.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारत का संविधान - विकिपीडिया",
+        "लोकतंत्र का महत्व लिखिए | Filo",
+        "लोकतंत्र क्या है - लोकतंत्र का महत्व, प्रकार, विशेषताएं - Studyfry"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "अंतरिक्ष अनुसंधान संगठन इसरो",
+      "status": 200,
+      "latency_ms": 10.05,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "testbook.com",
+        "hindi.iirs.gov.in",
+        "bharatdiscovery.org",
+        "tfipost.in"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारत का संविधान - विकिपीडिया",
+        "भारतीय अंतरिक्ष अनुसंधान संगठन (इसरो) यूपीएससी नोट्स: इतिहास, उद्देश्य और अधिक",
+        "भारतीय अंतरिक्ष अनुसंधान संगठन के बारे में | Welcome to Indian Institute of Remote Sensing (IIRS)"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "Python kaise sikhe",
+      "status": 200,
+      "latency_ms": 20.94,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "www.python.org",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "Python For Beginners"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "website kaise banaye",
+      "status": 200,
+      "latency_ms": 1196.16,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "docs.python.org",
+        "en.wikipedia.org",
+        "toptechglobal.in",
+        "www.wix.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 3,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Structuring content with HTML - Learn web development | MDN",
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "Artificial intelligence - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "machine learning kya hota hai",
+      "status": 200,
+      "latency_ms": 862.87,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "hi.quora.com",
+        "www.coursera.org",
+        "developers.google.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 4,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Machine learning - Wikipedia",
+        "Transformer (deep learning) - Wikipedia",
+        "Structuring content with HTML - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "cloud computing ke fayde",
+      "status": 200,
+      "latency_ms": 951.59,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "www.youtube.com",
+        "cloud.google.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 5,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Machine learning - Wikipedia",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "programming me career kaise banaye",
+      "status": 200,
+      "latency_ms": 908.7,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "www.datacamp.com",
+        "www.coursera.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "Quantum computing - Wikipedia",
+        "5. Data Structures — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "stock market me invest kaise kare",
+      "status": 200,
+      "latency_ms": 883.05,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "www.bajajfinserv.in",
+        "groww.in"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 5,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Domain Name System - Wikipedia",
+        "5. Data Structures — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "cybersecurity me job kaise paye",
+      "status": 200,
+      "latency_ms": 1268.5,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "docs.python.org",
+        "en.wikipedia.org",
+        "redbudcyber.com",
+        "www.neit.edu"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 5,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Structuring content with HTML - Learn web development | MDN",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "artificial intelligence ka future kya hai",
+      "status": 200,
+      "latency_ms": 917.61,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "builtin.com",
+        "www.sanskritiias.com",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 3,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Artificial intelligence - Wikipedia",
+        "Machine learning - Wikipedia",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "computer networking ke basics",
+      "status": 200,
+      "latency_ms": 870.39,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "en.wikipedia.org",
+        "docs.python.org",
+        "www.coursera.org",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 5,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "CSS styling basics - Learn web development | MDN",
+        "Structuring content with HTML - Learn web development | MDN",
+        "Domain Name System - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "data science roadmap for beginners",
+      "status": 200,
+      "latency_ms": 1056.05,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "codegnan.com",
+        "cdn.codewithmosh.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Domain Name System - Wikipedia",
+        "5. Data Structures — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "how to optimize sqlite query performance for large datasets",
+      "status": 200,
+      "latency_ms": 1120.79,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "docs.docker.com",
+        "www.sqliteforum.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Machine learning - Wikipedia",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "difference between generative adversarial networks and diffusion models",
+      "status": 200,
+      "latency_ms": 1164.84,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "docs.docker.com",
+        "www.geeksforgeeks.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Quantum computing - Wikipedia",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "step by step guide to setup cloudflare tunnel on windows",
+      "status": 200,
+      "latency_ms": 11.3,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "docs.python.org",
+        "en.wikipedia.org",
+        "github.com",
+        "medium.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "JavaScript Guide - JavaScript | MDN",
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "Structuring content with HTML - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "how to calculate compound annual growth rate in python pandas",
+      "status": 200,
+      "latency_ms": 1031.37,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "feliperego.github.io",
+        "ds4finance.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "5. Data Structures — Python 3.14.7 documentation",
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "Artificial intelligence - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "best practices for handling rate limits in REST API clients",
+      "status": 200,
+      "latency_ms": 1931.67,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "blog.postman.com",
+        "www.speakeasy.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "JavaScript Guide - JavaScript | MDN",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "how to configure nginx reverse proxy with ssl certificate",
+      "status": 200,
+      "latency_ms": 1115.97,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "community.letsencrypt.org",
+        "gist.github.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Domain Name System - Wikipedia",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "Structuring content with HTML - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "understanding time complexity of red black tree insertion",
+      "status": 200,
+      "latency_ms": 1181.25,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "medium.com",
+        "iq.opengenus.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Domain Name System - Wikipedia",
+        "Artificial intelligence - Wikipedia",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "how to extract text from pdf using python without ocr",
+      "status": 200,
+      "latency_ms": 1160.66,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "developer.mozilla.org",
+        "en.wikipedia.org",
+        "www.nutrient.io",
+        "stackoverflow.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "Structuring content with HTML - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "architectural differences between microservices and modular monoliths",
+      "status": 200,
+      "latency_ms": 1102.17,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "docs.docker.com",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Quantum computing - Wikipedia",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "how does transformer self attention mechanism scale with sequence length",
+      "status": 200,
+      "latency_ms": 1117.12,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "medium.com",
+        "sebastianraschka.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Domain Name System - Wikipedia",
+        "5. Data Structures — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "what is the speed of light",
+      "status": 200,
+      "latency_ms": 892.43,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.docker.com",
+        "docs.python.org",
+        "physicsfundamentals.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "CSS styling basics - Learn web development | MDN",
+        "Get started | Docker Docs"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "why is the sky blue",
+      "status": 200,
+      "latency_ms": 2025.18,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "en.wikipedia.org",
+        "docs.python.org",
+        "www.reddit.com",
+        "math.ucr.edu"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Structuring content with HTML - Learn web development | MDN",
+        "Artificial intelligence - Wikipedia",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "who invented the world wide web",
+      "status": 200,
+      "latency_ms": 904.3,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.python.org",
+        "webfoundation.org",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Machine learning - Wikipedia",
+        "Structuring content with HTML - Learn web development | MDN",
+        "CSS styling basics - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "how do airplanes generate lift",
+      "status": 200,
+      "latency_ms": 875.22,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.docker.com",
+        "docs.python.org",
+        "vastuda.internal",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Artificial intelligence - Wikipedia",
+        "Get started | Docker Docs"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "why do batteries degrade over time",
+      "status": 200,
+      "latency_ms": 1601.89,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "en.wikipedia.org",
+        "docs.docker.com",
+        "vastuda.internal",
+        "docs.python.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Structuring content with HTML - Learn web development | MDN",
+        "Artificial intelligence - Wikipedia",
+        "Get started | Docker Docs"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "what is the difference between ram and rom",
+      "status": 200,
+      "latency_ms": 829.04,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "developer.mozilla.org",
+        "docs.docker.com",
+        "docs.python.org",
+        "www.geeksforgeeks.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "CSS styling basics - Learn web development | MDN",
+        "Structuring content with HTML - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "how does public key cryptography work",
+      "status": 200,
+      "latency_ms": 851.66,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "docs.python.org",
+        "developer.mozilla.org",
+        "www.cloudflare.com",
+        "www.kiteworks.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Transformer (deep learning) - Wikipedia",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "why is water a universal solvent",
+      "status": 200,
+      "latency_ms": 847.75,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "en.wikipedia.org",
+        "docs.python.org",
+        "h2oglobalnews.com",
+        "www.usgs.gov"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Structuring content with HTML - Learn web development | MDN",
+        "Artificial intelligence - Wikipedia",
+        "The Python Tutorial — Python 3.14.7 documentation"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "what happens during a solar eclipse",
+      "status": 200,
+      "latency_ms": 843.49,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "developer.mozilla.org",
+        "docs.docker.com",
+        "en.wikipedia.org",
+        "www.bbc.co.uk",
+        "www.esa.int"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 5,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "CSS styling basics - Learn web development | MDN",
+        "Structuring content with HTML - Learn web development | MDN",
+        "Get started | Docker Docs"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "how do search engines index the web",
+      "status": 200,
+      "latency_ms": 898.51,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "developer.mozilla.org",
+        "en.wikipedia.org",
+        "vastuda.internal",
+        "seranking.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "5. Data Structures — Python 3.14.7 documentation",
+        "JavaScript Guide - JavaScript | MDN",
+        "Artificial intelligence - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "React vs Vue",
+      "status": 200,
+      "latency_ms": 1167.09,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "strapi.io",
+        "decode.agency",
+        "dev.to",
+        "vuejs.org",
+        "radixweb.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Vue vs React: Which is Better for Developers?",
+        "React vs Vue: which one should you choose in 2026?",
+        "Main differences between ReactJS and VueJS, in my opinion - DEV Community"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "Python vs Go",
+      "status": 200,
+      "latency_ms": 1223.26,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "developer.mozilla.org",
+        "en.wikipedia.org",
+        "oxylabs.io",
+        "dev.to"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 6,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "5. Data Structures — Python 3.14.7 documentation",
+        "Structuring content with HTML - Learn web development | MDN"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "PostgreSQL vs MongoDB",
+      "status": 200,
+      "latency_ms": 2552.93,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "aws.amazon.com",
+        "www.mongodb.com",
+        "www.knowi.com",
+        "www.geeksforgeeks.org",
+        "estuary.dev"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "MongoDB vs PostgreSQL - Difference Between Databases",
+        "Comparing MongoDB vs. PostgreSQL",
+        "MongoDB vs PostgreSQL: Choosing the Right Database ..."
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "Docker vs Kubernetes",
+      "status": 200,
+      "latency_ms": 1189.24,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.docker.com",
+        "www.scalecomputing.com",
+        "www.geeksforgeeks.org",
+        "www.paloaltonetworks.com",
+        "www.atlassian.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Get started | Docker Docs",
+        "Kubernetes vs Docker: A Comparison",
+        "Kubernetes Vs Docker - GeeksforGeeks"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "TCP vs UDP",
+      "status": 200,
+      "latency_ms": 1997.05,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.avg.com",
+        "www.geeksforgeeks.org",
+        "digilent.com",
+        "www.learncisco.net"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Domain Name System - Wikipedia",
+        "TCP vs. UDP: Key Differences and Uses",
+        "TCP vs. UDP"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "HTTP/2 vs HTTP/3",
+      "status": 200,
+      "latency_ms": 1235.54,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "docs.python.org",
+        "www.oshyn.com",
+        "www.logicmonitor.com",
+        "ably.com",
+        "www.pubnub.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "HTTP/2 vs HTTP/3: Improving Web Performance - Oshyn",
+        "HTTP/2 vs. HTTP/3 - LogicMonitor"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "REST vs GraphQL",
+      "status": 200,
+      "latency_ms": 1615.0,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "medium.com",
+        "www.contentful.com",
+        "blog.postman.com",
+        "aws.amazon.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Quantum computing - Wikipedia",
+        "Artificial intelligence - Wikipedia",
+        "GraphQL vs REST API | Similarities & Differences"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "Git vs SVN",
+      "status": 200,
+      "latency_ms": 1181.34,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.perforce.com",
+        "docs.mendix.com",
+        "www.akamai.com",
+        "nulab.com",
+        "www.reddit.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Git vs. SVN: What's the Difference, and Which is Better for Your Team? | Perforce Software",
+        "Differences Between Git and SVN | Mendix Documentation",
+        "Git vs SVN: Pros and Cons of Each Version Control System"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "CPU vs GPU",
+      "status": 200,
+      "latency_ms": 2278.9,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.cdw.com",
+        "aws.amazon.com",
+        "www.intel.com",
+        "www.ibm.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 2,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Transformer (deep learning) - Wikipedia",
+        "Artificial intelligence - Wikipedia",
+        "CPU vs. GPU: What's the Difference?"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "SSD vs HDD",
+      "status": 200,
+      "latency_ms": 2026.37,
+      "provider": "tavily",
+      "results_count": 7,
+      "top_domains": [
+        "www.crucial.com",
+        "aws.amazon.com",
+        "www.westerndigital.com",
+        "www.storagereview.com",
+        "www.intel.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "SSD vs. HDD: Know the Difference",
+        "SSD vs HDD - Difference Between Data Storage Devices",
+        "HDD vs SSD: Choosing the Right Drive for Your Data"
+      ],
+      "error": null
+    }
+  ]
+}

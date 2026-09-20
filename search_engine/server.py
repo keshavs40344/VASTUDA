@@ -43,6 +43,18 @@ app.secret_key = os.getenv("SECRET_KEY", "vastuda-secret-session-key-2026-secure
 
 ASSETS_DIR = os.path.join(BASE_DIR, "public", "assets")
 
+def ensure_seed_index():
+    """Ensure foundational documents exist in local index on fresh deployments."""
+    try:
+        stats = indexer.get_index_stats()
+        if stats.get("indexed_documents", 0) < 3:
+            logger.info("Local index is sparse; running background seed crawl...")
+            crawler.run_seed_crawl(max_docs=15)
+    except Exception as e:
+        logger.warning(f"Seed crawl check note: {e}")
+
+threading.Thread(target=ensure_seed_index, daemon=True).start()
+
 # --- Production Security & Rate Limiting ---
 RATE_LIMIT_BUCKETS = {}
 RATE_LIMIT_LOCK = threading.Lock()

@@ -1,0 +1,2551 @@
+{
+  "summary": {
+    "benchmark_timestamp": 1789922922,
+    "total_queries": 100,
+    "successful_queries": 100,
+    "failed_queries": 0,
+    "total_execution_time_seconds": 147.6,
+    "latency_ms": {
+      "median": 1550.57,
+      "p95": 3598.21,
+      "mean": 1325.27,
+      "min": 1.86,
+      "max": 4599.49
+    },
+    "provider_breakdown": {
+      "tavily": 75,
+      "hybrid_vastuda": 20,
+      "wikipedia_fallback": 2,
+      "none": 3
+    },
+    "total_local_index_hits": 20,
+    "category_summaries": {
+      "informational": {
+        "query_count": 10,
+        "avg_latency_ms": 24.21,
+        "total_results": 79,
+        "avg_results_per_query": 7.9,
+        "local_hits": 1
+      },
+      "navigational": {
+        "query_count": 10,
+        "avg_latency_ms": 14.59,
+        "total_results": 70,
+        "avg_results_per_query": 7.0,
+        "local_hits": 0
+      },
+      "academic": {
+        "query_count": 10,
+        "avg_latency_ms": 551.33,
+        "total_results": 80,
+        "avg_results_per_query": 8.0,
+        "local_hits": 2
+      },
+      "programming": {
+        "query_count": 10,
+        "avg_latency_ms": 11.92,
+        "total_results": 80,
+        "avg_results_per_query": 8.0,
+        "local_hits": 2
+      },
+      "news": {
+        "query_count": 10,
+        "avg_latency_ms": 14.64,
+        "total_results": 80,
+        "avg_results_per_query": 8.0,
+        "local_hits": 1
+      },
+      "hindi": {
+        "query_count": 10,
+        "avg_latency_ms": 2686.96,
+        "total_results": 68,
+        "avg_results_per_query": 6.8,
+        "local_hits": 0
+      },
+      "hinglish": {
+        "query_count": 10,
+        "avg_latency_ms": 2674.85,
+        "total_results": 72,
+        "avg_results_per_query": 7.2,
+        "local_hits": 0
+      },
+      "long_tail": {
+        "query_count": 10,
+        "avg_latency_ms": 2781.92,
+        "total_results": 72,
+        "avg_results_per_query": 7.2,
+        "local_hits": 6
+      },
+      "questions": {
+        "query_count": 10,
+        "avg_latency_ms": 2221.59,
+        "total_results": 80,
+        "avg_results_per_query": 8.0,
+        "local_hits": 8
+      },
+      "comparisons": {
+        "query_count": 10,
+        "avg_latency_ms": 2270.69,
+        "total_results": 75,
+        "avg_results_per_query": 7.5,
+        "local_hits": 0
+      }
+    }
+  },
+  "query_results": [
+    {
+      "category": "informational",
+      "query": "machine learning",
+      "status": 200,
+      "latency_ms": 72.67,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.energy.gov",
+        "www.ibm.com",
+        "mitsloan.mit.edu",
+        "www.geeksforgeeks.org",
+        "en.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "DOE Explains...Machine Learning",
+        "What is Machine Learning? | IBM",
+        "Machine learning, explained"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "what is quantum computing",
+      "status": 200,
+      "latency_ms": 23.24,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "aws.amazon.com",
+        "www.ibm.com",
+        "www.mckinsey.com",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "What is Quantum Computing?",
+        "What Is Quantum Computing? | IBM"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "Indian Constitution",
+      "status": 200,
+      "latency_ms": 21.63,
+      "provider": "wikipedia_fallback",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Constitution of India",
+        "Article 370 of the Constitution of India",
+        "Eighth Schedule to the Constitution of India"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "how does DNS work",
+      "status": 200,
+      "latency_ms": 2.66,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "newrelic.com",
+        "www.ibm.com",
+        "www.fortinet.com",
+        "www.proofpoint.com",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "What is DNS and How Does it Work? | New Relic",
+        "What Is DNS (Domain Name System)? - IBM",
+        "What Is Domain Name System (DNS)? - Fortinet"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "photosynthesis process",
+      "status": 200,
+      "latency_ms": 20.88,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.monash.edu",
+        "education.nationalgeographic.org",
+        "en.wikipedia.org",
+        "ssec.si.edu",
+        "www.khanacademy.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The process of photosynthesis - Student Academic Success",
+        "Photosynthesis",
+        "Photosynthesis"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "black hole event horizon",
+      "status": 200,
+      "latency_ms": 19.19,
+      "provider": "tavily",
+      "results_count": 7,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.youtube.com",
+        "www.space.com",
+        "www.astro.ucla.edu",
+        "www.britannica.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Event horizon - Wikipedia",
+        "We Thought Black Holes Created Event Horizons. It Might Be the Opposite",
+        "What is a black hole event horizon (and what happens there)? - Space"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "solar system planets order",
+      "status": 200,
+      "latency_ms": 22.5,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "labelstars.com",
+        "www.space.com",
+        "en.wikipedia.org",
+        "www.schoolsobservatory.org",
+        "science.nasa.gov"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Planets in the Solar System: Order, Facts & Unique Features",
+        "Solar system guide - Discover the order of planets and ...",
+        "Solar System"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "global warming causes",
+      "status": 200,
+      "latency_ms": 18.21,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "wwf.org.au",
+        "palmetto.com",
+        "www.nrdc.org",
+        "science.nasa.gov",
+        "www.un.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Causes of global warming | WWF-Australia | Causes of global warming | WWF Australia",
+        "Global Warming: Definitions, Causes, Effects, Solutions",
+        "Global Warming 101 - Definition, Facts, Causes and Effects ..."
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "human circulatory system",
+      "status": 200,
+      "latency_ms": 19.18,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "kidshealth.org",
+        "my.clevelandclinic.org",
+        "www.cancer.gov",
+        "www.ncbi.nlm.nih.gov",
+        "www.khanacademy.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Heart & Circulatory System",
+        "How Your Circulatory System Works - Cleveland Clinic",
+        "Definition of circulatory system"
+      ],
+      "error": null
+    },
+    {
+      "category": "informational",
+      "query": "history of internet",
+      "status": 200,
+      "latency_ms": 21.91,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.virginmedia.com",
+        "www.cs.odu.edu",
+        "www.geeksforgeeks.org",
+        "www.internetsociety.org",
+        "en.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "History of the Internet: A Timeline | Virgin Media O2",
+        "History of the Internet",
+        "Internet Origin: History of internet Invention from ARPANET to Modern Web (1957-2025) - GeeksforGeeks"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "python official website",
+      "status": 200,
+      "latency_ms": 3.93,
+      "provider": "tavily",
+      "results_count": 7,
+      "top_domains": [
+        "pythononline.net",
+        "en.wikipedia.org",
+        "www.python.org",
+        "www.learnpython.org",
+        "www.py4e.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Python Online - Editor, Compiler, Interpreter, IDE",
+        "Python (programming language) - Wikipedia",
+        "Welcome to Python.org"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "github login",
+      "status": 200,
+      "latency_ms": 21.47,
+      "provider": "tavily",
+      "results_count": 7,
+      "top_domains": [
+        "www.youtube.com",
+        "github.com",
+        "docs.github.com",
+        "learn.microsoft.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "How to Login Github Enterprise (Full 2025 Guide)",
+        "Sign in to GitHub",
+        "Authenticating with Enterprise Managed Users"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "wikipedia main page",
+      "status": 200,
+      "latency_ms": 21.69,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "simple.wikipedia.org",
+        "www.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Wikipedia:About the Main Page - Wikipedia",
+        "Wikipedia:Main Page history - Wikipedia",
+        "Wikipedia:Main Page design - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "google scholar",
+      "status": 200,
+      "latency_ms": 3.66,
+      "provider": "tavily",
+      "results_count": 6,
+      "top_domains": [
+        "en.wikipedia.org",
+        "paperpile.com",
+        "www.youtube.com",
+        "libraries.catholic.edu",
+        "chromewebstore.google.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Google Scholar - Wikipedia",
+        "How to use Google Scholar: the ultimate guide - Paperpile",
+        "How to Use Google Scholar for Academic Research | University of Idaho Library"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "stack overflow",
+      "status": 200,
+      "latency_ms": 16.35,
+      "provider": "tavily",
+      "results_count": 5,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.reddit.com",
+        "medium.com",
+        "stackoverflow.com",
+        "stackoverflow.co"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Stack Overflow",
+        "Eli5-What does a “stack overflow” mean? : r/explainlikeimfive",
+        "The Best and Worst Ways to Use Stack Overflow"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "npm registry",
+      "status": 200,
+      "latency_ms": 18.82,
+      "provider": "tavily",
+      "results_count": 7,
+      "top_domains": [
+        "help.sonatype.com",
+        "www.npmjs.com",
+        "forgejo.org",
+        "support.atlassian.com",
+        "docs.gitlab.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "npm Registry",
+        "npm | Home",
+        "npm Package Registry | Forgejo – Beyond coding. We forge."
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "arxiv preprints",
+      "status": 200,
+      "latency_ms": 17.5,
+      "provider": "tavily",
+      "results_count": 6,
+      "top_domains": [
+        "casrai.org",
+        "www.libraries.rutgers.edu",
+        "en.wikipedia.org",
+        "www.science.org",
+        "instr.iastate.libguides.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "arXiv Preprints: How They Work and How to Cite — CASRAI",
+        "ArXiv.org | Rutgers University Libraries",
+        "arXiv"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "supreme court of india",
+      "status": 200,
+      "latency_ms": 21.06,
+      "provider": "wikipedia_fallback",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Supreme Court of India",
+        "Chief Justice of India",
+        "List of sitting judges of the Supreme Court of India"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "university of delhi",
+      "status": 200,
+      "latency_ms": 17.98,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.britannica.com",
+        "en.wikipedia.org",
+        "iirfranking.com",
+        "www.topuniversities.com",
+        "x.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "University of Delhi | Education, Research, Courses, & Facts | Britannica",
+        "Delhi University",
+        "University of Delhi (DU) | IIRF Ranking"
+      ],
+      "error": null
+    },
+    {
+      "category": "navigational",
+      "query": "w3schools python",
+      "status": 200,
+      "latency_ms": 3.42,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.youtube.com",
+        "www.w3schools.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Python - Introduction - W3Schools.com",
+        "Python - Get Started - W3Schools.com",
+        "Python Tutorial"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "transformer architecture attention is all you need",
+      "status": 200,
+      "latency_ms": 20.57,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "en.wikipedia.org",
+        "parseur.com",
+        "mbrenndoerfer.com",
+        "huggingface.co"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "Attention Is All You Need",
+        "Attention Is All You Need Explained - The Paper That ..."
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "deep learning nature review",
+      "status": 200,
+      "latency_ms": 2.25,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "networks.cs.ucdavis.edu",
+        "www.nature.com",
+        "medium.com",
+        "link.springer.com",
+        "hal.science"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Deep learning review",
+        "Deep learning | Nature",
+        "Machine learning | Nature Reviews Genetics"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "CRISPR gene editing mechanism",
+      "status": 200,
+      "latency_ms": 24.27,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "pmc.ncbi.nlm.nih.gov",
+        "www.addgene.org",
+        "www.integra-biosciences.com",
+        "www.genoway.com",
+        "crisprtx.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Mechanism and Applications of CRISPR/Cas-9-Mediated ...",
+        "CRISPR Guide",
+        "What is CRISPR-Cas9 and how does it work? | INTEGRA"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "theory of relativity summary",
+      "status": 200,
+      "latency_ms": 20.7,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.ebsco.com",
+        "www.sciencedirect.com",
+        "www.youtube.com",
+        "www.space.com",
+        "www.energy.gov"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Theory of relativity | Physics | Research Starters | EBSCOhost",
+        "Relativity Theory - an overview | ScienceDirect Topics",
+        "Theory of relativity explained in 7 mins"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "quantum entanglement experiment",
+      "status": 200,
+      "latency_ms": 1153.9,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.aip.org",
+        "www.caltech.edu",
+        "en.wikipedia.org",
+        "www.reddit.com",
+        "www.facebook.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Entanglement and experiment, part 1: Before Bell - AIP.ORG",
+        "Caltech alumnus John Clauser discusses his first experimental proof of quantum entanglement. - www.caltech.edu",
+        "Quantum entanglement"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "semiconductor physics basics",
+      "status": 200,
+      "latency_ms": 22.34,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.electronics-tutorials.ws",
+        "www.youtube.com",
+        "en.wikipedia.org",
+        "www.physics.gov.az",
+        "nanohub.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Semiconductor Basics",
+        "Introduction to Semiconductor Physics and Devices",
+        "Semiconductor"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "economics supply and demand elasticity",
+      "status": 200,
+      "latency_ms": 18.41,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "www.scribd.com",
+        "en.wikipedia.org",
+        "openstax.org",
+        "www.khanacademy.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "Elasticity of Demand and Supply Explained | PDF | Elasticity (Economics) | Supply (Economics)",
+        "Elasticity (economics) - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "sociological theories of urbanization",
+      "status": 200,
+      "latency_ms": 18.78,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "pressbooks.howardcc.edu",
+        "oertx.highered.texas.gov",
+        "courses.lumenlearning.com",
+        "www.yorku.ca",
+        "www.scribd.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Urbanization – Introduction to Sociology",
+        "Theoretical Perspectives on Urbanization",
+        "14.2 Sociological Perspectives on Urbanization"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "neuroscience neuroplasticity mechanisms",
+      "status": 200,
+      "latency_ms": 1037.24,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.physio-pedia.com",
+        "www.youtube.com",
+        "www.ncbi.nlm.nih.gov",
+        "www.intechopen.com",
+        "www.mdpi.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Neuroplasticity",
+        "2-Minute Neuroscience: Neuroplasticity",
+        "Neuroplasticity - StatPearls - NCBI Bookshelf - NIH"
+      ],
+      "error": null
+    },
+    {
+      "category": "academic",
+      "query": "algorithmic game theory nash equilibrium",
+      "status": 200,
+      "latency_ms": 3194.85,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www2.math.upenn.edu",
+        "www.maths.lse.ac.uk",
+        "www.cs.cmu.edu",
+        "www.youtube.com",
+        "en.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Algorithmic Game Theory",
+        "Algorithmic Game Theory",
+        "Algorithmic Game Theory - CMU School of Computer Science"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "Python tutorial",
+      "status": 200,
+      "latency_ms": 5.38,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.pythontutorial.net",
+        "docs.python.org",
+        "www.youtube.com",
+        "www.learnpython.org",
+        "www.codecademy.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Python Tutorial",
+        "The Python Tutorial — Python 3.14.7 documentation",
+        "Python Basics for Beginners | Python tutorial"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "Python list comprehension",
+      "status": 200,
+      "latency_ms": 12.73,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "realpython.com",
+        "www.geeksforgeeks.org",
+        "www.youtube.com",
+        "www.w3schools.com",
+        "docs.python.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Python List Comprehension: Tutorial With Examples – Real Python",
+        "List Comprehension in Python - GeeksforGeeks",
+        "Learn Python LIST COMPREHENSIONS in 10 minutes! 📃"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "best Python libraries",
+      "status": 200,
+      "latency_ms": 3.01,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.datacamp.com",
+        "tryolabs.com",
+        "www.anaconda.com",
+        "medium.com",
+        "opencv.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Top 31 Python Libraries for Data Science in 2026",
+        "Top Python libraries of 2025 | Tryolabs",
+        "The 48 Best Open-Source Python Libraries and Tools in 2026 | Anaconda"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "javascript async await example",
+      "status": 200,
+      "latency_ms": 1.86,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.youtube.com",
+        "developer.mozilla.org",
+        "www.geeksforgeeks.org",
+        "www.codecademy.com",
+        "medium.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "How to Use async/await in JavaScript",
+        "async function - JavaScript - MDN Web Docs - Mozilla",
+        "Async and Await in JavaScript - GeeksforGeeks"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "docker compose tutorial",
+      "status": 200,
+      "latency_ms": 24.61,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "docs.docker.com",
+        "learn.microsoft.com",
+        "anderfernandez.com",
+        "www.youtube.com",
+        "www.dolthub.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Docker Compose Quickstart",
+        "Work with multiple containers using Docker Compose - Visual Studio (Windows) | Microsoft Learn",
+        "Docker Compose Tutorial - Ander Fernández"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "git merge vs rebase",
+      "status": 200,
+      "latency_ms": 4.07,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "shiftasia.com",
+        "www.youtube.com",
+        "www.atlassian.com",
+        "medium.com",
+        "dev.to"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Git Merge vs. Rebase: The Great Debate (And Which One YOU Should Use!)",
+        "Git MERGE vs REBASE: Everything You Need to Know",
+        "Merging vs. Rebasing | Atlassian Git Tutorial"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "react useEffect hook explained",
+      "status": 200,
+      "latency_ms": 19.37,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.geeksforgeeks.org",
+        "www.youtube.com",
+        "dmitripavlutin.com",
+        "legacy.reactjs.org",
+        "medium.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "ReactJS useEffect Hook - GeeksforGeeks",
+        "Learn React Hooks: useEffect - Simply Explained!",
+        "React's useEffect Hook Explained (4 min)"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "binary search python implementation",
+      "status": 200,
+      "latency_ms": 2.05,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "builtin.com",
+        "www.youtube.com",
+        "medium.com",
+        "www.w3schools.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "Binary Search Implementation in Python: A Tutorial | Built In",
+        "Binary Search in Python"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "sql inner join vs left join",
+      "status": 200,
+      "latency_ms": 26.72,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "pragmaticworks.com",
+        "www.sqlshack.com",
+        "www.youtube.com",
+        "www.thedataschool.co.uk",
+        "www.atlassian.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Inner vs. Outer in SQL",
+        "Learn SQL: INNER JOIN vs LEFT JOIN",
+        "Inner Joins vs Left Joins in SQL [The Only Video You Need]"
+      ],
+      "error": null
+    },
+    {
+      "category": "programming",
+      "query": "rust ownership and borrowing",
+      "status": 200,
+      "latency_ms": 19.4,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "dev.to",
+        "www.reddit.com",
+        "oneuptime.com",
+        "medium.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "Rust Ownership and Borrowing Explained - DEV Community",
+        "I still don't fully understand ownership and borrowing in Rust"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "latest AI news",
+      "status": 200,
+      "latency_ms": 19.2,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "blog.google",
+        "www.bbc.com",
+        "www.cnbc.com",
+        "techcrunch.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "The latest AI news we announced in July 2026",
+        "Meta becomes latest firm to say its AI hacked another company"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "tech industry layoffs 2026",
+      "status": 200,
+      "latency_ms": 16.93,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.youtube.com",
+        "skillsyncer.com",
+        "www.kron4.com",
+        "www.informationweek.com",
+        "timesofindia.indiatimes.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Layoffs Explained: Why Tech Jobs Are Disappearing in 2026 ...",
+        "2026 Tech Layoffs Tracker: 210,741 Workers Impacted",
+        "Tech layoffs in 2026 hit grim milestone"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "space mission launches 2026",
+      "status": 200,
+      "latency_ms": 28.8,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.spacex.com",
+        "nextspaceflight.com",
+        "space.skyrocket.de",
+        "www.spacelaunchschedule.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "2026 in spaceflight - Wikipedia",
+        "Launches - SpaceX",
+        "Launches | Next Spaceflight"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "global renewable energy trends",
+      "status": 200,
+      "latency_ms": 2.6,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "online.utpb.edu",
+        "www.iea.org",
+        "www.enerdata.net",
+        "renewablesnow.com",
+        "ember-energy.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Future of Renewable Energy: Trends and What’s Coming Next | UT Permian Basin Online",
+        "Global trends – Global Energy Review 2026 – Analysis - IEA",
+        "Global energy trends | 2026 edition : Powering growth, not emissions"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "semiconductor chip manufacturing news",
+      "status": 200,
+      "latency_ms": 17.12,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "apacnewsnetwork.com",
+        "technode.global",
+        "www.larsentoubro.com",
+        "www.bgr.com",
+        "www.tomshardware.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "L&T Semiconductor, Tata Electronics Join Hands For Chip Manufacturing",
+        "Nexperia and Tata Electronics deepen India's semiconductor manufacturing push",
+        "L&T Semiconductor and Tata Electronics Partner to Expand Indigenous Manufacturing of Market-leading Chip Products for Global Customers"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "autonomous vehicles regulation",
+      "status": 200,
+      "latency_ms": 18.93,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "en.wikipedia.org",
+        "www.volvoautonomoussolutions.com",
+        "www.ncsl.org",
+        "www.bakerdonelson.com",
+        "www.dmv.ca.gov"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Regulation of self-driving cars - Wikipedia",
+        "Navigating the road ahead: exploring the regulatory framework for autonomous vehicles in the United States",
+        "Self-Driving Vehicles Enacted Legislation"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "cybersecurity threats report",
+      "status": 200,
+      "latency_ms": 3.27,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.trellix.com",
+        "www.enisa.europa.eu",
+        "www.unicc.org",
+        "www.cisco.com",
+        "www.trendmicro.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Threat Reports | Trellix",
+        "Threat Landscape - ENISA - European Union",
+        "[PDF] Cybersecurity Threat Landscape Report 2022 - UNICC"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "quantum computing breakthrough",
+      "status": 200,
+      "latency_ms": 15.3,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.theguardian.com",
+        "www.nsf.gov",
+        "www.discovermagazine.com",
+        "www.networkworld.com",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Google hails breakthrough as quantum computer ...",
+        "Quantum computing: Expanding what's possible",
+        "Quantum Computing Is Beginning to Take Shape — Here Are Three ..."
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "electric vehicles battery innovation",
+      "status": 200,
+      "latency_ms": 2.12,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "ev-lectron.com",
+        "www.greencars.com",
+        "driivz.com",
+        "www.reddit.com",
+        "www.autosinnovate.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Electric Vehicle Innovations Shaping the Future of Mobility — Lectron EV",
+        "The Future of EV Batteries: What's Next?",
+        "What is the Latest Technology in EV Batteries? | Driivz"
+      ],
+      "error": null
+    },
+    {
+      "category": "news",
+      "query": "tech startup venture capital updates",
+      "status": 200,
+      "latency_ms": 22.11,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "valueaddvc.com",
+        "en.wikipedia.org",
+        "intellizence.com",
+        "www.prnewswire.com",
+        "www.rho.co"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Value Add VC | Startup & VC Intelligence Platform",
+        "Venture capital",
+        "Startup Funding"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "भारत का संविधान",
+      "status": 200,
+      "latency_ms": 2.76,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "hindi.lawrato.com",
+        "sansad.in",
+        "www.sci.gov.in",
+        "cdnbbsr.s3waas.gov.in"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारत का संविधान - विकिपीडिया",
+        "भारत का संविधान क्या है - संविधान की प्रस्तावना, मौलिक अधिकार और विशेषताएँ",
+        "डिजिटल संसद"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "कृत्रिम बुद्धिमत्ता क्या है",
+      "status": 200,
+      "latency_ms": 2686.26,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.drishtiias.com",
+        "hi.wikipedia.org",
+        "www.sanskritiias.com",
+        "rajras.in",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "कृत्रिम बुद्धिमत्ता और नैतिकता",
+        "कृत्रिम बुद्धि - विकिपीडिया",
+        "Future of artificial intelligence-Sanskriti IAS - Sanskriti IAS"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "सौर मंडल के ग्रह",
+      "status": 200,
+      "latency_ms": 3163.82,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "testbook.com",
+        "archive.org",
+        "bh.wikipedia.org",
+        "www.ck12.org",
+        "www.instagram.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "सौरमंडल (Solar System in Hindi) - सौरमंडल के ग्रह, क्षुद्र ग्रह, उल्कापिंड और धूमकेतु",
+        "हमारे सौर-मंडल के ग्रह",
+        "सौर मंडल - विकिपीडिया"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "भारत की राजधानी",
+      "status": 200,
+      "latency_ms": 3171.28,
+      "provider": "tavily",
+      "results_count": 6,
+      "top_domains": [
+        "www.bbc.com",
+        "www.youtube.com",
+        "www.instagram.com",
+        "www.olympics.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "पाकिस्तान वाले 'मक्का समझौते' को ट्रंप की हरी झंडी भारत के लिए कितनी बड़ी चिंता? - BBC News हिंदी",
+        "Naya Bharat | A Comedy Special",
+        "भारत से अब क्या चाहता है अमेरिका? डिमांड सुनकर हिल जाएँगे.."
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "भारतीय अर्थव्यवस्था का इतिहास",
+      "status": 200,
+      "latency_ms": 3253.64,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "hi.wikipedia.org",
+        "www.youtube.com",
+        "mpbou.edu.in",
+        "amp.bharatdiscovery.org",
+        "www.ignited.in"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "भारतीय अर्थव्यवस्था - विकिपीडिया",
+        "भारत का आर्थिक इतिहास",
+        "MHI-107 , भारतीय अर्थव्यवस्था का इतिहास-2 (C. 1700-2000 ..."
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "महात्मा गांधी का जीवन परिचय",
+      "status": 200,
+      "latency_ms": 2407.48,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "translate.google.com",
+        "hindi.webdunia.com",
+        "deepawali.co.in",
+        "www.bbc.com",
+        "bh.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Mahatma Gandhi | Biography, Education, Religion, Accomplishments, Death, Gandhi Jayanti, Martyrs’ Day & Facts | Britannica",
+        "Mahatma Gandhi : महात्मा गांधी का जीवन परिचय - mahatma gandhi jeevan parichay in hindi | Webdunia Hindi",
+        "महात्मा गांधी की जीवनी,जीवन परिचय, निबंध (जन्म, मृत्यु, हत्या) Mahatma Gandhi story biography history in Hindi - Deepawali"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "जलवायु परिवर्तन के प्रभाव",
+      "status": 200,
+      "latency_ms": 1990.46,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "resultmitra.com",
+        "metnet.imd.gov.in",
+        "hindi.downtoearth.org.in",
+        "www.drishtiias.com",
+        "research.fit.edu"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "जलवायु परिवर्तन (Climate Change): कारण, प्रभाव और समाधान (Causes, Impacts and Solutions) -",
+        "जलवायु परिवर्तन",
+        "जलवायु परिवर्तन और उसका प्रभाव | वैश्विक और स्थानीय ..."
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "कंप्यूटर कैसे काम करता है",
+      "status": 200,
+      "latency_ms": 2105.72,
+      "provider": "tavily",
+      "results_count": 6,
+      "top_domains": [
+        "hi.quora.com",
+        "translate.google.com",
+        "askfilo.com",
+        "sabkuchhindime.in",
+        "hi.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "कम्प्यूटर कैसे काम करता है और इसका उपयोग किसके लिए किया जाता है? - Quora",
+        "कंप्यूटर कैसे काम करते हैं? एक सरल परिचय",
+        "कंप्यूटर - विकिपीडिया"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "लोकतंत्र का महत्व",
+      "status": 200,
+      "latency_ms": 4028.65,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "hi.quora.com",
+        "askfilo.com",
+        "hi.wikipedia.org",
+        "quizlet.com",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "लोकतंत्र का क्या महत्व है? - Quora",
+        "लोकतंत्र का महत्व लिखिए - Filo",
+        "लोकतंत्र - विकिपीडिया"
+      ],
+      "error": null
+    },
+    {
+      "category": "hindi",
+      "query": "अंतरिक्ष अनुसंधान संगठन इसरो",
+      "status": 200,
+      "latency_ms": 4059.55,
+      "provider": "none",
+      "results_count": 0,
+      "top_domains": [],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "Python kaise sikhe",
+      "status": 200,
+      "latency_ms": 4599.49,
+      "provider": "none",
+      "results_count": 0,
+      "top_domains": [],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "website kaise banaye",
+      "status": 200,
+      "latency_ms": 3155.72,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "toptechglobal.in",
+        "www.wix.com",
+        "adsense.google.com",
+        "hi.quora.com",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Apni website kaise banaye - Toptech Global",
+        "How to Create a Website From Scratch in 10 Steps (for Beginners)",
+        "वेबसाइट बनाने का तरीका जानें"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "machine learning kya hota hai",
+      "status": 200,
+      "latency_ms": 2779.75,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "hi.quora.com",
+        "www.coursera.org",
+        "developers.google.com",
+        "www.ibm.com",
+        "cloud.google.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "मशीन लर्निंग (Machine Learning) क्या होती है और यह AI से ...",
+        "What Is Machine Learning? Definition, Types, and Examples",
+        "मशीन लर्निंग क्या है?  |  Machine Learning  |  Google for Developers"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "cloud computing ke fayde",
+      "status": 200,
+      "latency_ms": 2345.44,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.youtube.com",
+        "cloud.google.com",
+        "www.spanning.com",
+        "www.salesforce.com",
+        "www.vonage.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Cloud Computing Benefits - Hindi - # 4",
+        "What is Cloud Computing?",
+        "Cloud Computing: Benefits, Disadvantages & Types | Spanning"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "programming me career kaise banaye",
+      "status": 200,
+      "latency_ms": 2353.29,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.datacamp.com",
+        "www.coursera.org",
+        "www.youtube.com",
+        "navbharattimes.indiatimes.com",
+        "hi.quora.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "How to Become a Programmer in 2026: A Step-By-Step Guide | DataCamp",
+        "Programming Careers: 11 High-Paying Coding Jobs (And Where to Start) | Coursera",
+        "How to Start Coding & Get a Job (in 2026) ?"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "stock market me invest kaise kare",
+      "status": 200,
+      "latency_ms": 3417.74,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.bajajfinserv.in",
+        "groww.in",
+        "www.5paisa.com",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "स्टॉक मार्केट में निवेश कैसे करें?",
+        "Invest in Stocks & Share Market - Indian Stock Market App: Groww",
+        "बिगिनर्स के लिए शेयर मार्केट में कैसे इन्वेस्ट करें (2026)"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "cybersecurity me job kaise paye",
+      "status": 200,
+      "latency_ms": 1609.26,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "redbudcyber.com",
+        "www.neit.edu",
+        "destcert.com",
+        "www.coursera.org",
+        "www.naukri.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Cybersecurity Job Pay: 2026 Salary Guide by Role & Experience",
+        "7 Highest-Paid Cyber Security Jobs & Salaries",
+        "Top 10 Highest-Paid Cybersecurity Jobs in 2026 (Salaries Included)"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "artificial intelligence ka future kya hai",
+      "status": 200,
+      "latency_ms": 2521.23,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "builtin.com",
+        "www.sanskritiias.com",
+        "www.youtube.com",
+        "www.facebook.com",
+        "hi.quora.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Future of AI: How AI Is Changing the World",
+        "कृत्रिम बुद्धिमत्ता का भविष्य",
+        "Future में AI क्या कर सकता है? | What AI Can Do in Future"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "computer networking ke basics",
+      "status": 200,
+      "latency_ms": 2415.98,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.coursera.org",
+        "www.youtube.com",
+        "www.geeksforgeeks.org",
+        "zerotomastery.io",
+        "www.cisco.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "The Bits and Bytes of Computer Networking | Coursera",
+        "Computer Networking Fundamentals Course",
+        "Basics of Computer Networks - GeeksforGeeks"
+      ],
+      "error": null
+    },
+    {
+      "category": "hinglish",
+      "query": "data science roadmap for beginners",
+      "status": 200,
+      "latency_ms": 1550.57,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "codegnan.com",
+        "cdn.codewithmosh.com",
+        "www.coursera.org",
+        "www.dataquest.io",
+        "roadmap.sh"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Data Science Roadmap for Beginners (2026 Complete Guide) - Codegnan",
+        "Data Science Roadmap",
+        "Data Science Roadmap for Beginners: Essential Topics and Courses | Coursera"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "how to optimize sqlite query performance for large datasets",
+      "status": 200,
+      "latency_ms": 2916.05,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.sqliteforum.com",
+        "medium.com",
+        "github.com",
+        "developer.android.com",
+        "www.sqlite.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Managing Large Datasets in SQLite: Indexing and Optimization",
+        "Handling Large Data Efficiently With SQLite",
+        "Performance for large databases with 10+ million entries · pointfreeco/sqlite-data · Discussion #219 · GitHub"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "difference between generative adversarial networks and diffusion models",
+      "status": 200,
+      "latency_ms": 2543.71,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "www.geeksforgeeks.org",
+        "aurorasolar.com",
+        "apxml.com",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "Generative Adversarial Networks (GANs) vs Diffusion Models",
+        "GANs vs. Diffusion Models: Putting AI to the test | Aurora Solar"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "step by step guide to setup cloudflare tunnel on windows",
+      "status": 200,
+      "latency_ms": 4076.32,
+      "provider": "none",
+      "results_count": 0,
+      "top_domains": [],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "how to calculate compound annual growth rate in python pandas",
+      "status": 200,
+      "latency_ms": 2581.48,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "feliperego.github.io",
+        "ds4finance.com",
+        "medium.com",
+        "dabure.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "Calculating Compound Annual Growth Rates (CAGR) in Python",
+        "Compute Compound Annual Growth Rate (CAGR)"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "best practices for handling rate limits in REST API clients",
+      "status": 200,
+      "latency_ms": 3038.05,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "blog.postman.com",
+        "www.speakeasy.com",
+        "developer.zendesk.com",
+        "www.gravitee.io"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "What is API Rate Limiting? Understanding Best Practices",
+        "Rate Limiting Best Practices in REST API Design - Speakeasy"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "how to configure nginx reverse proxy with ssl certificate",
+      "status": 200,
+      "latency_ms": 2370.4,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "community.letsencrypt.org",
+        "gist.github.com",
+        "stackoverflow.com",
+        "forums.truenas.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "Setting up an nginx reverse proxy server for SSL connections on a remote virtual machine, with Apache tomcat - Help - Let's Encrypt Community Support",
+        "Setup SSL with NGINX reverse proxy · GitHub"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "understanding time complexity of red black tree insertion",
+      "status": 200,
+      "latency_ms": 3598.21,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "medium.com",
+        "iq.opengenus.org",
+        "www.geeksforgeeks.org",
+        "www.eecs.umich.edu",
+        "en.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Medium",
+        "Time and Space Complexity analysis of Red Black Tree",
+        "Introduction to Red-Black Tree - GeeksforGeeks"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "how to extract text from pdf using python without ocr",
+      "status": 200,
+      "latency_ms": 2727.87,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.nutrient.io",
+        "stackoverflow.com",
+        "dida.do",
+        "www.reddit.com",
+        "pypdf.readthedocs.io"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Parse PDFs with Python: Step-by-step text extraction tutorial",
+        "How to extract text from a PDF file via python? - Stack Overflow",
+        "How to extract text from PDF files | dida blog"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "architectural differences between microservices and modular monoliths",
+      "status": 200,
+      "latency_ms": 2238.2,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "www.youtube.com",
+        "www.reddit.com",
+        "getdx.com",
+        "www.atlassian.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "Modular Monoliths vs Microservices | Choosing Right Architecture for Modern Applications | Uplatz",
+        "Modular Monolith or Microservices : r/softwarearchitecture"
+      ],
+      "error": null
+    },
+    {
+      "category": "long_tail",
+      "query": "how does transformer self attention mechanism scale with sequence length",
+      "status": 200,
+      "latency_ms": 1728.94,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "medium.com",
+        "sebastianraschka.com",
+        "www.youtube.com",
+        "slds-lmu.github.io"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "Medium",
+        "Chapter 08 | Sebastian Raschka, PhD"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "what is the speed of light",
+      "status": 200,
+      "latency_ms": 1595.21,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "physicsfundamentals.org",
+        "en.wikipedia.org",
+        "www.space.com",
+        "www.britannica.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "How Fast Is the Speed of Light, and How Was It First Measured?",
+        "Speed of light - Wikipedia"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "why is the sky blue",
+      "status": 200,
+      "latency_ms": 1681.44,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "www.reddit.com",
+        "math.ucr.edu",
+        "spaceplace.nasa.gov",
+        "www.youtube.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "why is the sky blue? : r/explainlikeimfive",
+        "Why is the sky blue?"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "who invented the world wide web",
+      "status": 200,
+      "latency_ms": 2764.87,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "webfoundation.org",
+        "www.youtube.com",
+        "home.cern",
+        "en.wikipedia.org"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "History of the Web",
+        "Tim Berners-Lee: How This Guy Invented the World Wide Web 30 Years Ago"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "how do airplanes generate lift",
+      "status": 200,
+      "latency_ms": 2668.57,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "www.youtube.com",
+        "pilotinstitute.com",
+        "en.wikipedia.org",
+        "www1.grc.nasa.gov"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "How Airplane Wings REALLY Generate Lift",
+        "How Airplane Lift Works - Pilot Institute"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "why do batteries degrade over time",
+      "status": 200,
+      "latency_ms": 2462.37,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "www.gridx.ai",
+        "www.icomamerica.com",
+        "www.electrochem.org",
+        "www.large-battery.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "What is battery degradation and how to prevent it – gridX",
+        "Lithium-ion Battery Degradation & Prevention | Lithium-ion Battery Degradation & Prevention | Blog | Icom America."
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "what is the difference between ram and rom",
+      "status": 200,
+      "latency_ms": 2085.17,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "www.geeksforgeeks.org",
+        "www.slideshare.net",
+        "www.scribd.com",
+        "www.totalphase.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "RAM vs ROM - GeeksforGeeks",
+        "Difference between RAM and ROM | PDF"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "how does public key cryptography work",
+      "status": 200,
+      "latency_ms": 2308.2,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.cloudflare.com",
+        "www.kiteworks.com",
+        "www.okta.com",
+        "ssd.eff.org",
+        "www.preveil.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "How Does Public Key Encryption Work? | Public Key Cryptography and SSL",
+        "AES-256 and Public Key Cryptography: How They Work Together",
+        "Public Key Encryption: What Is Public Cryptography?"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "why is water a universal solvent",
+      "status": 200,
+      "latency_ms": 2271.12,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "h2oglobalnews.com",
+        "www.usgs.gov",
+        "www.youtube.com",
+        "quizlet.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "Why Is Water Called the Universal Solvent? | H2O Global News",
+        "Water, the Universal Solvent | U.S. Geological Survey"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "what happens during a solar eclipse",
+      "status": 200,
+      "latency_ms": 2383.15,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.bbc.co.uk",
+        "en.wikipedia.org",
+        "www.esa.int",
+        "spaceplace.nasa.gov",
+        "www.nhm.ac.uk"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "What is a solar eclipse and why do they happen?",
+        "Solar eclipse",
+        "ESA - The science of solar eclipses"
+      ],
+      "error": null
+    },
+    {
+      "category": "questions",
+      "query": "how do search engines index the web",
+      "status": 200,
+      "latency_ms": 1995.79,
+      "provider": "hybrid_vastuda",
+      "results_count": 8,
+      "top_domains": [
+        "vastuda.internal",
+        "seranking.com",
+        "www.bbc.co.uk",
+        "www.youtube.com",
+        "www.lumar.io"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 1,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "VASTUDA Sovereign Architecture Documentation",
+        "What is Search Engine Indexing & How Does it Work?",
+        "How do search engines work? - BBC Bitesize"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "React vs Vue",
+      "status": 200,
+      "latency_ms": 2236.53,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "strapi.io",
+        "decode.agency",
+        "dev.to",
+        "vuejs.org",
+        "radixweb.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Vue vs React: Which is Better for Developers?",
+        "React vs Vue: which one should you choose in 2026?",
+        "Main differences between ReactJS and VueJS, in my opinion - DEV Community"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "Python vs Go",
+      "status": 200,
+      "latency_ms": 2337.43,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "oxylabs.io",
+        "dev.to",
+        "bitfieldconsulting.com",
+        "www.youtube.com",
+        "medium.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Go vs Python: The Differences in 2026",
+        "Python vs Go for Backend Development in 2026: An Honest Comparison - DEV Community",
+        "Go vs Python: choosing the right language for the job — Bitfield Consulting"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "PostgreSQL vs MongoDB",
+      "status": 200,
+      "latency_ms": 2426.74,
+      "provider": "tavily",
+      "results_count": 7,
+      "top_domains": [
+        "www.enterprisedb.com",
+        "aws.amazon.com",
+        "www.knowi.com",
+        "www.mongodb.com",
+        "medium.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "MongoDB vs PostgreSQL: In-Depth Guide for Database Solutions",
+        "MongoDB vs PostgreSQL - Difference Between Databases - AWS",
+        "MongoDB vs PostgreSQL: Choosing the Right Database (2026)"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "Docker vs Kubernetes",
+      "status": 200,
+      "latency_ms": 2952.97,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.scalecomputing.com",
+        "www.geeksforgeeks.org",
+        "www.paloaltonetworks.com",
+        "www.atlassian.com",
+        "aws.amazon.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Kubernetes vs Docker: A Comparison",
+        "Kubernetes Vs Docker - GeeksforGeeks",
+        "What Is the Difference Between Dockers and Kubernetes? - Palo Alto Networks"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "TCP vs UDP",
+      "status": 200,
+      "latency_ms": 2167.33,
+      "provider": "tavily",
+      "results_count": 7,
+      "top_domains": [
+        "www.avg.com",
+        "www.geeksforgeeks.org",
+        "digilent.com",
+        "www.learncisco.net",
+        "www.reddit.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "What Is the Difference Between TCP and UDP?",
+        "TCP vs. UDP - GeeksforGeeks",
+        "TCP vs UDP: Header Size, Packet Size, and Differences – Digilent Blog"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "HTTP/2 vs HTTP/3",
+      "status": 200,
+      "latency_ms": 1893.08,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.oshyn.com",
+        "www.logicmonitor.com",
+        "ably.com",
+        "www.pubnub.com",
+        "blog.cloudflare.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "HTTP/2 vs HTTP/3: Improving Web Performance - Oshyn",
+        "HTTP/2 vs. HTTP/3 - LogicMonitor",
+        "HTTP/2 vs HTTP/3: A Comparison - Ably Realtime"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "REST vs GraphQL",
+      "status": 200,
+      "latency_ms": 2058.94,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "medium.com",
+        "www.contentful.com",
+        "blog.postman.com",
+        "aws.amazon.com",
+        "konghq.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "GraphQL vs REST API | Similarities & Differences",
+        "GraphQL vs. REST: Exploring how they work",
+        "GraphQL vs REST: Choosing the Right API Architecture ..."
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "Git vs SVN",
+      "status": 200,
+      "latency_ms": 2720.59,
+      "provider": "tavily",
+      "results_count": 8,
+      "top_domains": [
+        "www.perforce.com",
+        "docs.mendix.com",
+        "www.akamai.com",
+        "nulab.com",
+        "www.reddit.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "Git vs. SVN: What's the Difference, and Which is Better for Your Team? | Perforce Software",
+        "Differences Between Git and SVN | Mendix Documentation",
+        "Git vs SVN: Pros and Cons of Each Version Control System"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "CPU vs GPU",
+      "status": 200,
+      "latency_ms": 2140.84,
+      "provider": "tavily",
+      "results_count": 6,
+      "top_domains": [
+        "www.cdw.com",
+        "aws.amazon.com",
+        "www.intel.com",
+        "rtguides.it.tufts.edu",
+        "www.hp.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "CPU vs. GPU: What's the Difference?",
+        "GPU vs CPU - Difference Between Processing Units",
+        "CPU vs. GPU: What's the Difference?"
+      ],
+      "error": null
+    },
+    {
+      "category": "comparisons",
+      "query": "SSD vs HDD",
+      "status": 200,
+      "latency_ms": 1772.44,
+      "provider": "tavily",
+      "results_count": 7,
+      "top_domains": [
+        "www.crucial.com",
+        "aws.amazon.com",
+        "www.storagereview.com",
+        "www.westerndigital.com",
+        "www.intel.com"
+      ],
+      "duplicate_rate": 0.0,
+      "local_index_hits": 0,
+      "has_instant_answer": false,
+      "has_direct_nav": false,
+      "top_3_titles": [
+        "SSD vs. HDD: Know the Difference",
+        "SSD vs HDD - Difference Between Data Storage Devices - AWS",
+        "SSD vs HDD - StorageReview.com"
+      ],
+      "error": null
+    }
+  ]
+}
