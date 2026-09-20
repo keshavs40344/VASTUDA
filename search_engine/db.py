@@ -4,6 +4,9 @@ import hashlib
 import binascii
 import json
 import time
+import logging
+
+logger = logging.getLogger("VASTUDA_DB")
 
 DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vastuda.db")
 
@@ -82,6 +85,21 @@ def init_db():
             )
         """)
         conn.execute("""
+            CREATE TABLE IF NOT EXISTS search_results_cache (
+                cache_key TEXT PRIMARY KEY,
+                query TEXT NOT NULL,
+                category TEXT DEFAULT 'all',
+                page INTEGER DEFAULT 1,
+                page_size INTEGER DEFAULT 10,
+                time_filter TEXT DEFAULT '',
+                result_json TEXT NOT NULL,
+                created_at INTEGER NOT NULL,
+                expires_at INTEGER NOT NULL,
+                hit_count INTEGER DEFAULT 0
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_search_cache_expires ON search_results_cache(expires_at)")
+        conn.execute("""
             CREATE TABLE IF NOT EXISTS crawl_queue (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 url TEXT UNIQUE NOT NULL,
@@ -114,7 +132,7 @@ def init_db():
                 canonical_domain TEXT DEFAULT ''
             )
         """)
-        # Run safe migrations for existing tables
+        # Run safe migrations for documents
         for col_name, col_type in [
             ("content_type", "TEXT DEFAULT 'text/html'"),
             ("source_type", "TEXT DEFAULT 'web'"),
@@ -123,10 +141,32 @@ def init_db():
             ("canonical_domain", "TEXT DEFAULT ''"),
             ("published_at", "INTEGER DEFAULT 0"),
             ("updated_at", "INTEGER DEFAULT 0"),
-            ("crawled_at", "INTEGER DEFAULT 0")
+            ("crawled_at", "INTEGER DEFAULT 0"),
+            ("word_count", "INTEGER DEFAULT 0"),
+            ("heading_count", "INTEGER DEFAULT 0"),
+            ("paragraph_count", "INTEGER DEFAULT 0")
         ]:
             try:
                 conn.execute(f"ALTER TABLE documents ADD COLUMN {col_name} {col_type}")
+            except Exception:
+                pass
+
+        # Run safe migrations for crawl_queue frontier
+        for col_name, col_type in [
+            ("canonical_url", "TEXT DEFAULT ''"),
+            ("domain", "TEXT DEFAULT ''"),
+            ("priority", "INTEGER DEFAULT 0"),
+            ("discovered_at", "INTEGER DEFAULT 0"),
+            ("last_crawled_at", "INTEGER DEFAULT 0"),
+            ("next_crawl_at", "INTEGER DEFAULT 0"),
+            ("attempt_count", "INTEGER DEFAULT 0"),
+            ("http_status", "INTEGER DEFAULT 0"),
+            ("content_hash", "TEXT DEFAULT ''"),
+            ("etag", "TEXT DEFAULT ''"),
+            ("last_modified", "TEXT DEFAULT ''")
+        ]:
+            try:
+                conn.execute(f"ALTER TABLE crawl_queue ADD COLUMN {col_name} {col_type}")
             except Exception:
                 pass
 
@@ -180,6 +220,92 @@ def cache_ai_overview(query: str, data: dict):
             conn.commit()
     except Exception:
         pass
+
+
+def get_cached_search_result(cache_key: str) -> dict:
+    """Retrieve unexpired persistent search result from SQLite cache."""
+    if not cache_key:
+        return None
+    now = int(time.time())
+    try:
+        with get_db() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT result_json FROM search_results_cache
+                WHERE cache_key = ? AND expires_at > ?
+            """, (cache_key, now))
+            row = cur.fetchone()
+            if row:
+                try:
+                    conn.execute("UPDATE search_results_cache SET hit_count = hit_count + 1 WHERE cache_key = ?", (cache_key,))
+                    conn.commit()
+                except Exception:
+                    pass
+                return json.loads(row["result_json"])
+    except Exception as e:
+        logger.warning(f"Cache get error for {cache_key}: {e}")
+    return None
+
+
+def set_cached_search_result(cache_key: str, query: str, category: str, page: int, page_size: int,
+                             time_filter: str, data: dict, ttl_seconds: int = 900):
+    """Store search result into persistent SQLite cache with expiration."""
+    if not cache_key or not data:
+        return
+    now = int(time.time())
+    expires_at = now + ttl_seconds
+    data_json = json.dumps(data)
+    try:
+        with get_db() as conn:
+            conn.execute("""
+                INSERT INTO search_results_cache (
+                    cache_key, query, category, page, page_size, time_filter, result_json, created_at, expires_at, hit_count
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+                ON CONFLICT(cache_key) DO UPDATE SET
+                    result_json = excluded.result_json,
+                    created_at = excluded.created_at,
+                    expires_at = excluded.expires_at
+            """, (cache_key, query, category, page, page_size, time_filter or "", data_json, now, expires_at))
+            conn.commit()
+    except Exception as e:
+        logger.warning(f"Cache set error for {cache_key}: {e}")
+
+
+def cleanup_expired_cache(max_records: int = 20000) -> int:
+    """Prune expired cache entries and enforce maximum table size. Returns count of purged rows."""
+    now = int(time.time())
+    purged = 0
+    try:
+        with get_db() as conn:
+            cur = conn.cursor()
+            cur.execute("DELETE FROM search_results_cache WHERE expires_at <= ?", (now,))
+            purged += cur.rowcount
+            cur.execute("SELECT COUNT(*) AS total FROM search_results_cache")
+            total = cur.fetchone()["total"]
+            if total > max_records:
+                cur.execute("""
+                    DELETE FROM search_results_cache WHERE cache_key IN (
+                        SELECT cache_key FROM search_results_cache ORDER BY created_at ASC LIMIT ?
+                    )
+                """, (total - max_records,))
+                purged += cur.rowcount
+            conn.commit()
+    except Exception as e:
+        logger.warning(f"Cache cleanup error: {e}")
+    return purged
+
+
+def clear_search_cache() -> int:
+    """Clear all search cache entries (useful for tests or maintenance)."""
+    try:
+        with get_db() as conn:
+            cur = conn.cursor()
+            cur.execute("DELETE FROM search_results_cache")
+            deleted = cur.rowcount
+            conn.commit()
+            return deleted
+    except Exception:
+        return 0
 
 
 def get_matching_suggestions(prefix: str, limit: int = 8) -> list:

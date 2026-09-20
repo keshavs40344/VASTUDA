@@ -69,15 +69,36 @@ def clean_text_for_fts(text: str) -> str:
     return " OR ".join(token_clauses)
 
 
-def index_document(url: str, title: str, body_text: str, headings: str = "",
-                   meta_desc: str = "", language: str = "en",
-                   canonical_url: str = "", published_date: str = "",
-                   quality_score: float = 1.0, content_type: str = "text/html",
-                   source_type: str = "web", author: str = "",
-                   inbound_links_count: int = 0) -> int:
+def upsert_document(url=None, title: str = "", body_text: str = "", headings: str = "",
+                    meta_desc: str = "", language: str = "en",
+                    canonical_url: str = "", published_date: str = "",
+                    quality_score: float = 1.0, content_type: str = "text/html",
+                    source_type: str = "web", author: str = "",
+                    inbound_links_count: int = 0, word_count: int = 0,
+                    heading_count: int = 0, paragraph_count: int = 0) -> int:
     """
-    Insert or update a crawled document into the SQLite database and sync FTS5 index.
+    Insert or update a crawled document into SQLite database and sync FTS5 index.
+    Supports either dictionary object or individual arguments.
     """
+    if isinstance(url, dict):
+        doc = url
+        url = doc.get("url", "")
+        title = doc.get("title", "")
+        body_text = doc.get("body_text", "")
+        headings = doc.get("headings", "")
+        meta_desc = doc.get("meta_desc", "")
+        language = doc.get("language", "en")
+        canonical_url = doc.get("canonical_url", "")
+        published_date = doc.get("published_date", "")
+        quality_score = doc.get("quality_score", 1.0)
+        content_type = doc.get("content_type", "text/html")
+        source_type = doc.get("source_type", "web")
+        author = doc.get("author", "")
+        inbound_links_count = doc.get("inbound_links_count", 0)
+        word_count = doc.get("word_count", 0)
+        heading_count = doc.get("heading_count", 0)
+        paragraph_count = doc.get("paragraph_count", 0)
+
     if not url or not body_text:
         return 0
 
@@ -95,6 +116,10 @@ def index_document(url: str, title: str, body_text: str, headings: str = "",
 
     content_hash = hashlib.sha256(body_text.strip().encode("utf-8", errors="ignore")).hexdigest()
     now = int(time.time())
+
+    w_count = word_count or len(body_text.split())
+    h_count = heading_count or len([h for h in headings.split("|") if h.strip()])
+    p_count = paragraph_count or max(1, len(body_text.split(". ")))
 
     with db.get_db() as conn:
         cursor = conn.cursor()
@@ -129,11 +154,15 @@ def index_document(url: str, title: str, body_text: str, headings: str = "",
                     content_type = ?,
                     source_type = ?,
                     author = ?,
-                    inbound_links_count = ?
+                    inbound_links_count = ?,
+                    word_count = ?,
+                    heading_count = ?,
+                    paragraph_count = ?
                 WHERE id = ?
             """, (canon_url, title, headings, body_text, meta_desc,
                   language, domain, canonical_domain, published_date, now, content_hash,
-                  quality_score, content_type, source_type, author, inbound_links_count, doc_id))
+                  quality_score, content_type, source_type, author, inbound_links_count,
+                  w_count, h_count, p_count, doc_id))
 
             # Sync FTS5 virtual table
             try:
@@ -154,12 +183,14 @@ def index_document(url: str, title: str, body_text: str, headings: str = "",
                     url, canonical_url, title, headings, body_text,
                     meta_desc, language, domain, canonical_domain, published_date,
                     crawl_date, content_hash, quality_score, content_type,
-                    source_type, author, inbound_links_count
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    source_type, author, inbound_links_count,
+                    word_count, heading_count, paragraph_count
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (clean_url, canon_url, title, headings, body_text,
                   meta_desc, language, domain, canonical_domain, published_date,
                   now, content_hash, quality_score, content_type,
-                  source_type, author, inbound_links_count))
+                  source_type, author, inbound_links_count,
+                  w_count, h_count, p_count))
             doc_id = cursor.lastrowid
 
             try:
@@ -172,6 +203,83 @@ def index_document(url: str, title: str, body_text: str, headings: str = "",
 
             conn.commit()
             return doc_id
+
+
+def index_document(url: str, title: str, body_text: str, headings: str = "",
+                   meta_desc: str = "", language: str = "en",
+                   canonical_url: str = "", published_date: str = "",
+                   quality_score: float = 1.0, content_type: str = "text/html",
+                   source_type: str = "web", author: str = "",
+                   inbound_links_count: int = 0) -> int:
+    """Backward-compatible wrapper around upsert_document."""
+    return upsert_document(
+        url=url, title=title, body_text=body_text, headings=headings,
+        meta_desc=meta_desc, language=language, canonical_url=canonical_url,
+        published_date=published_date, quality_score=quality_score,
+        content_type=content_type, source_type=source_type, author=author,
+        inbound_links_count=inbound_links_count
+    )
+
+
+def delete_document(identifier) -> bool:
+    """Safely delete a document by ID or URL from documents and documents_fts."""
+    try:
+        with db.get_db() as conn:
+            cur = conn.cursor()
+            if isinstance(identifier, int) or (isinstance(identifier, str) and identifier.isdigit()):
+                doc_id = int(identifier)
+            else:
+                cur.execute("SELECT id FROM documents WHERE url = ? OR canonical_url = ?", (identifier, identifier))
+                row = cur.fetchone()
+                if not row:
+                    return False
+                doc_id = row["id"]
+
+            cur.execute("DELETE FROM documents WHERE id = ?", (doc_id,))
+            try:
+                cur.execute("DELETE FROM documents_fts WHERE rowid = ?", (doc_id,))
+            except Exception:
+                pass
+            conn.commit()
+            return True
+    except Exception as e:
+        logger.warning(f"Delete document error: {e}")
+        return False
+
+
+def reindex_all() -> int:
+    """Full atomic rebuild of the FTS5 virtual table from the documents table."""
+    try:
+        with db.get_db() as conn:
+            cur = conn.cursor()
+            cur.execute("DELETE FROM documents_fts")
+            cur.execute("""
+                INSERT INTO documents_fts (rowid, title, headings, body_text, domain)
+                SELECT id, title, headings, body_text, domain FROM documents
+            """)
+            count = cur.rowcount
+            conn.commit()
+            return count
+    except Exception as e:
+        logger.warning(f"Reindex all error: {e}")
+        return 0
+
+
+def get_index_vocabulary(min_freq: int = 1) -> dict:
+    """Extract real document tokens and frequencies from SQLite documents for spell-checker and suggestions."""
+    vocab = {}
+    try:
+        with db.get_db() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT title, headings FROM documents")
+            for row in cur.fetchall():
+                text = f"{row['title']} {row['headings']}"
+                words = re.findall(r'[a-zA-Z0-9_\-\.\+]{2,}', text.lower())
+                for w in words:
+                    vocab[w] = vocab.get(w, 0) + 1
+    except Exception as e:
+        logger.warning(f"Vocabulary build error: {e}")
+    return {k: v for k, v in vocab.items() if v >= min_freq}
 
 
 def compute_relevance_score(doc: dict, query: str, query_info: dict = None) -> tuple:

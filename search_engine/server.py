@@ -22,6 +22,8 @@ try:
     from search_engine import search_core
     from search_engine import indexer
     from search_engine import crawler
+    from search_engine import query_engine
+    from search_engine import spell_checker
     from search_engine.search_validator import (
         normalize_url, validate_result, deduplicate_results, safe_snippet
     )
@@ -30,6 +32,8 @@ except ImportError:
     import search_core
     import indexer
     import crawler
+    import query_engine
+    import spell_checker
     from search_validator import (
         normalize_url, validate_result, deduplicate_results, safe_snippet
     )
@@ -125,7 +129,7 @@ def get_git_commit_sha():
 def health_check():
     return jsonify({
         "status": "ok",
-        "version": "5.3",
+        "version": "5.4",
         "service": "VASTUDA Sovereign Search & Discovery Engine",
         "timestamp": int(time.time())
     })
@@ -135,7 +139,7 @@ def health_check():
 def api_version():
     return jsonify({
         "app": "VASTUDA",
-        "version": "5.3",
+        "version": "5.4",
         "commit": get_git_commit_sha(),
         "environment": "production"
     })
@@ -928,11 +932,11 @@ def api_search():
             return jsonify(specialized_res)
 
     # 4. General / Web Search (All Category)
+    SEARCH_CACHE_TTL_SECONDS = int(os.getenv("SEARCH_CACHE_TTL_SECONDS", 900))
     cache_key = f"all:{query.lower()}:{time_filter or 'any'}:{page}:{page_size}"
-    now = time.time()
-    if not debug_mode and cache_key in SEARCH_CACHE:
-        cached_time, cached_payload = SEARCH_CACHE[cache_key]
-        if now - cached_time < CACHE_TTL:
+    if not debug_mode:
+        cached_payload = db.get_cached_search_result(cache_key)
+        if cached_payload:
             cached_copy = dict(cached_payload)
             cached_copy["request_id"] = req_id
             return jsonify(cached_copy)
@@ -958,6 +962,14 @@ def api_search():
     start_idx = (page - 1) * page_size
     paged_results = validated_results[start_idx:start_idx + page_size]
 
+    # Evaluate deterministic spell correction
+    spell_info = query_engine.suggest_spell_correction(query)
+    did_you_mean = (
+        spell_info.get("corrected_query")
+        if (spell_info.get("has_correction") and spell_info.get("confidence", 0) >= 0.7)
+        else None
+    )
+
     elapsed_ms = round((time.time() - t_start) * 1000, 1)
     logger.info(
         f"[QUERY_LOG] req_id={req_id} query='{query}' category={category} "
@@ -974,6 +986,8 @@ def api_search():
         "provider": search_data.get("provider", "hybrid_vastuda"),
         "instant_answer": None,
         "destination": destination_data,
+        "did_you_mean": did_you_mean,
+        "spell_correction": spell_info,
         "pagination": {
             "page": page,
             "page_size": page_size,
@@ -991,7 +1005,16 @@ def api_search():
         }
 
     if payload.get("results") and not debug_mode:
-        SEARCH_CACHE[cache_key] = (now, payload)
+        db.set_cached_search_result(
+            cache_key=cache_key,
+            query=query,
+            category=category,
+            page=page,
+            page_size=page_size,
+            time_filter=time_filter or "",
+            data=payload,
+            ttl_seconds=SEARCH_CACHE_TTL_SECONDS
+        )
     return jsonify(payload)
 
 
@@ -1240,34 +1263,66 @@ def api_suggest():
     if not query:
         return jsonify([])
 
-    # 1. External suggestion query with browser headers & utf-8 decoding
-    try:
-        url = f"https://suggestqueries.google.com/complete/search?client=chrome&q={urllib.parse.quote(query)}"
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-            "Accept": "application/json, text/plain, */*",
-            "Accept-Language": "en-US,en;q=0.9,hi;q=0.8"
-        }
-        resp = http_session.get(url, headers=headers, timeout=(1.5, 2.5))
-        if resp.status_code == 200:
-            resp.encoding = "utf-8"
-            data = json.loads(resp.text)
-            if isinstance(data, list) and len(data) > 1 and isinstance(data[1], list):
-                suggs = [str(s).strip() for s in data[1] if str(s).strip()]
-                if suggs:
-                    return jsonify(suggs[:8])
-    except Exception as e:
-        logger.warning(f"Suggest provider query note: {type(e).__name__}")
+    combined_suggestions = []
+    seen = set()
 
-    # 2. Honest local fallback: Match against real past search queries in SQLite
-    try:
-        local_suggs = db.get_matching_suggestions(query, limit=8)
-        if local_suggs:
-            return jsonify(local_suggs)
-    except Exception as e:
-        logger.warning(f"Local suggest query note: {type(e).__name__}")
+    def add_candidate(s):
+        s_clean = str(s).strip()
+        if s_clean and s_clean.lower() not in seen:
+            seen.add(s_clean.lower())
+            combined_suggestions.append(s_clean)
 
-    return jsonify([])
+    # 1. First consult sovereign local index & past queries via query_engine
+    try:
+        local_candidates = query_engine.get_query_suggestions(query, limit=8)
+        for cand in local_candidates:
+            add_candidate(cand)
+    except Exception as e:
+        logger.warning(f"Local query engine suggest note: {type(e).__name__}")
+
+    # 2. External suggestion provider if needed to fill top suggestions
+    if len(combined_suggestions) < 8:
+        try:
+            url = f"https://suggestqueries.google.com/complete/search?client=chrome&q={urllib.parse.quote(query)}"
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                "Accept": "application/json, text/plain, */*",
+                "Accept-Language": "en-US,en;q=0.9,hi;q=0.8"
+            }
+            resp = http_session.get(url, headers=headers, timeout=(1.5, 2.5))
+            if resp.status_code == 200:
+                resp.encoding = "utf-8"
+                data = json.loads(resp.text)
+                if isinstance(data, list) and len(data) > 1 and isinstance(data[1], list):
+                    for s in data[1]:
+                        add_candidate(s)
+                        if len(combined_suggestions) >= 8:
+                            break
+        except Exception as e:
+            logger.warning(f"Suggest provider query note: {type(e).__name__}")
+
+    # 3. Database history fallback if still sparse
+    if len(combined_suggestions) < 8:
+        try:
+            db_suggs = db.get_matching_suggestions(query, limit=8)
+            for s in db_suggs:
+                add_candidate(s)
+                if len(combined_suggestions) >= 8:
+                    break
+        except Exception as e:
+            logger.warning(f"Local db suggest note: {type(e).__name__}")
+
+    return jsonify(combined_suggestions[:8])
+
+
+@app.route("/api/crawler/status", methods=["GET"])
+def api_crawler_status():
+    try:
+        status_info = crawler.get_crawler_status()
+        return jsonify({"status": "success", "data": status_info})
+    except Exception as e:
+        logger.error(f"Crawler status endpoint error: {e}")
+        return jsonify({"status": "error", "error": str(e)}), 500
 
 
 @app.route("/api/reader", methods=["GET"])

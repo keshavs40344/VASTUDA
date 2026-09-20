@@ -34,9 +34,9 @@ def calculate_ndcg(relevances, k=10):
 
 def run_evaluation(base_url="http://127.0.0.1:5000",
                    dataset_path="benchmark/relevance_dataset.json",
-                   output_path="benchmark/relevance_report.json",
+                   output_path="benchmark/search_quality_report.json",
                    judgments_path="benchmark/judgments.json",
-                   delay_between_queries=0.3):
+                   delay_between_queries=0.05):
     """
     Execute relevance evaluation across the dataset.
     Strictly observes the ground-truth principle:
@@ -273,12 +273,13 @@ def run_evaluation(base_url="http://127.0.0.1:5000",
                 "max": latencies[-1] if latencies else 0.0
             },
             "relevance_metrics": {
-                "precision_at_3": round(sum(all_p3) / len(all_p3), 4) if all_p3 else "NOT YET MEASURED (pending_human_judgment)",
-                "precision_at_5": round(sum(all_p5) / len(all_p5), 4) if all_p5 else "NOT YET MEASURED (pending_human_judgment)",
-                "precision_at_10": round(sum(all_p10) / len(all_p10), 4) if all_p10 else "NOT YET MEASURED (pending_human_judgment)",
-                "recall_at_10": round(sum(all_rec10) / len(all_rec10), 4) if all_rec10 else "NOT YET MEASURED (pending_human_judgment)",
-                "mrr": round(sum(all_mrr) / len(all_mrr), 4) if all_mrr else "NOT YET MEASURED (pending_human_judgment)",
-                "ndcg_at_10": round(sum(all_ndcg10) / len(all_ndcg10), 4) if all_ndcg10 else "NOT YET MEASURED (pending_human_judgment)"
+                "precision_at_3": round(sum(all_p3) / len(all_p3), 4) if all_p3 else None,
+                "precision_at_5": round(sum(all_p5) / len(all_p5), 4) if all_p5 else None,
+                "precision_at_10": round(sum(all_p10) / len(all_p10), 4) if all_p10 else None,
+                "recall_at_10": round(sum(all_rec10) / len(all_rec10), 4) if all_rec10 else None,
+                "mrr": round(sum(all_mrr) / len(all_mrr), 4) if all_mrr else None,
+                "ndcg_at_10": round(sum(all_ndcg10) / len(all_ndcg10), 4) if all_ndcg10 else None,
+                "status": "Human relevance metrics unavailable: 0 queries have been judged. Do not fabricate human judgments." if not all_p3 else "Judged against ground truth"
             },
             "provider_breakdown": provider_counts,
             "category_summaries": cat_summary
@@ -306,8 +307,14 @@ def run_evaluation(base_url="http://127.0.0.1:5000",
 
 if __name__ == "__main__":
     target = sys.argv[1] if len(sys.argv) > 1 else "http://127.0.0.1:5000"
-    out = sys.argv[2] if len(sys.argv) > 2 else "benchmark/relevance_report.json"
+    out = sys.argv[2] if len(sys.argv) > 2 else "benchmark/search_quality_report.json"
     ds = sys.argv[3] if len(sys.argv) > 3 else "benchmark/relevance_dataset.json"
     judg = sys.argv[4] if len(sys.argv) > 4 else "benchmark/judgments.json"
     delay = float(sys.argv[5]) if len(sys.argv) > 5 else 0.05
-    run_evaluation(base_url=target, output_path=out, dataset_path=ds, judgments_path=judg, delay_between_queries=delay)
+    rep = run_evaluation(base_url=target, output_path=out, dataset_path=ds, judgments_path=judg, delay_between_queries=delay)
+    # Also save to relevance_report.json for compatibility
+    try:
+        with open("benchmark/relevance_report.json", "w", encoding="utf-8") as f:
+            json.dump(rep, f, indent=2, ensure_ascii=False)
+    except Exception:
+        pass

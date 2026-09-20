@@ -16,6 +16,10 @@ Implements safe, lossless query preprocessing:
 import re
 import unicodedata
 import urllib.parse
+try:
+    from search_engine import spell_checker
+except ImportError:
+    import spell_checker
 
 
 # Common Hinglish stopwords & particles
@@ -395,6 +399,7 @@ def understand_query(query: str) -> dict:
     )
 
     entities = extract_entities(raw_q)
+    spell_res = spell_checker.correct_query(raw_q)
 
     # Map technical intent to code for backward compatibility with search_core
     compat_intent = "code" if intent == "technical" else ("direct_nav" if intent in ("url", "domain") else intent)
@@ -409,6 +414,7 @@ def understand_query(query: str) -> dict:
         "site_restriction": norm["site_restriction"],
         "filetype_restriction": norm["filetype_restriction"],
         "intent_signals": intent_signals,
+        "spell_correction": spell_res,
 
         # Backward-compatible 5.0-5.2 fields
         "raw_query": raw_q,
@@ -420,3 +426,50 @@ def understand_query(query: str) -> dict:
         "vertical": vertical,
         "location": None
     }
+
+
+def suggest_spell_correction(raw_query: str) -> dict:
+    """Evaluate spell correction candidate for a query."""
+    return spell_checker.correct_query(raw_query)
+
+
+def get_query_suggestions(prefix: str, limit: int = 8) -> list:
+    """
+    Generate fast, deterministic autocomplete suggestions from real index vocabulary,
+    curated technical vocabulary, and legitimate search analytics.
+    """
+    if not prefix or not prefix.strip():
+        return []
+    clean = prefix.strip().lower()
+    results = []
+    seen = set()
+
+    # 1. Match against past search queries from search_analytics if available
+    try:
+        from search_engine import db
+        hist = db.get_matching_suggestions(clean, limit=limit)
+        for h in hist:
+            if h.lower() not in seen and h.lower() != clean:
+                seen.add(h.lower())
+                results.append(h)
+    except Exception:
+        pass
+
+    # 2. Match against index tokens & technical dictionary
+    try:
+        vocab = spell_checker.get_combined_vocabulary()
+        prefix_matches = []
+        for term, freq in vocab.items():
+            if term.startswith(clean) and term != clean:
+                prefix_matches.append((term, freq))
+        prefix_matches.sort(key=lambda x: x[1], reverse=True)
+        for term, _ in prefix_matches:
+            if term not in seen:
+                seen.add(term)
+                results.append(term)
+            if len(results) >= limit:
+                break
+    except Exception:
+        pass
+
+    return results[:limit]

@@ -1,0 +1,36 @@
+{
+  "total_documents": 89,
+  "unique_domains_count": 9,
+  "top_domains": {
+    "en.wikipedia.org": 47,
+    "hi.wikipedia.org": 11,
+    "docs.python.org": 10,
+    "developer.mozilla.org": 10,
+    "www.sqlite.org": 4,
+    "doc.rust-lang.org": 3,
+    "docs.docker.com": 2,
+    "vastuda.internal": 1,
+    "react.dev": 1
+  },
+  "language_distribution": {
+    "en": 78,
+    "hi": 11
+  },
+  "word_count_stats": {
+    "min": 19,
+    "max": 3619,
+    "avg": 1747,
+    "median": 1616
+  },
+  "structural_metrics": {
+    "avg_headings": 2.9,
+    "avg_paragraphs": 24.5
+  },
+  "duplicate_content_hashes_count": 0,
+  "duplicate_content_groups": {},
+  "thin_pages_count": 0,
+  "thin_pages_sample": [],
+  "missing_titles_count": 0,
+  "missing_content_count": 0,
+  "quality_grade": "HEALTHY"
+}
