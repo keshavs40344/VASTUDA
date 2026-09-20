@@ -7,6 +7,8 @@ __pycache__/
 .env
 .env.local
 *.key
+*.keystore
+*.jks
 
 # SQLite database local files
 *.db
@@ -33,5 +35,13 @@ env/
 .venv/
 
 # OS metadata
-.DS_Store
-Thumbs.db
+# Build directories
+dist/
+build/
+win-unpacked/
+release/
+
+# Temporary profiles
+edge_temp_profile/
+*.idsig
+my-saas-project/

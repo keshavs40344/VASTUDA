@@ -3,8 +3,9 @@ import re
 import json
 import time
 import logging
+import threading
 import urllib.parse
-from flask import Flask, request, jsonify, render_template, send_from_directory, session
+from flask import Flask, request, jsonify, render_template, send_from_directory, send_file, session
 import requests
 from dotenv import load_dotenv
 
@@ -13,13 +14,23 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-# Import database and search core modules
+# Import database, indexer, crawler, and search core modules
 try:
     from search_engine import db
     from search_engine import search_core
+    from search_engine import indexer
+    from search_engine import crawler
+    from search_engine.search_validator import (
+        normalize_url, validate_result, deduplicate_results, safe_snippet
+    )
 except ImportError:
     import db
     import search_core
+    import indexer
+    import crawler
+    from search_validator import (
+        normalize_url, validate_result, deduplicate_results, safe_snippet
+    )
 
 
 load_dotenv()
@@ -30,13 +41,95 @@ logger = logging.getLogger("VASTUDA_Server")
 app = Flask(__name__, template_folder="templates", static_folder="static")
 app.secret_key = os.getenv("SECRET_KEY", "vastuda-secret-session-key-2026-secure-ultra")
 
+ASSETS_DIR = os.path.join(BASE_DIR, "public", "assets")
+
+# --- Production Security & Rate Limiting ---
+RATE_LIMIT_BUCKETS = {}
+RATE_LIMIT_LOCK = threading.Lock()
+
+def is_rate_limited(ip, limit=120, window_sec=60):
+    now = time.time()
+    with RATE_LIMIT_LOCK:
+        times = RATE_LIMIT_BUCKETS.get(ip, [])
+        times = [t for t in times if now - t < window_sec]
+        if len(times) >= limit:
+            RATE_LIMIT_BUCKETS[ip] = times
+            return True
+        times.append(now)
+        RATE_LIMIT_BUCKETS[ip] = times
+        return False
+
+@app.before_request
+def enforce_rate_limit():
+    if request.path.startswith("/api/"):
+        client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "127.0.0.1").split(",")[0].strip()
+        if is_rate_limited(client_ip, limit=120, window_sec=60):
+            return jsonify({"error": "Rate limit exceeded. Please slow down.", "status": 429}), 429
+
+@app.after_request
+def add_security_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    return response
+
+# --- Production Health & Legal Endpoints ---
+@app.route("/health", methods=["GET"])
+def health_check():
+    return jsonify({
+        "status": "ok",
+        "version": "1.0.0-beta.1",
+        "service": "VASTUDA Sovereign Search & Discovery Engine",
+        "timestamp": int(time.time())
+    })
+
+@app.route("/privacy", methods=["GET"])
+@app.route("/privacy-policy", methods=["GET"])
+def privacy_policy_route():
+    privacy_file = os.path.join(BASE_DIR, "public", "privacy.html")
+    if os.path.exists(privacy_file):
+        return send_file(privacy_file)
+    return render_template("index.html")
+
+@app.route("/terms", methods=["GET"])
+@app.route("/terms-of-service", methods=["GET"])
+def terms_of_service_route():
+    terms_file = os.path.join(BASE_DIR, "public", "terms.html")
+    if os.path.exists(terms_file):
+        return send_file(terms_file)
+    return render_template("index.html")
+
+# --- Production Error Handling ---
+@app.errorhandler(400)
+def handle_bad_request(e):
+    if request.path.startswith("/api/"):
+        return jsonify({"error": "Bad request", "status": 400}), 400
+    return render_template("index.html"), 400
+
+@app.errorhandler(404)
+def handle_not_found(e):
+    if request.path.startswith("/api/"):
+        return jsonify({"error": "Endpoint not found", "status": 404}), 404
+    return render_template("index.html"), 404
+
+@app.errorhandler(500)
+def handle_server_error(e):
+    logger.error(f"Internal server error on {request.path}: {e}")
+    if request.path.startswith("/api/"):
+        return jsonify({"error": "Internal server error", "status": 500}), 500
+    return render_template("index.html"), 500
+
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_MODEL = "qwen/qwen3.8-27b"
 
 # High-speed connection pool
 http_session = requests.Session()
-adapter = requests.adapters.HTTPAdapter(pool_connections=25, pool_maxsize=25, max_retries=1)
+adapter = requests.adapters.HTTPAdapter(pool_connections=25, pool_maxsize=25, max_retries=0)
 http_session.mount("https://", adapter)
 http_session.mount("http://", adapter)
 
@@ -48,12 +141,21 @@ CACHE_TTL = 900  # 15 minutes
 
 def evaluate_instant_math(query):
     """Safely calculate simple arithmetic if query is a math expression."""
-    clean = query.strip().replace("x", "*").replace("×", "*").replace("÷", "/")
-    if re.match(r"^[\d\s\+\-\*\/\(\)\.\%]+$", clean) and any(op in clean for op in "+-*/%"):
+    if not query:
+        return None
+    clean = query.strip().replace("x", "*").replace("×", "*").replace("÷", "/").replace("^", "**")
+    # Strict regex check: only digits, basic math symbols, spaces, parentheses
+    if re.match(r"^[\d\s\+\-\*\/\(\)\.\%\*]+$", clean) and any(op in clean for op in "+-*/%*"):
         try:
+            if len(clean) > 80 or clean.count("**") > 2:
+                return None
             res = eval(clean, {"__builtins__": None}, {})
             if isinstance(res, (int, float)):
-                return {"expression": query, "result": f"{res:,.4f}".rstrip("0").rstrip(".")}
+                if isinstance(res, int) or (isinstance(res, float) and res.is_integer()):
+                    formatted = str(int(res))
+                else:
+                    formatted = f"{res:.6f}".rstrip("0").rstrip(".")
+                return {"expression": query.strip(), "result": formatted}
         except Exception:
             pass
     return None
@@ -64,7 +166,7 @@ def get_destination_image(place_name):
     try:
         url = f"https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original|thumbnail&pithumbsize=1000&titles={urllib.parse.quote(place_name)}"
         headers = {"User-Agent": "VASTUDA-SearchEngine/1.0 (https://vastuda.internal; dev@vastuda.internal)"}
-        resp = http_session.get(url, headers=headers, timeout=5)
+        resp = http_session.get(url, headers=headers, timeout=(2.0, 3.0))
         if resp.status_code == 200:
             pages = resp.json().get("query", {}).get("pages", {})
             for p in pages.values():
@@ -72,7 +174,7 @@ def get_destination_image(place_name):
                 if thumb and not thumb.endswith(".svg.png"):
                     return thumb
     except Exception as e:
-        logger.warning(f"Wikipedia pageimages error for {place_name}: {e}")
+        logger.warning(f"Wikipedia pageimages note for {place_name}: {type(e).__name__}")
 
     # Fallback to search_core.fetch_wikimedia_images
     try:
@@ -88,6 +190,13 @@ def get_destination_intel(query):
     """Detect if query is a travel destination/city and return structured rich travel card data."""
     clean_q = query.strip()
     if len(clean_q) < 3 or len(clean_q.split()) > 5:
+        return None
+
+    # Fast intent filter: Avoid making Groq calls for coding, math, or generic queries
+    travel_clues = ["weather", "visit", "travel", "city", "hotel", "flights", "attractions", "tour", "beach", "capital", "island", "resort", "monument", "where is", "tourism in"]
+    words = clean_q.lower().split()
+    is_potential_place = any(c in clean_q.lower() for c in travel_clues) or (len(words) <= 2 and clean_q.istitle())
+    if not is_potential_place:
         return None
 
     cache_key = clean_q.lower()
@@ -118,7 +227,7 @@ If NO (it is not a place, or it is technical/general knowledge/math/concept), ou
             "Content-Type": "application/json"
         }
         payload = {
-            "model": GROQ_MODEL,
+            "model": "llama-3.1-8b-instant",
             "messages": [
                 {"role": "system", "content": "You are a world-class travel intelligence engine. Return JSON strictly."},
                 {"role": "user", "content": prompt}
@@ -127,7 +236,7 @@ If NO (it is not a place, or it is technical/general knowledge/math/concept), ou
             "temperature": 0.2,
             "max_tokens": 250
         }
-        resp = http_session.post(url, headers=headers, json=payload, timeout=4)
+        resp = http_session.post(url, headers=headers, json=payload, timeout=(2.0, 2.5))
         if resp.status_code == 200:
             parsed = resp.json().get("choices", [{}])[0].get("message", {}).get("content", "{}")
             data = json.loads(parsed)
@@ -138,14 +247,13 @@ If NO (it is not a place, or it is technical/general knowledge/math/concept), ou
                 data["maps_url"] = f"https://www.google.com/maps/search/?api=1&query={urllib.parse.quote(name)}"
                 data["flights_url"] = f"https://www.google.com/travel/flights?q=flights+to+{urllib.parse.quote(name)}"
                 data["hotels_url"] = f"https://www.google.com/travel/hotels?q=hotels+in+{urllib.parse.quote(name)}"
-                if img:
-                    DESTINATION_CACHE[cache_key] = data
+                DESTINATION_CACHE[cache_key] = data
                 return data
             else:
                 DESTINATION_CACHE[cache_key] = None
                 return None
     except Exception as e:
-        logger.warning(f"Destination check error: {e}")
+        logger.warning(f"Destination check note: {type(e).__name__}")
         return None
 
 
@@ -189,16 +297,31 @@ def generate_extractive_overview(query, results):
 
 
 def generate_ai_overview(query, results):
-    """Generate synthesized AI answer with SQLite persistent cache and Zero-Token fallback."""
+    """
+    Generate source-grounded synthesized AI overview:
+    - Enforces TTL (1h for breaking/news, 12h for static)
+    - Strictly answers only using retrieved sources
+    - If sources insufficient, returns honest fallback message
+    """
     if not results:
-        return None
+        return {
+            "overview": "Insufficient information from available sources.",
+            "mode": "insufficient_sources",
+            "sources": []
+        }
 
-    # 1. Tier 1: Check Persistent SQLite Cache (0 Tokens, Instant Return)
-    cached = db.get_cached_ai_overview(query)
-    if cached:
-        return cached
+    q_lower = query.lower()
+    is_breaking = any(k in q_lower for k in ["latest", "today", "current", "breaking", "news", "update"])
+    # 1 hour TTL for news/breaking, 12 hours TTL for general informational queries
+    cache_ttl = 3600 if is_breaking else 43200
 
-    # 2. Tier 2: Call Groq with Multi-Model Rotation (Fast Free Tier)
+    # 1. Tier 1: Check Persistent SQLite Cache with enforced TTL (never serve indefinitely stale content)
+    if not is_breaking:
+        cached = db.get_cached_ai_overview(query, max_age_seconds=cache_ttl)
+        if cached:
+            return cached
+
+    # 2. Tier 2: Call Groq with Multi-Model Rotation
     if GROQ_API_KEY:
         try:
             context_snippets = []
@@ -214,11 +337,11 @@ Web Context:
 Instructions:
 1. Provide a crisp, direct 2-to-3 sentence answer answering the query.
 2. Provide at most 3 short, high-impact bullet points (maximum 1 sentence each).
-3. Do NOT write long paragraphs or over-explain. Keep it sharp and factual.
-4. Cite sources using [1], [2].
-5. End with "**Related:**" followed by 3 short comma-separated search terms."""
+3. Do NOT write long paragraphs or over-explain. Keep it sharp, factual, and strictly grounded in the web context.
+4. Cite sources using [1], [2] corresponding strictly to the context items.
+5. If the provided context does not contain sufficient factual evidence, write: "Insufficient information from available sources."
+6. End with "**Related:**" followed by 3 short comma-separated search terms."""
 
-            # Try primary ultra-fast free model first, fallback to qwen
             models_to_try = ["llama-3.1-8b-instant", GROQ_MODEL, "llama-3.3-70b-versatile"]
             for model_name in models_to_try:
                 try:
@@ -230,13 +353,13 @@ Instructions:
                     payload = {
                         "model": model_name,
                         "messages": [
-                            {"role": "system", "content": "You are VASTUDA AI. Provide ultra-concise, factual overviews without filler."},
+                            {"role": "system", "content": "You are VASTUDA AI. Provide ultra-concise, factual overviews grounded strictly in context. Never hallucinate sources."},
                             {"role": "user", "content": prompt}
                         ],
                         "temperature": 0.2,
-                        "max_tokens": 200
+                        "max_tokens": 240
                     }
-                    resp = http_session.post(url, headers=headers, json=payload, timeout=10)
+                    resp = http_session.post(url, headers=headers, json=payload, timeout=(3.05, 8.0))
                     if resp.status_code == 200:
                         content = resp.json().get("choices", [{}])[0].get("message", {}).get("content", "")
                         result = {
@@ -244,24 +367,29 @@ Instructions:
                             "mode": "neural_llm",
                             "sources": [{"index": i, "title": r.get("title", ""), "url": r.get("url", ""), "domain": r.get("domain", "")} for i, r in enumerate(results[:5], 1)]
                         }
-                        # Save permanently in SQLite cache
                         db.cache_ai_overview(query, result)
                         return result
                     elif resp.status_code == 429:
                         logger.warning(f"Groq {model_name} rate limited (429), trying next model...")
                         continue
                 except Exception as model_err:
-                    logger.warning(f"Groq {model_name} failed: {model_err}")
+                    logger.warning(f"Groq {model_name} note: {type(model_err).__name__}")
                     continue
         except Exception as e:
             logger.error(f"Error calling Groq overview: {e}")
 
-    # 3. Tier 3: Zero-Token Extractive Fallback (Guarantees AI Overview ALWAYS Appears)
+    # 3. Tier 3: Zero-Token Extractive Fallback
     logger.info("Using Zero-Token Extractive Synthesizer fallback")
     fallback = generate_extractive_overview(query, results)
     if fallback:
         db.cache_ai_overview(query, fallback)
-    return fallback
+        return fallback
+
+    return {
+        "overview": "Insufficient information from available sources.",
+        "mode": "insufficient_sources",
+        "sources": []
+    }
 
 
 
@@ -343,6 +471,44 @@ def extract_article_content(target_url):
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/search")
+def search_page():
+    return render_template("index.html")
+
+
+@app.route("/discover")
+def discover_page():
+    return render_template("discover.html")
+
+
+@app.route("/research")
+def research_page():
+    return render_template("research.html")
+
+
+@app.route("/download/windows")
+def download_windows():
+    for name in ["Staunt Browser Ultra Setup 2.0.0.exe", "Staunt-Browser-Setup.exe"]:
+        p = os.path.join(ASSETS_DIR, name)
+        if os.path.exists(p):
+            return send_file(p, as_attachment=True, download_name="Staunt-Browser-Setup.exe")
+    return jsonify({"error": "Windows installer binary not found in server assets"}), 404
+
+
+@app.route("/download/android")
+def download_android():
+    for name in ["staunt-browser-release.apk", "Staunt-Browser-Mobile.apk"]:
+        p = os.path.join(ASSETS_DIR, name)
+        if os.path.exists(p):
+            return send_file(p, as_attachment=True, download_name="Staunt-Browser-Mobile.apk")
+    return jsonify({"error": "Android APK binary not found in server assets"}), 404
+
+
+@app.route("/assets/<path:filename>")
+def serve_shared_asset(filename):
+    return send_from_directory(ASSETS_DIR, filename)
 
 
 @app.route("/manifest.json")
@@ -548,12 +714,16 @@ def api_export_data():
     return jsonify(export_data)
 
 
-# --- Core Search Endpoint (Multi-Category Routing) ---
+# --- Core Search Endpoint (Multi-Category Routing & Hybrid Index) ---
 
 @app.route("/api/search", methods=["GET"])
+@app.route("/api/browser/search", methods=["GET"])
 def api_search():
-    query = request.args.get("q", "").strip()
+    query = request.args.get("q", "").strip()[:500]
     category = request.args.get("category", "all").strip().lower()
+    time_filter = request.args.get("time", "").strip().lower()
+    if time_filter not in ["day", "week", "month", "year"]:
+        time_filter = None
 
     if not query:
         return jsonify({"error": "Empty query"}), 400
@@ -566,44 +736,146 @@ def api_search():
         except Exception as e:
             logger.warning(f"History record error: {e}")
 
-    # 1. Specialized Categories
+    # 1. PURE MATH CHECK (Zero Network Dependency)
+    # Expressions like 120*45, (12+8)*5, 100/4, 2^10 return immediately
+    instant_math = evaluate_instant_math(query)
+    if instant_math:
+        return jsonify({
+            "query": query,
+            "category": category,
+            "intent": {"intent": "calculation", "confidence": 1.0},
+            "instant_answer": instant_math,
+            "destination": None,
+            "results": [],
+            "images": [],
+            "provider": "local_calculator"
+        })
+
+    # Query intent classification
+    intent_info = search_core.classify_query_intent(query)
+
+    # 2. DIRECT URL NAVIGATION CHECK (Zero Search Overhead)
+    # Queries like https://example.com, www.example.com, example.com
+    clean_q = query.strip()
+    is_direct_url = (
+        intent_info.get("intent") == "direct_nav" or
+        clean_q.startswith(("http://", "https://", "www.")) or
+        (re.match(r"^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(/.*)?$", clean_q) and " " not in clean_q)
+    )
+    if is_direct_url:
+        target_nav_url = clean_q if clean_q.startswith(("http://", "https://")) else f"https://{clean_q}"
+        norm_nav = normalize_url(target_nav_url) or target_nav_url
+        return jsonify({
+            "query": query,
+            "category": category,
+            "intent": {"intent": "direct_nav", "url": norm_nav},
+            "direct_nav": {"url": norm_nav},
+            "results": [],
+            "images": [],
+            "provider": "direct_nav"
+        })
+
+    # 3. Specialized Categories
     if category != "all":
-        specialized_res = search_core.route_search_category(query, category)
+        specialized_res = search_core.route_search_category(query, category, time_range=time_filter)
         if specialized_res is not None:
+            if isinstance(specialized_res, dict):
+                specialized_res["intent"] = intent_info
+                specialized_res["time_filter"] = time_filter
+                # Validate results in specialized category
+                if "results" in specialized_res and isinstance(specialized_res["results"], list):
+                    specialized_res["results"] = deduplicate_results(
+                        [r for r in specialized_res["results"] if validate_result(r)]
+                    )
             return jsonify(specialized_res)
 
-    # 2. General / Web Search (All Category)
-    cache_key = f"all:{query.lower()}"
+    # 4. General / Web Search (All Category)
+    cache_key = f"all:{query.lower()}:{time_filter or 'any'}"
     now = time.time()
     if cache_key in SEARCH_CACHE:
         cached_time, cached_payload = SEARCH_CACHE[cache_key]
         if now - cached_time < CACHE_TTL:
             return jsonify(cached_payload)
 
-    # Instant calculation check
-    instant_math = evaluate_instant_math(query)
-
-    # Destination Intelligence check
+    # Non-blocking destination intelligence check
     destination_data = get_destination_intel(query)
 
-    # Fast Web Search (Tavily with DDG fallback)
-    search_data = search_core.execute_web_query(query, max_results=8, include_images=False)
+    # Hybrid Search: Local FTS5 Index + Bounded High-Speed Multi-Provider Retriever
+    search_data = search_core.search_with_hybrid_ranking(query, max_results=8, time_range=time_filter)
 
     # Fetch visual preview images (Wikimedia high-res public images)
     preview_images = search_core.fetch_wikimedia_images(query, limit=6)
 
+    # Final validation & deduplication of results
+    validated_results = deduplicate_results(
+        [r for r in search_data.get("results", []) if validate_result(r)]
+    )
+
     payload = {
         "query": query,
         "category": "all",
-        "provider": search_data.get("provider", "unknown"),
-        "instant_answer": instant_math,
+        "time_filter": time_filter,
+        "intent": intent_info,
+        "provider": search_data.get("provider", "hybrid_vastuda"),
+        "instant_answer": None,
         "destination": destination_data,
-        "results": search_data.get("results", []),
-        "images": preview_images or search_data.get("images", [])
+        "results": validated_results,
+        "images": preview_images or search_data.get("images", []),
+        "message": "Insufficient information from available sources." if not validated_results else None
     }
     if payload.get("results"):
         SEARCH_CACHE[cache_key] = (now, payload)
     return jsonify(payload)
+
+
+@app.route("/api/intent", methods=["GET"])
+def api_intent():
+    query = request.args.get("q", "").strip()
+    return jsonify(search_core.classify_query_intent(query))
+
+
+@app.route("/api/discover", methods=["GET"])
+def api_discover():
+    category = request.args.get("category", "trending").strip().lower()
+    cache_key = f"discover:{category}"
+    cached = search_core.get_cached(cache_key)
+    if cached:
+        return jsonify(cached)
+
+    queries = {
+        "trending": "top trending global technology and science news 2026",
+        "ai": "artificial intelligence models robotics breakthrough developments",
+        "tech": "software developer tools cloud computing infrastructure news",
+        "science": "scientific discoveries astronomy physics quantum research",
+        "business": "global markets financial economy startup venture capital",
+        "india": "India tech digital infrastructure economy breakthroughs",
+        "dev": "open source software developer tools github releases"
+    }
+    target_q = queries.get(category, queries["trending"])
+    news_data = search_core.search_news_mode(target_q)
+    items = news_data.get("results", [])[:12]
+    payload = {
+        "category": category,
+        "items": items,
+        "updated_at": int(time.time())
+    }
+    search_core.set_cached(cache_key, payload, ttl=search_core.NEWS_CACHE_TTL)
+    return jsonify(payload)
+
+
+@app.route("/api/crawler/enqueue", methods=["POST"])
+def api_crawler_enqueue():
+    data = request.get_json() or {}
+    urls = data.get("urls", [])
+    if isinstance(urls, str):
+        urls = [urls]
+    added = crawler.enqueue_urls(urls)
+    return jsonify({"status": "success", "added": added})
+
+
+@app.route("/api/crawler/stats", methods=["GET"])
+def api_crawler_stats():
+    return jsonify(indexer.get_index_stats())
 
 
 
@@ -629,8 +901,8 @@ def api_overview():
     query = data.get("query", "").strip()
     results = data.get("results", [])
 
-    if not query or not results:
-        return jsonify({"error": "Missing query or results"}), 400
+    if not query:
+        return jsonify({"error": "Missing query"}), 400
 
     overview_data = generate_ai_overview(query, results)
     if not overview_data:
@@ -645,14 +917,32 @@ def api_suggest():
     if not query:
         return jsonify([])
 
+    # 1. External suggestion query with browser headers & utf-8 decoding
     try:
         url = f"https://suggestqueries.google.com/complete/search?client=chrome&q={urllib.parse.quote(query)}"
-        resp = requests.get(url, timeout=3)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.9,hi;q=0.8"
+        }
+        resp = http_session.get(url, headers=headers, timeout=(1.5, 2.5))
         if resp.status_code == 200:
-            suggestions = resp.json()[1]
-            return jsonify(suggestions[:8])
-    except Exception:
-        pass
+            resp.encoding = "utf-8"
+            data = json.loads(resp.text)
+            if isinstance(data, list) and len(data) > 1 and isinstance(data[1], list):
+                suggs = [str(s).strip() for s in data[1] if str(s).strip()]
+                if suggs:
+                    return jsonify(suggs[:8])
+    except Exception as e:
+        logger.warning(f"Suggest provider query note: {type(e).__name__}")
+
+    # 2. Honest local fallback: Match against real past search queries in SQLite
+    try:
+        local_suggs = db.get_matching_suggestions(query, limit=8)
+        if local_suggs:
+            return jsonify(local_suggs)
+    except Exception as e:
+        logger.warning(f"Local suggest query note: {type(e).__name__}")
 
     return jsonify([])
 

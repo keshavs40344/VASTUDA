@@ -1,0 +1,31 @@
+# VASTUDA Sovereign Search & Discovery — Production Caddy Reverse Proxy
+# Automatic HTTPS via Let's Encrypt / ZeroSSL
+
+{$VASTUDA_DOMAIN:search.vastuda.com} {
+    # Reverse proxy to local WSGI application
+    reverse_proxy 127.0.0.1:{$PORT:5000} {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto https
+    }
+
+    # Strict Production Security Headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    # High-Performance Compression
+    encode zstd gzip
+
+    # Production Logs
+    log {
+        output file /var/log/caddy/vastuda_access.log {
+            roll_size 50mb
+            roll_keep 5
+        }
+    }
+}

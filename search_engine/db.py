@@ -81,14 +81,56 @@ def init_db():
                 created_at INTEGER NOT NULL
             )
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS crawl_queue (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                url TEXT UNIQUE NOT NULL,
+                status TEXT DEFAULT 'pending',
+                depth INTEGER DEFAULT 0,
+                retry_count INTEGER DEFAULT 0,
+                added_at INTEGER NOT NULL,
+                crawled_at INTEGER DEFAULT 0
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS documents (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                url TEXT UNIQUE NOT NULL,
+                canonical_url TEXT DEFAULT '',
+                title TEXT DEFAULT '',
+                headings TEXT DEFAULT '',
+                body_text TEXT DEFAULT '',
+                meta_desc TEXT DEFAULT '',
+                language TEXT DEFAULT 'en',
+                domain TEXT DEFAULT '',
+                published_date TEXT DEFAULT '',
+                crawl_date INTEGER NOT NULL,
+                content_hash TEXT DEFAULT '',
+                quality_score REAL DEFAULT 1.0
+            )
+        """)
+        # FTS5 full-text virtual table for fast indexing & searching
+        try:
+            conn.execute("""
+                CREATE VIRTUAL TABLE IF NOT EXISTS documents_fts USING fts5(
+                    title,
+                    headings,
+                    body_text,
+                    domain,
+                    content='documents',
+                    content_rowid='id'
+                )
+            """)
+        except Exception:
+            pass
         conn.commit()
 
 
-def get_cached_ai_overview(query: str, max_age_days: int = 14):
-    """Retrieve persistent AI overview if generated within max_age_days (Saves 100% tokens)."""
+def get_cached_ai_overview(query: str, max_age_seconds: int = 43200):
+    """Retrieve persistent AI overview if generated within max_age_seconds (Default 12 hours)."""
     q_clean = query.strip().lower()
     q_hash = hashlib.sha256(q_clean.encode("utf-8")).hexdigest()
-    min_time = int(time.time()) - (max_age_days * 86400)
+    min_time = int(time.time()) - max_age_seconds
     try:
         with get_db() as conn:
             cur = conn.cursor()
@@ -102,7 +144,7 @@ def get_cached_ai_overview(query: str, max_age_days: int = 14):
 
 
 def cache_ai_overview(query: str, data: dict):
-    """Permanently store synthesized AI overview in SQLite cache."""
+    """Store synthesized AI overview in SQLite cache with timestamp."""
     if not query or not data:
         return
     q_clean = query.strip().lower()
@@ -117,6 +159,41 @@ def cache_ai_overview(query: str, data: dict):
             conn.commit()
     except Exception:
         pass
+
+
+def get_matching_suggestions(prefix: str, limit: int = 8) -> list:
+    """Retrieve matching past search queries from local database as fallback."""
+    if not prefix or not prefix.strip():
+        return []
+    clean = prefix.strip().lower()
+    try:
+        with get_db() as conn:
+            cur = conn.cursor()
+            # Match queries starting with or containing prefix
+            cur.execute("""
+                SELECT query, COUNT(*) as cnt
+                FROM search_analytics
+                WHERE lower(query) LIKE ?
+                GROUP BY lower(query)
+                ORDER BY cnt DESC, MAX(created_at) DESC
+                LIMIT ?
+            """, (f"{clean}%", limit))
+            rows = cur.fetchall()
+            results = [r["query"] for r in rows if r["query"].lower() != clean]
+            if len(results) < limit:
+                cur.execute("""
+                    SELECT query, COUNT(*) as cnt
+                    FROM search_analytics
+                    WHERE lower(query) LIKE ? AND lower(query) NOT LIKE ?
+                    GROUP BY lower(query)
+                    ORDER BY cnt DESC, MAX(created_at) DESC
+                    LIMIT ?
+                """, (f"%{clean}%", f"{clean}%", limit - len(results)))
+                more_rows = cur.fetchall()
+                results.extend([r["query"] for r in more_rows if r["query"].lower() != clean])
+            return results[:limit]
+    except Exception:
+        return []
 
 
 # --- Security: Password Hashing (PBKDF2-HMAC-SHA256) ---

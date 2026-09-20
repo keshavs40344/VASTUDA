@@ -15,22 +15,28 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <meta name="referrer" content="no-referrer" />
-  <link rel="stylesheet" href="/static/css/style.css?v=10" />
+  <link rel="stylesheet" href="/static/css/style.css?v=31" />
 </head>
 
 <body>
 
   <!-- APP HEADER -->
   <header class="app-header">
-    <div class="brand-logo" id="brandLogo" title="VASTUDA Home">
+    <div class="brand-logo" id="brandLogo" title="VASTUDA Home" onclick="window.location.href='/'" style="cursor: pointer;">
       <div class="logo-mark">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="3" fill="currentColor"/></svg>
       </div>
       <div class="brand-text-wrap">
         <span class="brand-name">VASTUDA</span>
-        <span class="brand-badge">DISCOVERY</span>
       </div>
     </div>
+
+    <!-- Header Navigation Links -->
+    <nav class="header-nav-links">
+      <a href="/" class="nav-link active">Search</a>
+      <a href="/discover" class="nav-link">Discover</a>
+      <a href="/research" class="nav-link">Research</a>
+    </nav>
 
     <!-- Header Search Form (Visible when on results page) -->
     <div class="header-search-wrapper" id="headerSearchWrap" style="display: none;">
@@ -39,7 +45,7 @@
           type="text" 
           id="headerSearchInput" 
           class="search-input" 
-          placeholder="Search web, research papers, GitHub code, or ask AI..." 
+          placeholder="Search the web or ask VASTUDA" 
           autocomplete="off" 
           required 
         />
@@ -56,16 +62,61 @@
 
     <!-- Header User & Controls Actions -->
     <div class="header-actions">
+      <!-- Native Apps Download Links -->
+      <a href="/download/windows" class="native-app-btn" title="Download VASTUDA Browser for Windows (.exe)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.95-1.801"/></svg>
+        <span>Windows</span>
+      </a>
+      <a href="/download/android" class="native-app-btn android-btn" title="Download VASTUDA Browser for Android (.apk)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4111 13.8533 8.086 12 8.086s-3.5902.3251-5.1368.8637L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
+        <span>Android</span>
+      </a>
+
       <!-- Auth / User Pill -->
       <button class="user-pill-btn" id="userAuthBtn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
         <span id="userAuthText">Sign In</span>
       </button>
 
-      <!-- Dashboard Button (History / Collections / Saved) -->
-      <button class="icon-btn" id="dashboardBtn" title="My VASTUDA Dashboard" aria-label="My VASTUDA">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-      </button>
+      <!-- Apps & Tools Menu Button -->
+      <div class="apps-menu-container" style="position: relative;">
+        <button class="icon-btn" id="dashboardBtn" title="VASTUDA Apps & Services" aria-label="VASTUDA Apps">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+        </button>
+        <div class="apps-dropdown" id="appsMenuDropdown" style="display: none;">
+          <div class="apps-dropdown-header">VASTUDA Services</div>
+          <div class="apps-grid-menu">
+            <a href="/" class="app-menu-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <span>Search</span>
+            </a>
+            <a href="/discover" class="app-menu-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              <span>Discover</span>
+            </a>
+            <a href="/research" class="app-menu-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              <span>Research</span>
+            </a>
+            <a href="/download/windows" class="app-menu-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.95-1.801"/></svg>
+              <span>Windows App</span>
+            </a>
+            <a href="/download/android" class="app-menu-item">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4111 13.8533 8.086 12 8.086s-3.5902.3251-5.1368.8637L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
+              <span>Android App</span>
+            </a>
+            <button type="button" class="app-menu-item" id="menuOpenDashboard">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+              <span>Saved & History</span>
+            </button>
+            <button type="button" class="app-menu-item" id="menuOpenSettings">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Preferences</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Theme Switcher -->
       <button class="icon-btn" id="themeToggle" title="Toggle Theme" aria-label="Toggle Theme">
@@ -77,13 +128,10 @@
   <!-- HOME HERO VIEW -->
   <main class="home-container" id="homeView">
     <div class="home-logo-wrap">
-      <div class="home-glow-ring">
-        <div class="home-mark">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="3" fill="currentColor"/></svg>
-        </div>
+      <div class="home-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="3" fill="currentColor"/></svg>
       </div>
       <h1 class="home-title">VASTUDA</h1>
-      <p class="home-subtitle">Autonomous Web Discovery & AI Research Engine</p>
     </div>
 
     <!-- Home Central Search Form -->
@@ -93,64 +141,84 @@
           type="text" 
           id="homeSearchInput" 
           class="search-input" 
-          placeholder="Search the web, explore code, analyze papers, or calculate anything..." 
+          placeholder="Search the web or ask VASTUDA" 
           autocomplete="off" 
           required 
           autofocus
         />
         <button type="button" class="clear-btn" id="homeClearBtn" title="Clear input" style="display: none;">✕</button>
         <button type="button" class="voice-btn" id="homeVoiceBtn" title="Voice Search" aria-label="Voice Search">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
         </button>
         <button type="submit" class="search-btn" aria-label="Search">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </button>
       </form>
       <div class="suggest-box" id="suggestBoxHome"></div>
     </div>
 
-    <!-- Quick Discovery Pills -->
-    <div class="quick-pills">
-      <button class="pill" data-query="Quantum computing breakthroughs 2026">⚛️ Quantum AI</button>
-      <button class="pill" data-query="FastAPI python microservice">💻 Developer Code</button>
-      <button class="pill" data-query="Deep learning transformers paper">🔬 Research Papers</button>
-      <button class="pill" data-query="Goa">🏖️ Travel Goa</button>
-      <button class="pill" data-query="Tokyo">⛩️ Tokyo Guide</button>
-      <button class="pill" data-query="AI hardware robotics news">⚡ Tech News</button>
-      <button class="pill" data-query="2400 * 18.5">🧮 Calculator</button>
+    <!-- Functional Search Mode Navigation -->
+    <nav class="home-modes-nav" id="homeVerticalShortcuts">
+      <button class="mode-nav-btn active" data-tab="all" title="Web Search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <span>All</span>
+      </button>
+      <button class="mode-nav-btn" data-tab="images" title="Search Images">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        <span>Images</span>
+      </button>
+      <button class="mode-nav-btn" data-tab="videos" title="Search Videos">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2"/></svg>
+        <span>Videos</span>
+      </button>
+      <button class="mode-nav-btn" data-tab="news" title="Search News">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8z"/></svg>
+        <span>News</span>
+      </button>
+      <button class="mode-nav-btn" data-tab="research" title="Scholarly Research Synthesis">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span>Research</span>
+      </button>
+      <button class="mode-nav-btn" data-tab="code" title="Developer Code & Repositories">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <span>Developer</span>
+      </button>
+      <button class="mode-nav-btn" data-tab="docs" title="PDF Documents & Manuals">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Documents</span>
+      </button>
+    </nav>
+
+    <!-- Dynamic Recent Searches for Guest Users -->
+    <div class="home-recent-wrap" id="homeRecentWrap" style="display: none;">
+      <div class="home-recent-header">
+        <span class="home-recent-title">Recent</span>
+        <button class="clear-recent-link" id="clearHomeRecentBtn" type="button">Clear</button>
+      </div>
+      <div class="home-recent-chips" id="homeRecentChips"></div>
     </div>
 
-    <!-- Platform Highlights Ribbon -->
-    <div class="home-features-ribbon">
-      <span class="feature-item">🔒 Zero Tracking</span>
-      <span class="dot">•</span>
-      <span class="feature-item">🧠 Real-Time AI Synthesis</span>
-      <span class="dot">•</span>
-      <span class="feature-item">📖 Ad-Free Reader Mode</span>
-      <span class="dot">•</span>
-      <span class="feature-item">⚡ Sub-Second Speed</span>
-    </div>
+    <!-- Home Footer Navigation -->
+    <footer class="home-footer">
+      <a href="/discover">Discover</a>
+      <span>•</span>
+      <a href="/research">Research</a>
+      <span>•</span>
+      <a href="/privacy">Privacy Policy</a>
+      <span>•</span>
+      <a href="/terms">Terms of Service</a>
+      <span>•</span>
+      <span>&copy; 2026 VASTUDA</span>
+    </footer>
   </main>
 
   <!-- SEARCH RESULTS VIEW -->
-  <main class="results-container" id="resultsView">
-    <!-- Category Tabs Navigation (All 11 Categories) -->
+  <main class="results-container" id="resultsView" style="display: none;">
+    <!-- Category Tabs Navigation (Genuine Verticals Only) -->
     <nav class="tabs-bar" id="categoriesBar">
       <button class="tab-btn active" data-tab="all">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         <span>All</span>
-      </button>
-      <button class="tab-btn" data-tab="ai">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
-        <span>AI Search</span>
-      </button>
-      <button class="tab-btn" data-tab="research">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        <span>Research</span>
-      </button>
-      <button class="tab-btn" data-tab="news">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8z"/></svg>
-        <span>News</span>
       </button>
       <button class="tab-btn" data-tab="images">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
@@ -160,27 +228,44 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2"/></svg>
         <span>Videos</span>
       </button>
-      <button class="tab-btn" data-tab="docs">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        <span>Documents</span>
+      <button class="tab-btn" data-tab="news">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8z"/></svg>
+        <span>News</span>
+      </button>
+      <button class="tab-btn" data-tab="research">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span>Research</span>
       </button>
       <button class="tab-btn" data-tab="code">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
         <span>Developer</span>
       </button>
-      <button class="tab-btn" data-tab="shopping">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-        <span>Shopping</span>
-      </button>
-      <button class="tab-btn" data-tab="jobs">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-        <span>Jobs</span>
-      </button>
-      <button class="tab-btn" data-tab="places">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>Places</span>
+      <button class="tab-btn" data-tab="docs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Documents</span>
       </button>
     </nav>
+
+    <!-- Search Filters Bar (Genuine Time Filters) -->
+    <div class="filters-bar" id="searchFiltersBar">
+      <div class="filters-left">
+        <div class="filter-dropdown-wrap" id="filterDropdownWrap">
+          <button type="button" class="filter-dropdown-btn" id="filterTimeBtn" aria-haspopup="true" aria-expanded="false">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span id="filterTimeLabel">Any time</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="filter-dropdown-menu" id="filterTimeMenu" style="display: none;">
+            <button type="button" class="filter-menu-item active" data-time="">Any time</button>
+            <button type="button" class="filter-menu-item" data-time="day">Past 24 hours</button>
+            <button type="button" class="filter-menu-item" data-time="week">Past week</button>
+            <button type="button" class="filter-menu-item" data-time="month">Past month</button>
+            <button type="button" class="filter-menu-item" data-time="year">Past year</button>
+          </div>
+        </div>
+      </div>
+      <div class="filters-right" id="resultsCountNotice"></div>
+    </div>
 
     <!-- Results Layout -->
     <div class="results-layout">
@@ -205,12 +290,12 @@
                 <h2 class="destination-title" id="destTitle">Goa</h2>
                 <div class="destination-country" id="destCountry">India</div>
               </div>
-              <div class="destination-weather-badge" id="destWeather">☀️ 28°C Tropical</div>
+              <div class="destination-weather-badge" id="destWeather">28°C Tropical</div>
             </div>
             <p class="destination-tagline" id="destTagline">A vibrant coastal paradise blending Portuguese heritage with sun-soaked beaches.</p>
             <div class="destination-stats-row">
-              <span class="dest-stat-pill" id="destBestTime">🗓️ Best time: Nov - Feb</span>
-              <span class="dest-stat-pill" id="destDuration">⏱️ Ideal: 4-5 Days</span>
+              <span class="dest-stat-pill" id="destBestTime">Best time: Nov - Feb</span>
+              <span class="dest-stat-pill" id="destDuration">Ideal: 4-5 Days</span>
             </div>
           </div>
           <div class="destination-body">
@@ -236,7 +321,7 @@
         <!-- Visual Discovery Strip -->
         <div class="visual-strip-container" id="visualStripContainer" style="display: none;">
           <div class="visual-strip-header">
-            <span class="visual-strip-title">Visual Discovery</span>
+            <span class="visual-strip-title">Images</span>
             <button class="visual-strip-more" id="visualStripMoreBtn">View All Images ↗</button>
           </div>
           <div class="visual-strip-scroll" id="visualStripScroll"></div>
@@ -247,12 +332,11 @@
 
           <div class="ai-overview-header">
             <div class="ai-title-wrap">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-              <span>VASTUDA AI Overview</span>
-              <span class="ai-badge">Neural Synthesis</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              <span>AI Overview</span>
             </div>
-            <button class="icon-btn" id="copyOverviewBtn" title="Copy Answer" style="width:30px; height:30px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="13" height="13" x="9" y="9" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <button class="icon-btn" id="copyOverviewBtn" title="Copy Answer" style="width:28px; height:28px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="13" height="13" x="9" y="9" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             </button>
           </div>
           <div class="ai-content" id="aiContent"></div>
@@ -309,9 +393,13 @@
 
         <!-- Empty / No Results State -->
         <div class="empty-state" id="emptyState" style="display: none;">
-          <div class="empty-icon">🔍</div>
-          <h3 class="empty-title">No direct matches found</h3>
-          <p class="empty-desc">Try modifying your keywords or switching search categories above.</p>
+          <h3 class="empty-title">No results found</h3>
+          <p class="empty-desc">Try:</p>
+          <ul class="empty-suggestions">
+            <li>Different keywords</li>
+            <li>Fewer words</li>
+            <li>Another search mode above</li>
+          </ul>
         </div>
 
       </div>
@@ -324,18 +412,7 @@
           <div class="related-list" id="relatedQueriesList"></div>
         </div>
 
-        <!-- Privacy & Transparency Box -->
-        <div class="sidebar-box">
-          <h3 class="sidebar-title">Privacy Guarantee</h3>
-          <p style="font-size:0.85rem; color:var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
-            VASTUDA never profiles or sells your search intent. All AI inference is run through strict ephemeral pipelines.
-          </p>
-          <div class="privacy-badges">
-            <span class="privacy-pill">✓ No Ads</span>
-            <span class="privacy-pill">✓ Encrypted</span>
-            <span class="privacy-pill">✓ Self-Sovereign</span>
-          </div>
-        </div>
+
       </aside>
     </div>
   </main>

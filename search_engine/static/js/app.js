@@ -174,7 +174,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Logo returns to home view
   brandLogo.addEventListener("click", () => {
+    document.body.classList.remove("in-search-mode");
     resultsView.classList.remove("active");
+    resultsView.style.display = "none";
     homeView.style.display = "flex";
     headerSearchWrap.style.display = "none";
     homeInput.value = "";
@@ -182,15 +184,140 @@ document.addEventListener("DOMContentLoaded", () => {
     currentQuery = "";
   });
 
-  // Quick Discovery Pills
-  document.querySelectorAll(".pill").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const q = btn.getAttribute("data-query");
-      homeInput.value = q;
-      headerInput.value = q;
-      executeSearch(q, "all");
+  // --- Guest Local Search History (Phase 4 & 11) ---
+  const GUEST_HISTORY_KEY = "vastuda_guest_history";
+
+  function getGuestHistory() {
+    try {
+      return JSON.parse(localStorage.getItem(GUEST_HISTORY_KEY) || "[]");
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function addGuestHistory(query, category = "all") {
+    if (!query || query.trim().length === 0) return;
+    const cleanQ = query.trim();
+    let history = getGuestHistory();
+    history = history.filter(item => item.query.toLowerCase() !== cleanQ.toLowerCase());
+    history.unshift({ query: cleanQ, category, timestamp: Date.now() });
+    if (history.length > 30) history = history.slice(0, 30);
+    try {
+      localStorage.setItem(GUEST_HISTORY_KEY, JSON.stringify(history));
+    } catch (e) {}
+    renderHomeRecentSearches();
+  }
+
+  function clearGuestHistory() {
+    try {
+      localStorage.removeItem(GUEST_HISTORY_KEY);
+    } catch (e) {}
+    renderHomeRecentSearches();
+  }
+
+  function renderHomeRecentSearches() {
+    const wrap = document.getElementById("homeRecentWrap");
+    const chipsContainer = document.getElementById("homeRecentChips");
+    if (!wrap || !chipsContainer) return;
+
+    const history = getGuestHistory();
+    if (history.length === 0) {
+      wrap.style.display = "none";
+      chipsContainer.innerHTML = "";
+      return;
+    }
+
+    wrap.style.display = "block";
+    chipsContainer.innerHTML = history.slice(0, 8).map(item => `
+      <button class="home-recent-chip" type="button" data-q="${escapeHtml(item.query)}" data-cat="${escapeHtml(item.category || 'all')}">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>${escapeHtml(item.query)}</span>
+      </button>
+    `).join("");
+
+    chipsContainer.querySelectorAll(".home-recent-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const q = chip.getAttribute("data-q");
+        const cat = chip.getAttribute("data-cat") || "all";
+        homeInput.value = q;
+        headerInput.value = q;
+        executeSearch(q, cat, currentTimeFilter);
+      });
     });
-  });
+  }
+
+  const clearHomeRecentBtn = document.getElementById("clearHomeRecentBtn");
+  if (clearHomeRecentBtn) {
+    clearHomeRecentBtn.addEventListener("click", clearGuestHistory);
+  }
+  renderHomeRecentSearches();
+
+  // --- Functional Search Vertical Shortcuts (Phase 10) ---
+  const homeVerticalShortcuts = document.getElementById("homeVerticalShortcuts");
+  if (homeVerticalShortcuts) {
+    homeVerticalShortcuts.querySelectorAll("button.pill").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const tab = btn.getAttribute("data-tab");
+        const currentVal = homeInput.value.trim();
+        if (currentVal) {
+          executeSearch(currentVal, tab, currentTimeFilter);
+        } else {
+          activeTab = tab;
+          tabBtns.forEach(b => {
+            b.classList.toggle("active", b.getAttribute("data-tab") === tab);
+          });
+          const span = btn.querySelector("span");
+          homeInput.placeholder = `Search in ${span ? span.textContent : tab}...`;
+          homeInput.focus();
+        }
+      });
+    });
+  }
+
+  // --- Header Apps Menu & Quick Settings (Phase 12 & 13) ---
+  const appsMenuDropdown = document.getElementById("appsMenuDropdown");
+  const menuOpenDashboard = document.getElementById("menuOpenDashboard");
+  const menuOpenSettings = document.getElementById("menuOpenSettings");
+
+  if (dashboardBtn && appsMenuDropdown) {
+    dashboardBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isVisible = appsMenuDropdown.style.display === "block";
+      appsMenuDropdown.style.display = isVisible ? "none" : "block";
+    });
+
+    document.addEventListener("click", (e) => {
+      if (appsMenuDropdown && !appsMenuDropdown.contains(e.target) && e.target !== dashboardBtn) {
+        appsMenuDropdown.style.display = "none";
+      }
+    });
+  }
+
+  if (menuOpenDashboard) {
+    menuOpenDashboard.addEventListener("click", () => {
+      if (appsMenuDropdown) appsMenuDropdown.style.display = "none";
+      openDashboard();
+    });
+  }
+
+  if (menuOpenSettings) {
+    menuOpenSettings.addEventListener("click", () => {
+      if (appsMenuDropdown) appsMenuDropdown.style.display = "none";
+      if (!currentUser) {
+        dashboardModal.classList.add("open");
+        dashTabs.forEach(t => t.classList.remove("active"));
+        dashPanes.forEach(p => p.classList.remove("active"));
+        const prefTab = document.querySelector('.dash-tab[data-view="preferences"]');
+        const prefPane = document.getElementById("panePreferences");
+        if (prefTab) prefTab.classList.add("active");
+        if (prefPane) prefPane.classList.add("active");
+      } else {
+        openDashboard();
+        const prefTab = document.querySelector('.dash-tab[data-view="preferences"]');
+        if (prefTab) prefTab.click();
+      }
+    });
+  }
 
   // --- Voice Search Support ---
   function setupVoiceSearch(btn, input) {
@@ -213,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const transcript = event.results[0][0].transcript;
       input.value = transcript;
       btn.style.color = "";
-      executeSearch(transcript, activeTab);
+      executeSearch(transcript, activeTab, currentTimeFilter);
     };
 
     recognition.onerror = () => {
@@ -226,12 +353,62 @@ document.addEventListener("DOMContentLoaded", () => {
   setupVoiceSearch(homeVoiceBtn, homeInput);
   setupVoiceSearch(headerVoiceBtn, headerInput);
 
-  // --- Search Suggestions ---
+  // --- Search Suggestions with Full Keyboard Navigation (Phase 3) ---
   function setupSuggestions(input, box) {
     let timeout = null;
+    let selectedIndex = -1;
+    let currentItems = [];
+
+    function renderSuggestions(items, isRecent = false) {
+      currentItems = items || [];
+      selectedIndex = -1;
+      if (currentItems.length === 0) {
+        box.classList.remove("active");
+        box.innerHTML = "";
+        return;
+      }
+      box.innerHTML = currentItems.map((s, idx) => `
+        <div class="suggest-item ${isRecent ? 'recent-type' : ''}" data-idx="${idx}">
+          ${isRecent ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>'}
+          <span>${escapeHtml(s)}</span>
+        </div>
+      `).join("");
+      box.classList.add("active");
+
+      box.querySelectorAll(".suggest-item").forEach((item) => {
+        item.addEventListener("click", () => {
+          const idx = parseInt(item.getAttribute("data-idx"), 10);
+          const text = currentItems[idx];
+          input.value = text;
+          box.classList.remove("active");
+          executeSearch(text, activeTab, currentTimeFilter);
+        });
+      });
+    }
+
+    // Show recent searches on focus when input is empty
+    input.addEventListener("focus", () => {
+      if (input.value.trim().length === 0) {
+        const recents = getGuestHistory().slice(0, 5).map(h => h.query);
+        if (recents.length > 0) {
+          renderSuggestions(recents, true);
+        }
+      }
+    });
+
     input.addEventListener("input", () => {
       const val = input.value.trim();
       clearTimeout(timeout);
+      if (val.length === 0) {
+        const recents = getGuestHistory().slice(0, 5).map(h => h.query);
+        if (recents.length > 0) {
+          renderSuggestions(recents, true);
+        } else {
+          box.classList.remove("active");
+          box.innerHTML = "";
+        }
+        return;
+      }
       if (val.length < 2) {
         box.classList.remove("active");
         box.innerHTML = "";
@@ -241,31 +418,53 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           const resp = await fetch(`/api/suggest?q=${encodeURIComponent(val)}`);
           const items = await resp.json();
-          if (items && items.length > 0) {
-            box.innerHTML = items.map(s => `
-              <div class="suggest-item">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                <span>${escapeHtml(s)}</span>
-              </div>
-            `).join("");
-            box.classList.add("active");
-
-            box.querySelectorAll(".suggest-item").forEach((item, idx) => {
-              item.addEventListener("click", () => {
-                const text = items[idx];
-                input.value = text;
-                box.classList.remove("active");
-                executeSearch(text, activeTab);
-              });
-            });
-          } else {
-            box.classList.remove("active");
-          }
+          renderSuggestions(items, false);
         } catch (e) {
           box.classList.remove("active");
         }
-      }, 200);
+      }, 150);
     });
+
+    input.addEventListener("keydown", (e) => {
+      if (!box.classList.contains("active") || currentItems.length === 0) {
+        if (e.key === "Escape") box.classList.remove("active");
+        return;
+      }
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        selectedIndex = (selectedIndex + 1) % currentItems.length;
+        updateSelection();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        selectedIndex = (selectedIndex - 1 + currentItems.length) % currentItems.length;
+        updateSelection();
+      } else if (e.key === "Enter") {
+        if (selectedIndex >= 0 && selectedIndex < currentItems.length) {
+          e.preventDefault();
+          const text = currentItems[selectedIndex];
+          input.value = text;
+          box.classList.remove("active");
+          executeSearch(text, activeTab, currentTimeFilter);
+        }
+      } else if (e.key === "Escape") {
+        box.classList.remove("active");
+      }
+    });
+
+    function updateSelection() {
+      const domItems = box.querySelectorAll(".suggest-item");
+      domItems.forEach((el, idx) => {
+        if (idx === selectedIndex) {
+          el.classList.add("selected");
+          el.classList.add("highlighted");
+          input.value = currentItems[idx];
+        } else {
+          el.classList.remove("selected");
+          el.classList.remove("highlighted");
+        }
+      });
+    }
 
     document.addEventListener("click", (e) => {
       if (!input.contains(e.target) && !box.contains(e.target)) {
@@ -276,14 +475,85 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSuggestions(homeInput, suggestBoxHome);
   setupSuggestions(headerInput, suggestBoxHeader);
 
-  // --- Category Tabs Switching ---
+  // --- Homepage Vertical Navigation Modes ---
+  const homeModeBtns = document.querySelectorAll(".mode-nav-btn");
+  homeModeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      homeModeBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const tab = btn.getAttribute("data-tab") || "all";
+      activeTab = tab;
+      const q = homeInput.value.trim();
+      if (q) {
+        headerInput.value = q;
+        executeSearch(q, activeTab, currentTimeFilter);
+      } else {
+        homeInput.focus();
+      }
+    });
+  });
+
+  // --- Category Tabs Switching (Results Page) ---
   tabBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       tabBtns.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       activeTab = btn.getAttribute("data-tab");
       if (currentQuery) {
-        executeSearch(currentQuery, activeTab);
+        executeSearch(currentQuery, activeTab, currentTimeFilter);
+      }
+    });
+  });
+
+  // --- Search Filters Dropdown (UI/UX 2.0) ---
+  let currentTimeFilter = "";
+  const filterTimeBtn = document.getElementById("filterTimeBtn");
+  const filterTimeMenu = document.getElementById("filterTimeMenu");
+  const filterTimeLabel = document.getElementById("filterTimeLabel");
+  const filterMenuItems = document.querySelectorAll(".filter-menu-item");
+  const filterChips = document.querySelectorAll(".filter-chip");
+  const resultsCountNotice = document.getElementById("resultsCountNotice");
+
+  if (filterTimeBtn && filterTimeMenu) {
+    filterTimeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isVisible = filterTimeMenu.style.display === "block";
+      filterTimeMenu.style.display = isVisible ? "none" : "block";
+      filterTimeBtn.setAttribute("aria-expanded", String(!isVisible));
+    });
+
+    filterMenuItems.forEach(item => {
+      item.addEventListener("click", () => {
+        filterMenuItems.forEach(m => m.classList.remove("active"));
+        item.classList.add("active");
+        currentTimeFilter = item.getAttribute("data-time") || "";
+        if (filterTimeLabel) {
+          filterTimeLabel.textContent = item.textContent.trim();
+        }
+        filterTimeMenu.style.display = "none";
+        filterTimeBtn.setAttribute("aria-expanded", "false");
+        if (currentQuery) {
+          executeSearch(currentQuery, activeTab, currentTimeFilter);
+        }
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!filterTimeBtn.contains(e.target) && !filterTimeMenu.contains(e.target)) {
+        filterTimeMenu.style.display = "none";
+        filterTimeBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  // Fallback for filter chips if present
+  filterChips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      filterChips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      currentTimeFilter = chip.getAttribute("data-time") || "";
+      if (currentQuery) {
+        executeSearch(currentQuery, activeTab, currentTimeFilter);
       }
     });
   });
@@ -316,12 +586,42 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // --- Core Search Execution ---
-  async function executeSearch(query, category = "all") {
+  async function executeSearch(query, category = "all", time = "") {
     currentQuery = query;
     activeTab = category;
+    currentTimeFilter = time || "";
+
+    // Sync tab button active states
+    tabBtns.forEach(b => {
+      b.classList.toggle("active", b.getAttribute("data-tab") === category);
+    });
+
+    // Sync homepage mode buttons
+    homeModeBtns.forEach(b => {
+      b.classList.toggle("active", b.getAttribute("data-tab") === category);
+    });
+
+    // Sync filter menu items and label
+    filterMenuItems.forEach(m => {
+      const isAct = (m.getAttribute("data-time") || "") === currentTimeFilter;
+      m.classList.toggle("active", isAct);
+      if (isAct && filterTimeLabel) {
+        filterTimeLabel.textContent = m.textContent.trim();
+      }
+    });
+
+    // Sync filter chips active states
+    filterChips.forEach(c => {
+      c.classList.toggle("active", (c.getAttribute("data-time") || "") === currentTimeFilter);
+    });
+
+    // Record search in guest history
+    addGuestHistory(query, category);
 
     // Switch view to results
+    document.body.classList.add("in-search-mode");
     homeView.style.display = "none";
+    resultsView.style.display = "block";
     resultsView.classList.add("active");
     headerSearchWrap.style.display = "flex";
     headerInput.value = query;
@@ -335,7 +635,12 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         url.searchParams.delete("category");
       }
-      window.history.replaceState({ query, category }, "", url);
+      if (currentTimeFilter) {
+        url.searchParams.set("time", currentTimeFilter);
+      } else {
+        url.searchParams.delete("time");
+      }
+      window.history.replaceState({ query, category, time: currentTimeFilter }, "", url);
     } catch (e) {}
 
     // Reset section visibilities
@@ -353,7 +658,7 @@ document.addEventListener("DOMContentLoaded", () => {
     videosSection.style.display = "none";
     imagesSection.style.display = "none";
     emptyState.style.display = "none";
-
+    if (resultsCountNotice) resultsCountNotice.textContent = "Searching...";
 
     // Show loading skeleton in web results
     webResultsSection.style.display = "flex";
@@ -373,10 +678,20 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
 
     try {
-      const resp = await fetch(`/api/search?q=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}`);
+      let fetchUrl = `/api/search?q=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}`;
+      if (currentTimeFilter) {
+        fetchUrl += `&time=${encodeURIComponent(currentTimeFilter)}`;
+      }
+      const resp = await fetch(fetchUrl);
       const data = await resp.json();
 
       webResultsSection.innerHTML = "";
+
+      // Count notification
+      if (resultsCountNotice) {
+        const count = (data.results || data.images || data.videos || data.documents || data.repositories || []).length;
+        resultsCountNotice.textContent = "";
+      }
 
       // Route rendering according to category
       if (category === "all") {
@@ -409,6 +724,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error("Search failed:", err);
       webResultsSection.innerHTML = `<p style="color:var(--text-secondary); padding: 20px;">Search request failed. Please check connection.</p>`;
+      if (resultsCountNotice) resultsCountNotice.textContent = "";
     }
   }
 
@@ -527,7 +843,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const datePill = document.createElement("span");
           datePill.className = "dest-stat-pill";
           datePill.style.fontSize = "0.75rem";
-          datePill.textContent = `🕒 ${item.published_date}`;
+          datePill.textContent = item.published_date;
           card.querySelector(".result-meta")?.appendChild(datePill);
         }
         webResultsSection.appendChild(card);
@@ -537,7 +853,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 5. Images Category
+  // 5. Images Category (Phase 6)
   function renderImagesCategory(data) {
     imagesSection.style.display = "grid";
     imagesSection.innerHTML = "";
@@ -545,11 +861,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (images.length > 0) {
       images.forEach(img => {
         const item = document.createElement("div");
-        item.className = "image-card";
+        item.className = "image-card-box";
+        
+        let domain = "web";
+        try {
+          domain = new URL(img.url).hostname.replace("www.", "");
+        } catch(e) {}
+
         item.innerHTML = `
-          <img src="${escapeHtml(img.url)}" alt="${escapeHtml(img.title || 'Image')}" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'" />
-          <div class="image-overlay">
-            <span class="image-title">${escapeHtml(img.title || 'Image')}</span>
+          <div class="image-thumb-wrap">
+            <img src="${escapeHtml(img.url)}" alt="${escapeHtml(img.title || 'Image')}" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.image-card-box').style.display='none'" />
+          </div>
+          <div class="image-card-meta">
+            <div class="image-card-title" title="${escapeHtml(img.title || 'Image')}">${escapeHtml(img.title || 'Image')}</div>
+            <div class="image-card-source">${escapeHtml(domain)}</div>
           </div>
         `;
 
@@ -566,23 +891,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 6. Videos Category
+  // 6. Videos Category (Phase 7)
   function renderVideosCategory(data) {
     videosSection.style.display = "grid";
     videosSection.innerHTML = "";
     const videos = data.videos || [];
     if (videos.length > 0) {
       videos.forEach(v => {
-        const card = document.createElement("div");
-        card.className = "video-card";
+        const card = document.createElement("a");
+        card.className = "video-card-box";
+        card.href = v.url;
+        card.target = "_blank";
+        card.rel = "noopener noreferrer";
         card.innerHTML = `
-          <div class="video-thumb-wrap">
-            <img class="video-thumb-img" src="${escapeHtml(v.thumbnail)}" alt="${escapeHtml(v.title)}" />
-            <span class="video-duration-tag">${escapeHtml(v.duration)}</span>
+          <div class="video-thumb-container">
+            <img src="${escapeHtml(v.thumbnail)}" alt="${escapeHtml(v.title)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=480&q=80'" />
+            <div class="video-play-badge">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
           </div>
-          <div class="video-body">
-            <a href="${escapeHtml(v.url)}" target="_blank" rel="noopener noreferrer" class="video-title">${escapeHtml(v.title)}</a>
-            <span class="video-channel">▶️ ${escapeHtml(v.channel)}</span>
+          <div class="video-card-info">
+            <div class="video-card-channel">${escapeHtml(v.channel || 'Video')}</div>
+            <div class="video-card-title">${escapeHtml(v.title)}</div>
+            ${v.snippet ? `<div class="video-card-snippet">${escapeHtml(v.snippet)}</div>` : ''}
           </div>
         `;
         videosSection.appendChild(card);
@@ -592,7 +923,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 7. Documents Category
+  // 7. Documents Category (Phase 8)
   function renderDocsCategory(data) {
     docsSection.style.display = "flex";
     docsSection.innerHTML = "";
@@ -600,20 +931,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (docs.length > 0) {
       docs.forEach(doc => {
         const card = document.createElement("div");
-        card.className = "doc-card";
+        card.className = "doc-card-box";
+        const isPdf = (doc.file_type || '').toUpperCase() === 'PDF' || (doc.url || '').toLowerCase().endsWith('.pdf');
         card.innerHTML = `
-          <div class="doc-icon-badge">
-            <span>📄</span>
-            <span>${escapeHtml(doc.file_type)}</span>
+          <div class="doc-header-row">
+            <span class="${isPdf ? 'doc-badge-pdf' : 'doc-badge-other'}">${isPdf ? 'PDF' : 'DOC'}</span>
+            <span class="doc-domain-label">${escapeHtml(doc.domain || 'web')}</span>
           </div>
-          <div class="doc-body">
-            <a href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer" class="doc-title">${escapeHtml(doc.title)}</a>
-            <p class="doc-snippet">${escapeHtml(doc.snippet)}</p>
-            <div class="doc-footer-row">
-              <span>${escapeHtml(doc.domain)}</span>
-              <span>•</span>
-              <a href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer" class="doc-download-btn">Direct View / Download ↗</a>
-            </div>
+          <a href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer" class="doc-title-link">${escapeHtml(doc.title)}</a>
+          <p class="doc-snippet-text">${escapeHtml(doc.snippet)}</p>
+          <div style="margin-top: 10px;">
+            <a href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer" style="font-size: 12px; font-weight: 600; color: var(--accent); text-decoration: none;">View Document ↗</a>
           </div>
         `;
         docsSection.appendChild(card);
@@ -635,7 +963,8 @@ document.addEventListener("DOMContentLoaded", () => {
         card.innerHTML = `
           <div class="code-header-row">
             <a href="${escapeHtml(repo.url)}" target="_blank" rel="noopener noreferrer" class="code-title-link">
-              📦 ${escapeHtml(repo.name)}
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span>${escapeHtml(repo.name)}</span>
             </a>
             <span class="dest-stat-pill" style="font-size:0.75rem;">GitHub</span>
           </div>
@@ -645,8 +974,14 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="lang-color-dot"></span>
               ${escapeHtml(repo.language)}
             </span>
-            <span class="code-stat-item">⭐ ${Number(repo.stars).toLocaleString()}</span>
-            <span class="code-stat-item">🍴 ${Number(repo.forks).toLocaleString()}</span>
+            <span class="code-stat-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle; margin-right:3px; opacity:0.8;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              ${Number(repo.stars).toLocaleString()}
+            </span>
+            <span class="code-stat-item">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle; margin-right:3px; opacity:0.8;"><circle cx="12" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9v2a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9"/><path d="M12 12v3"/></svg>
+              ${Number(repo.forks).toLocaleString()}
+            </span>
           </div>
         `;
         codeSection.appendChild(card);
@@ -740,7 +1075,7 @@ document.addEventListener("DOMContentLoaded", () => {
     card.className = "result-card";
 
     const favicon = item.favicon || (item.domain ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(item.domain)}&sz=64` : '');
-    const dateBadge = item.published_date ? `<span class="result-date-badge">🕒 ${escapeHtml(item.published_date)}</span>` : '';
+    const dateBadge = item.published_date ? `<span class="result-date-badge">${escapeHtml(item.published_date)}</span>` : '';
 
     card.innerHTML = `
       <div class="result-meta">
@@ -789,10 +1124,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     destTitle.textContent = dest.name || "Destination";
     destCountry.textContent = dest.country || "";
-    destWeather.textContent = dest.weather || "☀️ Mild";
+    destWeather.textContent = dest.weather || "Mild";
     destTagline.textContent = dest.tagline || "";
-    destBestTime.textContent = `🗓️ Best time: ${dest.best_time || 'All year'}`;
-    destDuration.textContent = `⏱️ Ideal: ${dest.ideal_duration || '3-4 Days'}`;
+    destBestTime.textContent = `Best time: ${dest.best_time || 'All year'}`;
+    destDuration.textContent = `Recommended: ${dest.ideal_duration || '3-4 Days'}`;
 
 
     destAttractions.innerHTML = (dest.attractions || []).map(att => `

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>VASTUDA Discover — Real-Time Web & Knowledge Discovery</title>
+  <link rel="icon" type="image/svg+xml" href="/static/icons/icon.svg" />
+  <meta name="theme-color" content="#0a0d14" />
+  <meta name="description" content="Discover breaking technology news, scientific breakthroughs, market trends, and developer innovations with VASTUDA." />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css?v=11" />
+  <style>
+    .discover-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+      width: 100%;
+    }
+    .discover-hero {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .discover-hero h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+    .discover-hero p {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+    .discover-nav {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .discover-cat-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .discover-cat-btn:hover, .discover-cat-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+    .discover-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+    }
+    .discover-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .discover-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(41, 151, 255, 0.35);
+      box-shadow: var(--shadow-md);
+    }
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .card-domain {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .card-domain img {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    .card-title {
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+    }
+    .card-title a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .card-title a:hover {
+      color: var(--accent);
+    }
+    .card-snippet {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 18px;
+      flex-grow: 1;
+    }
+    .card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
+    }
+    .card-action-link {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .loading-spinner {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- APP HEADER -->
+  <header class="app-header">
+    <div class="brand-logo" onclick="window.location.href='/'" style="cursor: pointer;">
+      <div class="logo-mark">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="3" fill="currentColor"/></svg>
+      </div>
+      <div class="brand-text-wrap">
+        <span class="brand-name">VASTUDA</span>
+        <span class="brand-badge">DISCOVER</span>
+      </div>
+    </div>
+
+    <nav class="header-nav-links" style="display: flex; align-items: center; gap: 18px; margin-left: 12px;">
+      <a href="/" class="nav-link" style="font-size: 13.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none;">Search</a>
+      <a href="/discover" class="nav-link active" style="font-size: 13.5px; font-weight: 600; color: var(--text-primary); text-decoration: none;">Discover</a>
+      <a href="/research" class="nav-link" style="font-size: 13.5px; font-weight: 500; color: var(--text-secondary); text-decoration: none;">Research</a>
+    </nav>
+
+    <div class="header-actions" style="margin-left: auto;">
+      <a href="/download/windows" class="native-app-btn" title="Download VASTUDA Browser for Windows (.exe)" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(41, 151, 255, 0.12); color: var(--accent); border: 1px solid rgba(41, 151, 255, 0.25); border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.95-1.801"/></svg>
+        <span>Windows</span>
+      </a>
+      <a href="/download/android" class="native-app-btn" title="Download VASTUDA Browser for Android (.apk)" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(52, 199, 89, 0.12); color: #34c759; border: 1px solid rgba(52, 199, 89, 0.25); border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4111 13.8533 8.086 12 8.086s-3.5902.3251-5.1368.8637L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
+        <span>Android</span>
+      </a>
+      <button class="icon-btn" id="themeToggle" title="Toggle Theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN DISCOVER VIEW -->
+  <main class="discover-container">
+    <div class="discover-hero">
+      <h1>VASTUDA Discover</h1>
+      <p>Real-time knowledge intelligence, technology breakthroughs, and global developments.</p>
+    </div>
+
+    <!-- Category Filter Tabs -->
+    <nav class="discover-nav" id="discoverTabs">
+      <button class="discover-cat-btn active" data-cat="trending">🔥 Trending</button>
+      <button class="discover-cat-btn" data-cat="ai">🧠 AI & Robotics</button>
+      <button class="discover-cat-btn" data-cat="tech">⚡ Software & Tech</button>
+      <button class="discover-cat-btn" data-cat="science">🔬 Science & Space</button>
+      <button class="discover-cat-btn" data-cat="business">📈 Business & Markets</button>
+      <button class="discover-cat-btn" data-cat="india">🇮🇳 India Focus</button>
+      <button class="discover-cat-btn" data-cat="dev">💻 Open Source / Dev</button>
+    </nav>
+
+    <!-- Content Grid -->
+    <div id="discoverContent">
+      <div class="loading-spinner">Loading verified intelligence feed...</div>
+    </div>
+  </main>
+
+  <script>
+    const theme = localStorage.getItem("vastuda_theme") || "dark";
+    document.documentElement.setAttribute("data-theme", theme);
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle.addEventListener("click", () => {
+      const cur = document.documentElement.getAttribute("data-theme") || "dark";
+      const next = cur === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("vastuda_theme", next);
+    });
+
+    const discoverTabs = document.getElementById("discoverTabs");
+    const discoverContent = document.getElementById("discoverContent");
+
+    async function loadFeed(category = "trending") {
+      discoverContent.innerHTML = '<div class="loading-spinner">Fetching live verified intelligence...</div>';
+      try {
+        const resp = await fetch(`/api/discover?category=${encodeURIComponent(category)}`);
+        const data = await resp.json();
+        const items = data.items || [];
+        if (items.length === 0) {
+          discoverContent.innerHTML = '<div class="loading-spinner">No current items found in this stream.</div>';
+          return;
+        }
+
+        let html = '<div class="discover-grid">';
+        items.forEach(item => {
+          const domain = item.domain || "news";
+          const favicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+          html += `
+            <div class="discover-card">
+              <div>
+                <div class="card-meta">
+                  <div class="card-domain">
+                    <img src="${favicon}" onerror="this.style.display='none'"/>
+                    <span>${domain}</span>
+                  </div>
+                  <span>${item.published_date || "Recent"}</span>
+                </div>
+                <h2 class="card-title">
+                  <a href="${item.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a>
+                </h2>
+                <p class="card-snippet">${escapeHtml(item.snippet)}</p>
+              </div>
+              <div class="card-actions">
+                <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="card-action-link">
+                  Open Source ➔
+                </a>
+                <a href="/search?q=${encodeURIComponent(item.title)}" class="card-action-link" style="color: var(--text-muted);">
+                  Search Topic 🔍
+                </a>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        discoverContent.innerHTML = html;
+      } catch (err) {
+        discoverContent.innerHTML = `<div class="loading-spinner">Error loading stream: ${err.message}</div>`;
+      }
+    }
+
+    discoverTabs.addEventListener("click", (e) => {
+      const btn = e.target.closest(".discover-cat-btn");
+      if (!btn) return;
+      document.querySelectorAll(".discover-cat-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const cat = btn.getAttribute("data-cat");
+      loadFeed(cat);
+    });
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    loadFeed("trending");
+  </script>
+</body>
+</html>
