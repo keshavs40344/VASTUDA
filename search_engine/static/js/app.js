@@ -1114,12 +1114,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Helper: Destination Card Population
   function populateDestinationCard(dest) {
-    if (dest.image) {
-      destHeroImg.src = dest.image;
+    const images = (dest.images && dest.images.length > 0) ? dest.images : (dest.image ? [dest.image] : []);
+    const destThumbsRow = document.getElementById("destThumbsRow");
+
+    if (images.length > 0) {
+      destHeroImg.src = images[0];
       destHeroImgWrap.style.display = "block";
       destHeroImg.onerror = () => { destHeroImgWrap.style.display = "none"; };
+
+      if (destThumbsRow) {
+        destThumbsRow.innerHTML = images.map((img, idx) => `
+          <div class="dest-thumb-item ${idx === 0 ? 'active' : ''}" data-src="${escapeHtml(img)}">
+            <img src="${escapeHtml(img)}" alt="Photo ${idx + 1}" referrerpolicy="no-referrer" />
+          </div>
+        `).join("");
+
+        destThumbsRow.querySelectorAll(".dest-thumb-item").forEach(item => {
+          item.addEventListener("click", () => {
+            destThumbsRow.querySelectorAll(".dest-thumb-item").forEach(t => t.classList.remove("active"));
+            item.classList.add("active");
+            destHeroImg.src = item.getAttribute("data-src");
+          });
+        });
+      }
     } else {
       destHeroImgWrap.style.display = "none";
+      if (destThumbsRow) destThumbsRow.innerHTML = "";
     }
 
     destTitle.textContent = dest.name || "Destination";
@@ -1128,7 +1148,6 @@ document.addEventListener("DOMContentLoaded", () => {
     destTagline.textContent = dest.tagline || "";
     destBestTime.textContent = `Best time: ${dest.best_time || 'All year'}`;
     destDuration.textContent = `Recommended: ${dest.ideal_duration || '3-4 Days'}`;
-
 
     destAttractions.innerHTML = (dest.attractions || []).map(att => `
       <button class="attraction-chip" data-attr="${escapeHtml(att)}">${escapeHtml(att)}</button>
@@ -1146,6 +1165,7 @@ document.addEventListener("DOMContentLoaded", () => {
     destHotelsBtn.href = dest.hotels_url || `https://www.google.com/travel/hotels?q=hotels+in+${encodeURIComponent(dest.name)}`;
     destFlightsBtn.href = dest.flights_url || `https://www.google.com/travel/flights?q=flights+to+${encodeURIComponent(dest.name)}`;
   }
+
 
   // Async AI Overview Fetcher
   async function fetchAiOverview(query, results) {
@@ -1672,7 +1692,310 @@ document.addEventListener("DOMContentLoaded", () => {
     checkUrlParams();
   });
 
+  // --- BING-STYLE DYNAMIC WALLPAPERS ---
+  const WALLPAPERS = [
+    {
+      url: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1920&q=80",
+      location: "Santorini, Aegean Sea, Greece"
+    },
+    {
+      url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80",
+      location: "Yosemite Valley, California"
+    },
+    {
+      url: "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?auto=format&fit=crop&w=1920&q=80",
+      location: "Kyoto Autumn Lanterns, Japan"
+    },
+    {
+      url: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1920&q=80",
+      location: "Cinque Terre Coastline, Italy"
+    },
+    {
+      url: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1920&q=80",
+      location: "Taj Mahal Sunrise, Agra, India"
+    },
+    {
+      url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80",
+      location: "Tropical Coastline, Maldives"
+    }
+  ];
+
+  function initWallpaperManager() {
+    const wallpaperBg = document.getElementById("wallpaperBg");
+    const wallpaperLocation = document.getElementById("wallpaperLocation");
+    const wallpaperToggleBtn = document.getElementById("wallpaperToggleBtn");
+
+    const savedMode = localStorage.getItem("staunt_wallpaper_mode");
+    if (savedMode === "disabled") {
+      document.body.classList.add("minimalist-mode");
+    }
+
+    const dayIndex = (new Date().getDate()) % WALLPAPERS.length;
+    const todayWp = WALLPAPERS[dayIndex];
+    if (wallpaperBg) wallpaperBg.style.backgroundImage = `url('${todayWp.url}')`;
+    if (wallpaperLocation) wallpaperLocation.textContent = todayWp.location;
+
+    if (wallpaperToggleBtn) {
+      wallpaperToggleBtn.addEventListener("click", () => {
+        document.body.classList.toggle("minimalist-mode");
+        const isMin = document.body.classList.contains("minimalist-mode");
+        localStorage.setItem("staunt_wallpaper_mode", isMin ? "disabled" : "enabled");
+      });
+    }
+  }
+
+  // --- LIVE WEATHER WIDGET ---
+  async function initWeatherWidget() {
+    const weatherIcon = document.getElementById("weatherIcon");
+    const weatherTemp = document.getElementById("weatherTemp");
+    const weatherCity = document.getElementById("weatherCity");
+    const headerWeatherPill = document.getElementById("headerWeatherPill");
+
+    try {
+      const res = await fetch("/api/weather");
+      if (res.ok) {
+        const data = await res.json();
+        if (weatherIcon) weatherIcon.textContent = data.icon || "🌤️";
+        if (weatherTemp) weatherTemp.textContent = `${data.temp}°C`;
+        if (weatherCity) weatherCity.textContent = data.city || "New Delhi";
+      }
+    } catch (e) {
+      console.warn("Weather fetch note:", e);
+    }
+
+    if (headerWeatherPill) {
+      headerWeatherPill.addEventListener("click", () => {
+        const city = weatherCity ? weatherCity.textContent : "New Delhi";
+        headerInput.value = `weather in ${city}`;
+        homeInput.value = `weather in ${city}`;
+        executeSearch(`weather in ${city}`, "all");
+      });
+    }
+  }
+
+  // --- BING FINANCIAL MARKETS & TRENDING NEWS ---
+  async function initTrendingAndMarkets() {
+    const marketsRibbon = document.getElementById("marketsRibbon");
+    const trendingChipsWrap = document.getElementById("trendingChipsWrap");
+    const trendingNewsGrid = document.getElementById("trendingNewsGrid");
+    const newsCatFilters = document.querySelectorAll(".news-filter-btn");
+
+    try {
+      const res = await fetch("/api/trending");
+      if (!res.ok) return;
+      const data = await res.json();
+
+      // 1. Markets
+      if (marketsRibbon && data.markets) {
+        marketsRibbon.innerHTML = data.markets.map(m => `
+          <div class="market-pill" data-query="${escapeHtml(m.symbol)} stock price today">
+            <span class="market-sym">${escapeHtml(m.symbol)}</span>
+            <span class="market-val">${escapeHtml(m.value)}</span>
+            <span class="market-chg ${m.is_up ? 'up' : 'down'}">${escapeHtml(m.change)}</span>
+          </div>
+        `).join("");
+
+        marketsRibbon.querySelectorAll(".market-pill").forEach(pill => {
+          pill.addEventListener("click", () => {
+            const q = pill.getAttribute("data-query");
+            homeInput.value = q;
+            headerInput.value = q;
+            executeSearch(q, "all");
+          });
+        });
+      }
+
+      // 2. Trending Topics
+      if (trendingChipsWrap && data.topics) {
+        trendingChipsWrap.innerHTML = data.topics.map(t => `
+          <button type="button" class="trending-chip" data-query="${escapeHtml(t.query)}">
+            <span>${t.icon || '🔥'} ${escapeHtml(t.query)}</span>
+          </button>
+        `).join("");
+
+        trendingChipsWrap.querySelectorAll(".trending-chip").forEach(chip => {
+          chip.addEventListener("click", () => {
+            const q = chip.getAttribute("data-query");
+            homeInput.value = q;
+            headerInput.value = q;
+            executeSearch(q, "all");
+          });
+        });
+      }
+
+      // 3. Trending News
+      let allNews = data.news || [];
+      function renderNews(items) {
+        if (!trendingNewsGrid) return;
+        if (!items || items.length === 0) {
+          trendingNewsGrid.innerHTML = `<div class="news-skeleton">No headlines available right now.</div>`;
+          return;
+        }
+        trendingNewsGrid.innerHTML = items.map(n => `
+          <a href="${escapeHtml(n.url || '#')}" target="_blank" rel="noopener noreferrer" class="news-card">
+            <div class="news-card-title">${escapeHtml(n.title)}</div>
+            <div class="news-card-footer">
+              <span class="news-source-tag">${escapeHtml(n.source || 'News')}</span>
+              <span class="news-time">${escapeHtml(n.time || 'Trending')}</span>
+            </div>
+          </a>
+        `).join("");
+      }
+
+      renderNews(allNews);
+
+      // News filters
+      newsCatFilters.forEach(btn => {
+        btn.addEventListener("click", async () => {
+          newsCatFilters.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          const cat = btn.getAttribute("data-cat");
+          if (cat === "all") {
+            renderNews(allNews);
+          } else {
+            try {
+              trendingNewsGrid.innerHTML = `<div class="news-skeleton">Loading ${cat} stories...</div>`;
+              const res = await fetch(`/api/search?q=${encodeURIComponent(cat + " news")}&category=news`);
+              if (res.ok) {
+                const ndata = await res.json();
+                renderNews(ndata.news || allNews);
+              }
+            } catch (e) {
+              renderNews(allNews);
+            }
+          }
+        });
+      });
+
+    } catch (e) {
+      console.warn("Trending fetch note:", e);
+    }
+  }
+
+  // --- QUICK TOOLS (Calculator, Currency, Travel Hub, Daily Fact) ---
+  function initQuickTools() {
+    const calcModal = document.getElementById("calcModal");
+    const currencyModal = document.getElementById("currencyModal");
+    const closeCalcModal = document.getElementById("closeCalcModal");
+    const closeCurrencyModal = document.getElementById("closeCurrencyModal");
+
+    const toolCalcBtn = document.getElementById("toolCalcBtn");
+    const toolCurrencyBtn = document.getElementById("toolCurrencyBtn");
+    const toolTravelBtn = document.getElementById("toolTravelBtn");
+    const toolFactBtn = document.getElementById("toolFactBtn");
+
+    if (toolCalcBtn && calcModal) toolCalcBtn.addEventListener("click", () => calcModal.classList.add("open"));
+    if (closeCalcModal && calcModal) closeCalcModal.addEventListener("click", () => calcModal.classList.remove("open"));
+
+    if (toolCurrencyBtn && currencyModal) toolCurrencyBtn.addEventListener("click", () => currencyModal.classList.add("open"));
+    if (closeCurrencyModal && currencyModal) closeCurrencyModal.addEventListener("click", () => currencyModal.classList.remove("open"));
+
+    if (toolTravelBtn) {
+      toolTravelBtn.addEventListener("click", () => {
+        const dests = ["Goa India", "Paris France", "Dubai UAE", "Kyoto Japan", "Manali Himachal", "Santorini Greece"];
+        const randomDest = dests[Math.floor(Math.random() * dests.length)];
+        homeInput.value = randomDest;
+        headerInput.value = randomDest;
+        executeSearch(randomDest, "all");
+      });
+    }
+
+    if (toolFactBtn) {
+      toolFactBtn.addEventListener("click", () => {
+        homeInput.value = "fact of the day";
+        headerInput.value = "fact of the day";
+        executeSearch("fact of the day", "all");
+      });
+    }
+
+    // Calculator logic
+    const calcDisplay = document.getElementById("calcDisplay");
+    let calcExpression = "";
+    document.querySelectorAll(".calc-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const val = btn.getAttribute("data-val");
+        if (val === "C") {
+          calcExpression = "";
+          if (calcDisplay) calcDisplay.textContent = "0";
+        } else if (val === "=") {
+          try {
+            const clean = calcExpression.replace(/×/g, "*").replace(/÷/g, "/");
+            const res = Function(`'use strict'; return (${clean})`)();
+            if (calcDisplay) calcDisplay.textContent = res;
+            calcExpression = String(res);
+          } catch (e) {
+            if (calcDisplay) calcDisplay.textContent = "Error";
+            calcExpression = "";
+          }
+        } else {
+          calcExpression += val;
+          if (calcDisplay) calcDisplay.textContent = calcExpression;
+        }
+      });
+    });
+
+    // Currency Converter logic
+    const currAmount = document.getElementById("currAmount");
+    const currFrom = document.getElementById("currFrom");
+    const currTo = document.getElementById("currTo");
+    const currResult = document.getElementById("currResult");
+    const currencyRateNote = document.getElementById("currencyRateNote");
+
+    const RATES = {
+      USD: 1.0,
+      INR: 83.82,
+      EUR: 0.92,
+      GBP: 0.78,
+      AED: 3.67
+    };
+
+    function updateCurrency() {
+      if (!currAmount || !currResult) return;
+      const amt = parseFloat(currAmount.value) || 0;
+      const f = currFrom ? currFrom.value : "USD";
+      const t = currTo ? currTo.value : "INR";
+      const inUSD = amt / (RATES[f] || 1.0);
+      const out = inUSD * (RATES[t] || 83.82);
+      currResult.value = out.toFixed(2);
+      if (currencyRateNote) {
+        currencyRateNote.textContent = `1 ${f} = ${((RATES[t] || 83.82) / (RATES[f] || 1.0)).toFixed(2)} ${t}`;
+      }
+    }
+
+    if (currAmount) currAmount.addEventListener("input", updateCurrency);
+    if (currFrom) currFrom.addEventListener("change", updateCurrency);
+    if (currTo) currTo.addEventListener("change", updateCurrency);
+  }
+
+  // --- COPILOT / DEEP AI TOGGLE ---
+  let isDeepAiMode = false;
+  function initCopilotToggle() {
+    const copilotBtn = document.getElementById("copilotToggleBtn");
+    const copilotLabel = document.getElementById("copilotLabel");
+
+    if (copilotBtn) {
+      copilotBtn.addEventListener("click", () => {
+        isDeepAiMode = !isDeepAiMode;
+        if (isDeepAiMode) {
+          copilotBtn.classList.add("active");
+          if (copilotLabel) copilotLabel.textContent = "Copilot";
+        } else {
+          copilotBtn.classList.remove("active");
+          if (copilotLabel) copilotLabel.textContent = "Fast";
+        }
+      });
+    }
+  }
+
+  // Initializations
+  initWallpaperManager();
+  initWeatherWidget();
+  initTrendingAndMarkets();
+  initQuickTools();
+  initCopilotToggle();
+
   // Initial Auth & URL Check
   checkAuth();
   checkUrlParams();
 });
+

@@ -3,31 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>VASTUDA — Independent AI Discovery & Neural Web Engine</title>
+  <title>STAUNT — Intelligent AI Discovery Engine (by VASTUDA)</title>
   <link rel="icon" type="image/svg+xml" href="/static/icons/icon.svg" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#0a0d14" />
-  <meta name="description" content="VASTUDA is an independent, private AI search engine with live web discovery, academic research synthesis, developer code search, and integrated Reader Mode." />
+  <meta name="description" content="STAUNT is a modern, high-speed, private AI search engine and neural web discovery platform by VASTUDA." />
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <meta name="referrer" content="no-referrer" />
-  <link rel="stylesheet" href="/static/css/style.css?v=31" />
+  <link rel="stylesheet" href="/static/css/style.css?v=40" />
 </head>
 
 <body>
 
+  <!-- BING-STYLE DYNAMIC WALLPAPER BACKDROP -->
+  <div class="wallpaper-container" id="wallpaperContainer">
+    <div class="wallpaper-bg" id="wallpaperBg"></div>
+    <div class="wallpaper-overlay" id="wallpaperOverlay"></div>
+    <div class="wallpaper-credit" id="wallpaperCredit" title="Daily Featured Landscape">
+      <span class="credit-icon">📷</span>
+      <span class="credit-location" id="wallpaperLocation">Amalfi Coast, Italy</span>
+    </div>
+  </div>
+
   <!-- APP HEADER -->
-  <header class="app-header">
-    <div class="brand-logo" id="brandLogo" title="VASTUDA Home" onclick="window.location.href='/'" style="cursor: pointer;">
+  <header class="app-header" id="appHeader">
+    <div class="brand-logo" id="brandLogo" title="STAUNT Home" onclick="window.location.href='/'" style="cursor: pointer;">
       <div class="logo-mark">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="3" fill="currentColor"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       </div>
       <div class="brand-text-wrap">
-        <span class="brand-name">VASTUDA</span>
+        <span class="brand-name">STAUNT</span>
+        <span class="brand-sub">by VASTUDA</span>
       </div>
     </div>
 
@@ -45,7 +56,7 @@
           type="text" 
           id="headerSearchInput" 
           class="search-input" 
-          placeholder="Search the web or ask VASTUDA" 
+          placeholder="Search the web or ask STAUNT AI" 
           autocomplete="off" 
           required 
         />
@@ -62,12 +73,24 @@
 
     <!-- Header User & Controls Actions -->
     <div class="header-actions">
-      <!-- Native Apps Download Links -->
-      <a href="/download/windows" class="native-app-btn" title="Download VASTUDA Browser for Windows (.exe)">
+      <!-- Live Weather Pill -->
+      <div class="header-weather-pill" id="headerWeatherPill" title="Live Weather Forecast">
+        <span class="weather-icon" id="weatherIcon">🌤️</span>
+        <span class="weather-temp" id="weatherTemp">28°C</span>
+        <span class="weather-city" id="weatherCity">New Delhi</span>
+      </div>
+
+      <!-- Wallpaper Toggle Button -->
+      <button class="icon-btn" id="wallpaperToggleBtn" title="Toggle Daily Wallpaper / Minimalist Mode" aria-label="Toggle Wallpaper">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+      </button>
+
+      <!-- Native Browser Download Badges -->
+      <a href="/download/windows" class="native-app-btn" title="Download Staunt Browser for Windows (.exe)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.95-1.801"/></svg>
-        <span>Windows</span>
+        <span>Staunt Windows</span>
       </a>
-      <a href="/download/android" class="native-app-btn android-btn" title="Download VASTUDA Browser for Android (.apk)">
+      <a href="/download/android" class="native-app-btn android-btn" title="Download Staunt Browser for Android (.apk)">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4111 13.8533 8.086 12 8.086s-3.5902.3251-5.1368.8637L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
         <span>Android</span>
       </a>
@@ -80,15 +103,15 @@
 
       <!-- Apps & Tools Menu Button -->
       <div class="apps-menu-container" style="position: relative;">
-        <button class="icon-btn" id="dashboardBtn" title="VASTUDA Apps & Services" aria-label="VASTUDA Apps">
+        <button class="icon-btn" id="dashboardBtn" title="VASTUDA Ecosystem" aria-label="Ecosystem Apps">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
         </button>
         <div class="apps-dropdown" id="appsMenuDropdown" style="display: none;">
-          <div class="apps-dropdown-header">VASTUDA Services</div>
+          <div class="apps-dropdown-header">VASTUDA Products</div>
           <div class="apps-grid-menu">
             <a href="/" class="app-menu-item">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              <span>Search</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>Staunt Search</span>
             </a>
             <a href="/discover" class="app-menu-item">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
@@ -96,19 +119,19 @@
             </a>
             <a href="/research" class="app-menu-item">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-              <span>Research</span>
+              <span>Research Lab</span>
             </a>
             <a href="/download/windows" class="app-menu-item">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.95-1.801"/></svg>
-              <span>Windows App</span>
+              <span>Staunt Windows</span>
             </a>
             <a href="/download/android" class="app-menu-item">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4111 13.8533 8.086 12 8.086s-3.5902.3251-5.1368.8637L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3432-4.1021-2.6889-7.5743-6.1185-9.4396"/></svg>
-              <span>Android App</span>
+              <span>Staunt Android</span>
             </a>
             <button type="button" class="app-menu-item" id="menuOpenDashboard">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-              <span>Saved & History</span>
+              <span>Bookmarks & History</span>
             </button>
             <button type="button" class="app-menu-item" id="menuOpenSettings">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -119,7 +142,7 @@
       </div>
 
       <!-- Theme Switcher -->
-      <button class="icon-btn" id="themeToggle" title="Toggle Theme" aria-label="Toggle Theme">
+      <button class="icon-btn" id="themeToggle" title="Toggle Dark/Light Theme" aria-label="Toggle Theme">
         <!-- Icon injected by JS -->
       </button>
     </div>
@@ -127,21 +150,36 @@
 
   <!-- HOME HERO VIEW -->
   <main class="home-container" id="homeView">
+    
+    <!-- Hero Brand Title & Subtitle -->
     <div class="home-logo-wrap">
       <div class="home-mark">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="3" fill="currentColor"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       </div>
-      <h1 class="home-title">VASTUDA</h1>
+      <h1 class="home-title">STAUNT</h1>
+      <p class="home-subtitle">Intelligent Neural Web Engine • <span class="sub-parent">by VASTUDA</span></p>
     </div>
 
-    <!-- Home Central Search Form -->
+    <!-- Bing-Style Financial Markets Ribbon -->
+    <div class="markets-ribbon" id="marketsRibbon">
+      <!-- Populated dynamically via /api/trending -->
+      <div class="market-pill loading-pill">Loading Market Indices...</div>
+    </div>
+
+    <!-- Home Central Glassmorphic Search Form -->
     <div class="home-search-wrap">
       <form class="search-form home-large-form" id="homeSearchForm">
+        <!-- Copilot / Deep AI Search Toggle -->
+        <button type="button" class="copilot-pill-btn" id="copilotToggleBtn" title="Toggle AI Deep Synthesis Mode">
+          <span class="copilot-sparkle">✨</span>
+          <span class="copilot-label" id="copilotLabel">Fast</span>
+        </button>
+
         <input 
           type="text" 
           id="homeSearchInput" 
           class="search-input" 
-          placeholder="Search the web or ask VASTUDA" 
+          placeholder="Search the web, explore destinations, or ask AI..." 
           autocomplete="off" 
           required 
           autofocus
@@ -157,7 +195,7 @@
       <div class="suggest-box" id="suggestBoxHome"></div>
     </div>
 
-    <!-- Functional Search Mode Navigation -->
+    <!-- Search Mode Navigation Verticals -->
     <nav class="home-modes-nav" id="homeVerticalShortcuts">
       <button class="mode-nav-btn active" data-tab="all" title="Web Search">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -189,14 +227,62 @@
       </button>
     </nav>
 
+    <!-- Quick Utilities & Widgets Row (Bing-Style Fast Access) -->
+    <div class="quick-tools-row" id="quickToolsRow">
+      <button type="button" class="tool-pill-btn" id="toolCalcBtn">
+        <span class="tool-icon">🧮</span>
+        <span>Calculator</span>
+      </button>
+      <button type="button" class="tool-pill-btn" id="toolCurrencyBtn">
+        <span class="tool-icon">💱</span>
+        <span>Currency</span>
+      </button>
+      <button type="button" class="tool-pill-btn" id="toolTravelBtn">
+        <span class="tool-icon">✈️</span>
+        <span>Travel Hub</span>
+      </button>
+      <button type="button" class="tool-pill-btn" id="toolFactBtn">
+        <span class="tool-icon">💡</span>
+        <span>Daily Fact</span>
+      </button>
+    </div>
+
+    <!-- Trending Topic Chips -->
+    <div class="trending-topics-bar" id="trendingTopicsBar">
+      <span class="trending-label">🔥 Trending:</span>
+      <div class="trending-chips-wrap" id="trendingChipsWrap">
+        <!-- Dynamically injected from /api/trending -->
+      </div>
+    </div>
+
     <!-- Dynamic Recent Searches for Guest Users -->
     <div class="home-recent-wrap" id="homeRecentWrap" style="display: none;">
       <div class="home-recent-header">
-        <span class="home-recent-title">Recent</span>
+        <span class="home-recent-title">Recent Searches</span>
         <button class="clear-recent-link" id="clearHomeRecentBtn" type="button">Clear</button>
       </div>
       <div class="home-recent-chips" id="homeRecentChips"></div>
     </div>
+
+    <!-- Bing-Style Trending Stories & News Cards -->
+    <section class="home-news-section" id="homeNewsSection">
+      <div class="home-news-header">
+        <div class="news-header-left">
+          <span class="news-pulse-dot"></span>
+          <h3 class="news-section-title">Trending News & Top Stories</h3>
+        </div>
+        <div class="news-category-filters" id="newsCatFilters">
+          <button class="news-filter-btn active" data-cat="all">All</button>
+          <button class="news-filter-btn" data-cat="tech">Tech & AI</button>
+          <button class="news-filter-btn" data-cat="world">World</button>
+          <button class="news-filter-btn" data-cat="sports">Sports</button>
+          <button class="news-filter-btn" data-cat="finance">Business</button>
+        </div>
+      </div>
+      <div class="trending-news-grid" id="trendingNewsGrid">
+        <div class="news-skeleton">Loading trending stories...</div>
+      </div>
+    </section>
 
     <!-- Home Footer Navigation -->
     <footer class="home-footer">
@@ -208,13 +294,13 @@
       <span>•</span>
       <a href="/terms">Terms of Service</a>
       <span>•</span>
-      <span>&copy; 2026 VASTUDA</span>
+      <span>&copy; 2026 VASTUDA Technologies • STAUNT</span>
     </footer>
   </main>
 
   <!-- SEARCH RESULTS VIEW -->
   <main class="results-container" id="resultsView" style="display: none;">
-    <!-- Category Tabs Navigation (Genuine Verticals Only) -->
+    <!-- Category Tabs Navigation -->
     <nav class="tabs-bar" id="categoriesBar">
       <button class="tab-btn active" data-tab="all">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -246,44 +332,44 @@
       </button>
     </nav>
 
-    <!-- Search Filters Bar (Genuine Time Filters) -->
+    <!-- Search Filters Bar (Time Filters) -->
     <div class="filters-bar" id="searchFiltersBar">
-      <div class="filters-left">
-        <div class="filter-dropdown-wrap" id="filterDropdownWrap">
-          <button type="button" class="filter-dropdown-btn" id="filterTimeBtn" aria-haspopup="true" aria-expanded="false">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span id="filterTimeLabel">Any time</span>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-          </button>
-          <div class="filter-dropdown-menu" id="filterTimeMenu" style="display: none;">
-            <button type="button" class="filter-menu-item active" data-time="">Any time</button>
-            <button type="button" class="filter-menu-item" data-time="day">Past 24 hours</button>
-            <button type="button" class="filter-menu-item" data-time="week">Past week</button>
-            <button type="button" class="filter-menu-item" data-time="month">Past month</button>
-            <button type="button" class="filter-menu-item" data-time="year">Past year</button>
-          </div>
-        </div>
-      </div>
-      <div class="filters-right" id="resultsCountNotice"></div>
+      <button class="filter-pill active" data-time="">All Time</button>
+      <button class="filter-pill" data-time="d">Past 24 Hours</button>
+      <button class="filter-pill" data-time="w">Past Week</button>
+      <button class="filter-pill" data-time="m">Past Month</button>
+      <button class="filter-pill" data-time="y">Past Year</button>
     </div>
 
     <!-- Results Layout -->
     <div class="results-layout">
-      <!-- Main Content Area -->
+      <!-- Main Results Column -->
       <div class="results-main">
-
-        <!-- 1. Instant Calculation Card -->
-        <div class="instant-calc-card" id="instantAnswerCard" style="display: none;">
-          <div class="calc-label">Instant Calculation</div>
-          <div class="calc-expression" id="calcExpr">120 * 45 =</div>
-          <div class="calc-result" id="calcResult">5,400</div>
+        <div class="results-meta-bar" id="resultsMetaBar">
+          <span class="results-stats" id="resultsStats"></span>
         </div>
 
-        <!-- 2. Smart Destination / Places Card -->
-        <div class="destination-card" id="destinationCard" style="display: none;">
-          <div class="destination-hero-img-wrap" id="destHeroImgWrap" style="display: none;">
-            <img id="destHeroImg" class="dest-hero-img" src="" alt="Destination Photo" referrerpolicy="no-referrer" />
+        <!-- Math Instant Answer Card -->
+        <div class="math-instant-card" id="mathInstantCard" style="display: none;">
+          <div class="math-card-header">
+            <span class="math-calc-badge">Calculation Result</span>
           </div>
+          <div class="math-result-val" id="mathResultVal">0</div>
+          <div class="math-expression-label" id="mathExprLabel">0 + 0</div>
+        </div>
+
+        <!-- Bing-Style Smart Destination / Travel Card -->
+        <div class="destination-card" id="destinationCard" style="display: none;">
+          <!-- Multi-photo gallery carousel -->
+          <div class="destination-gallery" id="destGalleryWrap">
+            <div class="destination-hero-img-wrap" id="destHeroImgWrap">
+              <img id="destHeroImg" class="dest-hero-img" src="" alt="Destination Photo" referrerpolicy="no-referrer" />
+            </div>
+            <div class="destination-thumbs-row" id="destThumbsRow">
+              <!-- Dynamically populated with 2-3 gallery thumbnails -->
+            </div>
+          </div>
+          
           <div class="destination-hero">
             <div class="destination-top-row">
               <div>
@@ -298,6 +384,7 @@
               <span class="dest-stat-pill" id="destDuration">Ideal: 4-5 Days</span>
             </div>
           </div>
+
           <div class="destination-body">
             <div class="dest-section-title">Top Attractions & Highlights</div>
             <div class="attractions-chips" id="destAttractions"></div>
@@ -327,174 +414,213 @@
           <div class="visual-strip-scroll" id="visualStripScroll"></div>
         </div>
 
-        <!-- 3. AI Overview Synthesis Card -->
-        <article class="ai-overview-card" id="aiOverviewCard" style="display: none;">
-
+        <!-- AI Overview Synthesis Card (Perplexity-Grade) -->
+        <div class="ai-overview-card" id="aiOverviewCard" style="display: none;">
           <div class="ai-overview-header">
-            <div class="ai-title-wrap">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-              <span>AI Overview</span>
+            <div class="ai-header-left">
+              <span class="ai-spark-icon">✨</span>
+              <span class="ai-title">STAUNT AI Overview</span>
+              <span class="ai-model-tag" id="aiModelTag">Llama 3.3 70B</span>
             </div>
-            <button class="icon-btn" id="copyOverviewBtn" title="Copy Answer" style="width:28px; height:28px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="13" height="13" x="9" y="9" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            </button>
-          </div>
-          <div class="ai-content" id="aiContent"></div>
-          <div class="sources-list" id="aiSources"></div>
-        </article>
-
-        <!-- 4. Research Mode Scholarly Panel -->
-        <article class="research-card" id="researchCard" style="display: none;">
-          <div class="research-header">
-            <div class="research-title-wrap">
-              <span class="research-badge">Academic Synthesis</span>
-              <h2 class="research-title" id="researchHeading">Scientific & Academic Consensus</h2>
+            <div class="ai-header-actions">
+              <button class="ai-action-btn" id="copyOverviewBtn" title="Copy text">Copy</button>
+              <button class="ai-action-btn" id="collapseOverviewBtn" title="Collapse">Collapse</button>
             </div>
           </div>
-          <div class="research-summary-text" id="researchSummary"></div>
-          
-          <div class="research-section">
-            <h3 class="research-subheading">Key Scientific Findings</h3>
-            <ul class="research-findings-list" id="researchFindings"></ul>
-          </div>
-
-          <div class="research-grid-meta">
-            <div class="research-meta-box">
-              <h4 class="research-meta-title">Methodology & Evidence</h4>
-              <p class="research-meta-desc" id="researchMethodology"></p>
-            </div>
-            <div class="research-meta-box">
-              <h4 class="research-meta-title">Counter-Arguments & Limitations</h4>
-              <p class="research-meta-desc" id="researchLimitations"></p>
+          <div class="ai-overview-body" id="aiOverviewBody">
+            <div class="ai-skeleton-wrap">
+              <div class="ai-skeleton-line" style="width: 90%;"></div>
+              <div class="ai-skeleton-line" style="width: 75%;"></div>
+              <div class="ai-skeleton-line" style="width: 82%;"></div>
             </div>
           </div>
-        </article>
-
-        <!-- 5. General Web Results Section -->
-        <section class="web-results" id="webResultsSection"></section>
-
-        <!-- 6. Developer Code Repositories Section -->
-        <section class="code-results" id="codeSection" style="display: none;"></section>
-
-        <!-- 7. Document & PDF Section -->
-        <section class="docs-results" id="docsSection" style="display: none;"></section>
-
-        <!-- 8. Shopping Discovery Section -->
-        <section class="shopping-results" id="shoppingSection" style="display: none;"></section>
-
-        <!-- 9. Jobs Openings Section -->
-        <section class="jobs-results" id="jobsSection" style="display: none;"></section>
-
-        <!-- 10. Video Results Section -->
-        <section class="videos-grid" id="videosSection" style="display: none;"></section>
-
-        <!-- 11. Images Grid Section -->
-        <section class="images-grid" id="imagesSection" style="display: none;"></section>
-
-        <!-- Empty / No Results State -->
-        <div class="empty-state" id="emptyState" style="display: none;">
-          <h3 class="empty-title">No results found</h3>
-          <p class="empty-desc">Try:</p>
-          <ul class="empty-suggestions">
-            <li>Different keywords</li>
-            <li>Fewer words</li>
-            <li>Another search mode above</li>
-          </ul>
+          <div class="ai-sources-tray" id="aiSourcesTray" style="display: none;">
+            <span class="sources-label">Sources:</span>
+            <div class="sources-list" id="aiSourcesList"></div>
+          </div>
         </div>
 
+        <!-- Web Search Results List -->
+        <div class="search-results-list" id="searchResultsList"></div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <div class="empty-icon">🔍</div>
+          <h3 class="empty-title">No search results found</h3>
+          <p class="empty-desc">Try checking your spelling or use more general keywords.</p>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-bar" id="paginationBar" style="display: none;">
+          <button class="page-btn" id="prevPageBtn" disabled>← Previous</button>
+          <span class="page-indicator" id="pageIndicator">Page 1</span>
+          <button class="page-btn" id="nextPageBtn">Next →</button>
+        </div>
       </div>
 
-      <!-- Right Sidebar Column -->
-      <aside class="results-sidebar">
-        <!-- Related Searches Box -->
-        <div class="sidebar-box">
-          <h3 class="sidebar-title">Related Searches</h3>
-          <div class="related-list" id="relatedQueriesList"></div>
+      <!-- Sidebar Column (Wikipedia Knowledge Graph & Discover) -->
+      <aside class="results-sidebar" id="resultsSidebar">
+        <div class="knowledge-card" id="knowledgeCard" style="display: none;">
+          <div class="kc-img-wrap" id="kcImgWrap" style="display: none;">
+            <img id="kcImg" src="" alt="Knowledge Entity" referrerpolicy="no-referrer" />
+          </div>
+          <div class="kc-content">
+            <h3 class="kc-title" id="kcTitle">Entity</h3>
+            <p class="kc-snippet" id="kcSnippet"></p>
+            <div class="kc-attrs" id="kcAttrs"></div>
+            <a href="#" target="_blank" rel="noopener noreferrer" class="kc-link" id="kcLink">Read on Wikipedia ↗</a>
+          </div>
         </div>
 
-
+        <!-- Did You Mean Suggestion -->
+        <div class="did-you-mean-card" id="didYouMeanCard" style="display: none;">
+          <span class="dym-label">Did you mean:</span>
+          <a href="#" class="dym-link" id="dymLink">suggestion</a>
+        </div>
       </aside>
     </div>
   </main>
 
-  <!-- ==================== MODALS & DRAWERS ==================== -->
-
-  <!-- 1. AUTH MODAL (Sign In / Register) -->
-  <div class="modal-overlay" id="authModal">
-    <div class="modal-content auth-modal-content">
+  <!-- QUICK TOOLS MODALS -->
+  <!-- 1. Calculator Modal -->
+  <div class="modal-overlay" id="calcModal">
+    <div class="modal-content calc-modal-content">
       <div class="modal-header">
-        <h3 class="modal-title" id="authModalTitle">Welcome to VASTUDA</h3>
-        <button class="modal-close-btn" id="closeAuthModal">✕</button>
+        <h3 class="modal-title">🧮 Quick Calculator</h3>
+        <button class="modal-close-btn" id="closeCalcModal">✕</button>
       </div>
       <div class="modal-body">
-        <div class="auth-tabs">
-          <button class="auth-tab active" id="tabSignIn">Sign In</button>
-          <button class="auth-tab" id="tabRegister">Create Account</button>
+        <div class="calc-display" id="calcDisplay">0</div>
+        <div class="calc-grid">
+          <button class="calc-btn op" data-val="C">C</button>
+          <button class="calc-btn op" data-val="(">(</button>
+          <button class="calc-btn op" data-val=")">)</button>
+          <button class="calc-btn op" data-val="/">÷</button>
+          <button class="calc-btn" data-val="7">7</button>
+          <button class="calc-btn" data-val="8">8</button>
+          <button class="calc-btn" data-val="9">9</button>
+          <button class="calc-btn op" data-val="*">×</button>
+          <button class="calc-btn" data-val="4">4</button>
+          <button class="calc-btn" data-val="5">5</button>
+          <button class="calc-btn" data-val="6">6</button>
+          <button class="calc-btn op" data-val="-">−</button>
+          <button class="calc-btn" data-val="1">1</button>
+          <button class="calc-btn" data-val="2">2</button>
+          <button class="calc-btn" data-val="3">3</button>
+          <button class="calc-btn op" data-val="+">+</button>
+          <button class="calc-btn" data-val="0">0</button>
+          <button class="calc-btn" data-val=".">.</button>
+          <button class="calc-btn op" data-val="%">%</button>
+          <button class="calc-btn equals" data-val="=">=</button>
         </div>
-
-        <form id="authForm" class="auth-form">
-          <div class="form-group" id="nameGroup" style="display: none;">
-            <label>Your Name</label>
-            <input type="text" id="authName" class="form-input" placeholder="e.g. Alex Vance" />
-          </div>
-          <div class="form-group">
-            <label>Email Address</label>
-            <input type="email" id="authEmail" class="form-input" placeholder="name@example.com" required />
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="authPassword" class="form-input" placeholder="••••••••" required minlength="6" />
-          </div>
-          <div class="auth-error-msg" id="authErrorMsg" style="display: none;"></div>
-          <button type="submit" class="auth-submit-btn" id="authSubmitBtn">Sign In</button>
-        </form>
       </div>
     </div>
   </div>
 
-  <!-- 2. MY VASTUDA DASHBOARD MODAL -->
+  <!-- 2. Currency Converter Modal -->
+  <div class="modal-overlay" id="currencyModal">
+    <div class="modal-content currency-modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">💱 Live Currency Converter</h3>
+        <button class="modal-close-btn" id="closeCurrencyModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="currency-row">
+          <input type="number" id="currAmount" value="1" min="0" class="form-input" />
+          <select id="currFrom" class="form-input">
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="AED">AED (Dirham)</option>
+            <option value="INR">INR (₹)</option>
+          </select>
+        </div>
+        <div class="currency-swap-icon">⬇</div>
+        <div class="currency-row">
+          <input type="text" id="currResult" value="83.82" readonly class="form-input" style="font-weight: 700; color: var(--accent);" />
+          <select id="currTo" class="form-input">
+            <option value="INR" selected>INR (₹)</option>
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="AED">AED (Dirham)</option>
+          </select>
+        </div>
+        <div class="currency-rate-note" id="currencyRateNote">1 USD = ₹83.82 INR</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. USER AUTH MODAL -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-content auth-modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="authModalTitle">Sign in to STAUNT</h3>
+        <button class="modal-close-btn" id="closeAuthModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="authForm">
+          <div class="form-group" id="nameGroup" style="display: none;">
+            <label for="userName">Full Name</label>
+            <input type="text" id="userName" class="form-input" placeholder="Enter your name" />
+          </div>
+          <div class="form-group">
+            <label for="userEmail">Email Address</label>
+            <input type="email" id="userEmail" class="form-input" placeholder="name@example.com" required />
+          </div>
+          <div class="form-group">
+            <label for="userPassword">Password</label>
+            <input type="password" id="userPassword" class="form-input" placeholder="••••••••" required />
+          </div>
+          <div class="auth-error-msg" id="authErrorMsg" style="display: none;"></div>
+          <button type="submit" class="auth-submit-btn" id="authSubmitBtn">Continue</button>
+        </form>
+        <div class="auth-switch-prompt">
+          <span id="authSwitchText">Don't have an account?</span>
+          <button type="button" class="auth-switch-link" id="authSwitchBtn">Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. DASHBOARD MODAL (Saved & History) -->
   <div class="modal-overlay" id="dashboardModal">
     <div class="modal-content dashboard-modal-content">
-      <div class="modal-header">
-        <div class="dashboard-header-title">
-          <div class="user-avatar-circle" id="dashAvatar">U</div>
-          <div>
-            <h3 class="modal-title" id="dashUserName">My VASTUDA</h3>
-            <span class="user-email-subtitle" id="dashUserEmail">Personal Discovery Hub</span>
+      <div class="dash-sidebar">
+        <div class="dash-user-badge">
+          <div class="dash-avatar" id="dashUserAvatar">U</div>
+          <div class="dash-user-info">
+            <div class="dash-user-name" id="dashUserName">Guest</div>
+            <div class="dash-user-email" id="dashUserEmail">guest@staunt.local</div>
           </div>
         </div>
-        <button class="modal-close-btn" id="closeDashboardModal">✕</button>
+        <nav class="dash-nav">
+          <button class="dash-nav-btn active" data-pane="history">Search History</button>
+          <button class="dash-nav-btn" data-pane="collections">Collections</button>
+          <button class="dash-nav-btn" data-pane="saved">Saved Results</button>
+          <button class="dash-nav-btn" data-pane="preferences">Preferences</button>
+        </nav>
       </div>
-
-      <div class="dashboard-nav-tabs">
-        <button class="dash-tab active" data-view="collections">📁 Collections</button>
-        <button class="dash-tab" data-view="history">🕒 Search History</button>
-        <button class="dash-tab" data-view="saved">⭐ Saved Results</button>
-        <button class="dash-tab" data-view="preferences">⚙️ Preferences & Privacy</button>
-      </div>
-
-      <div class="modal-body dashboard-body">
-        <!-- View A: Collections -->
-        <div class="dash-view-pane active" id="paneCollections">
+      <div class="dash-content-area">
+        <div class="dash-header">
+          <h3 class="dash-pane-title" id="dashPaneTitle">Search History</h3>
+          <button class="modal-close-btn" id="closeDashboardModal">✕</button>
+        </div>
+        <!-- View A: History -->
+        <div class="dash-view-pane active" id="paneHistory">
           <div class="pane-header-action">
-            <h4>Saved Collections</h4>
-            <button class="small-action-btn" id="newCollectionBtn">+ New Collection</button>
+            <span>Logged searches on this device</span>
+            <button class="small-action-btn danger" id="clearAllHistoryBtn">Clear History</button>
+          </div>
+          <div class="history-list-wrap" id="historyListWrap"></div>
+        </div>
+        <!-- View B: Collections -->
+        <div class="dash-view-pane" id="paneCollections">
+          <div class="pane-header-action">
+            <input type="text" id="newCollectionInput" placeholder="New collection name..." class="small-input" />
+            <button class="small-action-btn primary" id="createCollectionBtn">+ Add</button>
           </div>
           <div class="collections-grid" id="collectionsGrid"></div>
         </div>
-
-        <!-- View B: Search History -->
-        <div class="dash-view-pane" id="paneHistory">
-          <div class="pane-header-action">
-            <h4>Search History</h4>
-            <div class="history-actions-wrap">
-              <button class="small-action-btn secondary" id="toggleHistoryBtn">Pause History</button>
-              <button class="small-action-btn danger" id="clearHistoryBtn">Clear All</button>
-            </div>
-          </div>
-          <div class="history-list-wrap" id="historyList"></div>
-        </div>
-
         <!-- View C: Saved Results -->
         <div class="dash-view-pane" id="paneSaved">
           <div class="pane-header-action">
@@ -505,8 +631,7 @@
           </div>
           <div class="saved-list-wrap" id="savedResultsList"></div>
         </div>
-
-        <!-- View D: Preferences & Privacy -->
+        <!-- View D: Preferences -->
         <div class="dash-view-pane" id="panePreferences">
           <div class="pref-group">
             <label class="pref-label">
@@ -530,12 +655,6 @@
               <input type="checkbox" id="prefHistoryEnabled" checked />
             </label>
           </div>
-          <div class="pref-group">
-            <label class="pref-toggle-label">
-              <span>Personalized search intelligence</span>
-              <input type="checkbox" id="prefPersonalized" />
-            </label>
-          </div>
           <div class="pref-divider"></div>
           <div class="data-privacy-actions">
             <button class="small-action-btn secondary" id="exportDataBtn">Export My Data (JSON)</button>
@@ -546,7 +665,7 @@
     </div>
   </div>
 
-  <!-- 3. SAVE TO COLLECTION MODAL -->
+  <!-- 5. SAVE TO COLLECTION MODAL -->
   <div class="modal-overlay" id="saveResultModal">
     <div class="modal-content small-modal-content">
       <div class="modal-header">
@@ -568,7 +687,7 @@
     </div>
   </div>
 
-  <!-- 4. IN-APP READER MODE MODAL -->
+  <!-- 6. IN-APP READER MODE MODAL -->
   <div class="modal-overlay" id="readerModal">
     <div class="modal-content reader-modal-content">
       <div class="reader-toolbar">
@@ -592,7 +711,7 @@
     </div>
   </div>
 
-  <!-- 5. IMAGE LIGHTBOX MODAL -->
+  <!-- 7. IMAGE LIGHTBOX MODAL -->
   <div class="modal-overlay" id="lightboxModal">
     <div class="lightbox-content">
       <button class="modal-close-btn lightbox-close-btn" id="closeLightboxBtn">✕</button>
@@ -604,6 +723,6 @@
     </div>
   </div>
 
-  <script src="/static/js/app.js?v=10"></script>
+  <script src="/static/js/app.js?v=40"></script>
 </body>
 </html>
