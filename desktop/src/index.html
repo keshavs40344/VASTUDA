@@ -893,6 +893,13 @@
         <button class="zoom-ctrl-btn" id="btnFullscreen" title="Fullscreen (F11)" style="font-size: 11px;">⛶</button>
       </div>
     </div>
+    <div class="menu-item" id="menuItemSavePage">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span>Save page as...</span>
+      </div>
+      <span class="menu-shortcut">Ctrl+S</span>
+    </div>
     <div class="menu-item" id="menuItemPrint">
       <div class="menu-item-left">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
@@ -911,6 +918,12 @@
     <div class="menu-item" id="menuItemSettings">
       <div class="menu-item-left">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Settings</span>
+      </div>
+    </div>
+    <div class="menu-item" id="menuItemClearData">
+      <div class="menu-item-left">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         <span>Clear browsing data</span>
       </div>
       <span class="menu-shortcut">Ctrl+Shift+Del</span>
@@ -1016,12 +1029,37 @@
 
   <!-- Settings / Clear Data Modal -->
   <div class="modal-overlay" id="settingsModal">
-    <div class="modal-box">
+    <div class="modal-box" style="width: 480px; max-height: 85vh; overflow-y: auto;">
       <div class="modal-header">
-        <div class="modal-title">Clear Browsing Data</div>
+        <div class="modal-title">Browser Settings & Privacy</div>
         <button class="modal-close" id="btnModalClose">&times;</button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="gap: 16px;">
+        <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 2px;">General & Search</div>
+        <div class="modal-row">
+          <label class="modal-label" for="settingSearchEngine">Search Engine</label>
+          <select class="modal-select" id="settingSearchEngine">
+            <option value="staunt" selected>STAUNT Search (Protected Default)</option>
+          </select>
+        </div>
+        <div class="modal-row">
+          <label class="modal-label" for="settingHomeUrl">Homepage URL</label>
+          <input type="text" class="modal-select" id="settingHomeUrl" value="staunt://newtab" placeholder="staunt://newtab" style="cursor: text;">
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; margin: 4px 0;">
+          <input type="checkbox" id="settingRestoreTabs" style="accent-color: var(--accent); cursor: pointer;">
+          <label for="settingRestoreTabs" style="font-size: 12px; color: var(--text-muted); cursor: pointer;">Restore previous session tabs on startup</label>
+        </div>
+        <div class="modal-row">
+          <label class="modal-label" for="settingShieldLevel">STAUNT Shield</label>
+          <select class="modal-select" id="settingShieldLevel">
+            <option value="standard" selected>Standard (Ad & Tracker Blocker)</option>
+            <option value="strict">Strict (Aggressive Shielding)</option>
+            <option value="off">Off (Allow All)</option>
+          </select>
+        </div>
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 6px 0;"></div>
+        <div style="font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 2px;">Clear Browsing Data</div>
         <div class="modal-row">
           <label class="modal-label" for="timeRangeSelect">Time Range</label>
           <select class="modal-select" id="timeRangeSelect">
@@ -1032,13 +1070,14 @@
             <option value="all">All time</option>
           </select>
         </div>
-        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
-          Clears browsing history, search cache, and temporary offline site storage across all windows.
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 11.5px; color: var(--text-dim);">Clears browsing history, cache, and temp storage.</span>
+          <button class="btn-cancel" id="btnConfirmClear" style="color: #ff453a; border-color: rgba(255,69,58,0.3); padding: 5px 12px; font-size: 11.5px;">Clear Browsing Data</button>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn-cancel" id="btnCancelClear">Cancel</button>
-        <button class="btn-primary-action" id="btnConfirmClear">Clear Data</button>
+        <button class="btn-primary-action" id="btnSaveSettings">Save Settings</button>
       </div>
     </div>
   </div>
@@ -1264,9 +1303,11 @@
         document.getElementById('menuItemHistory')?.addEventListener('click', () => { closeMenu(); openHistoryModal(); });
         document.getElementById('menuItemDownloads')?.addEventListener('click', () => { closeMenu(); openDownloadsModal(); });
         document.getElementById('menuItemBookmarks')?.addEventListener('click', () => { closeMenu(); openBookmarksModal(); });
+        document.getElementById('menuItemSavePage')?.addEventListener('click', () => { closeMenu(); if (typeof api.savePage === 'function') api.savePage(); });
         document.getElementById('menuItemPrint')?.addEventListener('click', () => { closeMenu(); if (typeof api.printToPDF === 'function') api.printToPDF(); });
         document.getElementById('menuItemFind')?.addEventListener('click', () => { closeMenu(); omnibox.focus(); omnibox.select(); });
         document.getElementById('menuItemSettings')?.addEventListener('click', () => { closeMenu(); openSettingsModal(); });
+        document.getElementById('menuItemClearData')?.addEventListener('click', () => { closeMenu(); openSettingsModal(); });
         document.getElementById('menuItemDevTools')?.addEventListener('click', () => { closeMenu(); api.toggleDevTools(); });
         document.getElementById('menuItemAbout')?.addEventListener('click', () => { closeMenu(); openAboutModal(); });
 
@@ -1283,8 +1324,22 @@
       }
 
       // Settings Modal
-      function openSettingsModal() {
-        if (settingsModal) settingsModal.classList.add('active');
+      async function openSettingsModal() {
+        if (!settingsModal) return;
+        settingsModal.classList.add('active');
+        if (typeof api.getSettings === 'function') {
+          try {
+            const currentSettings = await api.getSettings();
+            if (currentSettings) {
+              const homeInput = document.getElementById('settingHomeUrl');
+              const restoreCheck = document.getElementById('settingRestoreTabs');
+              const shieldSelect = document.getElementById('settingShieldLevel');
+              if (homeInput && currentSettings.homeUrl) homeInput.value = currentSettings.homeUrl;
+              if (restoreCheck) restoreCheck.checked = Boolean(currentSettings.restoreTabsOnStartup);
+              if (shieldSelect && currentSettings.shieldLevel) shieldSelect.value = currentSettings.shieldLevel;
+            }
+          } catch (e) {}
+        }
       }
       function closeSettingsModal() {
         if (settingsModal) settingsModal.classList.remove('active');
@@ -1296,6 +1351,20 @@
           if (e.target === settingsModal) closeSettingsModal();
         });
       }
+      document.getElementById('btnSaveSettings')?.addEventListener('click', async () => {
+        const homeInput = document.getElementById('settingHomeUrl');
+        const restoreCheck = document.getElementById('settingRestoreTabs');
+        const shieldSelect = document.getElementById('settingShieldLevel');
+        if (typeof api.saveSettings === 'function') {
+          await api.saveSettings({
+            homeUrl: (homeInput ? homeInput.value.trim() : '') || 'staunt://newtab',
+            restoreTabsOnStartup: restoreCheck ? restoreCheck.checked : false,
+            shieldLevel: shieldSelect ? shieldSelect.value : 'standard'
+          });
+          showDownloadToast('Settings saved successfully', 2500);
+        }
+        closeSettingsModal();
+      });
       if (btnConfirmClear) {
         btnConfirmClear.addEventListener('click', async () => {
           const range = timeRangeSelect ? timeRangeSelect.value : '24h';
@@ -1696,6 +1765,35 @@
 
           tabEl.addEventListener('click', () => api.switchTab(tab.id));
           
+          tabEl.draggable = true;
+          tabEl.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', String(tab.id));
+            tabEl.style.opacity = '0.5';
+          });
+          tabEl.addEventListener('dragend', () => {
+            tabEl.style.opacity = '1';
+          });
+          tabEl.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+          });
+          tabEl.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const sourceId = Number(e.dataTransfer.getData('text/plain'));
+            if (sourceId && sourceId !== tab.id) {
+              const srcIdx = currentTabs.findIndex(t => t.id === sourceId);
+              const destIdx = currentTabs.findIndex(t => t.id === tab.id);
+              if (srcIdx !== -1 && destIdx !== -1) {
+                const [movedTab] = currentTabs.splice(srcIdx, 1);
+                currentTabs.splice(destIdx, 0, movedTab);
+                renderTabs();
+                if (typeof api.reorderTabs === 'function') {
+                  api.reorderTabs(currentTabs.map(t => t.id));
+                }
+              }
+            }
+          });
+
           // Right click -> Tab context menu
           tabEl.addEventListener('contextmenu', (e) => {
             e.preventDefault();
@@ -1951,6 +2049,49 @@
         else if (e.altKey && e.key === 'Home') {
           e.preventDefault();
           api.goHome();
+        }
+        // Ctrl+S -> Save Page
+        else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 's') {
+          e.preventDefault();
+          if (typeof api.savePage === 'function') api.savePage();
+        }
+        // Ctrl+R or F5 -> Reload
+        else if (((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'r') || e.key === 'F5') {
+          e.preventDefault();
+          api.reload();
+        }
+        // Ctrl+Shift+R -> Hard Reload
+        else if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'R' || e.key === 'r')) {
+          e.preventDefault();
+          api.reload();
+        }
+        // Ctrl+Plus or Ctrl+= -> Zoom In
+        else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === '=' || e.key === '+')) {
+          e.preventDefault();
+          adjustZoom(0.5);
+        }
+        // Ctrl+- -> Zoom Out
+        else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === '-') {
+          e.preventDefault();
+          adjustZoom(-0.5);
+        }
+        // Ctrl+0 -> Reset Zoom
+        else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === '0') {
+          e.preventDefault();
+          currentZoomLevel = 0;
+          if (typeof api.setZoom === 'function') api.setZoom(0);
+          if (zoomLevelDisplay) zoomLevelDisplay.textContent = '100%';
+        }
+        // Ctrl+F -> Find in Page
+        else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'f') {
+          e.preventDefault();
+          omnibox.focus();
+          omnibox.select();
+        }
+        // F12 -> DevTools
+        else if (e.key === 'F12') {
+          e.preventDefault();
+          if (typeof api.toggleDevTools === 'function') api.toggleDevTools();
         }
         // Ctrl+Shift+Delete -> Open Clear Browsing Data
         else if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'Delete' || e.key === 'Del')) {

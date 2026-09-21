@@ -353,6 +353,23 @@ function cycleTab(direction = 1) {
   switchTab(tabIds[nextIndex]);
 }
 
+function reorderTabs(orderedIds) {
+  if (!Array.isArray(orderedIds)) return;
+  const newMap = new Map();
+  for (const id of orderedIds) {
+    const numId = Number(id);
+    if (tabs.has(numId)) {
+      newMap.set(numId, tabs.get(numId));
+    }
+  }
+  for (const [id, tab] of tabs.entries()) {
+    if (!newMap.has(id)) {
+      newMap.set(id, tab);
+    }
+  }
+  tabs = newMap;
+}
+
 function isUrlBookmarked(url) {
   if (!url || typeof url !== 'string') return false;
   const clean = url.trim();
@@ -441,6 +458,37 @@ function bookmarkCurrentPage() {
   }
 }
 
+function saveCurrentPage() {
+  const tab = tabs.get(activeTabId);
+  if (!tab || !tab.view || !tab.view.webContents) return;
+  const currentUrl = tab.url || '';
+  if (!currentUrl || currentUrl.startsWith('staunt://') || currentUrl.includes('newtab.html') || currentUrl === 'about:blank') {
+    return;
+  }
+  let defaultName = 'webpage.html';
+  if (tab.title) {
+    defaultName = tab.title.replace(/[^a-zA-Z0-9_\- ]/g, '_').trim().slice(0, 60) + '.html';
+  }
+  dialog.showSaveDialog(mainWindow, {
+    title: 'Save Page As',
+    defaultPath: defaultName,
+    filters: [
+      { name: 'HTML Complete', extensions: ['html', 'htm'] },
+      { name: 'All Files', extensions: ['*'] }
+    ]
+  }).then(result => {
+    if (result && result.filePath) {
+      tab.view.webContents.savePage(result.filePath, 'HTMLComplete')
+        .then(() => {
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('download-complete', { fileName: path.basename(result.filePath) });
+          }
+        })
+        .catch(err => console.error('[SAVE PAGE ERROR]', err));
+    }
+  }).catch(err => console.error(err));
+}
+
 function showAboutDialog() {
   dialog.showMessageBox(mainWindow, {
     type: 'info',
@@ -457,6 +505,7 @@ const menuTemplate = [
       { label: 'New Tab', accelerator: 'CmdOrCtrl+T', click: () => createTab('staunt://newtab') },
       { label: 'New Incognito Tab', accelerator: 'CmdOrCtrl+Shift+N', click: () => createTab('staunt://newtab', { isIncognito: true }) },
       { type: 'separator' },
+      { label: 'Save Page As...', accelerator: 'CmdOrCtrl+S', click: () => saveCurrentPage() },
       { label: 'Close Tab', accelerator: 'CmdOrCtrl+W', click: () => closeTab(activeTabId) },
       { label: 'Reopen Closed Tab', accelerator: 'CmdOrCtrl+Shift+T', click: () => undoCloseTab() },
       { type: 'separator' },
@@ -1038,6 +1087,7 @@ function setupWebContentsEvents(tabObj) {
           <div class="code">${errorDescription} (${errorCode})</div>
           <div class="btn-group">
             <button onclick="location.reload()">🔄 Try Again</button>
+            <button class="sec" onclick="history.back()">⬅ Go Back</button>
             <button class="sec" onclick="location.href='${STAUNT_SEARCH_URL}/?q=${encodeURIComponent(validatedURL)}'">🔍 Search on STAUNT</button>
           </div>
         </div>
@@ -1404,7 +1454,7 @@ function handleNavigate(url) {
 }
 
 function handleHome() {
-  handleNavigate('staunt://newtab');
+  handleNavigate((settingsDB && settingsDB.homeUrl) ? settingsDB.homeUrl : 'staunt://newtab');
 }
 
 ipcMain.on('navigate-to', (e, url) => {
@@ -1845,6 +1895,14 @@ ipcMain.handle('save-settings', (e, newSettings) => {
     } catch (err) {}
   }
   return { success: true, settings: settingsDB };
+});
+
+ipcMain.on('save-page', (e) => {
+  if (verifyIpcSender(e)) saveCurrentPage();
+});
+
+ipcMain.on('reorder-tabs', (e, ids) => {
+  if (verifyIpcSender(e)) reorderTabs(ids);
 });
 
 ipcMain.on('toggle-devtools', (e) => {

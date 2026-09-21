@@ -115,9 +115,19 @@ const secureAPI = Object.freeze({
     ipcRenderer.send('print-to-pdf');
   },
 
-  // Tab Cycling API
+  savePage: () => {
+    ipcRenderer.send('save-page');
+  },
+
+  // Tab Cycling & Reorder API
   cycleTab: (direction = 1) => {
     ipcRenderer.send('cycle-tab', sanitizeNumber(direction, 1));
+  },
+
+  reorderTabs: (ids) => {
+    if (Array.isArray(ids)) {
+      ipcRenderer.send('reorder-tabs', ids.map(id => sanitizeNumber(id, 0)).filter(id => id > 0));
+    }
   },
 
   // History & Bookmarks Query API

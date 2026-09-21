@@ -347,6 +347,34 @@ class TestBrowserPhase5_6(unittest.TestCase):
         self.assertIn("getDisplayNearestPoint", self.main_js)
         self.assertIn("getNormalBounds", self.main_js)
 
+    # =========================================================================
+    # 10. REAL BROWSER CAPABILITIES: SAVE PAGE, DRAG/REORDER, SETTINGS (Tests 31 - 33)
+    # =========================================================================
+    def test_31_save_page_capability(self):
+        """Verify real Save Page functionality across main, preload, and index.html."""
+        self.assertIn("function saveCurrentPage()", self.main_js)
+        self.assertIn("ipcMain.on('save-page'", self.main_js)
+        self.assertIn("savePage", self.preload_js)
+        self.assertIn('id="menuItemSavePage"', self.index_html)
+        self.assertIn("Ctrl+S", self.index_html)
+
+    def test_32_tab_drag_and_reorder(self):
+        """Verify tab drag-and-drop reordering across main, preload, and index.html."""
+        self.assertIn("function reorderTabs(", self.main_js)
+        self.assertIn("ipcMain.on('reorder-tabs'", self.main_js)
+        self.assertIn("reorderTabs", self.preload_js)
+        self.assertIn("tabEl.draggable = true", self.index_html)
+        self.assertIn("api.reorderTabs", self.index_html)
+
+    def test_33_browser_settings_and_clear_data(self):
+        """Verify dedicated settings and clear browsing data controls."""
+        self.assertIn('id="settingSearchEngine"', self.index_html)
+        self.assertIn('id="settingHomeUrl"', self.index_html)
+        self.assertIn('id="settingRestoreTabs"', self.index_html)
+        self.assertIn('id="settingShieldLevel"', self.index_html)
+        self.assertIn('id="btnSaveSettings"', self.index_html)
+        self.assertIn('id="menuItemClearData"', self.index_html)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
