@@ -19,6 +19,50 @@ const {
 const USER_DATA_PATH = app.getPath('userData');
 const WINDOW_STATE_FILE = path.join(USER_DATA_PATH, 'window-state.json');
 
+// =============================================================================
+// RESILIENT ATOMIC JSON STORAGE UTILITIES (Zero Corruption & .bak Recovery)
+// =============================================================================
+function atomicWriteJson(filePath, data) {
+  try {
+    const tempFile = `${filePath}.${Date.now()}.${Math.random().toString(36).substr(2, 6)}.tmp`;
+    const bakFile = `${filePath}.bak`;
+    const jsonContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+    fs.writeFileSync(tempFile, jsonContent, 'utf-8');
+    if (fs.existsSync(filePath)) {
+      try {
+        fs.copyFileSync(filePath, bakFile);
+      } catch (e) {}
+    }
+    fs.renameSync(tempFile, filePath);
+  } catch (err) {
+    console.warn(`[ATOMIC WRITE ERROR] Failed writing ${filePath}:`, err.message);
+    try {
+      fs.writeFileSync(filePath, typeof data === 'string' ? data : JSON.stringify(data, null, 2), 'utf-8');
+    } catch (e) {}
+  }
+}
+
+function readJsonWithBak(filePath, fallback = null) {
+  try {
+    if (fs.existsSync(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    }
+  } catch (err) {
+    console.warn(`[STORAGE RESILIENCE] Primary file corrupted: ${filePath}, attempting .bak restore:`, err.message);
+    const bakFile = `${filePath}.bak`;
+    try {
+      if (fs.existsSync(bakFile)) {
+        const restored = JSON.parse(fs.readFileSync(bakFile, 'utf-8'));
+        atomicWriteJson(filePath, restored);
+        return restored;
+      }
+    } catch (bakErr) {
+      console.error(`[STORAGE RESILIENCE] Backup restore failed for ${bakFile}:`, bakErr.message);
+    }
+  }
+  return fallback;
+}
+
 const DEFAULT_WINDOW_BOUNDS = {
   width: 1200,
   height: 800,
@@ -34,20 +78,18 @@ let windowState = { ...DEFAULT_WINDOW_BOUNDS };
 
 function loadWindowState() {
   try {
-    if (fs.existsSync(WINDOW_STATE_FILE)) {
-      const raw = JSON.parse(fs.readFileSync(WINDOW_STATE_FILE, 'utf-8'));
-      if (raw && typeof raw === 'object') {
-        if (Number.isFinite(raw.width) && raw.width >= 600) windowState.width = Math.round(raw.width);
-        if (Number.isFinite(raw.height) && raw.height >= 400) windowState.height = Math.round(raw.height);
-        if (Number.isFinite(raw.x)) windowState.x = Math.round(raw.x);
-        if (Number.isFinite(raw.y)) windowState.y = Math.round(raw.y);
-        const maxVal = Boolean(raw.isMaximized !== undefined ? raw.isMaximized : raw.maximized);
-        windowState.isMaximized = maxVal;
-        windowState.maximized = maxVal;
-        const fullVal = Boolean(raw.isFullScreen !== undefined ? raw.isFullScreen : raw.fullscreen);
-        windowState.isFullScreen = fullVal;
-        windowState.fullscreen = fullVal;
-      }
+    const raw = readJsonWithBak(WINDOW_STATE_FILE, null);
+    if (raw && typeof raw === 'object') {
+      if (Number.isFinite(raw.width) && raw.width >= 600) windowState.width = Math.round(raw.width);
+      if (Number.isFinite(raw.height) && raw.height >= 400) windowState.height = Math.round(raw.height);
+      if (Number.isFinite(raw.x)) windowState.x = Math.round(raw.x);
+      if (Number.isFinite(raw.y)) windowState.y = Math.round(raw.y);
+      const maxVal = Boolean(raw.isMaximized !== undefined ? raw.isMaximized : raw.maximized);
+      windowState.isMaximized = maxVal;
+      windowState.maximized = maxVal;
+      const fullVal = Boolean(raw.isFullScreen !== undefined ? raw.isFullScreen : raw.fullscreen);
+      windowState.isFullScreen = fullVal;
+      windowState.fullscreen = fullVal;
     }
   } catch (e) {
     console.warn('[WINDOW STATE] Failed to parse window-state.json, falling back to defaults:', e.message);
@@ -139,11 +181,7 @@ function saveWindowState() {
       fullscreen: isFull
     };
 
-    try {
-      fs.writeFileSync(WINDOW_STATE_FILE, JSON.stringify(windowState, null, 2), 'utf-8');
-    } catch (e) {
-      console.warn('[WINDOW STATE SAVE ERROR]', e.message);
-    }
+    atomicWriteJson(WINDOW_STATE_FILE, windowState);
   }
 }
 
@@ -218,37 +256,11 @@ const DEFAULT_SETTINGS = {
 };
 let settingsDB = { ...DEFAULT_SETTINGS };
 
-try {
-  if (fs.existsSync(HISTORY_FILE)) {
-    historyDB = JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf-8'));
-  }
-} catch (e) {
-  historyDB = [];
-}
-
-try {
-  if (fs.existsSync(BOOKMARKS_FILE)) {
-    bookmarksDB = JSON.parse(fs.readFileSync(BOOKMARKS_FILE, 'utf-8'));
-  }
-} catch (e) {
-  bookmarksDB = [];
-}
-
-try {
-  if (fs.existsSync(DOWNLOADS_FILE)) {
-    downloadsDB = JSON.parse(fs.readFileSync(DOWNLOADS_FILE, 'utf-8'));
-  }
-} catch (e) {
-  downloadsDB = [];
-}
-
-try {
-  if (fs.existsSync(SETTINGS_FILE)) {
-    settingsDB = { ...DEFAULT_SETTINGS, ...JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf-8')) };
-  }
-} catch (e) {
-  settingsDB = { ...DEFAULT_SETTINGS };
-}
+historyDB = readJsonWithBak(HISTORY_FILE, []) || [];
+bookmarksDB = readJsonWithBak(BOOKMARKS_FILE, []) || [];
+downloadsDB = readJsonWithBak(DOWNLOADS_FILE, []) || [];
+const loadedSettings = readJsonWithBak(SETTINGS_FILE, null);
+settingsDB = loadedSettings ? { ...DEFAULT_SETTINGS, ...loadedSettings } : { ...DEFAULT_SETTINGS };
 
 function recordHistory(url, title) {
   if (!url || typeof url !== 'string') return;
@@ -265,9 +277,7 @@ function recordHistory(url, title) {
   historyDB.unshift(entry);
   if (historyDB.length > 5000) historyDB.pop();
   
-  try {
-    fs.writeFileSync(HISTORY_FILE, JSON.stringify(historyDB.slice(0, 1000)), 'utf-8');
-  } catch (e) {}
+  atomicWriteJson(HISTORY_FILE, historyDB.slice(0, 1000));
 }
 
 function clearHistoryRange(range = 'all') {
@@ -287,9 +297,7 @@ function clearHistoryRange(range = 'all') {
   } else {
     historyDB = [];
   }
-  try {
-    fs.writeFileSync(HISTORY_FILE, JSON.stringify(historyDB), 'utf-8');
-  } catch (e) {}
+  atomicWriteJson(HISTORY_FILE, historyDB);
   return { success: true, count: historyDB.length };
 }
 
@@ -302,9 +310,7 @@ function recordDownload(entry) {
     downloadsDB.unshift(entry);
     if (downloadsDB.length > 200) downloadsDB.pop();
   }
-  try {
-    fs.writeFileSync(DOWNLOADS_FILE, JSON.stringify(downloadsDB.slice(0, 100)), 'utf-8');
-  } catch (e) {}
+  atomicWriteJson(DOWNLOADS_FILE, downloadsDB.slice(0, 100));
 }
 
 const SESSION_FILE = path.join(USER_DATA_PATH, 'staunt_session_tabs.json');
@@ -322,24 +328,20 @@ function saveSessionTabs() {
       });
     }
   }
-  try {
-    fs.writeFileSync(SESSION_FILE, JSON.stringify(sessionTabs), 'utf-8');
-  } catch (e) {}
+  atomicWriteJson(SESSION_FILE, sessionTabs);
 }
 
 function restoreSessionTabs() {
   try {
-    if (fs.existsSync(SESSION_FILE)) {
-      const data = JSON.parse(fs.readFileSync(SESSION_FILE, 'utf-8'));
-      if (Array.isArray(data) && data.length > 0) {
-        for (const item of data) {
-          createTab(item.url || 'staunt://newtab', {
-            isPinned: Boolean(item.isPinned),
-            workspaceId: item.workspaceId
-          });
-        }
-        return true;
+    const data = readJsonWithBak(SESSION_FILE, null);
+    if (Array.isArray(data) && data.length > 0) {
+      for (const item of data) {
+        createTab(item.url || 'staunt://newtab', {
+          isPinned: Boolean(item.isPinned),
+          workspaceId: item.workspaceId
+        });
       }
+      return true;
     }
   } catch (e) {}
   return false;
@@ -387,7 +389,7 @@ function toggleBookmarkCurrentPage() {
   const existingIdx = bookmarksDB.findIndex(b => b.url === currentUrl);
   if (existingIdx !== -1) {
     bookmarksDB.splice(existingIdx, 1);
-    try { fs.writeFileSync(BOOKMARKS_FILE, JSON.stringify(bookmarksDB), 'utf-8'); } catch(e) {}
+    atomicWriteJson(BOOKMARKS_FILE, bookmarksDB);
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('bookmark-status-changed', { url: currentUrl, bookmarked: false });
     }
@@ -401,7 +403,7 @@ function toggleBookmarkCurrentPage() {
       createdAt: Date.now()
     };
     bookmarksDB.unshift(newItem);
-    try { fs.writeFileSync(BOOKMARKS_FILE, JSON.stringify(bookmarksDB), 'utf-8'); } catch(e) {}
+    atomicWriteJson(BOOKMARKS_FILE, bookmarksDB);
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('bookmark-status-changed', { url: currentUrl, bookmarked: true, bookmark: newItem });
     }
@@ -412,20 +414,20 @@ function toggleBookmarkCurrentPage() {
 function deleteBookmark(id) {
   const initLen = bookmarksDB.length;
   bookmarksDB = bookmarksDB.filter(b => b.id !== id);
-  try { fs.writeFileSync(BOOKMARKS_FILE, JSON.stringify(bookmarksDB), 'utf-8'); } catch(e) {}
+  atomicWriteJson(BOOKMARKS_FILE, bookmarksDB);
   return { success: bookmarksDB.length < initLen };
 }
 
 function deleteHistoryItem(id) {
   const initLen = historyDB.length;
   historyDB = historyDB.filter(h => h.id !== id);
-  try { fs.writeFileSync(HISTORY_FILE, JSON.stringify(historyDB), 'utf-8'); } catch(e) {}
+  atomicWriteJson(HISTORY_FILE, historyDB);
   return { success: historyDB.length < initLen };
 }
 
 function clearDownloads() {
   downloadsDB = [];
-  try { fs.writeFileSync(DOWNLOADS_FILE, JSON.stringify([]), 'utf-8'); } catch(e) {}
+  atomicWriteJson(DOWNLOADS_FILE, []);
   return { success: true };
 }
 
@@ -453,7 +455,7 @@ function bookmarkCurrentPage() {
   if (tab) {
     const item = { title: tab.title, url: tab.url, favicon: tab.favicon };
     bookmarksDB.push({ id: Date.now().toString(36), ...item });
-    try { fs.writeFileSync(BOOKMARKS_FILE, JSON.stringify(bookmarksDB), 'utf-8'); } catch(e) {}
+    atomicWriteJson(BOOKMARKS_FILE, bookmarksDB);
     if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('bookmark-added', item);
   }
 }
@@ -807,10 +809,16 @@ function createMainWindow() {
       try {
         detachTabView(tab);
         if (tab.view && tab.view.webContents && !tab.view.webContents.isDestroyed()) {
+          tab.view.webContents.stop();
           tab.view.webContents.close();
+          if (typeof tab.view.webContents.destroy === 'function') {
+            tab.view.webContents.destroy();
+          }
         }
+        tab.view = null;
       } catch (e) {}
     }
+    tabs.clear();
   });
   
   mainWindow.on('closed', () => {
@@ -1233,10 +1241,15 @@ function closeTab(tabId) {
 
   try {
     if (tab.view && tab.view.webContents && !tab.view.webContents.isDestroyed()) {
+      tab.view.webContents.stop();
       tab.view.webContents.close();
+      if (typeof tab.view.webContents.destroy === 'function') {
+        tab.view.webContents.destroy();
+      }
     }
   } catch(e) {}
 
+  tab.view = null;
   tabs.delete(tabId);
 
   if (secondaryTabId === tabId) {
@@ -1324,9 +1337,14 @@ setInterval(() => {
       detachTabView(tab);
       try {
         if (tab.view && tab.view.webContents && !tab.view.webContents.isDestroyed()) {
+          tab.view.webContents.stop();
           tab.view.webContents.close();
+          if (typeof tab.view.webContents.destroy === 'function') {
+            tab.view.webContents.destroy();
+          }
         }
       } catch(e) {}
+      tab.view = null;
       tab.isHibernated = true;
       notifyTabUpdated(tab);
     }
@@ -1674,9 +1692,7 @@ ipcMain.on('add-bookmark', (e, item) => {
       url: typeof item.url === 'string' ? item.url.slice(0, 2048) : '',
       favicon: typeof item.favicon === 'string' ? item.favicon.slice(0, 2048) : ''
     });
-    try {
-      fs.writeFileSync(BOOKMARKS_FILE, JSON.stringify(bookmarksDB), 'utf-8');
-    } catch (e) {}
+    atomicWriteJson(BOOKMARKS_FILE, bookmarksDB);
   }
 });
 
@@ -1764,14 +1780,20 @@ ipcMain.handle('get-downloads', (e) => {
 ipcMain.on('open-download', (e, itemPath) => {
   if (!verifyIpcSender(e)) return;
   if (typeof itemPath === 'string' && itemPath.trim()) {
-    shell.openPath(itemPath.trim());
+    const cleanPath = path.normalize(itemPath.trim());
+    if (fs.existsSync(cleanPath)) {
+      shell.openPath(cleanPath);
+    }
   }
 });
 
 ipcMain.on('show-in-folder', (e, itemPath) => {
   if (!verifyIpcSender(e)) return;
   if (typeof itemPath === 'string' && itemPath.trim()) {
-    shell.showItemInFolder(itemPath.trim());
+    const cleanPath = path.normalize(itemPath.trim());
+    if (fs.existsSync(cleanPath)) {
+      shell.showItemInFolder(cleanPath);
+    }
   }
 });
 
@@ -1889,10 +1911,27 @@ ipcMain.handle('get-settings', (e) => {
 ipcMain.handle('save-settings', (e, newSettings) => {
   if (!verifyIpcSender(e)) return { success: false };
   if (newSettings && typeof newSettings === 'object') {
-    settingsDB = { ...settingsDB, ...newSettings };
-    try {
-      fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settingsDB, null, 2), 'utf-8');
-    } catch (err) {}
+    const validated = {};
+    if (typeof newSettings.searchEngine === 'string' && ['staunt', 'google', 'duckduckgo', 'bing'].includes(newSettings.searchEngine.toLowerCase())) {
+      validated.searchEngine = newSettings.searchEngine.toLowerCase();
+    }
+    if (typeof newSettings.searchUrl === 'string' && /^https?:\/\//i.test(newSettings.searchUrl.trim())) {
+      validated.searchUrl = newSettings.searchUrl.trim().slice(0, 512);
+    }
+    if (typeof newSettings.homeUrl === 'string' && (/^https?:\/\//i.test(newSettings.homeUrl.trim()) || newSettings.homeUrl.trim().startsWith('staunt://') || newSettings.homeUrl.trim().startsWith('file://'))) {
+      validated.homeUrl = newSettings.homeUrl.trim().slice(0, 512);
+    }
+    if (typeof newSettings.shieldLevel === 'string' && ['strict', 'standard', 'off'].includes(newSettings.shieldLevel.toLowerCase())) {
+      validated.shieldLevel = newSettings.shieldLevel.toLowerCase();
+    }
+    if (typeof newSettings.hardwareAcceleration === 'boolean') {
+      validated.hardwareAcceleration = newSettings.hardwareAcceleration;
+    }
+    if (typeof newSettings.restoreTabsOnStartup === 'boolean') {
+      validated.restoreTabsOnStartup = newSettings.restoreTabsOnStartup;
+    }
+    settingsDB = { ...settingsDB, ...validated };
+    atomicWriteJson(SETTINGS_FILE, settingsDB);
   }
   return { success: true, settings: settingsDB };
 });

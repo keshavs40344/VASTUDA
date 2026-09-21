@@ -1,0 +1,73 @@
+{
+  "totalTabs": 50,
+  "openElapsedMs": 1099,
+  "closeElapsedMs": 236,
+  "baselineMem": {
+    "rss": 74.21,
+    "heapUsed": 3.85,
+    "heapTotal": 6.52
+  },
+  "peakMem": {
+    "rss": 111.53,
+    "heapUsed": 3.98,
+    "heapTotal": 8.77
+  },
+  "postCloseMem": {
+    "rss": 115.74,
+    "heapUsed": 4.14,
+    "heapTotal": 8.77
+  },
+  "rssDeltaMB": 41.53,
+  "heapDeltaMB": 0.29,
+  "history": [
+    {
+      "step": "baseline",
+      "rss": 74.21,
+      "heapUsed": 3.85,
+      "heapTotal": 6.52
+    },
+    {
+      "step": "opened_10",
+      "rss": 90.02,
+      "heapUsed": 3.98,
+      "heapTotal": 6.52
+    },
+    {
+      "step": "opened_20",
+      "rss": 98.1,
+      "heapUsed": 4.09,
+      "heapTotal": 6.52
+    },
+    {
+      "step": "opened_30",
+      "rss": 102.04,
+      "heapUsed": 4.19,
+      "heapTotal": 6.52
+    },
+    {
+      "step": "opened_40",
+      "rss": 107.29,
+      "heapUsed": 3.86,
+      "heapTotal": 8.77
+    },
+    {
+      "step": "opened_50",
+      "rss": 111.53,
+      "heapUsed": 3.98,
+      "heapTotal": 8.77
+    },
+    {
+      "step": "peak_50_open",
+      "rss": 111.53,
+      "heapUsed": 3.98,
+      "heapTotal": 8.77
+    },
+    {
+      "step": "post_close",
+      "rss": 115.74,
+      "heapUsed": 4.14,
+      "heapTotal": 8.77
+    }
+  ],
+  "status": "PASS"
+}

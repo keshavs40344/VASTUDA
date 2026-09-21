@@ -1,0 +1,17 @@
+{
+  "window_creation_ms": 117.63,
+  "ui_load_ms": 936.88,
+  "new_tab_creation_ms": 5.29,
+  "newtab_navigation_ms": 936.36,
+  "tab_switching_ms": 0.12,
+  "history_query_ms": 0.2,
+  "bookmarks_query_ms": 0.11,
+  "settings_open_ms": 0.06,
+  "startup_to_interactive_ms": 1999.82,
+  "process_total_elapsed_ms": 3361.57,
+  "avg_memory_rss_mb": 255.19,
+  "peak_memory_rss_mb": 481.73,
+  "avg_cpu_percent": 50.26,
+  "autocomplete_latency_ms": 204.88,
+  "search_api_latency_ms": 1645.51
+}
