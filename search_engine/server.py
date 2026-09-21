@@ -45,7 +45,19 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger("VASTUDA_Server")
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
-app.secret_key = os.getenv("SECRET_KEY", "vastuda-secret-session-key-2026-secure-ultra")
+
+# --- SECRET KEY: no insecure hardcoded fallback ---
+_secret_key = os.getenv("SECRET_KEY", "").strip()
+if not _secret_key:
+    _is_local = os.getenv("FLASK_ENV", "production").lower() in ("development", "dev", "local")
+    if _is_local:
+        import secrets as _secrets
+        _secret_key = _secrets.token_hex(32)
+        logger.warning("[SECURITY] SECRET_KEY not set; using random ephemeral key (dev mode). Set SECRET_KEY env var for production.")
+    else:
+        logger.critical("[SECURITY] SECRET_KEY env var is not set. Refusing to start in production without a secure secret.")
+        raise RuntimeError("SECRET_KEY environment variable must be set in production. Aborting startup.")
+app.secret_key = _secret_key
 
 ASSETS_DIR = os.path.join(BASE_DIR, "public", "assets")
 
@@ -65,35 +77,149 @@ threading.Thread(target=ensure_seed_index, daemon=True).start()
 RATE_LIMIT_BUCKETS = {}
 RATE_LIMIT_LOCK = threading.Lock()
 
+# Per-endpoint rate limits (requests per window_sec per IP)
+_RATE_LIMITS = {
+    "/api/search":   (60, 60),    # 60 req/min — heavier, external fetches
+    "/api/overview": (30, 60),    # 30 req/min — LLM calls
+    "/api/suggest":  (200, 60),   # 200 req/min — lightweight autocomplete
+    "/api/":         (120, 60),   # 120 req/min — general API catch-all
+}
+
+def _get_rate_limit_for_path(path):
+    """Return (limit, window_sec) for a given request path."""
+    for prefix in ("/api/search", "/api/overview", "/api/suggest"):
+        if path.startswith(prefix):
+            return _RATE_LIMITS[prefix]
+    return _RATE_LIMITS["/api/"]
+
 def is_rate_limited(ip, limit=120, window_sec=60):
     now = time.time()
+    bucket_key = f"{ip}"
     with RATE_LIMIT_LOCK:
-        times = RATE_LIMIT_BUCKETS.get(ip, [])
+        times = RATE_LIMIT_BUCKETS.get(bucket_key, [])
         times = [t for t in times if now - t < window_sec]
         if len(times) >= limit:
-            RATE_LIMIT_BUCKETS[ip] = times
+            RATE_LIMIT_BUCKETS[bucket_key] = times
             return True
         times.append(now)
-        RATE_LIMIT_BUCKETS[ip] = times
+        RATE_LIMIT_BUCKETS[bucket_key] = times
         return False
 
+def is_rate_limited_for_path(ip, path):
+    """Check per-endpoint rate limit; uses separate bucket per (ip, endpoint-prefix)."""
+    limit, window_sec = _get_rate_limit_for_path(path)
+    now = time.time()
+    # Determine bucket prefix
+    bucket_prefix = "/api/"
+    for prefix in ("/api/search", "/api/overview", "/api/suggest"):
+        if path.startswith(prefix):
+            bucket_prefix = prefix
+            break
+    bucket_key = f"{ip}:{bucket_prefix}"
+    with RATE_LIMIT_LOCK:
+        times = RATE_LIMIT_BUCKETS.get(bucket_key, [])
+        times = [t for t in times if now - t < window_sec]
+        if len(times) >= limit:
+            RATE_LIMIT_BUCKETS[bucket_key] = times
+            return True, window_sec
+        times.append(now)
+        RATE_LIMIT_BUCKETS[bucket_key] = times
+        return False, window_sec
+
+# --- CORS: allowed origins (non-wildcard in production) ---
+_DEFAULT_ORIGINS = ",".join([
+    "https://vastuda-search.onrender.com",
+    "http://localhost:5000",
+    "http://127.0.0.1:5000",
+    "http://localhost:3000",
+    "app://.",           # Electron app:// scheme
+])
+_ALLOWED_ORIGINS_RAW = os.getenv("ALLOWED_ORIGINS", _DEFAULT_ORIGINS)
+ALLOWED_ORIGINS = set(o.strip() for o in _ALLOWED_ORIGINS_RAW.split(",") if o.strip())
+
+def _get_cors_origin(request_origin):
+    """Return the matching allowed origin or None."""
+    if not request_origin:
+        return None
+    # Exact match
+    if request_origin in ALLOWED_ORIGINS:
+        return request_origin
+    # Allow any localhost port for dev convenience
+    if request_origin.startswith(("http://localhost:", "http://127.0.0.1:")):
+        return request_origin
+    # Allow Electron app:// scheme
+    if request_origin.startswith("app://"):
+        return request_origin
+    return None
+
 @app.before_request
-def enforce_rate_limit():
+def handle_preflight_and_rate_limit():
+    """Handle CORS preflight + per-endpoint rate limiting with Retry-After."""
+    # Handle OPTIONS preflight
+    if request.method == "OPTIONS":
+        origin = request.headers.get("Origin", "")
+        allowed = _get_cors_origin(origin)
+        resp = app.make_default_options_response()
+        if allowed:
+            resp.headers["Access-Control-Allow-Origin"] = allowed
+            resp.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+            resp.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+            resp.headers["Access-Control-Max-Age"] = "600"
+            resp.headers["Vary"] = "Origin"
+        return resp
+
+    # Per-endpoint rate limiting
     if request.path.startswith("/api/"):
         client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "127.0.0.1").split(",")[0].strip()
-        if is_rate_limited(client_ip, limit=120, window_sec=60):
-            return jsonify({"error": "Rate limit exceeded. Please slow down.", "status": 429}), 429
+        limited, window_sec = is_rate_limited_for_path(client_ip, request.path)
+        if limited:
+            resp = jsonify({"error": "Rate limit exceeded. Please slow down.", "status": 429})
+            resp.status_code = 429
+            resp.headers["Retry-After"] = str(window_sec)
+            return resp
 
 @app.after_request
 def add_security_headers(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    # --- CORS: non-wildcard, origin-reflected ---
+    origin = request.headers.get("Origin", "")
+    allowed_origin = _get_cors_origin(origin)
+    if allowed_origin:
+        response.headers["Access-Control-Allow-Origin"] = allowed_origin
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Vary"] = "Origin"
+    # No ACAO header at all for disallowed origins (safest default)
+
+    # --- Standard security headers ---
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "SAMEORIGIN"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+
+    # --- Content-Security-Policy ---
+    # Compatible with VASTUDA search UI: allows inline styles/scripts (needed for the
+    # existing vanilla-JS UI), Wikimedia images, Google Fonts, and external APIs.
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "font-src 'self' https://fonts.gstatic.com data:; "
+        "img-src 'self' data: https: blob:; "
+        "connect-src 'self' https://vastuda-search.onrender.com https://paying-andrews-focused-potential.trycloudflare.com http://localhost:5000 http://127.0.0.1:5000; "
+        "media-src 'self' blob:; "
+        "object-src 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self';"
+    )
+    response.headers["Content-Security-Policy"] = csp
+
+    # --- HSTS: only when behind HTTPS (Cloudflare, Render, or any TLS proxy) ---
+    forwarded_proto = request.headers.get("X-Forwarded-Proto", "")
+    if forwarded_proto == "https" or request.is_secure:
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
     return response
+
 
 # --- Production Health & Legal Endpoints ---
 def get_git_commit_sha():

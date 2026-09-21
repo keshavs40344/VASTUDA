@@ -248,7 +248,7 @@ let bookmarksDB = [];
 let downloadsDB = [];
 const DEFAULT_SETTINGS = {
   searchEngine: 'staunt',
-  searchUrl: 'http://127.0.0.1:5000',
+  searchUrl: 'https://vastuda-search.onrender.com',
   homeUrl: 'staunt://newtab',
   shieldLevel: 'standard',
   hardwareAcceleration: true,
@@ -1412,10 +1412,19 @@ function toggleSplitView(secId) {
   }
 }
 
-// =============================================================================
 // URL SANITIZER & PARSER (Intelligent URL vs STAUNT Search)
 // =============================================================================
-const STAUNT_SEARCH_URL = process.env.STAUNT_SEARCH_URL || 'http://127.0.0.1:5000';
+// Production URL resolution (3-tier):
+//   1. STAUNT_SEARCH_URL env var — highest priority (set per-environment)
+//   2. vastuda-search.onrender.com — permanent production URL (Render.com)
+//   3. http://127.0.0.1:5000 — local development fallback
+// NOTE: The temporary trycloudflare URL is NEVER used here by design.
+const STAUNT_SEARCH_URL = (
+  process.env.STAUNT_SEARCH_URL ||
+  'https://vastuda-search.onrender.com' ||
+  'http://127.0.0.1:5000'
+);
+
 
 function formatUrlOrSearch(input) {
   const trimmed = (input || '').trim().slice(0, 2048);
