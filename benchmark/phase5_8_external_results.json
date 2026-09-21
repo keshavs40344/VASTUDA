@@ -1,0 +1,82 @@
+{
+  "base_url": "https://bubble-background-dose-celebs.trycloudflare.com",
+  "results": [
+    {
+      "query": "python",
+      "status": 200,
+      "count": 10,
+      "provider": "hybrid_vastuda",
+      "latency_ms": 204
+    },
+    {
+      "query": "India",
+      "status": 200,
+      "count": 10,
+      "provider": "hybrid_vastuda",
+      "latency_ms": 2927
+    },
+    {
+      "query": "Delhi",
+      "status": 200,
+      "count": 1,
+      "provider": "local_index",
+      "latency_ms": 2280
+    },
+    {
+      "query": "CA Foundation",
+      "status": 200,
+      "count": 10,
+      "provider": "local_index",
+      "latency_ms": 1757
+    },
+    {
+      "query": "namaste bharat",
+      "status": 200,
+      "count": 4,
+      "provider": "local_index",
+      "latency_ms": 1686
+    },
+    {
+      "query": "aaj ka mausam kaisa hai",
+      "status": 200,
+      "count": 4,
+      "provider": "local_index",
+      "latency_ms": 2063
+    },
+    {
+      "query": "what is artificial intelligence",
+      "status": 200,
+      "count": 10,
+      "provider": "local_index",
+      "latency_ms": 1364
+    },
+    {
+      "query": "machine learning",
+      "status": 200,
+      "count": 10,
+      "provider": "hybrid_vastuda",
+      "latency_ms": 2498
+    },
+    {
+      "query": "weather today",
+      "status": 200,
+      "count": 10,
+      "provider": "hybrid_vastuda",
+      "latency_ms": 2343
+    },
+    {
+      "query": "github copilot",
+      "status": 200,
+      "count": 10,
+      "provider": "hybrid_vastuda",
+      "latency_ms": 2578
+    },
+    {
+      "query": "how to learn coding",
+      "status": 200,
+      "count": 10,
+      "provider": "hybrid_vastuda",
+      "latency_ms": 2049
+    }
+  ]
+}

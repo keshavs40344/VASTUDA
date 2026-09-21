@@ -1,0 +1,29 @@
+{
+  "concurrency_10": {
+    "concurrency": 10,
+    "total_time_s": 2.76,
+    "successful": 10,
+    "rate_limited": 0,
+    "errors": 0,
+    "latency_p50_ms": 2317.5,
+    "latency_p95_ms": 2735.2
+  },
+  "concurrency_25": {
+    "concurrency": 25,
+    "total_time_s": 0.94,
+    "successful": 25,
+    "rate_limited": 0,
+    "errors": 0,
+    "latency_p50_ms": 508.5,
+    "latency_p95_ms": 790.9
+  },
+  "concurrency_50": {
+    "concurrency": 50,
+    "total_time_s": 0.98,
+    "successful": 13,
+    "rate_limited": 37,
+    "errors": 0,
+    "latency_p50_ms": 469.4,
+    "latency_p95_ms": 559.4
+  }
+}

@@ -1418,7 +1418,7 @@ function toggleSplitView(secId) {
 //   1. STAUNT_SEARCH_URL env var — highest priority (set per-environment)
 //   2. vastuda-search.onrender.com — permanent production URL (Render.com)
 //   3. http://127.0.0.1:5000 — local development fallback
-// NOTE: The temporary trycloudflare URL is NEVER used here by design.
+// NOTE: Temporary ephemeral tunnels are NEVER used here by design.
 const STAUNT_SEARCH_URL = (
   process.env.STAUNT_SEARCH_URL ||
   'https://vastuda-search.onrender.com' ||
