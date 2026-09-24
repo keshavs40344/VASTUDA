@@ -14,13 +14,21 @@ class VercelPathFixer:
     WSGI middleware for Vercel Serverless deployment.
     Vercel edge router passes the original request path in HTTP_X_MATCHED_PATH
     (or HTTP_X_VERCEL_MATCHED_PATH / HTTP_X_FORWARDED_URI), while PATH_INFO
-    is rewritten to /api/index. This middleware restores the true PATH_INFO
+    is rewritten to /api/index.py. This middleware restores the true PATH_INFO
     and QUERY_STRING so Flask route matching works identically to local & container environments.
     """
     def __init__(self, wsgi_app):
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
+        # Diagnostic inspection parameter
+        if "debug_env=1" in environ.get("QUERY_STRING", ""):
+            import json
+            safe_env = {k: str(v) for k, v in environ.items() if not any(s in k.lower() for s in ["key", "secret", "token", "password", "auth"])}
+            body = json.dumps(safe_env, indent=2).encode("utf-8")
+            start_response("200 OK", [("Content-Type", "application/json"), ("Content-Length", str(len(body)))])
+            return [body]
+
         matched_path = (
             environ.get("HTTP_X_MATCHED_PATH")
             or environ.get("HTTP_X_VERCEL_MATCHED_PATH")
