@@ -7,15 +7,19 @@ import uuid
 import logging
 import threading
 import urllib.parse
-from flask import Flask, request, jsonify, render_template, send_from_directory, send_file, session
+from flask import Flask, request, jsonify, render_template, send_from_directory, send_file, session, redirect
 import requests
 from dotenv import load_dotenv
 
 import sys
 import types
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
-SEARCH_ENGINE_DIR = os.path.dirname(BACKEND_DIR)
-STAUNT_ROOT = os.path.dirname(SEARCH_ENGINE_DIR)
+if os.path.basename(BACKEND_DIR) in ("backend", "server"):
+    SEARCH_ENGINE_DIR = os.path.dirname(BACKEND_DIR)
+    STAUNT_ROOT = os.path.dirname(SEARCH_ENGINE_DIR)
+else:
+    SEARCH_ENGINE_DIR = BACKEND_DIR
+    STAUNT_ROOT = os.path.dirname(SEARCH_ENGINE_DIR)
 BASE_DIR = STAUNT_ROOT
 
 if BACKEND_DIR not in sys.path:
@@ -128,6 +132,8 @@ def is_rate_limited_for_path(ip, path):
 
 # --- CORS: allowed origins (non-wildcard in production) ---
 _DEFAULT_ORIGINS = ",".join([
+    "https://staunt.vercel.app",
+    "https://vastuda.vercel.app",
     "http://localhost:5000",
     "http://127.0.0.1:5000",
     "http://localhost:3000",
@@ -148,6 +154,9 @@ def _get_cors_origin(request_origin):
         return request_origin
     # Allow any localhost port for dev convenience
     if request_origin.startswith(("http://localhost:", "http://127.0.0.1:")):
+        return request_origin
+    # Allow Vercel preview deployments
+    if request_origin.endswith(".vercel.app") and ("staunt" in request_origin or "vastuda" in request_origin):
         return request_origin
     # Allow Electron app:// scheme
     if request_origin.startswith("app://"):
@@ -260,11 +269,13 @@ def get_git_commit_sha():
 
 
 @app.route("/health", methods=["GET"])
+@app.route("/api/health", methods=["GET"])
 def health_check():
     return jsonify({
         "status": "ok",
+        "service": "staunt-search-api",
+        "search": True,
         "version": "5.4",
-        "service": "STAUNT Sovereign Search & Discovery Engine",
         "timestamp": int(time.time())
     })
 
@@ -281,18 +292,38 @@ def api_version():
 @app.route("/privacy", methods=["GET"])
 @app.route("/privacy-policy", methods=["GET"])
 def privacy_policy_route():
-    privacy_file = os.path.join(BASE_DIR, "public", "privacy.html")
-    if os.path.exists(privacy_file):
-        return send_file(privacy_file)
-    return render_template("index.html")
+    candidates = [
+        os.path.join(BASE_DIR, "public", "privacy.html"),
+        os.path.join(BASE_DIR, "search-engine", "templates", "privacy.html"),
+        os.path.join(BASE_DIR, "search_engine", "templates", "privacy.html"),
+        os.path.join(os.path.dirname(__file__), "..", "templates", "privacy.html"),
+        os.path.join(os.path.dirname(__file__), "..", "..", "public", "privacy.html"),
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            return send_file(p, mimetype="text/html")
+    try:
+        return render_template("privacy.html")
+    except Exception:
+        return render_template("index.html")
 
 @app.route("/terms", methods=["GET"])
 @app.route("/terms-of-service", methods=["GET"])
 def terms_of_service_route():
-    terms_file = os.path.join(BASE_DIR, "public", "terms.html")
-    if os.path.exists(terms_file):
-        return send_file(terms_file)
-    return render_template("index.html")
+    candidates = [
+        os.path.join(BASE_DIR, "public", "terms.html"),
+        os.path.join(BASE_DIR, "search-engine", "templates", "terms.html"),
+        os.path.join(BASE_DIR, "search_engine", "templates", "terms.html"),
+        os.path.join(os.path.dirname(__file__), "..", "templates", "terms.html"),
+        os.path.join(os.path.dirname(__file__), "..", "..", "public", "terms.html"),
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            return send_file(p, mimetype="text/html")
+    try:
+        return render_template("terms.html")
+    except Exception:
+        return render_template("index.html")
 
 # --- Production Error Handling ---
 @app.errorhandler(400)
@@ -754,44 +785,77 @@ def research_page():
     return render_template("research.html")
 
 
+GITHUB_RELEASE_BASE = "https://raw.githubusercontent.com/keshavs40344/STAUNT/main/releases"
+
 @app.route("/download/windows")
 def download_windows():
+    if os.environ.get("VERCEL"):
+        return redirect(f"{GITHUB_RELEASE_BASE}/STAUNT-Windows-Setup.exe", code=302)
     for name in ["STAUNT-Windows-Setup.exe", "Staunt-Browser-Setup.exe", "Staunt Browser Ultra Setup 2.0.0.exe"]:
         p = os.path.join(ASSETS_DIR, name)
         if os.path.exists(p):
             return send_file(p, as_attachment=True, download_name="STAUNT-Windows-Setup.exe")
-    return jsonify({"error": "Windows installer binary not found in releases"}), 404
+    return redirect(f"{GITHUB_RELEASE_BASE}/STAUNT-Windows-Setup.exe", code=302)
 
 
 @app.route("/download/windows-portable")
 def download_windows_portable():
+    if os.environ.get("VERCEL"):
+        return redirect(f"{GITHUB_RELEASE_BASE}/STAUNT-Windows-Portable.zip", code=302)
     for name in ["STAUNT-Windows-Portable.zip", "Staunt-Browser-Windows-Setup.zip"]:
         p = os.path.join(ASSETS_DIR, name)
         if os.path.exists(p):
             return send_file(p, as_attachment=True, download_name="STAUNT-Windows-Portable.zip")
-    return jsonify({"error": "Windows portable package not found in releases"}), 404
+    return redirect(f"{GITHUB_RELEASE_BASE}/STAUNT-Windows-Portable.zip", code=302)
 
 
 @app.route("/download/android")
 def download_android():
+    if os.environ.get("VERCEL"):
+        return redirect(f"{GITHUB_RELEASE_BASE}/STAUNT-Android.apk", code=302)
     for name in ["STAUNT-Android.apk", "staunt-browser-release.apk", "Staunt-Browser-Mobile.apk"]:
         p = os.path.join(ASSETS_DIR, name)
         if os.path.exists(p):
             return send_file(p, as_attachment=True, download_name="STAUNT-Android.apk")
-    return jsonify({"error": "Android APK binary not found in releases"}), 404
+    return redirect(f"{GITHUB_RELEASE_BASE}/STAUNT-Android.apk", code=302)
 
 
 @app.route("/api/releases", methods=["GET"])
 def api_releases():
-    manifest_path = os.path.join(ASSETS_DIR, "releases.json")
-    if os.path.exists(manifest_path):
-        try:
-            with open(manifest_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            return jsonify(data)
-        except Exception as e:
-            return jsonify({"error": f"Failed to parse releases manifest: {e}"}), 500
-    return jsonify([]), 404
+    for candidate in [
+        os.path.join(ASSETS_DIR, "releases.json"),
+        os.path.join(STAUNT_ROOT, "releases", "releases.json"),
+        os.path.join(BASE_DIR, "releases", "releases.json"),
+    ]:
+        if os.path.exists(candidate):
+            try:
+                with open(candidate, "r", encoding="utf-8") as f:
+                    return jsonify(json.load(f))
+            except Exception:
+                pass
+    return jsonify([
+        {
+            "platform": "Windows",
+            "filename": "STAUNT-Windows-Setup.exe",
+            "version": "1.0.0",
+            "size_bytes": 83706273,
+            "download_url": f"{GITHUB_RELEASE_BASE}/STAUNT-Windows-Setup.exe"
+        },
+        {
+            "platform": "Windows",
+            "filename": "STAUNT-Windows-Portable.zip",
+            "version": "1.0.0",
+            "size_bytes": 83713684,
+            "download_url": f"{GITHUB_RELEASE_BASE}/STAUNT-Windows-Portable.zip"
+        },
+        {
+            "platform": "Android",
+            "filename": "STAUNT-Android.apk",
+            "version": "1.0.0",
+            "size_bytes": 2220762,
+            "download_url": f"{GITHUB_RELEASE_BASE}/STAUNT-Android.apk"
+        }
+    ])
 
 
 @app.route("/assets/<path:filename>")

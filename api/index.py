@@ -25,22 +25,29 @@ class VercelPathRewriteMiddleware:
 
     def __call__(self, environ, start_response):
         environ["SCRIPT_NAME"] = ""
-        matched = (
-            environ.get("HTTP_X_MATCHED_PATH") or
-            environ.get("HTTP_X_VERCEL_MATCHED_PATH") or
-            environ.get("HTTP_X_FORWARDED_URI") or
-            environ.get("REQUEST_URI") or
-            environ.get("RAW_URI")
-        )
-        if matched:
-            clean = matched.split("?", 1)[0]
-            if clean and clean not in ("/api/index", "/api/index.py"):
-                environ["PATH_INFO"] = clean
-            elif clean in ("/api/index", "/api/index.py"):
-                environ["PATH_INFO"] = "/"
-            if "?" in matched and not environ.get("QUERY_STRING"):
-                environ["QUERY_STRING"] = matched.split("?", 1)[1]
-        elif environ.get("PATH_INFO") in ("/api/index", "/api/index.py", ""):
+        # Prioritize real path headers over the internal rewrite destination (/api/index)
+        candidates = [
+            environ.get("HTTP_X_FORWARDED_URI"),
+            environ.get("REQUEST_URI"),
+            environ.get("RAW_URI"),
+            environ.get("HTTP_X_MATCHED_PATH"),
+            environ.get("HTTP_X_VERCEL_MATCHED_PATH"),
+            environ.get("PATH_INFO"),
+        ]
+        chosen = None
+        for c in candidates:
+            if c:
+                clean_c = c.split("?", 1)[0]
+                if clean_c and clean_c not in ("/api/index", "/api/index.py"):
+                    chosen = c
+                    break
+
+        if chosen:
+            clean = chosen.split("?", 1)[0]
+            environ["PATH_INFO"] = clean
+            if "?" in chosen and not environ.get("QUERY_STRING"):
+                environ["QUERY_STRING"] = chosen.split("?", 1)[1]
+        else:
             environ["PATH_INFO"] = "/"
 
         return self.wsgi_app(environ, start_response)

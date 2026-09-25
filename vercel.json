@@ -1,6 +1,39 @@
 {
   "version": 2,
+  "redirects": [
+    {
+      "source": "/download/windows",
+      "destination": "https://raw.githubusercontent.com/keshavs40344/STAUNT/main/releases/STAUNT-Windows-Setup.exe",
+      "permanent": false
+    },
+    {
+      "source": "/download/windows-portable",
+      "destination": "https://raw.githubusercontent.com/keshavs40344/STAUNT/main/releases/STAUNT-Windows-Portable.zip",
+      "permanent": false
+    },
+    {
+      "source": "/download/android",
+      "destination": "https://raw.githubusercontent.com/keshavs40344/STAUNT/main/releases/STAUNT-Android.apk",
+      "permanent": false
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/terms-of-service",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/privacy-policy",
+      "destination": "/privacy-policy.html"
+    },
     {
       "source": "/health",
       "destination": "/api/health"
@@ -28,6 +61,10 @@
     {
       "source": "/api/version",
       "destination": "/api/version"
+    },
+    {
+      "source": "/api/releases",
+      "destination": "/api/releases"
     },
     {
       "source": "/(.*)",
