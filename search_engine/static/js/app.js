@@ -27,6 +27,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let pendingSaveItem = null;
   let currentReaderFontSize = 1.15; // rem
 
+  function safeOn(el, event, handler) {
+    if (el) el.addEventListener(event, handler);
+  }
+
   // DOM Elements - Navigation & Header
   const header = document.querySelector(".app-header");
   const brandLogo = document.getElementById("brandLogo");
@@ -78,8 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const aiOverviewCard = document.getElementById("aiOverviewCard");
 
-  const aiContent = document.getElementById("aiContent");
-  const aiSources = document.getElementById("aiSources");
+  const aiContent = document.getElementById("aiContent") || document.getElementById("aiOverviewBody");
+  const aiSources = document.getElementById("aiSources") || document.getElementById("aiSourcesList");
   const copyOverviewBtn = document.getElementById("copyOverviewBtn");
 
   const researchCard = document.getElementById("researchCard");
@@ -89,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const researchMethodology = document.getElementById("researchMethodology");
   const researchLimitations = document.getElementById("researchLimitations");
 
-  const webResultsSection = document.getElementById("webResultsSection");
+  const webResultsSection = document.getElementById("webResultsSection") || document.getElementById("searchResultsList");
   const codeSection = document.getElementById("codeSection");
   const docsSection = document.getElementById("docsSection");
   const shoppingSection = document.getElementById("shoppingSection");
@@ -178,6 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Clear Buttons Setup ---
   function setupClearBtn(input, btn) {
+    if (!input || !btn) return;
     input.addEventListener("input", () => {
       btn.style.display = input.value.length > 0 ? "flex" : "none";
     });
@@ -298,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuOpenSettings = document.getElementById("menuOpenSettings");
 
   if (dashboardBtn && appsMenuDropdown) {
-    dashboardBtn.addEventListener("click", (e) => {
+    safeOn(dashboardBtn, "click", (e) => {
       e.stopPropagation();
       const isVisible = appsMenuDropdown.style.display === "block";
       appsMenuDropdown.style.display = isVisible ? "none" : "block";
@@ -339,6 +344,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Voice Search Support ---
   function setupVoiceSearch(btn, input) {
+    if (!btn || !input) return;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       btn.style.display = "none";
@@ -373,6 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Search Suggestions with Full Keyboard Navigation (Phase 3) ---
   function setupSuggestions(input, box) {
+    if (!input || !box) return;
     let timeout = null;
     let selectedIndex = -1;
     let currentItems = [];
@@ -662,38 +669,40 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (e) {}
 
     // Reset section visibilities
-    instantAnswerCard.style.display = "none";
-    destinationCard.style.display = "none";
-    destHeroImgWrap.style.display = "none";
-    visualStripContainer.style.display = "none";
-    aiOverviewCard.style.display = "none";
-    researchCard.style.display = "none";
-    webResultsSection.style.display = "none";
-    codeSection.style.display = "none";
-    docsSection.style.display = "none";
-    shoppingSection.style.display = "none";
-    jobsSection.style.display = "none";
-    videosSection.style.display = "none";
-    imagesSection.style.display = "none";
-    emptyState.style.display = "none";
+    if (instantAnswerCard) instantAnswerCard.style.display = "none";
+    if (destinationCard) destinationCard.style.display = "none";
+    if (destHeroImgWrap) destHeroImgWrap.style.display = "none";
+    if (visualStripContainer) visualStripContainer.style.display = "none";
+    if (aiOverviewCard) aiOverviewCard.style.display = "none";
+    if (researchCard) researchCard.style.display = "none";
+    if (webResultsSection) webResultsSection.style.display = "none";
+    if (codeSection) codeSection.style.display = "none";
+    if (docsSection) docsSection.style.display = "none";
+    if (shoppingSection) shoppingSection.style.display = "none";
+    if (jobsSection) jobsSection.style.display = "none";
+    if (videosSection) videosSection.style.display = "none";
+    if (imagesSection) imagesSection.style.display = "none";
+    if (emptyState) emptyState.style.display = "none";
     if (resultsCountNotice) resultsCountNotice.textContent = "Searching...";
 
     // Show loading skeleton in web results
-    webResultsSection.style.display = "flex";
-    webResultsSection.innerHTML = `
-      <div class="result-card">
-        <div class="skeleton" style="height: 18px; width: 40%; margin-bottom: 8px;"></div>
-        <div class="skeleton" style="height: 24px; width: 70%; margin-bottom: 10px;"></div>
-        <div class="skeleton" style="height: 14px; width: 95%; margin-bottom: 6px;"></div>
-        <div class="skeleton" style="height: 14px; width: 85%;"></div>
-      </div>
-      <div class="result-card">
-        <div class="skeleton" style="height: 18px; width: 35%; margin-bottom: 8px;"></div>
-        <div class="skeleton" style="height: 24px; width: 65%; margin-bottom: 10px;"></div>
-        <div class="skeleton" style="height: 14px; width: 90%; margin-bottom: 6px;"></div>
-        <div class="skeleton" style="height: 14px; width: 75%;"></div>
-      </div>
-    `;
+    if (webResultsSection) {
+      webResultsSection.style.display = "flex";
+      webResultsSection.innerHTML = `
+        <div class="result-card">
+          <div class="skeleton" style="height: 18px; width: 40%; margin-bottom: 8px;"></div>
+          <div class="skeleton" style="height: 24px; width: 70%; margin-bottom: 10px;"></div>
+          <div class="skeleton" style="height: 14px; width: 95%; margin-bottom: 6px;"></div>
+          <div class="skeleton" style="height: 14px; width: 85%;"></div>
+        </div>
+        <div class="result-card">
+          <div class="skeleton" style="height: 18px; width: 35%; margin-bottom: 8px;"></div>
+          <div class="skeleton" style="height: 24px; width: 65%; margin-bottom: 10px;"></div>
+          <div class="skeleton" style="height: 14px; width: 90%; margin-bottom: 6px;"></div>
+          <div class="skeleton" style="height: 14px; width: 75%;"></div>
+        </div>
+      `;
+    }
 
     try {
       let fetchUrl = `/api/search?q=${encodeURIComponent(query)}&category=${encodeURIComponent(category)}`;
@@ -703,7 +712,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const resp = await apiFetch(fetchUrl);
       const data = await resp.json();
 
-      webResultsSection.innerHTML = "";
+      if (webResultsSection) webResultsSection.innerHTML = "";
 
       // Count notification
       if (resultsCountNotice) {
@@ -741,7 +750,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (err) {
       console.error("Search failed:", err);
-      webResultsSection.innerHTML = `<p style="color:var(--text-secondary); padding: 20px;">Search request failed. Please check connection.</p>`;
+      if (webResultsSection) webResultsSection.innerHTML = `<p style="color:var(--text-secondary); padding: 20px;">Search request failed. Please check connection.</p>`;
       if (resultsCountNotice) resultsCountNotice.textContent = "";
     }
   }
@@ -751,21 +760,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // 1. ALL Category (Web + Instant Answer + Destination + AI Overview)
   function renderAllCategory(data, query) {
     // Instant Math
-    if (data.instant_answer) {
-      calcExpr.textContent = `${data.instant_answer.expression} =`;
-      calcResult.textContent = data.instant_answer.result;
+    if (data.instant_answer && instantAnswerCard) {
+      if (calcExpr) calcExpr.textContent = `${data.instant_answer.expression} =`;
+      if (calcResult) calcResult.textContent = data.instant_answer.result;
       instantAnswerCard.style.display = "block";
     }
 
     // Destination Card
-    if (data.destination) {
+    if (data.destination && destinationCard) {
       populateDestinationCard(data.destination);
       destinationCard.style.display = "block";
     }
 
     // Visual Discovery Strip (All Tab)
     const previewImages = data.images || [];
-    if (previewImages.length > 0) {
+    if (previewImages.length > 0 && visualStripContainer && visualStripScroll) {
       visualStripScroll.innerHTML = previewImages.slice(0, 6).map(img => `
         <div class="visual-strip-item" title="${escapeHtml(img.title || query)}">
           <img src="${escapeHtml(img.url)}" alt="${escapeHtml(img.title || query)}" referrerpolicy="no-referrer" onerror="this.parentElement.style.display='none'" />
@@ -776,32 +785,34 @@ document.addEventListener("DOMContentLoaded", () => {
       visualStripScroll.querySelectorAll(".visual-strip-item").forEach((el, idx) => {
         el.addEventListener("click", () => {
           const img = previewImages[idx];
-          lightboxImg.src = img.url;
-          lightboxTitle.textContent = img.title || query;
-          lightboxVisitBtn.href = img.url;
-          lightboxModal.classList.add("open");
+          if (lightboxImg) lightboxImg.src = img.url;
+          if (lightboxTitle) lightboxTitle.textContent = img.title || query;
+          if (lightboxVisitBtn) lightboxVisitBtn.href = img.url;
+          if (lightboxModal) lightboxModal.classList.add("open");
         });
       });
-    } else {
+    } else if (visualStripContainer) {
       visualStripContainer.style.display = "none";
     }
 
     // Render Web Results
     const results = data.results || [];
-    if (results.length > 0) {
+    if (results.length > 0 && webResultsSection) {
       webResultsSection.style.display = "flex";
       results.forEach(item => {
         webResultsSection.appendChild(createWebResultCard(item));
       });
 
       // Trigger AI Overview async
-      aiOverviewCard.style.display = "block";
-      aiContent.innerHTML = `<div class="skeleton" style="height: 16px; width: 90%; margin-bottom: 8px;"></div><div class="skeleton" style="height: 16px; width: 75%;"></div>`;
-      aiSources.innerHTML = "";
-      fetchAiOverview(query, results);
+      if (aiOverviewCard && aiContent) {
+        aiOverviewCard.style.display = "block";
+        aiContent.innerHTML = `<div class="skeleton" style="height: 16px; width: 90%; margin-bottom: 8px;"></div><div class="skeleton" style="height: 16px; width: 75%;"></div>`;
+        if (aiSources) aiSources.innerHTML = "";
+        fetchAiOverview(query, results);
+      }
 
     } else if (!data.instant_answer && !data.destination && previewImages.length === 0) {
-      emptyState.style.display = "block";
+      if (emptyState) emptyState.style.display = "block";
     }
 
   }
@@ -1132,13 +1143,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Helper: Destination Card Population
   function populateDestinationCard(dest) {
+    if (!destinationCard) return;
     const images = (dest.images && dest.images.length > 0) ? dest.images : (dest.image ? [dest.image] : []);
     const destThumbsRow = document.getElementById("destThumbsRow");
 
-    if (images.length > 0) {
+    if (images.length > 0 && destHeroImg && destHeroImgWrap) {
       destHeroImg.src = images[0];
       destHeroImgWrap.style.display = "block";
-      destHeroImg.onerror = () => { destHeroImgWrap.style.display = "none"; };
+      destHeroImg.onerror = () => { if (destHeroImgWrap) destHeroImgWrap.style.display = "none"; };
 
       if (destThumbsRow) {
         destThumbsRow.innerHTML = images.map((img, idx) => `
@@ -1151,37 +1163,39 @@ document.addEventListener("DOMContentLoaded", () => {
           item.addEventListener("click", () => {
             destThumbsRow.querySelectorAll(".dest-thumb-item").forEach(t => t.classList.remove("active"));
             item.classList.add("active");
-            destHeroImg.src = item.getAttribute("data-src");
+            if (destHeroImg) destHeroImg.src = item.getAttribute("data-src");
           });
         });
       }
-    } else {
+    } else if (destHeroImgWrap) {
       destHeroImgWrap.style.display = "none";
       if (destThumbsRow) destThumbsRow.innerHTML = "";
     }
 
-    destTitle.textContent = dest.name || "Destination";
-    destCountry.textContent = dest.country || "";
-    destWeather.textContent = dest.weather || "Mild";
-    destTagline.textContent = dest.tagline || "";
-    destBestTime.textContent = `Best time: ${dest.best_time || 'All year'}`;
-    destDuration.textContent = `Recommended: ${dest.ideal_duration || '3-4 Days'}`;
+    if (destTitle) destTitle.textContent = dest.name || "Destination";
+    if (destCountry) destCountry.textContent = dest.country || "";
+    if (destWeather) destWeather.textContent = dest.weather || "Mild";
+    if (destTagline) destTagline.textContent = dest.tagline || "";
+    if (destBestTime) destBestTime.textContent = `Best time: ${dest.best_time || 'All year'}`;
+    if (destDuration) destDuration.textContent = `Recommended: ${dest.ideal_duration || '3-4 Days'}`;
 
-    destAttractions.innerHTML = (dest.attractions || []).map(att => `
-      <button class="attraction-chip" data-attr="${escapeHtml(att)}">${escapeHtml(att)}</button>
-    `).join("");
+    if (destAttractions) {
+      destAttractions.innerHTML = (dest.attractions || []).map(att => `
+        <button class="attraction-chip" data-attr="${escapeHtml(att)}">${escapeHtml(att)}</button>
+      `).join("");
 
-    destAttractions.querySelectorAll(".attraction-chip").forEach(chip => {
-      chip.addEventListener("click", () => {
-        const attr = chip.getAttribute("data-attr");
-        headerInput.value = `${dest.name} ${attr}`;
-        executeSearch(`${dest.name} ${attr}`, "all");
+      destAttractions.querySelectorAll(".attraction-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          const attr = chip.getAttribute("data-attr");
+          if (headerInput) headerInput.value = `${dest.name} ${attr}`;
+          executeSearch(`${dest.name} ${attr}`, "all");
+        });
       });
-    });
+    }
 
-    destMapsBtn.href = dest.maps_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dest.name)}`;
-    destHotelsBtn.href = dest.hotels_url || `https://www.google.com/travel/hotels?q=hotels+in+${encodeURIComponent(dest.name)}`;
-    destFlightsBtn.href = dest.flights_url || `https://www.google.com/travel/flights?q=flights+to+${encodeURIComponent(dest.name)}`;
+    if (destMapsBtn) destMapsBtn.href = dest.maps_url || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(dest.name)}`;
+    if (destHotelsBtn) destHotelsBtn.href = dest.hotels_url || `https://www.google.com/travel/hotels?q=hotels+in+${encodeURIComponent(dest.name)}`;
+    if (destFlightsBtn) destFlightsBtn.href = dest.flights_url || `https://www.google.com/travel/flights?q=flights+to+${encodeURIComponent(dest.name)}`;
   }
 
 
@@ -1211,7 +1225,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Copy Overview Button
-  copyOverviewBtn.addEventListener("click", () => {
+  safeOn(copyOverviewBtn, "click", () => {
     const text = aiContent.innerText;
     navigator.clipboard.writeText(text);
     copyOverviewBtn.innerHTML = `✓`;
@@ -1222,6 +1236,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Sidebar Related Queries
   function updateRelatedQueries(query) {
+    if (!relatedQueriesList) return;
     const suggestions = [
       `${query} guide`,
       `${query} latest news`,
@@ -1235,7 +1250,7 @@ document.addEventListener("DOMContentLoaded", () => {
     relatedQueriesList.querySelectorAll(".related-chip").forEach(chip => {
       chip.addEventListener("click", () => {
         const q = chip.getAttribute("data-q");
-        headerInput.value = q;
+        if (headerInput) headerInput.value = q;
         executeSearch(q, activeTab);
       });
     });
@@ -1267,18 +1282,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  closeReaderBtn.addEventListener("click", () => readerModal.classList.remove("open"));
-  readerFontInc.addEventListener("click", () => {
+  safeOn(closeReaderBtn, "click", () => readerModal.classList.remove("open"));
+  safeOn(readerFontInc, "click", () => {
     currentReaderFontSize = Math.min(1.6, currentReaderFontSize + 0.1);
     readerBody.style.fontSize = `${currentReaderFontSize}rem`;
   });
-  readerFontDec.addEventListener("click", () => {
+  safeOn(readerFontDec, "click", () => {
     currentReaderFontSize = Math.max(0.9, currentReaderFontSize - 0.1);
     readerBody.style.fontSize = `${currentReaderFontSize}rem`;
   });
 
   // Lightbox Close
-  closeLightboxBtn.addEventListener("click", () => lightboxModal.classList.remove("open"));
+  safeOn(closeLightboxBtn, "click", () => lightboxModal.classList.remove("open"));
 
   // Close modals on overlay click
   document.querySelectorAll(".modal-overlay").forEach(overlay => {
@@ -1313,18 +1328,18 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateUserUI(isLoggedIn) {
     if (isLoggedIn && currentUser) {
       const name = currentUser.name || currentUser.email.split("@")[0];
-      userAuthText.textContent = name;
-      dashAvatar.textContent = name.charAt(0).toUpperCase();
-      dashUserName.textContent = name;
-      dashUserEmail.textContent = currentUser.email;
+      if (userAuthText) userAuthText.textContent = name;
+      if (dashAvatar) dashAvatar.textContent = name.charAt(0).toUpperCase();
+      if (dashUserName) dashUserName.textContent = name;
+      if (dashUserEmail) dashUserEmail.textContent = currentUser.email;
     } else {
-      userAuthText.textContent = "Sign In";
-      dashUserName.textContent = "Guest User";
-      dashUserEmail.textContent = "Sign in to sync your search hub";
+      if (userAuthText) userAuthText.textContent = "Sign In";
+      if (dashUserName) dashUserName.textContent = "Guest User";
+      if (dashUserEmail) dashUserEmail.textContent = "Sign in to sync your search hub";
     }
   }
 
-  userAuthBtn.addEventListener("click", () => {
+  safeOn(userAuthBtn, "click", () => {
     if (currentUser) {
       openDashboard();
     } else {
@@ -1332,7 +1347,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  dashboardBtn.addEventListener("click", openDashboard);
+  safeOn(dashboardBtn, "click", openDashboard);
 
   function openDashboard() {
     if (!currentUser) {
@@ -1346,12 +1361,12 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPreferences();
   }
 
-  closeAuthModal.addEventListener("click", () => authModal.classList.remove("open"));
-  closeDashboardModal.addEventListener("click", () => dashboardModal.classList.remove("open"));
+  safeOn(closeAuthModal, "click", () => authModal.classList.remove("open"));
+  safeOn(closeDashboardModal, "click", () => dashboardModal.classList.remove("open"));
 
   // Tab switching between Sign In & Register
   let isRegisterMode = false;
-  tabSignIn.addEventListener("click", () => {
+  safeOn(tabSignIn, "click", () => {
     isRegisterMode = false;
     tabSignIn.classList.add("active");
     tabRegister.classList.remove("active");
@@ -1359,7 +1374,7 @@ document.addEventListener("DOMContentLoaded", () => {
     authSubmitBtn.textContent = "Sign In";
     authErrorMsg.style.display = "none";
   });
-  tabRegister.addEventListener("click", () => {
+  safeOn(tabRegister, "click", () => {
     isRegisterMode = true;
     tabRegister.classList.add("active");
     tabSignIn.classList.remove("active");
@@ -1368,7 +1383,7 @@ document.addEventListener("DOMContentLoaded", () => {
     authErrorMsg.style.display = "none";
   });
 
-  authForm.addEventListener("submit", async (e) => {
+  safeOn(authForm, "submit", async (e) => {
     e.preventDefault();
     authErrorMsg.style.display = "none";
     const email = authEmail.value.trim();
@@ -1400,7 +1415,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  signOutBtn.addEventListener("click", async () => {
+  safeOn(signOutBtn, "click", async () => {
     await apiFetch("/api/auth/logout", { method: "POST" });
     currentUser = null;
     updateUserUI(false);
@@ -1450,7 +1465,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  newCollectionBtn.addEventListener("click", async () => {
+  safeOn(newCollectionBtn, "click", async () => {
     const name = prompt("Enter new collection name (e.g., AI Research, Stays, Physics):");
     if (!name || !name.trim()) return;
     try {
@@ -1514,14 +1529,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  clearHistoryBtn.addEventListener("click", async () => {
+  safeOn(clearHistoryBtn, "click", async () => {
     if (confirm("Are you sure you want to clear your entire search history?")) {
       await apiFetch("/api/history/clear", { method: "POST" });
       loadHistory();
     }
   });
 
-  toggleHistoryBtn.addEventListener("click", async () => {
+  safeOn(toggleHistoryBtn, "click", async () => {
     const resp = await apiFetch("/api/history/toggle", { method: "POST" });
     const data = await resp.json();
     toggleHistoryBtn.textContent = data.history_enabled ? "Pause History" : "Resume History";
@@ -1568,7 +1583,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  savedFilterSelect.addEventListener("change", () => {
+  safeOn(savedFilterSelect, "change", () => {
     loadSavedBookmarks(savedFilterSelect.value);
   });
 
@@ -1583,9 +1598,9 @@ document.addEventListener("DOMContentLoaded", () => {
     saveResultModal.classList.add("open");
   }
 
-  closeSaveResultModal.addEventListener("click", () => saveResultModal.classList.remove("open"));
+  safeOn(closeSaveResultModal, "click", () => saveResultModal.classList.remove("open"));
 
-  confirmSaveBtn.addEventListener("click", async () => {
+  safeOn(confirmSaveBtn, "click", async () => {
     if (!pendingSaveItem) return;
     const selectedCollection = saveCollectionSelect.value || "General";
     try {
@@ -1639,13 +1654,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  prefSafeSearch.addEventListener("change", savePreferences);
-  prefNewTab.addEventListener("change", savePreferences);
-  prefHistoryEnabled.addEventListener("change", savePreferences);
-  prefPersonalized.addEventListener("change", savePreferences);
+  safeOn(prefSafeSearch, "change", savePreferences);
+  safeOn(prefNewTab, "change", savePreferences);
+  safeOn(prefHistoryEnabled, "change", savePreferences);
+  safeOn(prefPersonalized, "change", savePreferences);
 
   // Export User Data
-  exportDataBtn.addEventListener("click", async () => {
+  safeOn(exportDataBtn, "click", async () => {
     try {
       const resp = await apiFetch("/api/export");
       const data = await resp.json();
