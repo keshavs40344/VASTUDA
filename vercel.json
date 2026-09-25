@@ -6,6 +6,10 @@
       "destination": "/api/health"
     },
     {
+      "source": "/api/health",
+      "destination": "/api/health"
+    },
+    {
       "source": "/api/search",
       "destination": "/api/search"
     },
