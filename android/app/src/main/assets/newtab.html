@@ -342,7 +342,8 @@
               } else if (isDomain) {
                 target = 'https://' + val;
               } else {
-                target = 'https://patrick-downloadable-presidential-emma.trycloudflare.com/?q=' + encodeURIComponent(val);
+                const searchBase = window.STAUNT_SEARCH_BASE || 'https://staunt.vercel.app/?q=';
+                target = searchBase + encodeURIComponent(val);
               }
             }
             window.location.href = target;

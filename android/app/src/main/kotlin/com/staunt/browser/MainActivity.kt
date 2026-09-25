@@ -55,7 +55,14 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val NEW_TAB_URL = "file:///android_asset/newtab.html"
-        const val STAUNT_SEARCH_BASE = "https://patrick-downloadable-presidential-emma.trycloudflare.com/?q="
+        val STAUNT_SEARCH_BASE: String
+            get() {
+                val prop = System.getProperty("staunt.search.url")
+                if (!prop.isNullOrBlank()) {
+                    return if (prop.endsWith("?q=")) prop else "$prop/?q="
+                }
+                return "https://staunt.vercel.app/?q="
+            }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -345,6 +352,8 @@ class MainActivity : AppCompatActivity() {
             allowFileAccess = true
             allowContentAccess = true
             mediaPlaybackRequiresUserGesture = false
+            mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+            javaScriptCanOpenWindowsAutomatically = true
             cacheMode = WebSettings.LOAD_DEFAULT
         }
 

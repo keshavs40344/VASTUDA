@@ -1,7 +1,8 @@
-﻿package com.staunt.browser
+package com.staunt.browser
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.webkit.*
@@ -16,12 +17,24 @@ class StauntWebViewClient(
 ) : WebViewClient() {
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-        view.loadUrl(request.url.toString())
-        return true
+        val url = request.url.toString()
+        val scheme = request.url.scheme?.lowercase() ?: ""
+        if (scheme == "http" || scheme == "https" || scheme == "file" || scheme == "about") {
+            return false
+        }
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, request.url)
+            intent.addCategory(Intent.CATEGORY_BROWSABLE)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+            return true
+        } catch (e: Exception) {
+            return true
+        }
     }
 
     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-        if (adBlockEngine.shouldBlock(request.url.toString())) {
+        if (!request.isForMainFrame && adBlockEngine.shouldBlock(request.url.toString())) {
             return WebResourceResponse("text/plain", "UTF-8", ByteArrayInputStream("".toByteArray()))
         }
         return super.shouldInterceptRequest(view, request)

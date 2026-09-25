@@ -81,7 +81,9 @@ function isHomographOrDeceptive(urlStr) {
     }
     // Check for deceptive brand spoofing (e.g. paypa1, go0gle, app1e)
     if (/paypa[l1i]|g[o0]{2}g[l1]e|micr[o0]s[o0]ft|app[l1]e-secure|netflix-login/i.test(host)) {
-      if (!host.endsWith('.paypal.com') && !host.endsWith('.google.com') && !host.endsWith('.microsoft.com') && !host.endsWith('.apple.com') && !host.endsWith('.netflix.com')) {
+      const LEGIT_DOMAINS = ['paypal.com', 'google.com', 'microsoft.com', 'apple.com', 'netflix.com'];
+      const isLegit = LEGIT_DOMAINS.some(d => host === d || host.endsWith('.' + d)) || /^(?:[a-zA-Z0-9-]+\.)*google\.[a-z.]+$/i.test(host);
+      if (!isLegit) {
         return true;
       }
     }
