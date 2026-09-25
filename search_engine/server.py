@@ -12,54 +12,53 @@ import requests
 from dotenv import load_dotenv
 
 import sys
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if BASE_DIR not in sys.path:
-    sys.path.insert(0, BASE_DIR)
+import types
+BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+SEARCH_ENGINE_DIR = os.path.dirname(BACKEND_DIR)
+STAUNT_ROOT = os.path.dirname(SEARCH_ENGINE_DIR)
+BASE_DIR = STAUNT_ROOT
+
+if BACKEND_DIR not in sys.path:
+    sys.path.insert(0, BACKEND_DIR)
+
+if "search_engine" not in sys.modules:
+    _pkg = types.ModuleType("search_engine")
+    _pkg.__path__ = [BACKEND_DIR]
+    sys.modules["search_engine"] = _pkg
 
 # Import database, indexer, crawler, and search core modules
-try:
-    from search_engine import db
-    from search_engine import search_core
-    from search_engine import indexer
-    from search_engine import crawler
-    from search_engine import query_engine
-    from search_engine import spell_checker
-    from search_engine.search_validator import (
-        normalize_url, validate_result, deduplicate_results, safe_snippet
-    )
-except ImportError:
-    import db
-    import search_core
-    import indexer
-    import crawler
-    import query_engine
-    import spell_checker
-    from search_validator import (
-        normalize_url, validate_result, deduplicate_results, safe_snippet
-    )
-
+import db
+import search_core
+import indexer
+import crawler
+import query_engine
+import spell_checker
+from search_validator import (
+    normalize_url, validate_result, deduplicate_results, safe_snippet
+)
 
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("VASTUDA_Server")
+logger = logging.getLogger("STAUNT_Server")
 
-app = Flask(__name__, template_folder="templates", static_folder="static")
+TEMPLATES_DIR = os.path.join(SEARCH_ENGINE_DIR, "templates")
+STATIC_DIR = os.path.join(SEARCH_ENGINE_DIR, "static")
+app = Flask(__name__, template_folder=TEMPLATES_DIR, static_folder=STATIC_DIR)
 
-# --- SECRET KEY: no insecure hardcoded fallback ---
-_secret_key = os.getenv("SECRET_KEY", "").strip()
-if not _secret_key:
-    _is_local = os.getenv("FLASK_ENV", "production").lower() in ("development", "dev", "local")
-    if _is_local:
-        import secrets as _secrets
-        _secret_key = _secrets.token_hex(32)
-        logger.warning("[SECURITY] SECRET_KEY not set; using random ephemeral key (dev mode). Set SECRET_KEY env var for production.")
+# --- SECRET KEY: safe retrieval via config with production error logging ---
+try:
+    from config import get_secret_key
+    app.secret_key = get_secret_key(STAUNT_ROOT)
+except Exception as _e:
+    logger.error(f"[CONFIG] Error loading secret key from config: {_e}")
+    _raw_key = os.getenv("SECRET_KEY", "").strip()
+    if _raw_key:
+        app.secret_key = _raw_key
     else:
-        logger.critical("[SECURITY] SECRET_KEY env var is not set. Refusing to start in production without a secure secret.")
-        raise RuntimeError("SECRET_KEY environment variable must be set in production. Aborting startup.")
-app.secret_key = _secret_key
+        app.secret_key = hashlib.sha256(f"staunt-sovereign-{STAUNT_ROOT}".encode("utf-8")).hexdigest()
 
-ASSETS_DIR = os.path.join(BASE_DIR, "public", "assets")
+ASSETS_DIR = os.path.join(STAUNT_ROOT, "releases")
 
 def ensure_seed_index():
     """Ensure foundational documents exist in local index on fresh deployments."""
@@ -71,7 +70,8 @@ def ensure_seed_index():
     except Exception as e:
         logger.warning(f"Seed crawl check note: {e}")
 
-threading.Thread(target=ensure_seed_index, daemon=True).start()
+if not os.getenv("VERCEL"):
+    threading.Thread(target=ensure_seed_index, daemon=True).start()
 
 # --- Production Security & Rate Limiting ---
 RATE_LIMIT_BUCKETS = {}
@@ -128,7 +128,6 @@ def is_rate_limited_for_path(ip, path):
 
 # --- CORS: allowed origins (non-wildcard in production) ---
 _DEFAULT_ORIGINS = ",".join([
-    "https://vastuda-search.onrender.com",
     "http://localhost:5000",
     "http://127.0.0.1:5000",
     "http://localhost:3000",
@@ -136,6 +135,9 @@ _DEFAULT_ORIGINS = ",".join([
 ])
 _ALLOWED_ORIGINS_RAW = os.getenv("ALLOWED_ORIGINS", _DEFAULT_ORIGINS)
 ALLOWED_ORIGINS = set(o.strip() for o in _ALLOWED_ORIGINS_RAW.split(",") if o.strip())
+_pub_url = os.getenv("STAUNT_PUBLIC_URL", "").strip()
+if _pub_url:
+    ALLOWED_ORIGINS.add(_pub_url)
 
 def _get_cors_origin(request_origin):
     """Return the matching allowed origin or None."""
@@ -198,14 +200,20 @@ def add_security_headers(response):
 
     # --- Content-Security-Policy ---
     # Compatible with VASTUDA search UI: allows inline styles/scripts (needed for the
-    # existing vanilla-JS UI), Wikimedia images, Google Fonts, and external APIs.
+    # Dynamic connect-src: allows 'self', localhost, and explicitly configured STAUNT_PUBLIC_URL
+    connect_sources = ["'self'", "http://localhost:5000", "http://127.0.0.1:5000"]
+    public_url = os.getenv("STAUNT_PUBLIC_URL", "").strip()
+    if public_url and public_url not in connect_sources:
+        connect_sources.append(public_url)
+    connect_src_str = " ".join(connect_sources)
+
     csp = (
         "default-src 'self'; "
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         "font-src 'self' https://fonts.gstatic.com data:; "
         "img-src 'self' data: https: blob:; "
-        "connect-src 'self' https://vastuda-search.onrender.com https://paying-andrews-focused-potential.trycloudflare.com http://localhost:5000 http://127.0.0.1:5000; "
+        f"connect-src {connect_src_str}; "
         "media-src 'self' blob:; "
         "object-src 'none'; "
         "base-uri 'self'; "
@@ -256,7 +264,7 @@ def health_check():
     return jsonify({
         "status": "ok",
         "version": "5.4",
-        "service": "VASTUDA Sovereign Search & Discovery Engine",
+        "service": "STAUNT Sovereign Search & Discovery Engine",
         "timestamp": int(time.time())
     })
 
@@ -301,9 +309,23 @@ def handle_not_found(e):
 
 @app.errorhandler(500)
 def handle_server_error(e):
-    logger.error(f"Internal server error on {request.path}: {e}")
-    if request.path.startswith("/api/"):
-        return jsonify({"error": "Internal server error", "status": 500}), 500
+    import traceback
+    tb = traceback.format_exc()
+    logger.error(f"[500_INTERNAL_SERVER_ERROR] {request.method} {request.path}: {e}\n{tb}")
+    if request.path.startswith("/api/") or request.path == "/health":
+        return jsonify({"error": "Internal server error", "status": 500, "path": request.path}), 500
+    return render_template("index.html"), 500
+
+@app.errorhandler(Exception)
+def handle_unhandled_exception(e):
+    from werkzeug.exceptions import HTTPException
+    if isinstance(e, HTTPException):
+        return e
+    import traceback
+    tb = traceback.format_exc()
+    logger.error(f"[UNHANDLED_EXCEPTION] Crash on {request.method} {request.path}: {e}\n{tb}")
+    if request.path.startswith("/api/") or request.path == "/health":
+        return jsonify({"error": "Internal server error", "status": 500, "path": request.path}), 500
     return render_template("index.html"), 500
 
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "")
@@ -712,6 +734,7 @@ def extract_article_content(target_url):
 # --- Web Page Routes ---
 
 @app.route("/")
+@app.route("/api/index")
 def index():
     return render_template("index.html")
 
@@ -733,20 +756,42 @@ def research_page():
 
 @app.route("/download/windows")
 def download_windows():
-    for name in ["Staunt Browser Ultra Setup 2.0.0.exe", "Staunt-Browser-Setup.exe"]:
+    for name in ["STAUNT-Windows-Setup.exe", "Staunt-Browser-Setup.exe", "Staunt Browser Ultra Setup 2.0.0.exe"]:
         p = os.path.join(ASSETS_DIR, name)
         if os.path.exists(p):
-            return send_file(p, as_attachment=True, download_name="Staunt-Browser-Setup.exe")
-    return jsonify({"error": "Windows installer binary not found in server assets"}), 404
+            return send_file(p, as_attachment=True, download_name="STAUNT-Windows-Setup.exe")
+    return jsonify({"error": "Windows installer binary not found in releases"}), 404
+
+
+@app.route("/download/windows-portable")
+def download_windows_portable():
+    for name in ["STAUNT-Windows-Portable.zip", "Staunt-Browser-Windows-Setup.zip"]:
+        p = os.path.join(ASSETS_DIR, name)
+        if os.path.exists(p):
+            return send_file(p, as_attachment=True, download_name="STAUNT-Windows-Portable.zip")
+    return jsonify({"error": "Windows portable package not found in releases"}), 404
 
 
 @app.route("/download/android")
 def download_android():
-    for name in ["staunt-browser-release.apk", "Staunt-Browser-Mobile.apk"]:
+    for name in ["STAUNT-Android.apk", "staunt-browser-release.apk", "Staunt-Browser-Mobile.apk"]:
         p = os.path.join(ASSETS_DIR, name)
         if os.path.exists(p):
-            return send_file(p, as_attachment=True, download_name="Staunt-Browser-Mobile.apk")
-    return jsonify({"error": "Android APK binary not found in server assets"}), 404
+            return send_file(p, as_attachment=True, download_name="STAUNT-Android.apk")
+    return jsonify({"error": "Android APK binary not found in releases"}), 404
+
+
+@app.route("/api/releases", methods=["GET"])
+def api_releases():
+    manifest_path = os.path.join(ASSETS_DIR, "releases.json")
+    if os.path.exists(manifest_path):
+        try:
+            with open(manifest_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            return jsonify(data)
+        except Exception as e:
+            return jsonify({"error": f"Failed to parse releases manifest: {e}"}), 500
+    return jsonify([]), 404
 
 
 @app.route("/assets/<path:filename>")
@@ -964,7 +1009,10 @@ def api_export_data():
 def api_search():
     t_start = time.time()
     req_id = uuid.uuid4().hex[:12]
-    query = request.args.get("q", "").strip()[:500]
+    raw_q = request.args.get("q", "")
+    if len(raw_q) > 4000:
+        return jsonify({"error": "Query payload exceeds maximum allowed size", "request_id": req_id}), 400
+    query = raw_q.strip()[:500]
     category = request.args.get("category", "all").strip().lower()
     time_filter = request.args.get("time", "").strip().lower()
     if time_filter not in ["day", "week", "month", "year"]:
@@ -1449,7 +1497,6 @@ def api_crawler_status():
     except Exception as e:
         logger.error(f"Crawler status endpoint error: {e}")
         return jsonify({"status": "error", "error": str(e)}), 500
-
 
 @app.route("/api/reader", methods=["GET"])
 def api_reader():
