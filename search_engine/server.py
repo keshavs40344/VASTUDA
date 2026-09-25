@@ -209,8 +209,16 @@ def add_security_headers(response):
 
     # --- Content-Security-Policy ---
     # Compatible with VASTUDA search UI: allows inline styles/scripts (needed for the
-    # Dynamic connect-src: allows 'self', localhost, and explicitly configured STAUNT_PUBLIC_URL
-    connect_sources = ["'self'", "http://localhost:5000", "http://127.0.0.1:5000"]
+    # Dynamic connect-src: allows 'self', localhost, Render backend, and explicitly configured STAUNT_PUBLIC_URL
+    connect_sources = [
+        "'self'",
+        "http://localhost:5000",
+        "http://127.0.0.1:5000",
+        "https://staunt.onrender.com",
+        "https://*.onrender.com",
+        "https://staunt.vercel.app",
+        "https://*.vercel.app"
+    ]
     public_url = os.getenv("STAUNT_PUBLIC_URL", "").strip()
     if public_url and public_url not in connect_sources:
         connect_sources.append(public_url)
