@@ -1,6 +1,24 @@
 // VASTUDA — Independent AI Discovery & Neural Web Engine Client Logic
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Centralized Backend Resolution: Route Vercel Frontend Traffic to Render Backend
+  const RENDER_BACKEND_URL = "https://staunt.onrender.com";
+  const isVercel = window.location.hostname.endsWith(".vercel.app") || window.location.hostname === "staunt.vercel.app";
+  const API_BASE = (window.STAUNT_BACKEND_URL !== undefined) ? window.STAUNT_BACKEND_URL : (isVercel ? RENDER_BACKEND_URL : "");
+
+  async function apiFetch(path, options) {
+    if (API_BASE && typeof path === "string" && path.startsWith("/api/")) {
+      const fullUrl = `${API_BASE}${path}`;
+      try {
+        const resp = await fetch(fullUrl, options);
+        if (resp.ok) return resp;
+      } catch (err) {
+        console.warn(`[STAUNT] Backend request to ${fullUrl} failed, falling back to local:`, err);
+      }
+    }
+    return fetch(path, options);
+  }
+
   // State
   let currentQuery = "";
   let activeTab = "all";
@@ -416,7 +434,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       timeout = setTimeout(async () => {
         try {
-          const resp = await fetch(`/api/suggest?q=${encodeURIComponent(val)}`);
+          const resp = await apiFetch(`/api/suggest?q=${encodeURIComponent(val)}`);
           const items = await resp.json();
           renderSuggestions(items, false);
         } catch (e) {
@@ -682,7 +700,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (currentTimeFilter) {
         fetchUrl += `&time=${encodeURIComponent(currentTimeFilter)}`;
       }
-      const resp = await fetch(fetchUrl);
+      const resp = await apiFetch(fetchUrl);
       const data = await resp.json();
 
       webResultsSection.innerHTML = "";
@@ -1170,7 +1188,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Async AI Overview Fetcher
   async function fetchAiOverview(query, results) {
     try {
-      const resp = await fetch("/api/overview", {
+      const resp = await apiFetch("/api/overview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query, results })
@@ -1238,7 +1256,7 @@ document.addEventListener("DOMContentLoaded", () => {
     readerModal.classList.add("open");
 
     try {
-      const resp = await fetch(`/api/reader?url=${encodeURIComponent(url)}`);
+      const resp = await apiFetch(`/api/reader?url=${encodeURIComponent(url)}`);
       const data = await resp.json();
       readerTitle.textContent = data.title || title;
       readerDomainBadge.textContent = data.domain || domain;
@@ -1276,7 +1294,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Check auth state on launch
   async function checkAuth() {
     try {
-      const resp = await fetch("/api/auth/me");
+      const resp = await apiFetch("/api/auth/me");
       const data = await resp.json();
       if (data.authenticated && data.user) {
         currentUser = data.user;
@@ -1383,7 +1401,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   signOutBtn.addEventListener("click", async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await apiFetch("/api/auth/logout", { method: "POST" });
     currentUser = null;
     updateUserUI(false);
     dashboardModal.classList.remove("open");
@@ -1405,7 +1423,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadCollections() {
     if (!currentUser) return;
     try {
-      const resp = await fetch("/api/collections");
+      const resp = await apiFetch("/api/collections");
       const data = await resp.json();
       userCollections = data.collections || [];
 
@@ -1436,7 +1454,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const name = prompt("Enter new collection name (e.g., AI Research, Stays, Physics):");
     if (!name || !name.trim()) return;
     try {
-      const resp = await fetch("/api/collections", {
+      const resp = await apiFetch("/api/collections", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), description: "Personal collection" })
@@ -1453,7 +1471,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadHistory() {
     if (!currentUser) return;
     try {
-      const resp = await fetch("/api/history?limit=40");
+      const resp = await apiFetch("/api/history?limit=40");
       const data = await resp.json();
       const items = data.history || [];
 
@@ -1486,7 +1504,7 @@ document.addEventListener("DOMContentLoaded", () => {
       historyList.querySelectorAll(".delete-item-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
           const id = btn.getAttribute("data-id");
-          await fetch(`/api/history/${id}`, { method: "DELETE" });
+          await apiFetch(`/api/history/${id}`, { method: "DELETE" });
           loadHistory();
         });
       });
@@ -1498,13 +1516,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   clearHistoryBtn.addEventListener("click", async () => {
     if (confirm("Are you sure you want to clear your entire search history?")) {
-      await fetch("/api/history/clear", { method: "POST" });
+      await apiFetch("/api/history/clear", { method: "POST" });
       loadHistory();
     }
   });
 
   toggleHistoryBtn.addEventListener("click", async () => {
-    const resp = await fetch("/api/history/toggle", { method: "POST" });
+    const resp = await apiFetch("/api/history/toggle", { method: "POST" });
     const data = await resp.json();
     toggleHistoryBtn.textContent = data.history_enabled ? "Pause History" : "Resume History";
   });
@@ -1540,7 +1558,7 @@ document.addEventListener("DOMContentLoaded", () => {
       savedResultsList.querySelectorAll(".delete-item-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
           const id = btn.getAttribute("data-id");
-          await fetch(`/api/saved/${id}`, { method: "DELETE" });
+          await apiFetch(`/api/saved/${id}`, { method: "DELETE" });
           loadSavedBookmarks(savedFilterSelect.value);
         });
       });
@@ -1571,7 +1589,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!pendingSaveItem) return;
     const selectedCollection = saveCollectionSelect.value || "General";
     try {
-      const resp = await fetch("/api/saved", {
+      const resp = await apiFetch("/api/saved", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1596,7 +1614,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadPreferences() {
     if (!currentUser) return;
     try {
-      const resp = await fetch("/api/preferences");
+      const resp = await apiFetch("/api/preferences");
       const data = await resp.json();
       const p = data.preferences || {};
       prefSafeSearch.value = p.safe_search || "moderate";
@@ -1614,7 +1632,7 @@ document.addEventListener("DOMContentLoaded", () => {
       history_enabled: prefHistoryEnabled.checked,
       personalized: prefPersonalized.checked
     };
-    fetch("/api/preferences", {
+    apiFetch("/api/preferences", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -1629,7 +1647,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Export User Data
   exportDataBtn.addEventListener("click", async () => {
     try {
-      const resp = await fetch("/api/export");
+      const resp = await apiFetch("/api/export");
       const data = await resp.json();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -1752,7 +1770,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const headerWeatherPill = document.getElementById("headerWeatherPill");
 
     try {
-      const res = await fetch("/api/weather");
+      const res = await apiFetch("/api/weather");
       if (res.ok) {
         const data = await res.json();
         if (weatherIcon) weatherIcon.textContent = data.icon || "🌤️";
@@ -1781,7 +1799,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const newsCatFilters = document.querySelectorAll(".news-filter-btn");
 
     try {
-      const res = await fetch("/api/trending");
+      const res = await apiFetch("/api/trending");
       if (!res.ok) return;
       const data = await res.json();
 
@@ -1855,7 +1873,7 @@ document.addEventListener("DOMContentLoaded", () => {
           } else {
             try {
               trendingNewsGrid.innerHTML = `<div class="news-skeleton">Loading ${cat} stories...</div>`;
-              const res = await fetch(`/api/search?q=${encodeURIComponent(cat + " news")}&category=news`);
+              const res = await apiFetch(`/api/search?q=${encodeURIComponent(cat + " news")}&category=news`);
               if (res.ok) {
                 const ndata = await res.json();
                 renderNews(ndata.news || allNews);
